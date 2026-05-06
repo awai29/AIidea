@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 點子池 — 平台體驗升級計劃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.16);
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --faint: #b0afa8;
+
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.09);
+  --green-mid: rgba(22,163,74,0.2);
+  --amber: #b45309;
+  --amber-dim: rgba(180,83,9,0.09);
+  --blue: #1d4ed8;
+  --blue-dim: rgba(29,78,216,0.09);
+  --pink: #be185d;
+  --pink-dim: rgba(190,24,93,0.09);
+  --purple: #6d28d9;
+  --purple-dim: rgba(109,40,217,0.09);
+  --coral: #c2410c;
+  --coral-dim: rgba(194,65,12,0.09);
+  --teal: #0f766e;
+  --teal-dim: rgba(15,118,110,0.09);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 3rem 2.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-left {}
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: .6rem;
+}
+h1 {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -.02em;
+  line-height: 1.2;
+}
+h1 span { color: var(--green); }
+.header-sub {
+  margin-top: .5rem;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 300;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+.stat {
+  text-align: center;
+  padding: .75rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.stat-n {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.stat-l {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+  margin-top: 2px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  padding: 1.25rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245,244,240,.9);
+  backdrop-filter: blur(12px);
+}
+.filter-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.fb {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Sora', sans-serif;
+  white-space: nowrap;
+}
+.fb:hover { border-color: var(--border-hover); color: var(--text); background: var(--surface); }
+.fb.on { border-color: transparent; color: #ffffff; font-weight: 500; }
+.fb.on.f-all    { background: #1a1a1a; }
+.fb.on.f-ux     { background: var(--teal); }
+.fb.on.f-ui     { background: var(--blue); }
+.fb.on.f-fe     { background: var(--purple); }
+.fb.on.f-be     { background: var(--amber); }
+.fb.on.f-ai     { background: var(--pink); }
+.fb.on.f-mkt    { background: var(--coral); }
+.fb.on.f-predict{ background: var(--green); }
+.fb.on.f-boost  { background: var(--amber); }
+
+/* ── MAIN ── */
+main {
+  padding: 2rem 2.5rem 4rem;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.section-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: background .2s;
+  position: relative;
+}
+.card:hover { background: var(--surface2); }
+.card.open { background: var(--surface2); }
+.card.open::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent-color, var(--green));
+}
+
+.new-dot {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--pink);
+}
+
+.ctop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.cico {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+.cname {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.tags {
+  display: flex; gap: 4px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .03em;
+}
+.tag-ui      { background: var(--blue-dim);   color: var(--blue); }
+.tag-ux      { background: var(--teal-dim);   color: var(--teal); }
+.tag-fe      { background: var(--purple-dim); color: var(--purple); }
+.tag-be      { background: var(--amber-dim);  color: var(--amber); }
+.tag-ai      { background: var(--pink-dim);   color: var(--pink); }
+.tag-mkt     { background: var(--coral-dim);  color: var(--coral); }
+.tag-predict { background: var(--green-dim);  color: var(--green); }
+.tag-boost   { background: var(--amber-dim);  color: var(--amber); }
+.tag-easy    { background: rgba(22,163,74,.1);   color: #15803d; }
+.tag-mid     { background: rgba(180,83,9,.1);    color: #b45309; }
+.tag-hard    { background: rgba(194,65,12,.1);   color: #c2410c; }
+
+.cdesc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+/* ── DETAIL ── */
+.detail {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.detail.open { display: block; }
+
+.dsec { margin-bottom: 12px; }
+.dl {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 4px;
+}
+.db {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+  font-weight: 300;
+}
+.db ul { padding-left: 1.1rem; }
+.db li { margin-bottom: 2px; }
+
+.code {
+  background: #f0efe9;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  color: #4a4a5a;
+  margin-top: 5px;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.disc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border-hover);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Sora', sans-serif;
+  transition: all .2s;
+}
+.disc-btn:hover {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 300;
+}
+
+/* ── LEGEND ── */
+.legend {
+  padding: .75rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+.legend-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="eyebrow">AI Strategy · iGaming Platform</div>
+    <h1>點子池 <span>全覽</span></h1>
+    <p class="header-sub">平台體驗 · 新客獲取 · 存款提升 · 風控保留 — Angular 技術方向</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-n" id="sTotal">24</div>
+      <div class="stat-l">TOTAL IDEAS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="sShown">24</div>
+      <div class="stat-l">SHOWING</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">4</div>
+      <div class="stat-l">CATEGORIES</div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span class="filter-label">篩選</span>
+  <div class="filters">
+    <button class="fb f-all on" onclick="fil('all',this)">全部</button>
+    <button class="fb f-ui"      onclick="fil('ui',this)">UI</button>
+    <button class="fb f-ux"      onclick="fil('ux',this)">UX</button>
+    <button class="fb f-fe"      onclick="fil('fe',this)">前端</button>
+    <button class="fb f-be"      onclick="fil('be',this)">後端</button>
+    <button class="fb f-ai"      onclick="fil('ai',this)">AI 模型</button>
+    <button class="fb f-mkt"     onclick="fil('mkt',this)">行銷</button>
+    <button class="fb f-predict" onclick="fil('predict',this)">預測存款</button>
+    <button class="fb f-boost"   onclick="fil('boost',this)">提升金額</button>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>新加入點子</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#15803d"></div>低複雜度</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div>中複雜度</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c2410c"></div>高複雜度</div>
+</div>
+
+<script>
+const CATS = [
+  { key:'platform',    label:'平台體驗 — 個人化與預測', accent:'var(--blue)' },
+  { key:'acquisition', label:'新客獲取 — Landing Page 到首次存款', accent:'var(--coral)' },
+  { key:'deposit',     label:'存款提升 — 預測與轉換', accent:'var(--green)' },
+  { key:'risk',        label:'風控與保留 — 流失與異常', accent:'var(--amber)' },
+];
+
+const ALL = [
+  // ── PLATFORM ──
+  {id:'p1',cat:'platform',isNew:false,name:'首頁動態排版',ico:'≡',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['ui','fe','be'],diff:'mid',
+   desc:'首頁模組順序由後端 AI 排序結果驅動，Angular 動態渲染，不再寫死版型。',
+   why:'動態排版在 CTR 上持續優於固定版型，核心是讓首頁結構本身就是個人化的。',
+   angular:['LayoutService 取 moduleOrder[] 存入 Signal','@for + trackBy 依序渲染不寫死','Angular Animation 做位移動畫'],
+   code:`moduleOrder = signal<string[]>([]);
+fetchLayout() {
+  this.http.get<string[]>('/api/layout/user')
+    .subscribe(o => this.moduleOrder.set(o));
+}`,
+   predict:'首頁結構本身就是預測結果，用戶不需滾動就能找到想看的區塊。',
+   api:'GET /api/layout/user → string[]'},
+
+  {id:'p2',cat:'platform',isNew:false,name:'AI 推薦區塊（三層混合）',ico:'✦',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   desc:'「為你推薦」從後端拿 Played / Similar / Trending 三層結果合併渲染，附來源標籤。',
+   why:'三層混搭讓推薦兼顧個人化與新鮮感，避免同溫層效應。',
+   angular:['forkJoin 同時打三支 API','卡片帶 source badge（因為你玩過 / 熱門中）','Skeleton loading 避免版面跳動'],
+   code:`return forkJoin({
+  played:   this.http.get('/api/rec/played'),
+  similar:  this.http.get('/api/rec/similar'),
+  trending: this.http.get('/api/rec/trending')
+});`,
+   predict:'每次進 app AI 已根據最近行為預備好內容。',
+   api:'GET /api/rec/played, /similar, /trending'},
+
+  {id:'p3',cat:'platform',isNew:false,name:'導覽選單個人化排序',ico:'☰',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'mid',
+   desc:'NavBar 分類順序從用戶偏好分數動態渲染，新用戶走熱門排序，行為累積後漸進個人化。',
+   why:'選單重排能明顯提升常用功能的可達性，降低操作步驟數。',
+   angular:['UserPreferenceService 取 categoryOrder Signal','@for 渲染不寫死 nav item 陣列','新用戶 fallback 全站熱門排序','OnPush ChangeDetection 減少重繪'],
+   code:`categories = computed(() =>
+  this.prefSvc.categoryOrder()
+  ?? this.prefSvc.globalDefault());`,
+   predict:'最常去的頁面自然靠近拇指熱區，減少尋找時間。',
+   api:'GET /api/user/nav-order → CategoryItem[]'},
+
+  {id:'p4',cat:'platform',isNew:false,name:'押注金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'mid',
+   desc:'金額快捷按鈕從後端取個人化預設值，不寫死，讓輸入行為更直覺。',
+   why:'個人化預設讓用戶少一個輸入動作，與歷史習慣一致。',
+   angular:['AmountPresetComponent @Input presets:number[]','BettingService 開面板時 call API','presets 快取 SessionStorage 同 session 不重複 fetch'],
+   code:`presets = signal<number[]>([]);
+ngOnInit() {
+  this.bettingSvc.getPresets()
+    .subscribe(p => this.presets.set(p));
+}`,
+   predict:'系統記得習慣金額，下次開面板就已備好選項。',
+   api:'GET /api/user/amount-presets → number[]'},
+
+  {id:'p5',cat:'platform',isNew:false,name:'熱門趨勢提前標籤',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ui','fe','ai'],diff:'easy',
+   desc:'後端偵測互動量快速上升的內容，前端在卡片上附「即將熱門」標籤。',
+   why:'Early Trend Detection 讓平台在內容飽和前完成曝光布局，用戶感受到「眼光」。',
+   angular:['ContentCard @Input trendTag (hot_soon | rising | null)','後端 list API 帶 trendTag 欄位','@if 條件顯示，Angular Animation 自然出現'],
+   code:`@if (trendTag === 'hot_soon') {
+  <span class="trend-badge">即將熱門</span>
+}`,
+   predict:'用戶看到標籤就知道平台比別人早一步推薦。',
+   api:'GET /api/content/list → [..., { trendTag }]'},
+
+  {id:'p6',cat:'platform',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
+   types:['ux','be','ai'],diff:'hard',
+   desc:'活動推薦依用戶行為畫像動態配對，前端顯示推薦理由，提升點擊意願。',
+   why:'全站廣播 CTR 遠低於個人化推薦，推薦理由更能建立信任。',
+   angular:['PromoCard @Input reason 欄位渲染說明','PromotionService 取 /api/promo/personalized','IntersectionObserver 曝光追蹤回傳後端'],
+   code:`@Input() promo!: {
+  title: string;
+  reason: string; // '根據你的常玩類型'
+  cta: string;
+};`,
+   predict:'用戶看到的活動是系統預測他現在最感興趣的。',
+   api:'GET /api/promo/personalized → Promo[]（含 reason）'},
+
+  {id:'p7',cat:'platform',isNew:false,name:'情境式 AI 客服',ico:'◈',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['ui','ux','fe','ai'],diff:'mid',
+   desc:'嵌入式 AI 助手知道用戶在哪個頁面、做了什麼，給出情境對應的操作建議。',
+   why:'用戶卡關時最需要的是「這一步怎麼做」的即時引導，不是通用說明頁。',
+   angular:['ChatWidget 讀取 RouterService 取當前 route context','call API 時帶 currentPage / lastAction','CDK Overlay 浮動 chat 面板不影響 layout'],
+   code:`sendMessage(text: string) {
+  const ctx = {
+    page: this.router.url,
+    lastAction: this.actSvc.lastAction()
+  };
+  this.chatSvc.ask(text, ctx).subscribe(...);
+}`,
+   predict:'AI 知道此刻在做什麼，主動說出最相關的下一步。',
+   api:'POST /api/chat → { reply }（後端帶 context 給 LLM）'},
+
+  // ── ACQUISITION ──
+  {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 意圖偵測',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['mkt','fe','be','ai'],diff:'mid',
+   desc:'AI 從 UTM 參數 + 瀏覽行為推斷訪客偏好（Sports / Casino / General），動態調整 LP 內容。',
+   why:'同一廣告受眾裡有不同偏好，AI 在第一秒就分流，提升後續轉換率。',
+   angular:['LP standalone component 讀 queryParams 取 UTM','IntentService 計算 intentScore → Signal','@switch 切換 SportsHero / CasinoHero / GenericHero','IntersectionObserver 追蹤看過哪些 section'],
+   code:`detectIntent(params: Params, scroll: ScrollEvent[]): Intent {
+  const utmHint = params['utm_content'];
+  const seen = scroll.filter(s => s.ratio > 0.5)
+                     .map(s => s.section);
+  return this.scoreIntent(utmHint, seen);
+}`,
+   predict:'用戶在 LP 停留幾秒，系統已知要給他 Sports 還是 Casino offer。',
+   api:'POST /api/intent/lp → { intent, confidence }'},
+
+  {id:'a2',cat:'acquisition',isNew:true,name:'AI 精簡註冊流程',ico:'✎',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   desc:'根據來源與意圖動態決定表單欄位和順序，最短路徑完成註冊。',
+   why:'每多一個欄位都會流失用戶，AI 判斷哪些可先省略、稍後補填。',
+   angular:['RegisterForm fields 從後端動態取，不寫死','Reactive Forms + 動態 FormControl 建構','依 intent 預填部分欄位','Progressive disclosure：必填先、KYC 最後'],
+   code:`formConfig$ = this.regSvc.getFormConfig(
+  this.intentSvc.current()
+);
+// → { fields, prefilled: { product: 'sports' },
+//     skipable: ['address'] }`,
+   predict:'系統知道這個用戶從哪個廣告來，給他最短的註冊路徑。',
+   api:'GET /api/register/config?intent=sports → FormConfig'},
+
+  {id:'a3',cat:'acquisition',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['mkt','ux','be','ai'],diff:'mid',
+   desc:'註冊完成瞬間，AI 根據來源 + LP 行為立即配對最相關的 Welcome Offer。',
+   why:'Welcome Offer 是黃金時刻，配對錯誤（給 Casino 用戶看 Sports 優惠）直接影響首次存款率。',
+   angular:['RegisterSuccess 完成後立即 call /api/offers/welcome','OfferCard 支援 sports / casino / combined variant','動畫呈現「為你專屬」的感受','Deep link 直接帶到對應 lobby'],
+   code:`ngOnInit() {
+  this.offerSvc.getWelcomeOffer({
+    intent: this.intentSvc.current(),
+    source: this.utmSvc.source()
+  }).subscribe(o => this.offer.set(o));
+}`,
+   predict:'新用戶完成註冊後 3 秒內看到的就是為他準備的 offer。',
+   api:'POST /api/offers/welcome → WelcomeOffer（依 intent + source）'},
+
+  {id:'a4',cat:'acquisition',isNew:true,name:'管道歸因鏈追蹤',ico:'⊞',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['mkt','be','ai'],diff:'mid',
+   desc:'把行銷管道、LP 行為、優惠類型串成歸因鏈，AI 學哪個組合 LTV 最高。',
+   why:'AI 能分析哪個 LP + offer + 管道組合的 LTV 最高，而不只看最後轉換。',
+   angular:['SessionStorage 保存完整 utm 鏈和 intent 歷程','關鍵動作觸發 TrackingService.emit()','後台 Angular dashboard 視覺化完整漏斗'],
+   code:`trackFunnel(step: FunnelStep) {
+  this.http.post('/api/analytics/funnel', {
+    step, intent: this.intentSvc.current(),
+    utmSource: this.utmSvc.source(),
+    offerId: this.offerSvc.currentOffer()?.id
+  }).subscribe();
+}`,
+   predict:'AI 學習哪條路徑 LTV 最高，自動給相似管道配最好的 offer 組合。',
+   api:'POST /api/analytics/funnel → void'},
+
+  {id:'a5',cat:'acquisition',isNew:true,name:'LP 動態 A/B 自動優化',ico:'⚙',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['mkt','fe','be','ai'],diff:'hard',
+   desc:'多版本 LP 由 AI bandit 算法自動分流，即時把流量導向高效版本，不需等人工決定。',
+   why:'傳統 A/B test 需人工設定時間，bandit 算法在測試期間就持續優化。',
+   angular:['VariantService 進站 call /api/ab/assign 取 variantId','LP 依 variantId lazy load 不同 Hero / CTA','每次 conversion event 回報 /api/ab/convert'],
+   code:`assignVariant(): Observable<string> {
+  return this.http.post<{variantId: string}>(
+    '/api/ab/assign',
+    { campaignId: this.utmSvc.campaign() }
+  ).pipe(map(r => r.variantId));
+}`,
+   predict:'不需等測試結束，AI 即時讓更多用戶看到更好的版本。',
+   api:'POST /api/ab/assign → { variantId } / POST /api/ab/convert'},
+
+  {id:'a6',cat:'acquisition',isNew:true,name:'OAuth 快速登入 + 意圖保留',ico:'⊛',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'easy',
+   desc:'Google / Line OAuth 快速註冊，redirect 後自動把 LP 偵測到的意圖帶入，不需重填偏好。',
+   why:'OAuth 常見問題是 redirect 後失去 LP context，AI 意圖必須跨越保留下來。',
+   angular:['OAuth redirect 前把 intentData 存 sessionStorage','Callback ngOnInit 取回 intentData 送後端','Angular Auth Guard 確保 state 驗證，防 CSRF'],
+   code:`initiateOAuth(provider: string) {
+  sessionStorage.setItem('pre_auth_intent',
+    JSON.stringify(this.intentSvc.current()));
+  window.location.href = \`/auth/\${provider}\`;
+}`,
+   predict:'即使有 OAuth redirect，系統仍記得這個用戶對什麼感興趣。',
+   api:'POST /api/auth/complete → { token, user, offerSuggestion }'},
+
+  // ── DEPOSIT ──
+  {id:'d1',cat:'deposit',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','be','ai'],diff:'hard',
+   desc:'後端 ML 即時計算每個活躍用戶的「存款意圖分數」，超過閾值觸發前端介入動作。',
+   why:'預測核心是在用戶準備好之前就知道，讓介入感覺像巧合，不像廣告。',
+   angular:['DepositIntentService 透過 SSE 接收 intent score 更新','Score 存入 Signal 全域訂閱','達閾值觸發 DepositNudgeComponent'],
+   code:`intentScore = signal<number>(0);
+connect() {
+  const sse = new EventSource('/api/stream/deposit-intent');
+  sse.onmessage = (e) => {
+    const { score } = JSON.parse(e.data);
+    this.intentScore.set(score);
+    if (score > 0.75) this.triggerNudge();
+  };
+}`,
+   predict:'用戶還沒點存款按鈕，系統已知道他快要存了。',
+   api:'SSE /api/stream/deposit-intent → { score, triggerReason }'},
+
+  {id:'d2',cat:'deposit',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['predict','ux','fe','be'],diff:'easy',
+   desc:'帳戶餘額低於個人歷史平均特定比例時，顯示輕量 banner 附個人化充值誘因。',
+   why:'餘額接近臨界是最強存款訊號，此時介入成本低、轉換率高，且用戶能立刻理解原因。',
+   angular:['BalanceService computed() 監控 balance ratio','CDK Overlay 插入頁面頂部','Banner 內容依 userProduct 動態化','Dismiss 後 cooldown 同天不重複'],
+   code:`lowBalanceAlert = computed(() => {
+  const ratio = this.balance() / this.avgMinBalance();
+  return ratio < 0.3
+    ? { show: true, nudgeType: this.userProduct() }
+    : { show: false };
+});`,
+   predict:'系統知道用戶快沒子彈了，主動提醒而不是等他自己發現。',
+   api:'GET /api/user/balance-status → { balance, threshold, nudgeContent }'},
+
+  {id:'d3',cat:'deposit',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['predict','ux','fe','be'],diff:'mid',
+   desc:'用戶開存款頁但 30 秒內離開，立即觸發精準挽回 offer 降低放棄率。',
+   why:'開過存款頁是極強訊號，放棄通常因為「不覺得划算」，一個即時 offer 能扭轉。',
+   angular:['ngOnDestroy 偵測未完成離開','Router events 偵測離開 /deposit route','Bottom sheet 而非強制 modal','Offer 由後端即時生成非固定 bonus'],
+   code:`private enteredAt = Date.now();
+private completed = false;
+ngOnDestroy() {
+  const elapsed = Date.now() - this.enteredAt;
+  if (!this.completed && elapsed < 30000)
+    this.nudgeSvc.triggerAbandonOffer();
+}`,
+   predict:'系統偵測猶豫行為，在最後一刻給出最相關的理由讓他完成存款。',
+   api:'POST /api/deposit/abandon → { offer: AbandonOffer }（即時生成）'},
+
+  {id:'d4',cat:'deposit',isNew:true,name:'存款金額升級 Offer',ico:'▲',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['boost','ux','fe','be'],diff:'mid',
+   desc:'用戶輸入金額後，AI 即時計算「再存多 X 元」能解鎖的 bonus，在輸入框旁即時顯示。',
+   why:'讓用戶清楚看到多存一點的邊際收益，自然願意調高金額。API 需壓在 200ms 以內。',
+   angular:['監聽輸入事件 debounce 500ms 後 call API','UpgradeHint 在輸入框旁 computed 顯示','金額變化時平滑動畫過渡不閃爍'],
+   code:`this.amount$.pipe(
+  debounceTime(500),
+  distinctUntilChanged(),
+  switchMap(amt => this.depositSvc.getUpgradeHint(amt))
+).subscribe(hint => this.upgradeHint.set(hint));
+// hint: { targetAmt: 500, gain: '+50 free spins' }`,
+   predict:'用戶輸入 300，系統立刻顯示「再存 200 即可雙倍 bonus」。',
+   api:'GET /api/deposit/upgrade-hint?amount=N → UpgradeHint（<200ms）'},
+
+  {id:'d5',cat:'deposit',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','be','ai'],diff:'mid',
+   desc:'AI 學習每個用戶的存款週期，在預測存款時間點前主動發送 push 或站內提醒。',
+   why:'習慣性存款用戶有明確週期，提前提醒能搭配活動提前鎖單。',
+   angular:['NotificationService 接收後端排程 Web Push + 站內 badge','推播內容依偏好個人化（Sports 看賽事 / Casino 看 jackpot）','Angular badge component 顯示未讀'],
+   code:`// 後端排程邏輯（討論方向）
+// 1. 分析歷史存款時間序列
+// 2. 預測下次存款視窗 ± 12hr
+// 3. 視窗前 2hr 排程推播
+// 4. 依 user.preferredProduct 選模板`,
+   predict:'系統知道用戶通常週四晚上存款，週四下午就推最新活動。',
+   api:'後端排程 job + POST /api/notify/deposit-reminder'},
+
+  {id:'d6',cat:'deposit',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['boost','ux','fe'],diff:'easy',
+   desc:'存款頁顯示距下一個 VIP tier 或 bonus 解鎖還差多少，製造明確的進度感。',
+   why:'Progress visualization 是提升消費的強力 UX 手法，「差一點」讓用戶願意多存。',
+   angular:['TierProgressComponent @Input tierStatus','Angular Animation 平滑填充進度條不瞬間跳','顯示具體差距：再存 NT$1,200 解鎖白金','點擊進度條展開 tier 福利說明'],
+   code:`@Input() tierStatus!: {
+  currentTier: string;
+  nextTier:    string;
+  progress:    number;    // 0~1
+  amountNeeded:number;
+  nextBenefit: string;    // '每週 cashback 5%'
+};`,
+   predict:'AI 計算最能打動這個用戶的里程碑，顯示在進度條旁。',
+   api:'GET /api/user/tier-status → TierStatus'},
+
+  {id:'d7',cat:'deposit',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['boost','predict','be','ai'],diff:'hard',
+   desc:'結合意圖分數 + 活動熱度，AI 動態決定什麼時候推「限時存款 bonus」，非固定排程。',
+   why:'固定排程 bonus 用戶會預期甚至等它，AI 動態時機讓 offer 更有稀缺感，轉換率更高。',
+   angular:['TimedOfferBanner 監聽 depositIntentScore Signal','score>0.6 且有活躍活動才觸發，避免打擾','Offer 帶倒數計時（Angular countdown pipe）','Dismiss 後同用戶當天只觸發一次'],
+   code:`showOffer = computed(() =>
+  this.intentSvc.intentScore() > 0.6 &&
+  this.offerSvc.hasActiveOffer() &&
+  !this.dismissed()
+);`,
+   predict:'系統判斷「現在最可能存款」，在精準時間點送出限時 offer。',
+   api:'GET /api/offers/timed → TimedOffer | null'},
+
+  {id:'d8',cat:'deposit',isNew:true,name:'存款流程障礙分析',ico:'⊟',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['boost','ux','fe','be'],diff:'mid',
+   desc:'分析存款流程 drop-off 點，AI 找出讓用戶放棄的步驟，系統化降低摩擦。',
+   why:'有時提升存款不是靠 offer，而是把讓用戶放棄的步驟移除。AI 能找到人工難以發現的障礙。',
+   angular:['存款流程每步驟埋 tracking（step_enter / step_exit / step_complete）','後台 Angular funnel dashboard 視覺化 drop-off rate','AI 分析哪類用戶在哪步放棄並推薦優化優先順序'],
+   code:`trackStep(step: DepositStep, action: 'enter'|'exit'|'complete') {
+  this.analytics.track('deposit_funnel', {
+    step, action,
+    timeOnStep: this.stepTimer.elapsed(),
+    balance:    this.balanceSvc.current()
+  });
+}`,
+   predict:'AI 識別哪類用戶更容易在哪個步驟放棄，推薦針對性簡化。',
+   api:'POST /api/analytics/deposit-step / GET /api/analytics/funnel-report'},
+
+  // ── RISK ──
+  {id:'r1',cat:'risk',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['be','ai','ux'],diff:'hard',
+   desc:'後端 AI 計算流失機率，達閾值時透過 WebSocket 觸發站內保留行動。',
+   why:'流失預測精準度可達 80%+，在行為轉變初期介入比事後追回有效得多。',
+   angular:['WebSocket / SSE 接即時風控推播','RetentionBanner 監聽事件顯示個人化訊息','CDK Overlay 非侵入式提示，不強制彈窗'],
+   code:`this.ws.onmessage = (msg) => {
+  const evt = JSON.parse(msg.data);
+  if (evt.type === 'churn_risk')
+    this.showBanner(evt.payload);
+};`,
+   predict:'系統在行為開始轉冷之前就行動，不等用戶真的離開。',
+   api:'WebSocket /ws/retention → RetentionEvent'},
+
+  {id:'r2',cat:'risk',isNew:false,name:'零行為用戶早期分群',ico:'▣',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['ux','fe','be','ai'],diff:'mid',
+   desc:'新用戶進站後，前端即時回報瀏覽路徑，後端推斷意圖分群觸發不同 onboarding。',
+   why:'在第一次操作前就能預判用戶類型，顯著提升首次轉換率。',
+   angular:['SessionTrackingService 用 Router events 追蹤頁面序列','每 N 頁 POST 瀏覽序列到後端','後端回 segmentType，前端 @switch 切換 onboarding'],
+   code:`router.events.pipe(
+  filter(e => e instanceof NavigationEnd)
+).subscribe(e => {
+  this.pageSequence.push(e.urlAfterRedirects);
+  if (this.pageSequence.length % 3 === 0)
+    this.reportSegment();
+});`,
+   predict:'在用戶第一個操作前就已推斷類型，準備好對應引導內容。',
+   api:'POST /api/session/segment → { segmentType }'},
+
+  {id:'r3',cat:'risk',isNew:false,name:'異常行為視覺化後台',ico:'⊡',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['be','ai','ui'],diff:'hard',
+   desc:'後台 dashboard 即時顯示 AI 風控評分和異常事件佇列，讓風控從被動審查變主動管理。',
+   why:'AI fraud detection 核心是把人工從例行審查解放，只處理真正需要判斷的 edge case。',
+   angular:['SSE / WebSocket 接即時事件流','RiskQueueComponent 依 confidence score 排序','Angular Material Table + CDK Virtual Scroll 處理大量事件','[class.high-risk] directive 色碼化樣式'],
+   code:`events$ = this.riskSvc.eventStream$.pipe(
+  scan((acc, e) => [e, ...acc].slice(0, 100), []),
+  map(evts => evts.sort((a, b) =>
+    b.confidenceScore - a.confidenceScore))
+);`,
+   predict:'AI 把最需要看的案件排到最前面，風控不需主動查。',
+   api:'SSE /api/stream/risk-events → RiskEvent[]'}
+];
+
+const DIFF_L = {easy:'低複雜',mid:'中複雜',hard:'高複雜'};
+const DIFF_C = {easy:'tag-easy',mid:'tag-mid',hard:'tag-hard'};
+const TYPE_L = {ui:'UI',ux:'UX',fe:'前端',be:'後端',ai:'AI 模型',mkt:'行銷',predict:'預測存款',boost:'提升金額'};
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function cardHTML(d){
+  const tags = d.types.map(t=>`<span class="tag tag-${t}">${TYPE_L[t]||t}</span>`).join('')
+    + `<span class="tag ${DIFF_C[d.diff]}">${DIFF_L[d.diff]}</span>`;
+  return `<div class="card" id="card-${d.id}" onclick="tog('${d.id}')" style="--accent-color:${d.accentColor}">
+    ${d.isNew ? '<div class="new-dot"></div>' : ''}
+    <div class="ctop">
+      <div class="cico" style="background:${d.icoBg};color:${d.accentColor}">${d.ico}</div>
+      <div class="cname">${d.name}</div>
+    </div>
+    <div class="tags">${tags}</div>
+    <div class="cdesc">${d.desc}</div>
+    <div class="detail" id="det-${d.id}">
+      <div class="dsec"><div class="dl">為什麼做</div><div class="db">${d.why}</div></div>
+      <div class="dsec"><div class="dl">Angular 切入點</div><div class="db"><ul>${d.angular.map(a=>`<li>${a}</li>`).join('')}</ul></div></div>
+      <div class="dsec"><div class="dl">程式碼方向</div><div class="code">${esc(d.code)}</div></div>
+      <div class="dsec"><div class="dl">預測 / 介入邏輯</div><div class="db">${d.predict}</div></div>
+      <div class="dsec"><div class="dl">API 設計</div><div class="db">${d.api}</div></div>
+    </div>
+  </div>`;
+}
+
+function render(f) {
+  const main = document.getElementById('main');
+  const filtered = f === 'all' ? ALL : ALL.filter(d => d.types.includes(f));
+  let html = '';
+  let shown = 0;
+  CATS.forEach(cat => {
+    const items = filtered.filter(d => d.cat === cat.key);
+    if (!items.length) return;
+    shown += items.length;
+    html += `<section class="section">
+      <div class="section-header">
+        <div class="section-title">${cat.label}</div>
+        <div class="section-line"></div>
+        <div class="section-count">${items.length} ideas</div>
+      </div>
+      <div class="grid">${items.map(cardHTML).join('')}</div>
+    </section>`;
+  });
+  if (!shown) html = '<div class="empty-state">沒有符合篩選條件的點子</div>';
+  main.innerHTML = html;
+  document.getElementById('sShown').textContent = shown;
+}
+
+function fil(f, btn) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  render(f);
+}
+
+function tog(id) {
+  const card = document.getElementById('card-' + id);
+  const det = document.getElementById('det-' + id);
+  const was = det.classList.contains('open');
+  document.querySelectorAll('.detail').forEach(x => x.classList.remove('open'));
+  document.querySelectorAll('.card').forEach(x => x.classList.remove('open'));
+  if (!was) { det.classList.add('open'); card.classList.add('open'); }
+}
+
+render('all');
+</script>
+</body>
+</html>
