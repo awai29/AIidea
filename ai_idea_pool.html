@@ -151,7 +151,8 @@ h1 span { color: var(--green); }
 .fb.on.f-ai     { background: var(--pink); }
 .fb.on.f-mkt    { background: var(--coral); }
 .fb.on.f-predict{ background: var(--green); }
-.fb.on.f-boost  { background: var(--amber); }
+.fb.on.f-boost   { background: var(--amber); }
+.fb.on.f-archive { background: #6b6b6b; }
 
 /* ── MAIN ── */
 main {
@@ -378,7 +379,7 @@ main {
   </div>
   <div class="stats-row">
     <div class="stat">
-      <div class="stat-n" id="sTotal">24</div>
+      <div class="stat-n" id="sTotal">25</div>
       <div class="stat-l">TOTAL IDEAS</div>
     </div>
     <div class="stat">
@@ -404,6 +405,7 @@ main {
     <button class="fb f-mkt"     onclick="fil('mkt',this)">行銷</button>
     <button class="fb f-predict" onclick="fil('predict',this)">預測存款</button>
     <button class="fb f-boost"   onclick="fil('boost',this)">提升金額</button>
+    <button class="fb f-archive" onclick="fil('archive',this)">ARCHIVE</button>
   </div>
 </div>
 
@@ -422,6 +424,7 @@ const CATS = [
   { key:'acquisition', label:'新客獲取 — Landing Page 到首次存款', accent:'var(--coral)' },
   { key:'deposit',     label:'存款提升 — 預測與轉換', accent:'var(--green)' },
   { key:'risk',        label:'風控與保留 — 流失與異常', accent:'var(--amber)' },
+  { key:'archive',     label:'ARCHIVE', accent:'#6b6b6b' },
 ];
 
 const ALL = [
@@ -452,7 +455,7 @@ fetchLayout() {
    predict:'每次進 app AI 已根據最近行為預備好內容。',
    api:'GET /api/rec/played, /similar, /trending'},
 
-  {id:'p3',cat:'platform',isNew:false,name:'導覽選單個人化排序',ico:'☰',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'p3',cat:'archive',isNew:false,name:'導覽選單個人化排序',ico:'☰',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'mid',
    desc:'NavBar 分類順序從用戶偏好分數動態渲染，新用戶走熱門排序，行為累積後漸進個人化。',
    why:'選單重排能明顯提升常用功能的可達性，降低操作步驟數。',
@@ -463,7 +466,7 @@ fetchLayout() {
    predict:'最常去的頁面自然靠近拇指熱區，減少尋找時間。',
    api:'GET /api/user/nav-order → CategoryItem[]'},
 
-  {id:'p4',cat:'platform',isNew:false,name:'押注金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'p4',cat:'deposit',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'mid',
    desc:'金額快捷按鈕從後端取個人化預設值，不寫死，讓輸入行為更直覺。',
    why:'個人化預設讓用戶少一個輸入動作，與歷史習慣一致。',
@@ -478,14 +481,17 @@ ngOnInit() {
 
   {id:'p5',cat:'platform',isNew:false,name:'熱門趨勢提前標籤',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ui','fe','ai'],diff:'easy',
-   desc:'後端偵測互動量快速上升的內容，前端在卡片上附「即將熱門」標籤。',
-   why:'Early Trend Detection 讓平台在內容飽和前完成曝光布局，用戶感受到「眼光」。',
-   angular:['ContentCard @Input trendTag (hot_soon | rising | null)','後端 list API 帶 trendTag 欄位','@if 條件顯示，Angular Animation 自然出現'],
-   code:`@if (trendTag === 'hot_soon') {
-  <span class="trend-badge">即將熱門</span>
+   desc:'後端根據近期互動數據即時計算 Provider 與 Game 的熱門程度，前端依此動態調整排列順序，最熱門的自動排到最前面，無標籤、無數字，順序本身就是答案。',
+   why:'玩家不需要看到排名數字，只要熱門的自然出現在眼前就夠了。動態排序比靜態順序更能反映當下趨勢，也不會讓畫面過於雜亂。',
+   angular:['ProviderList / GameList 從後端取已排序的陣列，不寫死順序','@for + trackBy 確保排序變動時只更新位移，不重繪卡片','Angular Animation 讓位置變動有平滑過渡','可搭配 polling 或 SSE 定期更新排序'],
+   code:`providerList = signal<Provider[]>([]);
+
+ngOnInit() {
+  this.http.get<Provider[]>('/api/providers/ranked')
+    .subscribe(list => this.providerList.set(list));
 }`,
-   predict:'用戶看到標籤就知道平台比別人早一步推薦。',
-   api:'GET /api/content/list → [..., { trendTag }]'},
+   predict:'熱門的 Provider 和 Game 自然出現在最顯眼的位置，玩家不需思考就能找到當下最夯的選擇。',
+   api:'GET /api/providers/ranked → Provider[]（已依熱度排序）/ GET /api/games/ranked → Game[]'},
 
   {id:'p6',cat:'platform',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
    types:['ux','be','ai'],diff:'hard',
@@ -500,7 +506,7 @@ ngOnInit() {
    predict:'用戶看到的活動是系統預測他現在最感興趣的。',
    api:'GET /api/promo/personalized → Promo[]（含 reason）'},
 
-  {id:'p7',cat:'platform',isNew:false,name:'情境式 AI 客服',ico:'◈',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+  {id:'p7',cat:'archive',isNew:false,name:'情境式 AI 客服',ico:'◈',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
    types:['ui','ux','fe','ai'],diff:'mid',
    desc:'嵌入式 AI 助手知道用戶在哪個頁面、做了什麼，給出情境對應的操作建議。',
    why:'用戶卡關時最需要的是「這一步怎麼做」的即時引導，不是通用說明頁。',
@@ -557,7 +563,7 @@ ngOnInit() {
    predict:'新用戶完成註冊後 3 秒內看到的就是為他準備的 offer。',
    api:'POST /api/offers/welcome → WelcomeOffer（依 intent + source）'},
 
-  {id:'a4',cat:'acquisition',isNew:true,name:'管道歸因鏈追蹤',ico:'⊞',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'a4',cat:'archive',isNew:true,name:'管道歸因鏈追蹤',ico:'⊞',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['mkt','be','ai'],diff:'mid',
    desc:'把行銷管道、LP 行為、優惠類型串成歸因鏈，AI 學哪個組合 LTV 最高。',
    why:'AI 能分析哪個 LP + offer + 管道組合的 LTV 最高，而不只看最後轉換。',
@@ -572,7 +578,7 @@ ngOnInit() {
    predict:'AI 學習哪條路徑 LTV 最高，自動給相似管道配最好的 offer 組合。',
    api:'POST /api/analytics/funnel → void'},
 
-  {id:'a5',cat:'acquisition',isNew:true,name:'LP 動態 A/B 自動優化',ico:'⚙',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+  {id:'a5',cat:'archive',isNew:true,name:'LP 動態 A/B 自動優化',ico:'⚙',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
    types:['mkt','fe','be','ai'],diff:'hard',
    desc:'多版本 LP 由 AI bandit 算法自動分流，即時把流量導向高效版本，不需等人工決定。',
    why:'傳統 A/B test 需人工設定時間，bandit 算法在測試期間就持續優化。',
@@ -586,7 +592,7 @@ ngOnInit() {
    predict:'不需等測試結束，AI 即時讓更多用戶看到更好的版本。',
    api:'POST /api/ab/assign → { variantId } / POST /api/ab/convert'},
 
-  {id:'a6',cat:'acquisition',isNew:true,name:'OAuth 快速登入 + 意圖保留',ico:'⊛',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'a6',cat:'archive',isNew:true,name:'OAuth 快速登入 + 意圖保留',ico:'⊛',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'easy',
    desc:'Google / Line OAuth 快速註冊，redirect 後自動把 LP 偵測到的意圖帶入，不需重填偏好。',
    why:'OAuth 常見問題是 redirect 後失去 LP context，AI 意圖必須跨越保留下來。',
@@ -600,7 +606,7 @@ ngOnInit() {
    api:'POST /api/auth/complete → { token, user, offerSuggestion }'},
 
   // ── DEPOSIT ──
-  {id:'d1',cat:'deposit',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d1',cat:'archive',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['predict','be','ai'],diff:'hard',
    desc:'後端 ML 即時計算每個活躍用戶的「存款意圖分數」，超過閾值觸發前端介入動作。',
    why:'預測核心是在用戶準備好之前就知道，讓介入感覺像巧合，不像廣告。',
@@ -617,7 +623,7 @@ connect() {
    predict:'用戶還沒點存款按鈕，系統已知道他快要存了。',
    api:'SSE /api/stream/deposit-intent → { score, triggerReason }'},
 
-  {id:'d2',cat:'deposit',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'d2',cat:'archive',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['predict','ux','fe','be'],diff:'easy',
    desc:'帳戶餘額低於個人歷史平均特定比例時，顯示輕量 banner 附個人化充值誘因。',
    why:'餘額接近臨界是最強存款訊號，此時介入成本低、轉換率高，且用戶能立刻理解原因。',
@@ -631,7 +637,7 @@ connect() {
    predict:'系統知道用戶快沒子彈了，主動提醒而不是等他自己發現。',
    api:'GET /api/user/balance-status → { balance, threshold, nudgeContent }'},
 
-  {id:'d3',cat:'deposit',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'d3',cat:'archive',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['predict','ux','fe','be'],diff:'mid',
    desc:'用戶開存款頁但 30 秒內離開，立即觸發精準挽回 offer 降低放棄率。',
    why:'開過存款頁是極強訊號，放棄通常因為「不覺得划算」，一個即時 offer 能扭轉。',
@@ -660,7 +666,7 @@ ngOnDestroy() {
    predict:'用戶輸入 300，系統立刻顯示「再存 200 即可雙倍 bonus」。',
    api:'GET /api/deposit/upgrade-hint?amount=N → UpgradeHint（<200ms）'},
 
-  {id:'d5',cat:'deposit',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d5',cat:'archive',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['predict','be','ai'],diff:'mid',
    desc:'AI 學習每個用戶的存款週期，在預測存款時間點前主動發送 push 或站內提醒。',
    why:'習慣性存款用戶有明確週期，提前提醒能搭配活動提前鎖單。',
@@ -673,7 +679,7 @@ ngOnDestroy() {
    predict:'系統知道用戶通常週四晚上存款，週四下午就推最新活動。',
    api:'後端排程 job + POST /api/notify/deposit-reminder'},
 
-  {id:'d6',cat:'deposit',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'d6',cat:'archive',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['boost','ux','fe'],diff:'easy',
    desc:'存款頁顯示距下一個 VIP tier 或 bonus 解鎖還差多少，製造明確的進度感。',
    why:'Progress visualization 是提升消費的強力 UX 手法，「差一點」讓用戶願意多存。',
@@ -688,7 +694,7 @@ ngOnDestroy() {
    predict:'AI 計算最能打動這個用戶的里程碑，顯示在進度條旁。',
    api:'GET /api/user/tier-status → TierStatus'},
 
-  {id:'d7',cat:'deposit',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d7',cat:'archive',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['boost','predict','be','ai'],diff:'hard',
    desc:'結合意圖分數 + 活動熱度，AI 動態決定什麼時候推「限時存款 bonus」，非固定排程。',
    why:'固定排程 bonus 用戶會預期甚至等它，AI 動態時機讓 offer 更有稀缺感，轉換率更高。',
@@ -716,8 +722,26 @@ ngOnDestroy() {
    predict:'AI 識別哪類用戶更容易在哪個步驟放棄，推薦針對性簡化。',
    api:'POST /api/analytics/deposit-step / GET /api/analytics/funnel-report'},
 
+  {id:'d9',cat:'deposit',isNew:true,name:'快沒籌碼？再撐幾回合',ico:'⟲',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','boost','ux','fe','be'],diff:'mid',
+   desc:'玩家餘額趨近於零時，系統即時給予固定金額免費籌碼（Free Credit），讓他多玩幾回合；完成指定輪數後解鎖存款 Bonus，把「快放棄」的時機轉換成再次存款的動力。',
+   why:'快沒錢的玩家最接近離開，但也最渴望「再試一次」。Free Credit 讓他留下來，Bonus 條件在他最有感的時刻出現，完成輪數後自然引導他存款繼續，感覺像平台在幫他，不像廣告。',
+   angular:['BalanceWatchService 監控餘額，低於個人歷史平均最低值 20% 時觸發','CDK Overlay 顯示底部 sheet（非強制彈窗，可關閉）','倒數計時 pipe 製造稀缺感（限時 10 分鐘）','輪數完成後自動判斷解鎖狀態，顯示存款 CTA'],
+   code:`lastChance = computed(() => {
+  const ratio = this.balance() / this.avgMinBalance();
+  return ratio < 0.2 && !this.claimed();
+});
+
+// 輪數追蹤
+this.roundCount$.pipe(
+  filter(n => n >= this.wagerRequired),
+  take(1)
+).subscribe(() => this.unlockBonus());`,
+   predict:'系統在玩家快放棄前主動出手，Free Credit 是橋樑，存款 Bonus 是目的地。',
+   api:'POST /api/offers/last-chance → { freeCredit, wagerRequired, bonusOnDeposit }'},
+
   // ── RISK ──
-  {id:'r1',cat:'risk',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['be','ai','ux'],diff:'hard',
    desc:'後端 AI 計算流失機率，達閾值時透過 WebSocket 觸發站內保留行動。',
    why:'流失預測精準度可達 80%+，在行為轉變初期介入比事後追回有效得多。',
@@ -730,7 +754,7 @@ ngOnDestroy() {
    predict:'系統在行為開始轉冷之前就行動，不等用戶真的離開。',
    api:'WebSocket /ws/retention → RetentionEvent'},
 
-  {id:'r2',cat:'risk',isNew:false,name:'零行為用戶早期分群',ico:'▣',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'r2',cat:'archive',isNew:false,name:'零行為用戶早期分群',ico:'▣',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['ux','fe','be','ai'],diff:'mid',
    desc:'新用戶進站後，前端即時回報瀏覽路徑，後端推斷意圖分群觸發不同 onboarding。',
    why:'在第一次操作前就能預判用戶類型，顯著提升首次轉換率。',
@@ -745,7 +769,7 @@ ngOnDestroy() {
    predict:'在用戶第一個操作前就已推斷類型，準備好對應引導內容。',
    api:'POST /api/session/segment → { segmentType }'},
 
-  {id:'r3',cat:'risk',isNew:false,name:'異常行為視覺化後台',ico:'⊡',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'r3',cat:'archive',isNew:false,name:'異常行為視覺化後台',ico:'⊡',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['be','ai','ui'],diff:'hard',
    desc:'後台 dashboard 即時顯示 AI 風控評分和異常事件佇列，讓風控從被動審查變主動管理。',
    why:'AI fraud detection 核心是把人工從例行審查解放，只處理真正需要判斷的 edge case。',
@@ -788,7 +812,7 @@ function cardHTML(d){
 
 function render(f) {
   const main = document.getElementById('main');
-  const filtered = f === 'all' ? ALL : ALL.filter(d => d.types.includes(f));
+  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive') : f === 'archive' ? ALL.filter(d => d.cat === 'archive') : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
   let html = '';
   let shown = 0;
   CATS.forEach(cat => {
