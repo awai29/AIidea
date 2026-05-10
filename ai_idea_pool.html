@@ -468,16 +468,30 @@ fetchLayout() {
 
   {id:'p4',cat:'deposit',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'mid',
-   desc:'金額快捷按鈕從後端取個人化預設值，不寫死，讓輸入行為更直覺。',
-   why:'個人化預設讓用戶少一個輸入動作，與歷史習慣一致。',
-   angular:['AmountPresetComponent @Input presets:number[]','BettingService 開面板時 call API','presets 快取 SessionStorage 同 session 不重複 fetch'],
-   code:`presets = signal<number[]>([]);
+   desc:'根據玩家歷史存款行為，自動產生 5 個個人化金額快捷按鈕（-10%、-5%、平均、+5%、+10%），取代傳統寫死的固定金額，+10% 作為主推選項視覺強調。',
+   why:'固定金額按鈕與玩家習慣落差大，個人化預設讓玩家少一個輸入動作；+10% 引導往上存，降低存款摩擦同時提升客均存款。',
+   angular:['AmountPresetComponent 接收 presets:PresetOption[]，每個 option 含 amount / label / highlight','DepositService.getPresets() 取後端計算結果，SessionStorage 快取同 session 不重複 fetch','按鈕超出平台存款上下限時自動 disabled，避免玩家點了才報錯','5 個金額若有重複（平均值太小）後端去重，只回傳不重複選項'],
+   code:`interface PresetOption {
+  amount: number;    // 已無條件進位至整數
+  label: string;     // '' | '你常用' | '推薦'
+  highlight: boolean;
+}
+
+presets = signal<PresetOption[]>([]);
+
 ngOnInit() {
-  this.bettingSvc.getPresets()
+  this.depositSvc.getPresets()
     .subscribe(p => this.presets.set(p));
-}`,
-   predict:'系統記得習慣金額，下次開面板就已備好選項。',
-   api:'GET /api/user/amount-presets → number[]'},
+}
+
+// 後端邏輯（偽碼）：
+// avg = mean(last 30 deposits)
+// 若筆數 < 3 → fallback 同層級群體平均
+// candidates = [avg×0.9, avg×0.95, avg, avg×1.05, avg×1.1].map(Math.ceil)
+// 去重 → 過濾平台 min/max → 組成 PresetOption[]
+// highlight = true 僅 +10% 選項`,
+   predict:'玩家開存款面板時，5 個貼近習慣的金額已備好，+10% 視覺突出，自然引導往上存。',
+   api:'GET /api/user/deposit-presets → PresetOption[]（後端完成平均計算、去重、邊界過濾）'},
 
   {id:'p5',cat:'platform',isNew:false,name:'熱門趨勢提前標籤',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ui','fe','ai'],diff:'easy',
