@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { spawnHitParticles } from './particles.js';
 import { hitboxOverlapsEntity } from './collision.js';
 import { hurtPlayer } from './entities/player.js';
 
@@ -26,7 +27,7 @@ export function updateCombat(state) {
     state.enemies.forEach((enemy) => {
       if (enemy.state === 'death' || enemy.hitThisAttack) return;
       if (hitboxOverlapsEntity(hb, enemy)) {
-        hurtEnemy(enemy, CONFIG.PLAYER_ATTACK_DAMAGE, p.x);
+        hurtEnemy(enemy, CONFIG.PLAYER_ATTACK_DAMAGE, p.x, state);
         enemy.hitThisAttack = true;
       }
     });
@@ -61,15 +62,25 @@ export function updateCombat(state) {
         ? CONFIG.SPEARMAN_ATTACK_DAMAGE : CONFIG.SWORDSMAN_ATTACK_DAMAGE;
       hurtPlayer(p, dmg, enemy.x);
       enemy.hitPlayerThisAttack = true;
+      state.screenShake = { intensity: 10, timer: 12 };
     }
   });
 }
 
-function hurtEnemy(enemy, damage, attackerX) {
+function hurtEnemy(enemy, damage, attackerX, state) {
   if (enemy.hurtTimer > 0 || enemy.state === 'death') return;
 
   enemy.hp = Math.max(0, enemy.hp - damage);
-  if (enemy.hp === 0) {
+
+  // 打擊特效
+  const isDeath = enemy.hp === 0;
+  const hitX = (enemy.x + attackerX) / 2;
+  const hitY = enemy.y - enemy.height * 0.5;
+  spawnHitParticles(state, hitX, hitY, isDeath ? '#ff6644' : '#ffee44');
+  state.screenShake = { intensity: 5, timer: 8 };
+  state.hitFreeze = 2;
+
+  if (isDeath) {
     enemy.state = 'death';
     return;
   }
