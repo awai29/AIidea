@@ -379,7 +379,7 @@ main {
   </div>
   <div class="stats-row">
     <div class="stat">
-      <div class="stat-n" id="sTotal">25</div>
+      <div class="stat-n" id="sTotal">28</div>
       <div class="stat-l">TOTAL IDEAS</div>
     </div>
     <div class="stat">
@@ -507,6 +507,42 @@ ngOnInit() {
    predict:'熱門的 Provider 和 Game 自然出現在最顯眼的位置，玩家不需思考就能找到當下最夯的選擇。',
    api:'GET /api/providers/ranked → Provider[]（已依熱度排序）/ GET /api/games/ranked → Game[]'},
 
+  {id:'p8',cat:'platform',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['fe','ui','ux'],diff:'easy',
+   desc:'頁面先顯示極小縮圖並放大模糊（LQIP），真實圖片下載完成後以 CSS transition 清晰淡入。純 CSS + JS 實現，所有瀏覽器皆相容，無需任何新 API。',
+   why:'網路差的玩家看到白框或破圖，體驗差且跳出率高。Blur-Up 讓畫面立刻有內容，感知速度遠快於實際載入速度，不需等圖載完才有東西看。',
+   angular:['BlurUpDirective 掛在 <img>，接收 blurUp（原圖 URL）與 lqip（base64 縮圖 ~300B）兩個 Input','ngAfterViewInit 先把 lqip 放入 src，CSS filter:blur(12px) scale(1.05) 撐滿容器不留白邊','new Image() preload 原圖，onload 替換 src 並移除 blur，CSS transition 自動補間','純 CSS transition: filter .4s ease, transform .4s ease — IE11+ / iOS Safari / Android Chrome 全覆蓋'],
+   code:`// blur-up.directive.ts
+@Directive({ selector: 'img[blurUp]', standalone: true })
+export class BlurUpDirective implements AfterViewInit {
+  @Input() blurUp!: string;  // 原圖 URL
+  @Input() lqip!:   string;  // base64 縮圖（≤ 1KB）
+
+  constructor(private el: ElementRef<HTMLImageElement>) {}
+
+  ngAfterViewInit() {
+    const img = this.el.nativeElement;
+    img.src = this.lqip;
+    Object.assign(img.style, {
+      filter: 'blur(12px)',
+      transform: 'scale(1.05)',
+      transition: 'filter .4s ease, transform .4s ease',
+    });
+    const hi = new Image();
+    hi.src = this.blurUp;
+    hi.onload = () => {
+      img.src = this.blurUp;
+      img.style.filter = 'none';
+      img.style.transform = 'scale(1)';
+    };
+  }
+}
+
+// 使用方式
+// <img [blurUp]="game.imageUrl" [lqip]="game.lqip" alt="..." />`,
+   predict:'玩家進頁面立刻看到有內容的畫面，不是白框；網路恢復後自動清晰，全程無感。',
+   api:'後端 GET /api/images/:id?q=10 回傳極低品質縮圖（≤1KB）base64，前端 inline 寫入 lqip；或直接在資料預載時一併附上 lqipBase64 欄位'},
+
   {id:'p6',cat:'platform',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
    types:['ux','be','ai'],diff:'hard',
    desc:'活動推薦依用戶行為畫像動態配對，前端顯示推薦理由，提升點擊意願。',
@@ -534,6 +570,40 @@ ngOnInit() {
 }`,
    predict:'AI 知道此刻在做什麼，主動說出最相關的下一步。',
    api:'POST /api/chat → { reply }（後端帶 context 給 LLM）'},
+
+  {id:'p9',cat:'platform',isNew:true,name:'客服反饋標籤化 + 問卷送 Point',ico:'⊕',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','be','ai','mkt'],diff:'mid',
+   desc:'AI 自動將客服工單與玩家訊息分類標籤（存款問題 / 活動疑問 / 技術異常…），統整成可讀報表；反饋量不足時觸發「填問卷送 Point」活動，主動補充資料缺口。',
+   why:'客服工單是最真實的痛點來源，但散落各工單系統難以量化。AI 標籤化讓產品 / 設計團隊每週就能看出哪個流程問題最多；問卷送 Point 則把被動收集變成主動活動，玩家有誘因、平台有數據。',
+   angular:['FeedbackDashboard 顯示 AI 分類後的標籤分佈圓餅圖 + 每週趨勢折線圖（Angular Material Charts 或 lightweight ECharts wrapper）','SurveyTriggerService 監控過去 N 天反饋筆數，低於閾值時自動在 CMS 排程「問卷送 Point」活動','SurveyComponent 多步驟表單（CDK Stepper），完成後呼叫 /api/survey/complete 派發 Point','標籤雲端元件 TagCloudComponent 依出現頻率決定字體大小，點擊可下鑽查看原始工單'],
+   code:`// 後端 AI 分類流程（偽碼）
+// 1. 每 1hr batch job 取新工單 from CS 系統
+// 2. 呼叫 LLM / 分類模型：
+//    POST /internal/classify → { label, confidence, sentiment }
+//    labels: deposit | withdrawal | bonus | technical | account | other
+// 3. 寫入 feedback_tags table，串聯原工單 ID
+// 4. sentiment < 0 且 confidence > 0.8 → 標記為「高優先」
+
+// 前端：自動觸發問卷
+insufficientFeedback = computed(() =>
+  this.feedbackSvc.weeklyCount() < THRESHOLD
+);
+
+ngOnInit() {
+  if (this.insufficientFeedback()) {
+    this.campaignSvc.activate('survey_point_reward');
+  }
+}
+
+// 問卷完成派 Point
+completeSurvey(answers: SurveyAnswer[]) {
+  this.http.post('/api/survey/complete', { answers })
+    .subscribe(({ pointsAwarded }) => {
+      this.toast.show(\`+\${pointsAwarded} Points 已入帳！\`);
+    });
+}`,
+   predict:'產品團隊每週看到標籤分佈報表，能快速找出最需要優化的流程；問卷資料補足 AI 分類的死角，形成玩家反饋的正向循環。',
+   api:'GET /api/feedback/summary → { labels: TagCount[], trend: WeeklyTrend[], topIssues: Issue[] } / POST /api/survey/complete → { pointsAwarded } / GET /api/survey/active → Survey | null'},
 
   // ── ACQUISITION ──
   {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 意圖偵測',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
@@ -755,6 +825,90 @@ this.roundCount$.pipe(
    api:'POST /api/offers/last-chance → { freeCredit, wagerRequired, bonusOnDeposit }'},
 
   // ── RISK ──
+  {id:'r4',cat:'risk',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['ux','be','ai','mkt'],diff:'mid',
+   desc:'依玩家行為與平台事件，分 8 種情境精準觸發 Push Notification，每則推播都帶個人化內容與深連結，直接帶回對應頁面，不是一句通用文字。',
+   why:'通用廣播推播開啟率 <2%；情境化推播搭配個人化文案開啟率可達 15%+。關鍵是「對的時機 + 對的理由 + 對的著陸頁」，不是發越多越好。',
+   angular:['PushService 封裝 Firebase Cloud Messaging（FCM），Web Push API 覆蓋所有瀏覽器','後端 event bus 發出觸發事件，前端 Service Worker 接收並顯示系統通知','每則推播帶 deepLink 欄位，點擊後 Angular Router 導向對應頁（投注單 / 優惠頁 / 活動頁）','PushPreferenceComponent 讓玩家自選接收哪些類型，存入 user.pushSettings，避免轟炸'],
+   code:`// 8 種觸發情境與文案邏輯
+const PUSH_SCENARIOS = {
+
+  // ✅ 賽事投注結果 — 比賽結束後立即推
+  BET_RESULT: {
+    trigger: 'match_ended',
+    title: (d) => d.won ? '🏆 恭喜！你贏了' : '⚽ 比賽結束',
+    body:  (d) => d.won
+      ? \`+\${d.payout} 已入帳，下一場繼續？\`
+      : \`\${d.match} 結束，查看分析下次更準！\`,
+    deepLink: '/my-bets/:betId',
+  },
+
+  // ✅ 優惠券到期提醒 — 到期前 24hr + 2hr 各一次
+  COUPON_EXPIRY: {
+    trigger: 'coupon_expiring',
+    title: () => '⏰ 優惠券快到期了',
+    body:  (d) => \`「\${d.couponName}」剩 \${d.hoursLeft} 小時，立即使用！\`,
+    deepLink: '/promotions/my-coupons',
+    maxPerDay: 2,
+  },
+
+  // ✅ 限時活動開始 — 活動上線即推（依玩家偏好篩選）
+  EVENT_START: {
+    trigger: 'campaign_launched',
+    title: (d) => \`🎯 \${d.title} 現在開始\`,
+    body:  (d) => \`限時 \${d.durationHr}hr，\${d.highlight}\`,
+    deepLink: '/promotions/:campaignId',
+    filter: 'userInterestMatch',  // 只推相關產品的玩家
+  },
+
+  // 🔴 Jackpot 快到頂 — 累積獎金超過個人歷史關注閾值
+  JACKPOT_HOT: {
+    trigger: 'jackpot_threshold',
+    title: () => '💰 Jackpot 快爆了',
+    body:  (d) => \`現在累積 \${d.amount}，近期最高紀錄！\`,
+    deepLink: '/games/jackpot',
+  },
+
+  // 🔴 回歸禮包 — 沉睡 7 天首推，14 天再推一次
+  WIN_BACK: {
+    trigger: 'user_inactive_days',
+    title: () => '🎁 久違了，專屬禮包等你',
+    body:  (d) => \`回來就送 \${d.bonusDesc}，今天限定\`,
+    deepLink: '/promotions/winback',
+    cooldownDays: 7,
+  },
+
+  // 🔴 新遊戲上線 — 依玩家最常玩類型篩選推送
+  NEW_GAME: {
+    trigger: 'game_released',
+    title: (d) => \`✨ 新遊戲：\${d.gameName}\`,
+    body:  (d) => \`\${d.provider} 最新作，首玩享 \${d.freeSpins} Free Spins\`,
+    deepLink: '/games/:gameId',
+    filter: 'preferredCategory',
+  },
+
+  // 🔴 VIP 快升等 — 距升等差 < 10%
+  VIP_CLOSE: {
+    trigger: 'tier_progress_threshold',
+    title: (d) => \`⭐ 距 \${d.nextTier} 只差一步\`,
+    body:  (d) => \`再存 \${d.amountNeeded} 即可解鎖 \${d.benefit}\`,
+    deepLink: '/profile/vip',
+  },
+
+  // 🔴 比賽即將開始 — 已投注賽事，開賽前 30 分鐘
+  MATCH_SOON: {
+    trigger: 'match_kickoff_soon',
+    title: (d) => \`⏱ \${d.match} 30 分鐘後開賽\`,
+    body:  () => '你的投注已鎖定，加油！',
+    deepLink: '/live/:matchId',
+  },
+};`,
+   predict:'每種推播只在最相關的時刻送出，玩家看到的是「它知道我在做什麼」而不是廣告轟炸，開啟率與回流率都大幅提升。',
+   api:`POST /api/push/send → { scenario, userId, payload }
+GET  /api/push/preferences → UserPushSettings
+PUT  /api/push/preferences → 更新訂閱偏好
+後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff`},
+
   {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['be','ai','ux'],diff:'hard',
    desc:'後端 AI 計算流失機率，達閾值時透過 WebSocket 觸發站內保留行動。',
