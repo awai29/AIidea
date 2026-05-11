@@ -479,3 +479,117 @@ cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
 python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
 # 期望：20/20 passed
 ```
+
+---
+
+## [2026-05-11] 補齊趙雲真實素材 prompt pack
+
+### 目前進度
+- 補上真實 AI 素材接入的上游規格文件，讓 `image2 + agent-sprite-forge + pipeline/` 可以直接開始生第一批角色圖
+- 把起手順序明確定成：`趙雲 reference → 趙雲 idle poseboard → pipeline 驗證 → 趙雲 walk`
+- 修正文檔理解落差：現有 `pipeline/run.py` 的真實流程是「每個 action 各自餵一張 poseboard」，不是只丟單一 `poseboard.png` 就完成全部動作
+
+### 改了哪些檔案
+- `docs/zhaoyun-sprite-prompt-pack.md`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 無，這次只新增與更新文件，沒有改動遊戲程式或 pipeline 程式碼
+
+### 阻塞點
+- 真實角色素材尚未生成
+- `pipeline/input/` 的實際輸入圖仍需由下一步的 image2 / agent-sprite-forge 流程產出
+
+### 下一步
+- 先用 `docs/zhaoyun-sprite-prompt-pack.md` 的 `Reference Prompt A` 生成 2 到 4 張趙雲候選圖
+- 選定 `reference-v1.png` 後，再生成 `idle-poseboard-v1.png`
+- 跑 `pipeline/run.py all --character zhaoyun --action idle --poseboard ...`
+
+### 驗證方式
+- 檢查 `docs/zhaoyun-sprite-prompt-pack.md` 是否已包含：
+  - 趙雲 `reference / idle / walk` prompt
+  - negative prompt
+  - pipeline 命令範例
+  - 命名與版本規則
+
+---
+
+## [2026-05-11] 建立趙雲素材輸入骨架與 agent-sprite-forge 操作稿
+
+### 目前進度
+- 已建立 `pipeline/input/` 入口說明與 `pipeline/input/zhaoyun/` 輸入骨架
+- 已把 `reference / idle / walk` prompt 與 negative prompt 拆成可直接使用的 `.txt` 檔
+- 已補一份 `agent-sprite-forge` 專用 runbook，讓下一步可以直接從趙雲 reference 開始產圖
+
+### 改了哪些檔案
+- `pipeline/input/README.md`
+- `pipeline/input/zhaoyun/agent-sprite-forge-runbook.md`
+- `pipeline/input/zhaoyun/reference-prompt-a.txt`
+- `pipeline/input/zhaoyun/reference-prompt-b.txt`
+- `pipeline/input/zhaoyun/reference-negative.txt`
+- `pipeline/input/zhaoyun/idle-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/idle-negative.txt`
+- `pipeline/input/zhaoyun/walk-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/walk-negative.txt`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 無，這次只新增素材流程文件與輸入骨架，沒有改動遊戲程式或 pipeline 程式邏輯
+
+### 阻塞點
+- 真實角色圖片仍未生成
+- 尚未把 `reference-v1.png` 與 `idle-poseboard-v1.png` 放進 `pipeline/input/zhaoyun/`
+
+### 下一步
+- 用 `pipeline/input/zhaoyun/reference-prompt-a.txt` 先生成 2 到 4 張趙雲候選圖
+- 選出 `reference-v1.png`
+- 再用 `pipeline/input/zhaoyun/idle-poseboard-prompt.txt` 生成 `idle-poseboard-v1.png`
+
+### 驗證方式
+- 檢查 `pipeline/input/zhaoyun/` 是否已有 prompt txt、negative txt 與 runbook
+- 確認 `pipeline/input/README.md` 的命令範例與 `pipeline/run.py` 參數一致
+
+---
+
+## [2026-05-11] Phase 8：2.5D 升級（透視縮放 + 衝刺系統）
+
+### 目前進度
+- 透視縮放：角色依 beltY 縮放（遠景 0.8×，近景 1.2×）
+- Painter's Algorithm：所有角色依 beltY 排序繪製，近景蓋遠景
+- 地板透視橫線：二次方分布，強化近大遠小感
+- 跳躍陰影：起跳時地板出現橢圓陰影，越高越淡
+- 走位帶：60px → 120px，戰場縱深大幅提升
+- 衝刺（C 鍵）：12 幀衝刺，60 幀冷卻，可接 Z/X 取消
+- 衝刺 UI：右上角冷卻進度條
+- 測試：23/23 全部通過
+
+### 改了哪些檔案
+- `zhaoyun-mvp/src/game/config.js`：BELT_Y_RANGE/TOLERANCE/速度/衝刺常數
+- `zhaoyun-mvp/src/game/renderer.js`：透視縮放、Painter's Algorithm、陰影、UI
+- `zhaoyun-mvp/src/game/state.js`：dashTimer/dashCooldown
+- `zhaoyun-mvp/src/game/text-state.js`：暴露衝刺欄位
+- `zhaoyun-mvp/src/game/entities/player.js`：衝刺狀態機
+- `tests/test_zhaoyun_mvp.py`：3 個衝刺測試
+
+### 阻塞點
+無
+
+### 下一步
+Phase 9（選項）：
+1. 音效（Web Audio API）
+2. 行動裝置觸控按鍵
+3. 真實 AI sprite 素材接入
+
+### 驗證方式
+```bash
+cd zhaoyun-mvp && python3 -m http.server 8080
+# 瀏覽器 http://localhost:8080
+# 往上走：確認角色變小；往下走：確認角色變大
+# 跳躍：確認地板出現陰影
+# C 鍵：確認快速衝刺，右上角有冷卻條
+# 攻擊敵人：確認透視縮放下仍可命中
+
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+# 23/23 passed
+```
