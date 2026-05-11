@@ -12,6 +12,8 @@ export function getTextState(state) {
       state: state.player.state,
       facing: state.player.facing,
       onGround: state.player.onGround,
+      dashTimer: state.player.dashTimer,
+      dashCooldown: state.player.dashCooldown,
     },
     enemies: state.enemies.map(e => ({
       id: e.id,

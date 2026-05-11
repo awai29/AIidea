@@ -21,6 +21,8 @@ export function createInitialState() {
       attackCooldown: 0,
       hurtTimer: 0,
       deathTimer: 0,
+      dashTimer: 0,
+      dashCooldown: 0,
     },
     enemies: [],
     hitboxes: [],
