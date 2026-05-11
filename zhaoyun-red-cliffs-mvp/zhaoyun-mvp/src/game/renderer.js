@@ -299,6 +299,38 @@ export function render(ctx, state) {
   ctx.fillStyle = '#fff'; ctx.font = '11px monospace';
   ctx.fillText(`趙雲  ${p.hp} / ${p.maxHp}`, 20, 27);
 
+  // 衝刺冷卻 UI（右上角）
+  const dashBarW = 100;
+  const dashBarX = CONFIG.CANVAS_WIDTH - dashBarW - 16;
+  const dashBarY = 16;
+  const dashReady = p.dashCooldown === 0 && p.state !== 'dash';
+  const dashProgress = p.dashCooldown > 0
+    ? 1 - p.dashCooldown / CONFIG.DASH_COOLDOWN
+    : 1;
+
+  // 背景
+  ctx.fillStyle = '#333';
+  ctx.fillRect(dashBarX, dashBarY, dashBarW, 14);
+
+  // 進度條
+  if (p.state === 'dash') {
+    // 衝刺中：閃爍（依 frameCount 切換）
+    ctx.fillStyle = state.frameCount % 6 < 3 ? '#88ffff' : '#44aaaa';
+    ctx.fillRect(dashBarX, dashBarY, dashBarW, 14);
+  } else {
+    ctx.fillStyle = dashReady ? '#ffffaa' : '#668866';
+    ctx.fillRect(dashBarX, dashBarY, dashBarW * dashProgress, 14);
+  }
+
+  // 外框
+  ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+  ctx.strokeRect(dashBarX, dashBarY, dashBarW, 14);
+
+  // 文字
+  ctx.fillStyle = dashReady ? '#fff' : '#aaa';
+  ctx.font = '11px monospace';
+  ctx.fillText('DASH [C]', dashBarX + 4, dashBarY + 11);
+
   // 區段提示
   if (state.mode === 'running') {
     const seg = state.level.segments[state.level.currentSegment];
