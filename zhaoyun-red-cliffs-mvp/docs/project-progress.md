@@ -421,3 +421,61 @@ zhaoyun-red-cliffs-mvp/
     ├── test_zhaoyun_mvp.py        # 14 個遊戲邏輯測試
     └── test_sprite_integration.py  # 4 個 sprite 整合測試
 ```
+
+---
+
+## [2026-05-11] Phase 7：視差背景 + 打擊感強化，20/20 通過
+
+### 目前進度
+
+Phase 7 全部完成（Tasks 21-28）：
+- **視差背景**：4 層捲動（天空漸層、遠山 0.05×、帳篷旗幟 0.25×、地面紋路 0.6×），純 Canvas2D 繪製，不需要圖片
+- **螢幕震動**：攻擊命中敵人 intensity=5/timer=8，玩家受傷 intensity=10/timer=12；HUD 不受影響
+- **打擊凍幀**：命中後 hitFreeze=2，跳過 2 幀遊戲邏輯，強化衝擊感
+- **命中粒子**：6 個放射狀粒子，命中=黃色，擊殺=橘紅色，含重力衰減
+- **測試**：20/20 遊戲 + sprite 整合測試全通過（pipeline 測試另計 14 個）
+
+### 改了哪些檔案
+
+新增：
+- `zhaoyun-mvp/src/game/particles.js`（spawnHitParticles / updateParticles）
+
+修改：
+- `zhaoyun-mvp/src/game/renderer.js`：drawBackground()（視差）、drawParticles()、ctx.save/translate 震動偏移
+- `zhaoyun-mvp/src/game/state.js`：加入 screenShake / hitFreeze / particles 欄位
+- `zhaoyun-mvp/src/game/text-state.js`：暴露 particles.length / screenShake.timer
+- `zhaoyun-mvp/src/game/combat.js`：hurtEnemy 觸發粒子 + 震動；玩家受傷觸發震動
+- `zhaoyun-mvp/src/main.js`：tick 加入粒子更新 + 震動衰減 + hitFreeze 凍幀邏輯
+- `tests/test_zhaoyun_mvp.py`：新增 test_hit_feel_fields_exist / test_attack_triggers_screen_shake
+
+### 跑了哪些測試
+
+指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+結果：**20/20 全部通過**
+
+### 阻塞點
+
+無
+
+### 下一步
+
+Phase 8（選項，擇一繼續）：
+1. **音效**：Web Audio API 純程式生成 8-bit 音效（攻擊、受傷、死亡、通關）
+2. **行動裝置觸控按鍵**：畫面下方虛擬搖桿與按鈕
+3. **真實 AI sprite 素材**：準備 poseboard 圖片，執行 `pipeline/run.py all --character <name>`
+
+### 驗證方式
+
+```bash
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp
+python3 -m http.server 8080
+# 瀏覽器開 http://localhost:8080
+# 往右走：確認背景各層以不同速度移動
+# 攻擊命中敵人：確認畫面輕微震動 + 黃色粒子噴濺
+# 被打到：確認震動更強
+
+# 另一個 terminal
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+# 期望：20/20 passed
+```
