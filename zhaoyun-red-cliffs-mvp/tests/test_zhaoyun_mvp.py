@@ -16,7 +16,7 @@ def page():
         browser = p.chromium.launch()
         pg = browser.new_page(viewport={"width": 800, "height": 450})
         pg.goto(BASE_URL)
-        pg.wait_for_timeout(600)
+        pg.wait_for_function("typeof window.render_game_to_text === 'function'", timeout=5000)
         yield pg
         browser.close()
 
