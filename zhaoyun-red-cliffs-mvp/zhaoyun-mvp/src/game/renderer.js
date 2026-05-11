@@ -51,6 +51,21 @@ function getEntityBeltY(entity) {
   return entity.beltY !== undefined ? entity.beltY : entity.y;
 }
 
+// 跳躍陰影：角色跳起時在地板上顯示落點提示
+function drawShadow(ctx, screenX, beltY, baseWidth, scale, jumpHeight) {
+  if (jumpHeight <= 0) return;
+  const fadeT = Math.max(0, 1 - jumpHeight / 80); // jumpHeight 越高，陰影越淡
+  ctx.save();
+  ctx.globalAlpha = 0.3 * fadeT;
+  ctx.fillStyle = '#000';
+  const w = baseWidth * scale * 0.7;
+  const h = Math.max(3, 8 * scale * fadeT);
+  ctx.beginPath();
+  ctx.ellipse(screenX, beltY, w / 2, h / 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawParticles(ctx, state, camX) {
   for (const p of state.particles) {
     const alpha = p.life / p.maxLife;
@@ -136,16 +151,33 @@ function drawBackground(ctx, camX) {
     ctx.fillStyle = '#2a1810';
   }
 
-  // ── 層 3：地面（棕色，固定）
+  // ── 層 3：地面（棕色，固定底色）
   ctx.fillStyle = '#5c4033';
-  ctx.fillRect(0, G, W, H - G);
+  ctx.fillRect(0, G - CONFIG.BELT_Y_RANGE, W, H - G + CONFIG.BELT_Y_RANGE);
 
-  // 地面縱向紋路（視差 0.6×）
+  // 透視橫線：越靠近下方間距越大（二次方分布），強化近大遠小感
+  const floorTop = G - CONFIG.BELT_Y_RANGE; // 260
+  ctx.strokeStyle = '#4a3028';
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.5;
+  for (let row = 0; row <= 8; row++) {
+    const t = row / 8;
+    const lineY = floorTop + CONFIG.BELT_Y_RANGE * t * t; // 二次方使間距遞增
+    ctx.beginPath();
+    ctx.moveTo(0, lineY);
+    ctx.lineTo(W, lineY);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // 縱向紋路（視差 0.6×）
   const p3 = ((camX * 0.6) % 80 + 80) % 80;
   ctx.fillStyle = '#4a3028';
+  ctx.globalAlpha = 0.4;
   for (let rx = -80; rx < W + 80; rx += 80) {
-    ctx.fillRect(rx - p3, G, 3, H - G);
+    ctx.fillRect(rx - p3, G - CONFIG.BELT_Y_RANGE, 2, H - G + CONFIG.BELT_Y_RANGE);
   }
+  ctx.globalAlpha = 1;
 }
 
 export function render(ctx, state) {
@@ -200,6 +232,12 @@ export function render(ctx, state) {
     const dispH  = ent.height * scale;
     const screenX = ent.x - cam;
     const screenY = ent.y;   // y 已含 jumpHeight 偏移
+
+    // 跳躍陰影（在角色本體之前畫，讓陰影在角色底下）
+    const jumpH = ent.jumpHeight || 0;
+    if (jumpH > 0) {
+      drawShadow(ctx, screenX, beltY, ent.width, scale, jumpH);
+    }
 
     if (kind === 'enemy') {
       const e = ent;
