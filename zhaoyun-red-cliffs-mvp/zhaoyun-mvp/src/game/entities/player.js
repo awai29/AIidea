@@ -19,36 +19,71 @@ export function updatePlayer(state, { isDown }) {
     p.hurtTimer--;
     if (p.hurtTimer === 0 && p.state === 'hurt') p.state = 'idle';
   }
-  if (p.attackCooldown > 0) p.attackCooldown--;
+  if (p.attackCooldown > 0)  p.attackCooldown--;
+  if (p.dashCooldown > 0)    p.dashCooldown--;
+  if (p.dashTimer > 0)       p.dashTimer--;
 
-  // ── 輸入處理（attack / hurt 期間跳過）
-  const canInput = p.state !== 'attack' && p.state !== 'hurt';
+  // ── 衝刺進行中：維持速度，並處理取消
+  if (p.state === 'dash') {
+    if (p.dashTimer > 0) {
+      p.vx = p.facing * CONFIG.DASH_SPEED;
+      // 取消：Z 接攻擊
+      if (isDown('KeyZ') && p.attackCooldown === 0) {
+        p.dashTimer    = 0;
+        p.state        = 'attack';
+        p.attackTimer  = CONFIG.PLAYER_ATTACK_DURATION;
+        p.attackCooldown = CONFIG.PLAYER_ATTACK_COOLDOWN;
+        p.vx           = 0;
+      // 取消：X 接跳躍
+      } else if (isDown('KeyX') && p.onGround) {
+        p.dashTimer  = 0;
+        p.jumpVy     = CONFIG.JUMP_FORCE;
+        // state 將在下方由物理結果決定
+      }
+    } else {
+      // 衝刺結束
+      p.state = 'idle';
+      p.vx    = 0;
+    }
+  }
+
+  const canInput = p.state !== 'attack' && p.state !== 'hurt' && p.state !== 'dash';
+  const previousBeltY = p.beltY;
 
   if (canInput) {
-    // 攻擊
-    if (isDown('KeyZ') && p.attackCooldown === 0) {
-      p.state = 'attack';
-      p.attackTimer = CONFIG.PLAYER_ATTACK_DURATION;
+    // 觸發衝刺（優先於攻擊）
+    if (isDown('KeyC') && p.dashCooldown === 0) {
+      p.state       = 'dash';
+      p.dashTimer   = CONFIG.DASH_DURATION;
+      p.dashCooldown = CONFIG.DASH_COOLDOWN;
+      p.vx          = p.facing * CONFIG.DASH_SPEED;
+    } else if (isDown('KeyZ') && p.attackCooldown === 0) {
+      p.state        = 'attack';
+      p.attackTimer  = CONFIG.PLAYER_ATTACK_DURATION;
       p.attackCooldown = CONFIG.PLAYER_ATTACK_COOLDOWN;
-      p.vx = 0;
-    }
-    // 跳躍（只有 KeyX，ArrowUp 是走位鍵）
-    else if (isDown('KeyX') && p.onGround) {
+      p.vx           = 0;
+    } else if (isDown('KeyX') && p.onGround) {
       p.jumpVy = CONFIG.JUMP_FORCE;
     }
   }
 
-  // 水平移動（attack/hurt 時 vx = 0）
-  if (canInput && p.state !== 'attack') {
-    if (isDown('ArrowLeft'))       { p.vx = -CONFIG.PLAYER_SPEED; p.facing = -1; }
-    else if (isDown('ArrowRight')) { p.vx =  CONFIG.PLAYER_SPEED; p.facing =  1; }
-    else                            { p.vx = 0; }
-  } else if (!canInput) {
+  // ── 左右移動（不在衝刺/攻擊/受傷中）
+  if (canInput && p.state !== 'attack' && p.state !== 'dash') {
+    if (isDown('ArrowLeft')) {
+      p.vx = -CONFIG.PLAYER_SPEED;
+      p.facing = -1;
+    } else if (isDown('ArrowRight')) {
+      p.vx = CONFIG.PLAYER_SPEED;
+      p.facing = 1;
+    } else {
+      p.vx = 0;
+    }
+  } else if (!canInput && p.state !== 'dash') {
     p.vx = 0;
   }
 
-  // Belt-scroll Y 走位（只在地面；與跳躍物理完全獨立）
-  if (canInput && p.onGround) {
+  // ── Belt-scroll 走位（不在衝刺中）
+  if (canInput && p.onGround && p.state !== 'dash') {
     if (isDown('ArrowDown')) {
       p.beltY = Math.min(CONFIG.GROUND_Y, p.beltY + CONFIG.PLAYER_SPEED_Y);
     }
@@ -57,10 +92,9 @@ export function updatePlayer(state, { isDown }) {
     }
   }
 
-  // ── 物理（永遠執行，包含 attack / hurt 狀態）
+  // ── 物理（永遠執行）
   p.x += p.vx;
 
-  // 跳躍物理
   if (p.jumpVy > 0 || p.jumpHeight > 0) {
     p.jumpVy -= CONFIG.GRAVITY;
     p.jumpHeight = Math.max(0, p.jumpHeight + p.jumpVy);
@@ -68,28 +102,26 @@ export function updatePlayer(state, { isDown }) {
   p.onGround = p.jumpHeight === 0;
   if (p.onGround) p.jumpVy = 0;
 
-  // 渲染 Y = belt Y - 跳躍高度
   p.y = p.beltY - p.jumpHeight;
 
-  // 邊界限制
+  // ── 邊界限制
   p.x = Math.max(state.camera.x + p.width / 2, p.x);
   p.x = Math.min(CONFIG.LEVEL_WIDTH - p.width / 2, p.x);
 
-  // 清場鎖區右邊界
   const seg = state.level.segments[state.level.currentSegment];
   if (seg && seg.status === 'active' && state.camera.locked) {
     p.x = Math.min(seg.lockX - p.width / 2, p.x);
   }
 
-  // ── 狀態更新（attack/hurt 由 timer 管理）
-  if (p.state !== 'attack' && p.state !== 'hurt') {
+  // ── 狀態機（attack/hurt/dash 狀態由各自邏輯控制，此處只決定 idle/walk/jump）
+  if (p.state !== 'attack' && p.state !== 'hurt' && p.state !== 'dash') {
+    const movedOnBelt = p.beltY !== previousBeltY;
     if (!p.onGround) p.state = 'jump';
-    else if (p.vx !== 0) p.state = 'walk';
+    else if (p.vx !== 0 || movedOnBelt) p.state = 'walk';
     else p.state = 'idle';
   }
 }
 
-// 玩家受傷（由 combat.js 呼叫）
 export function hurtPlayer(player, damage, attackerX) {
   if (player.hurtTimer > 0 || player.state === 'death') return;
 
