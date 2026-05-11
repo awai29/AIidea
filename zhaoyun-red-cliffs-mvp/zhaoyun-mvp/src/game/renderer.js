@@ -55,19 +55,80 @@ function getEnemyAction(enemy) {
   return 'idle';
 }
 
+// 視差背景：三國赤壁風格，4 層捲動
+function drawBackground(ctx, camX) {
+  const W = CONFIG.CANVAS_WIDTH;
+  const H = CONFIG.CANVAS_HEIGHT;
+  const G = CONFIG.GROUND_Y;
+
+  // ── 層 0：天空漸層（固定不動）
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, G);
+  skyGrad.addColorStop(0,   '#0d1b2a');
+  skyGrad.addColorStop(0.5, '#1a1a3e');
+  skyGrad.addColorStop(1,   '#3d1a0a');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, G);
+
+  // ── 層 1：遠山輪廓（視差 0.05×）
+  const p1 = ((camX * 0.05) % W + W) % W;
+  ctx.fillStyle = '#1e1428';
+  for (let rx = -W; rx < W * 2; rx += 280) {
+    const mx = rx - p1;
+    ctx.beginPath();
+    ctx.moveTo(mx,       G - 10);
+    ctx.lineTo(mx + 50,  G - 90);
+    ctx.lineTo(mx + 130, G - 60);
+    ctx.lineTo(mx + 200, G - 110);
+    ctx.lineTo(mx + 280, G - 20);
+    ctx.lineTo(mx + 280, G);
+    ctx.lineTo(mx,       G);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // ── 層 2：中景（帳篷 + 旗幟，視差 0.25×）
+  const p2 = ((camX * 0.25) % W + W) % W;
+  ctx.fillStyle = '#2a1810';
+  for (let rx = -W; rx < W * 2; rx += 160) {
+    const mx = rx - p2;
+    // 帳篷三角
+    ctx.beginPath();
+    ctx.moveTo(mx,       G - 5);
+    ctx.lineTo(mx + 30,  G - 55);
+    ctx.lineTo(mx + 60,  G - 5);
+    ctx.closePath();
+    ctx.fill();
+    // 旗杆
+    ctx.fillStyle = '#1a0e08';
+    ctx.fillRect(mx + 105, G - 70, 5, 70);
+    // 旗幟（小三角）
+    ctx.fillStyle = '#8b1a1a';
+    ctx.beginPath();
+    ctx.moveTo(mx + 110, G - 70);
+    ctx.lineTo(mx + 130, G - 60);
+    ctx.lineTo(mx + 110, G - 50);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#2a1810';
+  }
+
+  // ── 層 3：地面（棕色，固定）
+  ctx.fillStyle = '#5c4033';
+  ctx.fillRect(0, G, W, H - G);
+
+  // 地面縱向紋路（視差 0.6×）
+  const p3 = ((camX * 0.6) % 80 + 80) % 80;
+  ctx.fillStyle = '#4a3028';
+  for (let rx = -80; rx < W + 80; rx += 80) {
+    ctx.fillRect(rx - p3, G, 3, H - G);
+  }
+}
+
 export function render(ctx, state) {
   ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
   const cam = state.camera.x;
 
-  // 背景
-  ctx.fillStyle = '#1a1a2e';
-  ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
-  ctx.fillStyle = '#16213e';
-  ctx.fillRect(0, 200, CONFIG.CANVAS_WIDTH, 250);
-
-  // 地面
-  ctx.fillStyle = '#5c4033';
-  ctx.fillRect(0, CONFIG.GROUND_Y + 64, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+  drawBackground(ctx, cam);
 
   // 鎖區提示線
   if (state.mode === 'running') {
