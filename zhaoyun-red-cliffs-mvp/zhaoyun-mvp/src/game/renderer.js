@@ -39,11 +39,11 @@ function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing
   ctx.fillRect(screenX - dispW / 2, screenY - dispH, dispW, dispH);
 }
 
-// 透視縮放：依 beltY 計算角色縮放比例（0.8× 遠景 ~ 1.2× 近景）
+// 透視縮放：依 beltY 計算角色縮放比例（0.88× 遠景 ~ 1.12× 近景）
 function getPerspectiveScale(beltY) {
   const minY = CONFIG.GROUND_Y - CONFIG.BELT_Y_RANGE; // 260
   const t = Math.max(0, Math.min(1, (beltY - minY) / CONFIG.BELT_Y_RANGE));
-  return 0.8 + 0.4 * t;
+  return 0.88 + 0.24 * t;
 }
 
 // 取得角色的 beltY（玩家有 beltY 欄位，敵人直接用 y）

@@ -29,14 +29,21 @@ const LEVEL_SCRIPT = [
   ]},
 ];
 
+// 隨機 beltY：在走位帶範圍內均勻分布
+function randomBeltY() {
+  const min = CONFIG.GROUND_Y - CONFIG.BELT_Y_RANGE;
+  return Math.round(min + Math.random() * CONFIG.BELT_Y_RANGE);
+}
+
 function spawnSegment(state, segment) {
   if (segment.spawned) return;
   segment.spawned = true;
   segment.enemyDefs.forEach(def => {
     const id = ++enemyIdCounter;
+    const beltY = randomBeltY();
     const enemy = def.type === 'swordsman'
-      ? createSwordsman(id, def.x, CONFIG.GROUND_Y)
-      : createSpearman(id, def.x, CONFIG.GROUND_Y);
+      ? createSwordsman(id, def.x, beltY)
+      : createSpearman(id, def.x, beltY);
     state.enemies.push(enemy);
     segment.enemies.push(id);
   });
