@@ -39,6 +39,18 @@ function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing
   ctx.fillRect(screenX - dispW / 2, screenY - dispH, dispW, dispH);
 }
 
+// 透視縮放：依 beltY 計算角色縮放比例（0.8× 遠景 ~ 1.2× 近景）
+function getPerspectiveScale(beltY) {
+  const minY = CONFIG.GROUND_Y - CONFIG.BELT_Y_RANGE; // 260
+  const t = Math.max(0, Math.min(1, (beltY - minY) / CONFIG.BELT_Y_RANGE));
+  return 0.8 + 0.4 * t;
+}
+
+// 取得角色的 beltY（玩家有 beltY 欄位，敵人直接用 y）
+function getEntityBeltY(entity) {
+  return entity.beltY !== undefined ? entity.beltY : entity.y;
+}
+
 function drawParticles(ctx, state, camX) {
   for (const p of state.particles) {
     const alpha = p.life / p.maxLife;
@@ -54,6 +66,7 @@ function getPlayerAction(player) {
   if (player.state === 'death')  return 'death';
   if (player.state === 'hurt')   return 'hurt';
   if (player.state === 'attack') return 'attack';
+  if (player.state === 'dash')   return 'walk';  // dash 用 walk 動畫（色塊版）
   if (Math.abs(player.vx) > 0.1) return 'walk';
   return 'idle';
 }
@@ -164,71 +177,74 @@ export function render(ctx, state) {
     });
   }
 
-  // 敵人
+  // ── 收集所有角色，依 beltY 排序後繪製（Painter's Algorithm）
+  const drawEntities = [];
+
   state.enemies.forEach((e) => {
     if (e.state === 'death' && e.deathTimer <= 0) return;
-    const ex = e.x - cam;
-    const ey = e.y - e.height;
-    ctx.globalAlpha = e.state === 'death' ? 0.4 : 1;
-    const enemyFallback = e.state === 'hurt' ? '#ff9999'
-      : e.type === 'swordsman' ? '#cc3333' : '#cc6600';
-    drawSprite(
-      ctx,
-      CHARACTER_KEY[e.type],
-      getEnemyAction(e),
-      ex,
-      e.y,
-      e.width,
-      e.height,
-      e.facing,
-      enemyFallback,
-    );
-    ctx.globalAlpha = 1;
-
-    // 血條
-    const maxHp = e.type === 'swordsman' ? CONFIG.SWORDSMAN_HP : CONFIG.SPEARMAN_HP;
-    ctx.fillStyle = '#333';
-    ctx.fillRect(ex - e.width / 2, ey - 10, e.width, 5);
-    ctx.fillStyle = '#ff4444';
-    ctx.fillRect(ex - e.width / 2, ey - 10, e.width * Math.max(0, e.hp / maxHp), 5);
+    drawEntities.push({ kind: 'enemy', ent: e });
   });
 
-  // 玩家
   const p = state.player;
   if (!(p.state === 'death' && p.deathTimer <= 0)) {
-    const px = p.x - cam;
-    const py = p.y - p.height;
-    const playerFallback = p.state === 'hurt' ? '#aaaaff'
-      : p.state === 'attack' ? '#ffffff' : '#5588ff';
-    drawSprite(
-      ctx,
-      CHARACTER_KEY.player,
-      getPlayerAction(p),
-      px,
-      p.y,
-      p.width,
-      p.height,
-      p.facing,
-      playerFallback,
-    );
-
-    // 方向三角
-    ctx.fillStyle = '#ffdd00';
-    ctx.beginPath();
-    const tipX = px + p.facing * (p.width / 2 + 8);
-    const midY = py + p.height / 2;
-    ctx.moveTo(tipX, midY);
-    ctx.lineTo(tipX - p.facing * 12, midY - 8);
-    ctx.lineTo(tipX - p.facing * 12, midY + 8);
-    ctx.fill();
-
-    // 攻擊框（調試可視）
-    state.hitboxes.filter(h => h.owner === 'player').forEach(h => {
-      ctx.strokeStyle = 'rgba(255,255,100,0.6)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(h.x - cam, h.y, h.width, h.height);
-    });
+    drawEntities.push({ kind: 'player', ent: p });
   }
+
+  // beltY 小（遠景）先畫，beltY 大（近景）後畫，自然產生遮擋
+  drawEntities.sort((a, b) => getEntityBeltY(a.ent) - getEntityBeltY(b.ent));
+
+  drawEntities.forEach(({ kind, ent }) => {
+    const beltY  = getEntityBeltY(ent);
+    const scale  = getPerspectiveScale(beltY);
+    const dispW  = ent.width  * scale;
+    const dispH  = ent.height * scale;
+    const screenX = ent.x - cam;
+    const screenY = ent.y;   // y 已含 jumpHeight 偏移
+
+    if (kind === 'enemy') {
+      const e = ent;
+      ctx.globalAlpha = e.state === 'death' ? 0.4 : 1;
+      const enemyFallback = e.state === 'hurt' ? '#ff9999'
+        : e.type === 'swordsman' ? '#cc3333' : '#cc6600';
+      drawSprite(ctx, CHARACTER_KEY[e.type], getEnemyAction(e),
+        screenX, screenY, dispW, dispH, e.facing, enemyFallback);
+      ctx.globalAlpha = 1;
+
+      // 血條（縮放後位置）
+      const maxHp = e.type === 'swordsman' ? CONFIG.SWORDSMAN_HP : CONFIG.SPEARMAN_HP;
+      const barY = screenY - dispH - 10;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(screenX - dispW / 2, barY, dispW, 5);
+      ctx.fillStyle = '#ff4444';
+      ctx.fillRect(screenX - dispW / 2, barY, dispW * Math.max(0, e.hp / maxHp), 5);
+
+    } else {
+      // 玩家
+      const playerFallback = p.state === 'hurt'   ? '#aaaaff'
+        : p.state === 'attack' ? '#ffffff'
+        : p.state === 'dash'   ? '#88ffff'
+        : '#5588ff';
+      drawSprite(ctx, CHARACTER_KEY.player, getPlayerAction(p),
+        screenX, screenY, dispW, dispH, p.facing, playerFallback);
+
+      // 方向三角
+      ctx.fillStyle = '#ffdd00';
+      ctx.beginPath();
+      const tipX = screenX + p.facing * (dispW / 2 + 8);
+      const midY = screenY - dispH / 2;
+      ctx.moveTo(tipX, midY);
+      ctx.lineTo(tipX - p.facing * 12, midY - 8);
+      ctx.lineTo(tipX - p.facing * 12, midY + 8);
+      ctx.fill();
+
+      // 攻擊框（調試可視）
+      state.hitboxes.filter(h => h.owner === 'player').forEach(h => {
+        ctx.strokeStyle = 'rgba(255,255,100,0.6)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(h.x - cam, h.y, h.width, h.height);
+      });
+    }
+  });
 
   // 繪製命中粒子
   drawParticles(ctx, state, cam);
