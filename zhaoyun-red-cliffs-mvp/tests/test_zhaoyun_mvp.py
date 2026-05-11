@@ -34,6 +34,45 @@ def advance(page: Page, ms: int):
     page.evaluate(f"window.advanceTime({ms})")
 
 
+def get_alive_enemies(state: dict) -> list[dict]:
+    return [enemy for enemy in state["enemies"] if enemy["state"] != "death"]
+
+
+def get_nearest_alive_enemy(state: dict) -> dict | None:
+    alive = get_alive_enemies(state)
+    if not alive:
+        return None
+    player_x = state["player"]["x"]
+    return min(alive, key=lambda enemy: abs(enemy["x"] - player_x))
+
+
+def move_player_to_enemy(page: Page, max_steps: int = 80, target_gap: int = 55) -> int:
+    for _ in range(max_steps):
+        state = get_state(page)
+        target = get_nearest_alive_enemy(state)
+        if target is None:
+            raise AssertionError("找不到可接近的敵人")
+
+        gap = target["x"] - state["player"]["x"]
+        if abs(gap) <= target_gap:
+            return target["id"]
+
+        key = "ArrowRight" if gap > 0 else "ArrowLeft"
+        page.keyboard.down(key)
+        advance(page, 100)
+        page.keyboard.up(key)
+
+    raise AssertionError("玩家未能在預期時間內靠近敵人")
+
+
+def face_enemy(page: Page, target_x: int):
+    player_x = get_state(page)["player"]["x"]
+    key = "ArrowLeft" if target_x < player_x else "ArrowRight"
+    page.keyboard.down(key)
+    advance(page, 50)
+    page.keyboard.up(key)
+
+
 # ─── Test 1：初始狀態為 title ─────────────────────────────
 def test_initial_state_is_title(page):
     assert get_state(page)["mode"] == "title"
@@ -126,37 +165,64 @@ def test_player_jumps_with_x_and_lands(page):
 # ─── Test 8：第一段有存活敵人 ───────────────────────────
 def test_first_segment_has_enemies(page):
     start_game(page)
-    alive = [e for e in get_state(page)["enemies"] if e["state"] != "death"]
+    alive = get_alive_enemies(get_state(page))
     assert len(alive) > 0
 
 
-# ─── Test 9：攻擊可減少敵人總 HP ────────────────────────
-def test_attack_reduces_enemy_hp(page):
+# ─── Test 9：敵人會沿 belt-scroll 深度追向玩家 ───────────
+def test_enemy_tracks_player_belt_y(page):
     start_game(page)
-    # 只前進 500ms，確保還在 segment 0（有 2 刀兵在附近）
-    advance(page, 500)
-    total_hp_before = sum(e["hp"] for e in get_state(page)["enemies"] if e["state"] != "death")
 
-    # 向右移動靠近敵人，然後攻擊
-    page.keyboard.down("ArrowRight")
-    advance(page, 1000)
-    page.keyboard.up("ArrowRight")
+    # 在玩家移動前先記錄敵人初始位置
+    state_initial = get_state(page)
+    target_initial = get_nearest_alive_enemy(state_initial)
+    assert target_initial is not None
+    enemy_initial_y = target_initial["y"]
 
-    for _ in range(5):
-        page.keyboard.down("KeyZ")
-        advance(page, 100)
-        page.keyboard.up("KeyZ")
-        advance(page, 300)
+    # 玩家往上走（beltY 減少），敵人應跟上
+    page.keyboard.down("ArrowUp")
+    advance(page, 800)
+    page.keyboard.up("ArrowUp")
+    player_belt_y = get_state(page)["player"]["beltY"]
 
-    total_hp_after = sum(e["hp"] for e in get_state(page)["enemies"] if e["state"] != "death")
-    # 只需要確認有敵人被擊倒（hp 降到 0）或 hp 減少
-    initial_total = sum(e["hp"] for e in get_state(page)["enemies"])
-    assert total_hp_after <= total_hp_before, (
-        f"攻擊後存活敵人總 HP 應 <= 初始，前：{total_hp_before}，後：{total_hp_after}"
+    # 再等敵人跟上
+    advance(page, 1200)
+
+    state_after = get_state(page)
+    target_after = next((enemy for enemy in state_after["enemies"] if enemy["id"] == target_initial["id"]), None)
+    assert target_after is not None
+    # 敵人應往玩家方向移動（y 減小）
+    assert target_after["y"] < enemy_initial_y, (
+        f"敵人應從 y={enemy_initial_y} 向玩家 beltY={player_belt_y} 移動，但現在 y={target_after['y']}"
     )
 
 
-# ─── Test 10：render_game_to_text 輸出合法 JSON ─────────
+# ─── Test 10：攻擊可減少目標敵人 HP ──────────────────────
+def test_attack_reduces_target_enemy_hp(page):
+    start_game(page)
+    target_id = move_player_to_enemy(page)
+    before_state = get_state(page)
+    target_before = next(enemy for enemy in before_state["enemies"] if enemy["id"] == target_id)
+
+    for _ in range(6):
+        current_state = get_state(page)
+        target_enemy = next((enemy for enemy in current_state["enemies"] if enemy["id"] == target_id), None)
+        if target_enemy is None or target_enemy["state"] == "death":
+            break
+        face_enemy(page, target_enemy["x"])
+        page.keyboard.down("KeyZ")
+        advance(page, 100)
+        page.keyboard.up("KeyZ")
+        advance(page, 500)
+
+    after_state = get_state(page)
+    target_after = next(enemy for enemy in after_state["enemies"] if enemy["id"] == target_id)
+    assert target_after["hp"] < target_before["hp"] or target_after["state"] == "death", (
+        f"目標敵人血量應下降或死亡，前：{target_before['hp']}，後：{target_after['hp']}，狀態：{target_after['state']}"
+    )
+
+
+# ─── Test 11：render_game_to_text 輸出合法 JSON ─────────
 def test_text_state_schema(page):
     start_game(page)
     advance(page, 500)
@@ -165,14 +231,14 @@ def test_text_state_schema(page):
     assert all(k in state["player"] for k in ["x", "y", "hp", "state", "onGround"])
 
 
-# ─── Test 11：截圖 title ─────────────────────────────────
+# ─── Test 12：截圖 title ─────────────────────────────────
 def test_screenshot_title(page):
     os.makedirs("docs/screenshots", exist_ok=True)
     page.evaluate("window.renderNow()")
     page.screenshot(path="docs/screenshots/title.png")
 
 
-# ─── Test 12：截圖 running ───────────────────────────────
+# ─── Test 13：截圖 running ───────────────────────────────
 def test_screenshot_running(page):
     os.makedirs("docs/screenshots", exist_ok=True)
     start_game(page)

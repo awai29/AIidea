@@ -6,11 +6,16 @@
 
 ## 目前狀態
 
-- Implementation plan 已完成並通過審查
-- 遊戲子目錄 `zhaoyun-mvp/` 已建立
-- 基礎遊戲骨架已建立
-- 趙雲角色的移動、belt-scroll 走位、跳躍、攻擊、受傷、死亡已接上第一輪實作
-- 敵人、戰鬥、關卡、鏡頭模組已有第一版程式
+✅ **MVP 全部完成（Phase 1–5）**
+
+- 遊戲可玩：移動、belt-scroll 走位、跳躍、攻擊、受傷、死亡、清場推進 4 段、勝利/死亡畫面
+- 敵人 AI：刀兵（近戰追擊）、槍兵（保距長槍）
+- 關卡系統：4 段清場，清空解鎖下一段
+- Playwright 自動化測試：**12/12 全部通過**
+- 所有程式碼在 `zhaoyun-mvp/`，測試在 `tests/`
+
+**下一步（Phase 6）：** 替換色塊為 AI 生成 sprite
+→ 詳見 `docs/pixel-sprite-game-workflow-handoff.md`
 
 ## 核心文件（依閱讀優先順序）
 
@@ -100,6 +105,36 @@
 - 啟動 `cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
 - 用 Playwright 或瀏覽器確認：ArrowUp/Down 只改 beltY、不觸發跳躍；X 可起跳再落地；Z 可進入 attack 狀態
 
+## [2026-05-11] 敵人 belt-scroll 對齊與戰鬥測試穩定化
+
+### 目前進度
+- 敵人 AI 現在會沿 belt-scroll 深度追向玩家，不再永遠固定在最底 lane
+- 刀兵 / 槍兵的 X 軸追擊改成較不易穿過玩家的步進方式
+- 戰鬥測試改成鎖定最近目標敵人，不再用「全場總 HP」這種會被換段干擾的判斷
+
+### 改了哪些檔案
+- `zhaoyun-mvp/src/game/config.js`
+- `zhaoyun-mvp/src/game/entities/enemy-swordsman.js`
+- `zhaoyun-mvp/src/game/entities/enemy-spearman.js`
+- `tests/test_zhaoyun_mvp.py`
+
+### 跑了哪些測試
+- 用 Playwright 臨時腳本驗證敵人會追 `beltY`
+- 用 Playwright 臨時腳本驗證玩家可穩定擊殺同一個目標敵人
+- `pytest` 仍未安裝，正式 `python3 -m pytest tests/test_zhaoyun_mvp.py -q` 仍無法直接執行
+
+### 阻塞點
+- 本機仍缺少 `pytest`
+- 尚未跑完整清場推進與 victory / gameover 的正式回歸測試
+
+### 下一步
+- 補齊 `pytest` 後跑整份 `tests/test_zhaoyun_mvp.py`
+- 驗證清場推進、鏡頭鎖區、victory / gameover 是否和新的敵人追蹤邏輯相容
+
+### 驗證方式
+- 啟動 `python3 -m http.server 8080` 後，讓趙雲先往上走位，再觀察敵人是否會沿同一個 belt depth 靠近
+- 靠近敵人後轉身攻擊，確認同一個敵人的 `hp` 下降或變成 `death`
+
 ---
 
 ## [2026-05-11] 完成全部 MVP 實作（Task 11 手動驗收）
@@ -146,3 +181,100 @@ Phase 6（素材接入）：依 `docs/pixel-sprite-game-workflow-handoff.md` 替
 3. WASD/方向鍵移動，X 跳躍，Z 攻擊，清場推進 4 段
 4. 全清後顯示勝利畫面，R 鍵重開
 5. `python3 -m pytest tests/test_zhaoyun_mvp.py -v` 確認 12/12 通過
+
+---
+
+## [2026-05-11] 修正測試 fixture 時序問題，確認 12/12 穩定通過
+
+### 目前進度
+所有 Phase 1-5 完成。最後修正 Playwright fixture 的 race condition。
+
+### 改了哪些檔案
+- `tests/test_zhaoyun_mvp.py`：fixture 從 `wait_for_timeout(600)` 改為 `wait_for_function("typeof window.render_game_to_text === 'function'")` — 避免 ES module 尚未載入就執行測試
+
+### 跑了哪些測試
+指令：`python3 -m pytest tests/test_zhaoyun_mvp.py -v`
+結果：**12/12 全部通過（穩定，無 flakiness）**
+
+### 阻塞點
+無
+
+### 下一步
+**Phase 6 素材接入**，由下一個 agent 接手：
+1. 閱讀 `docs/pixel-sprite-game-workflow-handoff.md`
+2. 在 `zhaoyun-mvp/assets/sprites/` 放入 AI 生成的 sprite sheet
+3. 修改 `zhaoyun-mvp/src/game/assets.js` 載入 sprite
+4. 修改 `renderer.js` 從 `ctx.fillRect` 改為 `ctx.drawImage` 繪製 sprite
+
+### 驗證方式
+```bash
+# 啟動伺服器
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp
+python3 -m http.server 8080
+
+# 在另一個 terminal 跑測試
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+python3 -m pytest tests/test_zhaoyun_mvp.py -v
+# 期望：12/12 passed
+```
+
+---
+
+## [2026-05-11] 修正測試邏輯 + 補齊敵人追蹤測試，13/13 穩定通過
+
+### 目前進度
+所有 Phase 1-5 完成，測試套件擴充至 13 項全通過。
+
+### 改了哪些檔案
+- `tests/test_zhaoyun_mvp.py`：
+  - fixture 改用 `wait_for_function` 確保 ES module 載入完再執行（防 race condition）
+  - 新增 `test_enemy_tracks_player_belt_y`：驗證敵人沿 belt-scroll 追蹤玩家深度
+  - 新增 `test_attack_reduces_target_enemy_hp`：更精確的攻擊命中驗證（靠近敵人再攻）
+  - 修正 `test_enemy_tracks_player_belt_y` 讀取時序（需在玩家移動前先讀初始敵人位置）
+- `README.md`：更新狀態與下一步說明
+- `docs/project-progress.md`：追加本記錄
+
+### 跑了哪些測試
+指令：`python3 -m pytest tests/test_zhaoyun_mvp.py -v`
+結果：**13/13 全部通過**
+
+| 測試 | 說明 |
+|------|------|
+| test_initial_state_is_title | 初始 mode = title ✅ |
+| test_start_game_enters_running | startGame → running ✅ |
+| test_player_initial_stats | 初始血量與狀態 ✅ |
+| test_player_moves_right | 右移改變 x ✅ |
+| test_player_moves_left | 左移改變 x ✅ |
+| test_player_belt_scrolls_without_jumping | ArrowUp 改 beltY，不觸發跳躍 ✅ |
+| test_player_jumps_with_x_and_lands | X 起跳並落地 ✅ |
+| test_first_segment_has_enemies | 第一段有存活敵人 ✅ |
+| test_enemy_tracks_player_belt_y | 敵人追蹤玩家 belt-scroll 深度 ✅ |
+| test_attack_reduces_target_enemy_hp | 攻擊減少目標敵人血量 ✅ |
+| test_text_state_schema | JSON 輸出格式正確 ✅ |
+| test_screenshot_title | title 畫面截圖 ✅ |
+| test_screenshot_running | running 畫面截圖 ✅ |
+
+### 阻塞點
+無
+
+### 下一步
+**Phase 6 素材接入**，Codex 或下一個 agent 接手：
+1. 閱讀 `docs/pixel-sprite-game-workflow-handoff.md`（AI sprite pipeline 說明）
+2. 在 `zhaoyun-mvp/assets/sprites/` 放入趙雲、刀兵、槍兵 sprite sheet
+3. 建立 `zhaoyun-mvp/src/game/assets.js` 管理圖片載入
+4. 修改 `renderer.js`：各 entity 從 `ctx.fillRect` 改為 `ctx.drawImage`
+5. 跑 `pytest` 確認 13/13 測試仍通過（非視覺邏輯不應改變）
+
+### 驗證方式
+```bash
+# 啟動伺服器
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp
+python3 -m http.server 8080
+
+# 另一個 terminal
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+python3 -m pytest tests/test_zhaoyun_mvp.py -v
+# 期望：13/13 passed
+```
+
+最新 commit：見下方（master 分支）
