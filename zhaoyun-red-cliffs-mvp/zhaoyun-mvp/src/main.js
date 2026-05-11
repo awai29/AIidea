@@ -10,6 +10,7 @@ import { updateCombat } from './game/combat.js';
 import { updateCamera } from './game/camera.js';
 import { render } from './game/renderer.js';
 import { getTextState } from './game/text-state.js';
+import { updateParticles } from './game/particles.js';
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -17,11 +18,26 @@ let state = createInitialState();
 let lastTime = 0;
 
 function tick() {
+  // 更新粒子（永遠執行，不受 hitFreeze 影響）
+  updateParticles(state);
+
+  // 螢幕震動衰減（永遠執行）
+  if (state.screenShake.timer > 0) {
+    state.screenShake.intensity *= 0.8;
+    state.screenShake.timer--;
+  }
+
   if (state.mode === 'title') {
     if (isDown('KeyZ') || isDown('Space') || isDown('Enter')) startGame();
     return;
   }
   if (state.mode !== 'running') return;
+
+  // 打擊凍幀：跳過本幀的遊戲邏輯
+  if (state.hitFreeze > 0) {
+    state.hitFreeze--;
+    return;
+  }
 
   updatePlayer(state, { isDown });
 
