@@ -111,6 +111,7 @@
 - 敵人 AI 現在會沿 belt-scroll 深度追向玩家，不再永遠固定在最底 lane
 - 刀兵 / 槍兵的 X 軸追擊改成較不易穿過玩家的步進方式
 - 戰鬥測試改成鎖定最近目標敵人，不再用「全場總 HP」這種會被換段干擾的判斷
+- 第一段清場後推進到第二段的驗證路徑已確認可行
 
 ### 改了哪些檔案
 - `zhaoyun-mvp/src/game/config.js`
@@ -121,6 +122,7 @@
 ### 跑了哪些測試
 - 用 Playwright 臨時腳本驗證敵人會追 `beltY`
 - 用 Playwright 臨時腳本驗證玩家可穩定擊殺同一個目標敵人
+- 用 Playwright 臨時腳本驗證清掉第一段後 `currentSegment` 會推進到 `1`
 - `pytest` 仍未安裝，正式 `python3 -m pytest tests/test_zhaoyun_mvp.py -q` 仍無法直接執行
 
 ### 阻塞點
@@ -129,7 +131,7 @@
 
 ### 下一步
 - 補齊 `pytest` 後跑整份 `tests/test_zhaoyun_mvp.py`
-- 驗證清場推進、鏡頭鎖區、victory / gameover 是否和新的敵人追蹤邏輯相容
+- 驗證後續區段、victory / gameover 是否和新的敵人追蹤邏輯相容
 
 ### 驗證方式
 - 啟動 `python3 -m http.server 8080` 後，讓趙雲先往上走位，再觀察敵人是否會沿同一個 belt depth 靠近
@@ -278,3 +280,144 @@ python3 -m pytest tests/test_zhaoyun_mvp.py -v
 ```
 
 最新 commit：見下方（master 分支）
+
+---
+
+## [2026-05-11] Phase 6 sprite pipeline 完成，18/18 測試通過
+
+### 目前進度
+
+Phase 6 全部完成（Tasks 12-20）：
+- **Pipeline 模組**（`pipeline/`）：Python 腳本，處理 AI 生成圖片 → 可用 spritesheet
+  - `snap.py`：Lanczos 降採樣 + 調色盤量化，消除 mixel 雜訊
+  - `recover.py`：Chroma key 提取分格圖的單格，bounding box 裁切
+  - `align.py`：底部對齊所有 frame，消除 frame drift
+  - `pack.py`：打包 spritesheet + 輸出 `atlas.json`
+  - `run.py`：CLI 入口，支援 `snap/recover/align/pack/all` 子命令
+  - `gen_placeholder.py`：生成色塊測試用 spritesheet（不需要真實素材即可測試 JS 端）
+- **遊戲端整合**（`zhaoyun-mvp/src/game/`）：
+  - `assets.js`（新增）：瀏覽器端 sprite 載入器，`loadSprite(character)` / `getFrame()` / `calcFrameIndex()` / `isLoaded()` / `loadAssets()`
+  - `renderer.js`（修改）：新增 `drawSprite()` helper，各 entity 優先用 sprite，fallback 為色塊
+- **測試**（`tests/test_sprite_integration.py`）：4 個 smoke tests 驗證 pipeline 輸出與遊戲整合
+- **測試修復**：修正 `test_player_belt_scrolls_without_jumping`（advance 500ms→200ms，避免玩家撞到 belt 邊界導致 state 變 idle）
+
+### 改了哪些檔案
+
+新增：
+- `pipeline/snap.py`
+- `pipeline/recover.py`
+- `pipeline/align.py`
+- `pipeline/pack.py`
+- `pipeline/run.py`
+- `pipeline/gen_placeholder.py`
+- `zhaoyun-mvp/src/game/assets.js`
+- `tests/test_sprite_integration.py`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/sheet.png`（placeholder）
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/sheet.png`（placeholder）
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/atlas.json`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/sheet.png`（placeholder）
+- `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/atlas.json`
+
+修改：
+- `zhaoyun-mvp/src/game/renderer.js`（新增 drawSprite helper，替換 fillRect）
+- `tests/test_zhaoyun_mvp.py`（advance 500ms→200ms，修正 belt-scroll 邊界時序）
+
+### 跑了哪些測試
+
+指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+結果：**18/18 全部通過**
+
+| 測試 | 說明 |
+|------|------|
+| test_initial_state_is_title | 初始 mode = title ✅ |
+| test_start_game_enters_running | startGame → running ✅ |
+| test_player_initial_stats | 初始血量與狀態 ✅ |
+| test_player_moves_right | 右移改變 x ✅ |
+| test_player_moves_left | 左移改變 x ✅ |
+| test_player_belt_scrolls_without_jumping | ArrowUp 改 beltY，不觸發跳躍 ✅ |
+| test_player_jumps_with_x_and_lands | X 起跳並落地 ✅ |
+| test_first_segment_has_enemies | 第一段有存活敵人 ✅ |
+| test_enemy_tracks_player_belt_y | 敵人追蹤玩家 belt-scroll 深度 ✅ |
+| test_attack_reduces_target_enemy_hp | 攻擊減少目標敵人血量 ✅ |
+| test_clearing_first_segment_advances_level | 清場後推進到第二段 ✅ |
+| test_text_state_schema | JSON 輸出格式正確 ✅ |
+| test_screenshot_title | title 畫面截圖 ✅ |
+| test_screenshot_running | running 畫面截圖 ✅ |
+| test_placeholder_sprite_files_exist | placeholder sprite 檔案存在 ✅ |
+| test_atlas_json_structure | atlas.json 格式正確 ✅ |
+| test_game_loads_without_errors | 遊戲載入無 console error ✅ |
+| test_game_renders_with_sprite_or_fallback | 遊戲用 sprite 或 fallback 色塊渲染 ✅ |
+
+### 阻塞點
+
+無
+
+### 下一步
+
+**真實 AI 素材接入**（下一個 agent 接手）：
+
+1. 準備 AI 生成 sprite 圖片（poseboard 分格圖，3×4 格，每格一個動作幀）
+2. 放到 `pipeline/input/<character>/poseboard.png`
+3. 執行 Pipeline（在 `zhaoyun-red-cliffs-mvp/` 目錄）：
+   ```bash
+   cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+   python3 pipeline/run.py all --character zhaoyun
+   python3 pipeline/run.py all --character wei-swordsman
+   python3 pipeline/run.py all --character wei-spearman
+   ```
+4. 輸出自動放到 `zhaoyun-mvp/assets/sprites/<character>/runtime/`
+5. 跑測試確認 18/18 仍通過
+
+**Pipeline 模組說明：**
+- `snap.py`：消除 AI 圖的 mixel → 乾淨像素風格
+- `recover.py`：從分格圖（預設 3×4 格）提取每格 frame（chroma key + bounding box）
+- `align.py`：底部對齊，消除 frame 之間的位移飄移
+- `pack.py`：合併成 spritesheet，輸出 atlas.json
+
+**atlas.json 格式：**
+```json
+{
+  "frameWidth": 48,
+  "frameHeight": 64,
+  "animations": {
+    "idle": {
+      "fps": 8,
+      "frames": [{"x": 0, "y": 0, "w": 48, "h": 64}]
+    }
+  }
+}
+```
+
+### 驗證方式
+
+```bash
+# 啟動伺服器
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp
+python3 -m http.server 8080
+
+# 另一個 terminal
+cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+# 期望：18/18 passed
+```
+
+**目前目錄結構（pipeline）：**
+```
+zhaoyun-red-cliffs-mvp/
+├── pipeline/
+│   ├── snap.py
+│   ├── recover.py
+│   ├── align.py
+│   ├── pack.py
+│   ├── run.py
+│   └── gen_placeholder.py
+├── zhaoyun-mvp/
+│   └── assets/sprites/
+│       ├── zhaoyun/runtime/{sheet.png, atlas.json}
+│       ├── wei-swordsman/runtime/{sheet.png, atlas.json}
+│       └── wei-spearman/runtime/{sheet.png, atlas.json}
+└── tests/
+    ├── test_zhaoyun_mvp.py        # 14 個遊戲邏輯測試
+    └── test_sprite_integration.py  # 4 個 sprite 整合測試
+```
