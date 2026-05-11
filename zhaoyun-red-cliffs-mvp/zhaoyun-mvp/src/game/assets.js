@@ -74,6 +74,15 @@ export function isLoaded(character) {
   return Boolean(_cache[character]);
 }
 
+/**
+ * 預載入所有角色的 sprites（main.js 呼叫）。
+ * 使用 Promise.allSettled 確保即使某個 sprite 載入失敗也不中斷遊戲。
+ */
+export async function loadAssets() {
+  const characters = ['zhaoyun', 'wei-swordsman', 'wei-spearman'];
+  await Promise.allSettled(characters.map(c => loadSprite(c)));
+}
+
 function _loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();

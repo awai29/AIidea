@@ -1,4 +1,59 @@
 import { CONFIG } from './config.js';
+import { getFrame, calcFrameIndex, isLoaded } from './assets.js';
+
+// 角色 key 對應表
+const CHARACTER_KEY = {
+  player:    'zhaoyun',
+  swordsman: 'wei-swordsman',
+  spearman:  'wei-spearman',
+};
+
+/**
+ * 以 sprite 繪製 entity；若 sprite 未載入則 fallback 到色塊。
+ * screenX：角色中心 X（canvas 座標）
+ * screenY：角色腳底 Y（canvas 座標）
+ */
+function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing, fallbackColor) {
+  if (isLoaded(charKey)) {
+    const frameIdx = calcFrameIndex(charKey, action);
+    const frame = getFrame(charKey, action, frameIdx);
+    if (frame) {
+      const dx = screenX - dispW / 2;
+      const dy = screenY - dispH;
+      ctx.save();
+      if (facing === -1) {
+        ctx.translate(screenX, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(frame.img, frame.x, frame.y, frame.w, frame.h,
+                      -dispW / 2, dy, dispW, dispH);
+      } else {
+        ctx.drawImage(frame.img, frame.x, frame.y, frame.w, frame.h,
+                      dx, dy, dispW, dispH);
+      }
+      ctx.restore();
+      return;
+    }
+  }
+  // Fallback：色塊
+  ctx.fillStyle = fallbackColor;
+  ctx.fillRect(screenX - dispW / 2, screenY - dispH, dispW, dispH);
+}
+
+function getPlayerAction(player) {
+  if (player.state === 'death')  return 'death';
+  if (player.state === 'hurt')   return 'hurt';
+  if (player.state === 'attack') return 'attack';
+  if (Math.abs(player.vx) > 0.1) return 'walk';
+  return 'idle';
+}
+
+function getEnemyAction(enemy) {
+  if (enemy.state === 'death')    return 'death';
+  if (enemy.state === 'hurt')     return 'hurt';
+  if (enemy.state === 'attack')   return 'attack';
+  if (enemy.state === 'approach') return 'walk';
+  return 'idle';
+}
 
 export function render(ctx, state) {
   ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
@@ -35,9 +90,19 @@ export function render(ctx, state) {
     const ex = e.x - cam;
     const ey = e.y - e.height;
     ctx.globalAlpha = e.state === 'death' ? 0.4 : 1;
-    ctx.fillStyle = e.state === 'hurt' ? '#ff9999'
+    const enemyFallback = e.state === 'hurt' ? '#ff9999'
       : e.type === 'swordsman' ? '#cc3333' : '#cc6600';
-    ctx.fillRect(ex - e.width / 2, ey, e.width, e.height);
+    drawSprite(
+      ctx,
+      CHARACTER_KEY[e.type],
+      getEnemyAction(e),
+      ex,
+      e.y,
+      e.width,
+      e.height,
+      e.facing,
+      enemyFallback,
+    );
     ctx.globalAlpha = 1;
 
     // 血條
@@ -53,9 +118,19 @@ export function render(ctx, state) {
   if (!(p.state === 'death' && p.deathTimer <= 0)) {
     const px = p.x - cam;
     const py = p.y - p.height;
-    ctx.fillStyle = p.state === 'hurt' ? '#aaaaff'
+    const playerFallback = p.state === 'hurt' ? '#aaaaff'
       : p.state === 'attack' ? '#ffffff' : '#5588ff';
-    ctx.fillRect(px - p.width / 2, py, p.width, p.height);
+    drawSprite(
+      ctx,
+      CHARACTER_KEY.player,
+      getPlayerAction(p),
+      px,
+      p.y,
+      p.width,
+      p.height,
+      p.facing,
+      playerFallback,
+    );
 
     // 方向三角
     ctx.fillStyle = '#ffdd00';
