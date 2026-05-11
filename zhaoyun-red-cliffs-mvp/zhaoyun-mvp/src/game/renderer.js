@@ -39,6 +39,17 @@ function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing
   ctx.fillRect(screenX - dispW / 2, screenY - dispH, dispW, dispH);
 }
 
+function drawParticles(ctx, state, camX) {
+  for (const p of state.particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    const size = 4 * alpha + 1;
+    ctx.fillRect(p.x - camX - size / 2, p.y - size / 2, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
 function getPlayerAction(player) {
   if (player.state === 'death')  return 'death';
   if (player.state === 'hurt')   return 'hurt';
@@ -128,6 +139,14 @@ export function render(ctx, state) {
   ctx.clearRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
   const cam = state.camera.x;
 
+  // 螢幕震動偏移（套用到全部遊戲元素，HUD 除外）
+  const shakeX = state.screenShake.timer > 0
+    ? (Math.random() - 0.5) * state.screenShake.intensity : 0;
+  const shakeY = state.screenShake.timer > 0
+    ? (Math.random() - 0.5) * state.screenShake.intensity * 0.6 : 0;
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
+
   drawBackground(ctx, cam);
 
   // 鎖區提示線
@@ -210,6 +229,10 @@ export function render(ctx, state) {
       ctx.strokeRect(h.x - cam, h.y, h.width, h.height);
     });
   }
+
+  // 繪製命中粒子
+  drawParticles(ctx, state, cam);
+  ctx.restore();  // 移除震動偏移，確保 HUD 不抖動
 
   // 玩家血條 HUD
   const pr = Math.max(0, p.hp / p.maxHp);
