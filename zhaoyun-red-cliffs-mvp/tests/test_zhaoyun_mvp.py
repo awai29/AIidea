@@ -73,6 +73,19 @@ def face_enemy(page: Page, target_x: int):
     page.keyboard.up(key)
 
 
+def attack_target(page: Page, target_id: int, max_cycles: int = 6):
+    for _ in range(max_cycles):
+        current_state = get_state(page)
+        target_enemy = next((enemy for enemy in current_state["enemies"] if enemy["id"] == target_id), None)
+        if target_enemy is None or target_enemy["state"] == "death":
+            return
+        face_enemy(page, target_enemy["x"])
+        page.keyboard.down("KeyZ")
+        advance(page, 100)
+        page.keyboard.up("KeyZ")
+        advance(page, 500)
+
+
 # ─── Test 1：初始狀態為 title ─────────────────────────────
 def test_initial_state_is_title(page):
     assert get_state(page)["mode"] == "title"
@@ -122,7 +135,7 @@ def test_player_belt_scrolls_without_jumping(page):
     before = get_state(page)["player"]
 
     page.keyboard.down("ArrowUp")
-    advance(page, 500)
+    advance(page, 200)  # 200ms ≈ 12 frames × 2px = 24px，未到邊界（range=60），state 應為 walk
     # 在 keyboard.up 之前讀取 state（此時按鍵仍按下，state 應為 walk）
     after_up = get_state(page)["player"]
     page.keyboard.up("ArrowUp")
@@ -204,16 +217,7 @@ def test_attack_reduces_target_enemy_hp(page):
     before_state = get_state(page)
     target_before = next(enemy for enemy in before_state["enemies"] if enemy["id"] == target_id)
 
-    for _ in range(6):
-        current_state = get_state(page)
-        target_enemy = next((enemy for enemy in current_state["enemies"] if enemy["id"] == target_id), None)
-        if target_enemy is None or target_enemy["state"] == "death":
-            break
-        face_enemy(page, target_enemy["x"])
-        page.keyboard.down("KeyZ")
-        advance(page, 100)
-        page.keyboard.up("KeyZ")
-        advance(page, 500)
+    attack_target(page, target_id)
 
     after_state = get_state(page)
     target_after = next(enemy for enemy in after_state["enemies"] if enemy["id"] == target_id)
@@ -222,7 +226,24 @@ def test_attack_reduces_target_enemy_hp(page):
     )
 
 
-# ─── Test 11：render_game_to_text 輸出合法 JSON ─────────
+# ─── Test 11：清掉第一段後會推進到第二段 ────────────────
+def test_clearing_first_segment_advances_level(page):
+    start_game(page)
+
+    for _ in range(4):
+        state = get_state(page)
+        if state["level"]["currentSegment"] >= 1:
+            break
+        target_id = move_player_to_enemy(page)
+        attack_target(page, target_id)
+
+    final_state = get_state(page)
+    assert final_state["level"]["currentSegment"] >= 1
+    assert final_state["level"]["segments"][0]["status"] == "cleared"
+    assert final_state["camera"]["locked"] is False
+
+
+# ─── Test 12：render_game_to_text 輸出合法 JSON ─────────
 def test_text_state_schema(page):
     start_game(page)
     advance(page, 500)
@@ -231,14 +252,14 @@ def test_text_state_schema(page):
     assert all(k in state["player"] for k in ["x", "y", "hp", "state", "onGround"])
 
 
-# ─── Test 12：截圖 title ─────────────────────────────────
+# ─── Test 13：截圖 title ─────────────────────────────────
 def test_screenshot_title(page):
     os.makedirs("docs/screenshots", exist_ok=True)
     page.evaluate("window.renderNow()")
     page.screenshot(path="docs/screenshots/title.png")
 
 
-# ─── Test 13：截圖 running ───────────────────────────────
+# ─── Test 14：截圖 running ───────────────────────────────
 def test_screenshot_running(page):
     os.makedirs("docs/screenshots", exist_ok=True)
     start_game(page)
