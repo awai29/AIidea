@@ -29,6 +29,9 @@ export function createInitialState() {
       segments: [],
     },
     camera: { x: 0, locked: false },
+    screenShake: { intensity: 0, timer: 0 },
+    hitFreeze: 0,
+    particles: [],
     frameCount: 0,
   };
 }

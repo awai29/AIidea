@@ -36,5 +36,7 @@ export function getTextState(state) {
       x: Math.round(state.camera.x),
       locked: state.camera.locked,
     },
+    particles: state.particles.length,
+    screenShake: state.screenShake.timer,
   };
 }
