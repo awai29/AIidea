@@ -294,3 +294,49 @@ def test_attack_triggers_screen_shake(page):
     assert (enemy_after["hp"] < target_hp_before or enemy_after["state"] == "death"), (
         f"攻擊後敵人血量應下降或死亡，HP 前={target_hp_before} 後={enemy_after['hp']}"
     )
+
+
+# ─── Test 17：dashTimer / dashCooldown 欄位存在 ──────────────
+def test_dash_fields_exist(page):
+    start_game(page)
+    p = get_state(page)["player"]
+    assert "dashTimer" in p, "player 應有 dashTimer 欄位"
+    assert "dashCooldown" in p, "player 應有 dashCooldown 欄位"
+    assert p["dashTimer"] == 0
+    assert p["dashCooldown"] == 0
+
+
+# ─── Test 18：C 鍵觸發衝刺，dashTimer 啟動 ──────────────────
+def test_dash_triggers_on_c_key(page):
+    start_game(page)
+    # 先向右走，讓 facing = 1
+    page.keyboard.down("ArrowRight")
+    advance(page, 100)
+    page.keyboard.up("ArrowRight")
+
+    # 按 C 觸發衝刺
+    page.keyboard.down("KeyC")
+    advance(page, 16)   # 1 幀足夠讓衝刺啟動
+    page.keyboard.up("KeyC")
+
+    p = get_state(page)["player"]
+    # dashTimer 應 > 0（衝刺中）或 dashCooldown > 0（衝刺已觸發）
+    dash_triggered = p["dashTimer"] > 0 or p["dashCooldown"] > 0
+    assert dash_triggered, f"按 C 後應觸發衝刺，dashTimer={p['dashTimer']} dashCooldown={p['dashCooldown']}"
+
+
+# ─── Test 19：衝刺結束後有冷卻 ──────────────────────────────
+def test_dash_has_cooldown(page):
+    start_game(page)
+    # 觸發衝刺
+    page.keyboard.down("KeyC")
+    advance(page, 16)
+    page.keyboard.up("KeyC")
+
+    # 等衝刺結束（DASH_DURATION = 12 幀 = 200ms，多等一些）
+    advance(page, 300)
+
+    p = get_state(page)["player"]
+    # 衝刺結束後應有冷卻（dashCooldown > 0）
+    assert p["dashCooldown"] > 0, f"衝刺後應有冷卻，dashCooldown={p['dashCooldown']}"
+    assert p["dashTimer"] == 0, "衝刺已結束，dashTimer 應為 0"
