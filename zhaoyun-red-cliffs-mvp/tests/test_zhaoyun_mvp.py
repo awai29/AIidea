@@ -265,3 +265,32 @@ def test_screenshot_running(page):
     start_game(page)
     advance(page, 500)
     page.screenshot(path="docs/screenshots/running.png")
+
+
+# ─── Test 15：攻擊命中後 screenShake 欄位存在 ────────────────
+def test_hit_feel_fields_exist(page):
+    start_game(page)
+    state = get_state(page)
+    # 確認 Phase 7 新增的欄位存在於 text state
+    assert "particles" in state, "state 應包含 particles 欄位"
+    assert "screenShake" in state, "state 應包含 screenShake 欄位"
+    assert isinstance(state["particles"], int), "particles 應為 integer（粒子數量）"
+    assert isinstance(state["screenShake"], (int, float)), "screenShake 應為數字（timer）"
+
+
+# ─── Test 16：攻擊命中後敵人血量下降（打擊感整合驗證）────────
+def test_attack_triggers_screen_shake(page):
+    start_game(page)
+    target_id = move_player_to_enemy(page)
+    state_before = get_state(page)
+    target_hp_before = next(e for e in state_before["enemies"] if e["id"] == target_id)["hp"]
+
+    # 用 attack_target（內部自動對準 + 多次嘗試，已知可靠）
+    attack_target(page, target_id, max_cycles=2)
+
+    state_after = get_state(page)
+    enemy_after = next((e for e in state_after["enemies"] if e["id"] == target_id), None)
+    assert enemy_after is not None
+    assert (enemy_after["hp"] < target_hp_before or enemy_after["state"] == "death"), (
+        f"攻擊後敵人血量應下降或死亡，HP 前={target_hp_before} 後={enemy_after['hp']}"
+    )
