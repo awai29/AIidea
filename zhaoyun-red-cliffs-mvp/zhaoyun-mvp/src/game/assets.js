@@ -36,13 +36,20 @@ export async function loadSprite(character) {
     }),
   ]);
 
+  // 載入時把 img 寫入每個 frame 物件，getFrame 就不用每次 spread 建新物件
+  for (const anim of Object.values(atlas.animations)) {
+    for (const frame of anim.frames) {
+      frame.img = img;
+    }
+  }
+
   _cache[character] = { img, atlas };
   return _cache[character];
 }
 
 /**
  * 取得指定角色 / 動作 / 幀 的繪製參數。
- * 回傳 { img, x, y, w, h }，或 null（未載入 / 動作不存在）。
+ * 直接回傳 frame 物件（img 已在 loadSprite 時寫入），零額外分配。
  */
 export function getFrame(character, action, frameIndex) {
   const sprite = _cache[character];
@@ -51,8 +58,7 @@ export function getFrame(character, action, frameIndex) {
   const anim = sprite.atlas.animations[action];
   if (!anim || anim.frames.length === 0) return null;
 
-  const frame = anim.frames[frameIndex % anim.frames.length];
-  return { img: sprite.img, ...frame };
+  return anim.frames[frameIndex % anim.frames.length];
 }
 
 /**

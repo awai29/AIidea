@@ -21,6 +21,9 @@ function sceneImg(key) {
 // 天空漸層快取（只建一次，不用每幀 createLinearGradient）
 let _skyGrad = null;
 
+// 受傷 vignette 漸層快取（只建一次，透過 ctx.globalAlpha 控制強度）
+let _vignetteGrad = null;
+
 // Title 畫面 UI 的 offscreen canvas（只建一次，避免每幀 shadowBlur GPU 消耗）
 let _titleCanvas = null;
 
@@ -471,12 +474,16 @@ export function render(ctx, state) {
   if (state.hurtFlash > 0) {
     const vW = CONFIG.CANVAS_WIDTH;
     const vH = CONFIG.CANVAS_HEIGHT;
-    const alpha = (state.hurtFlash / 20) * 0.55;
-    const grad = ctx.createRadialGradient(vW / 2, vH / 2, vH * 0.25, vW / 2, vH / 2, vH * 0.85);
-    grad.addColorStop(0, 'rgba(180,0,0,0)');
-    grad.addColorStop(1, `rgba(200,0,0,${alpha.toFixed(3)})`);
-    ctx.fillStyle = grad;
+    // 預建漸層（只建一次），用 globalAlpha 控制強度，避免每幀 createRadialGradient
+    if (!_vignetteGrad) {
+      _vignetteGrad = ctx.createRadialGradient(vW / 2, vH / 2, vH * 0.25, vW / 2, vH / 2, vH * 0.85);
+      _vignetteGrad.addColorStop(0, 'rgba(180,0,0,0)');
+      _vignetteGrad.addColorStop(1, 'rgb(200,0,0)');
+    }
+    ctx.globalAlpha = (state.hurtFlash / 20) * 0.55;
+    ctx.fillStyle = _vignetteGrad;
     ctx.fillRect(0, 0, vW, vH);
+    ctx.globalAlpha = 1;
   }
 
   // 玩家血條 HUD
@@ -522,12 +529,11 @@ export function render(ctx, state) {
   ctx.font = '11px monospace';
   ctx.fillText('DASH [C]', dashBarX + 4, dashBarY + 11);
 
-  // 區段提示
+  // 區段提示（aliveCount 由 updateLevel 快取，不重算）
   if (state.mode === 'running') {
     const seg = state.level.segments[state.level.currentSegment];
     if (seg) {
-      const alive = state.enemies.filter(e =>
-        seg.enemies.includes(e.id) && e.state !== 'death').length;
+      const alive = seg.aliveCount ?? 0;
       ctx.fillStyle = '#ffcc44'; ctx.font = '13px monospace';
       ctx.fillText(`區段 ${state.level.currentSegment + 1} / ${CONFIG.NUM_SEGMENTS}  殘敵：${alive}`, 16, 50);
     }

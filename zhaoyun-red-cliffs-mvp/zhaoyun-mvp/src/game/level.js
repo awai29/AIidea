@@ -74,11 +74,19 @@ export function updateLevel(state) {
   const seg = state.level.segments[state.level.currentSegment];
   if (!seg || seg.status !== 'active') return;
 
-  // 計算當前段存活敵人（死亡敵人不從陣列移除，只排除）
-  const alive = seg.enemies.filter(id => {
-    const e = state.enemies.find(e => e.id === id);
-    return e && e.state !== 'death';
-  }).length;
+  // 計算存活數：for 迴圈 + 計數器，避免 filter/find 每幀分配陣列
+  // 同時快取到 seg.aliveCount，供 renderer 直接讀取（不用重算）
+  let alive = 0;
+  for (let i = 0; i < seg.enemies.length; i++) {
+    const id = seg.enemies[i];
+    for (let j = 0; j < state.enemies.length; j++) {
+      if (state.enemies[j].id === id && state.enemies[j].state !== 'death') {
+        alive++;
+        break;
+      }
+    }
+  }
+  seg.aliveCount = alive;
 
   if (alive > 0) return;
 
