@@ -34,6 +34,7 @@ function tick() {
     if (isDown('KeyZ') || isDown('Space') || isDown('Enter')) startGame();
     return;
   }
+  if (state.mode === 'paused') return;
   if (state.mode !== 'running') return;
 
   // 打擊凍幀：跳過本幀的遊戲邏輯
@@ -77,6 +78,10 @@ document.addEventListener('keydown', (e) => {
     else document.exitFullscreen();
   }
   if (e.code === 'KeyR') startGame();
+  if (e.code === 'Escape') {
+    if (state.mode === 'running') state.mode = 'paused';
+    else if (state.mode === 'paused') state.mode = 'running';
+  }
 });
 
 window.render_game_to_text = () => JSON.stringify(getTextState(state));

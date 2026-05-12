@@ -19,16 +19,27 @@
       <div class="touch-btn dpad-right" data-key="ArrowRight">→</div>
 
       <!-- 右側動作鍵 -->
-      <div class="touch-btn action-x" data-key="KeyX">跳</div>
-      <div class="touch-btn action-z" data-key="KeyZ">攻</div>
-      <div class="touch-btn action-c" data-key="KeyC">衝</div>
+      <div class="touch-btn action-x" data-key="KeyX"><span>跳</span><small>X</small></div>
+      <div class="touch-btn action-z" data-key="KeyZ"><span>攻</span><small>Z</small></div>
+      <div class="touch-btn action-c" data-key="KeyC"><span>衝</span><small>C</small></div>
+
+      <!-- 暫停按鈕（右上角） -->
+      <div class="touch-btn btn-pause" id="btn-pause">⏸</div>
     </div>
   </div>
   <script type="module" src="src/main.js"></script>
   <script>
     // 觸控按鍵事件綁定（在 load 後執行，等待 main.js 初始化）
     window.addEventListener('load', () => {
-      document.querySelectorAll('.touch-btn').forEach(btn => {
+      // 暫停按鈕（不走 data-key 機制，直接觸發 ESC）
+      const pauseBtn = document.getElementById('btn-pause');
+      if (pauseBtn) {
+        const fireEsc = () => document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+        pauseBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fireEsc(); }, { passive: false });
+        pauseBtn.addEventListener('mousedown',  (e) => { e.preventDefault(); fireEsc(); });
+      }
+
+      document.querySelectorAll('.touch-btn[data-key]').forEach(btn => {
         const key = btn.dataset.key;
 
         // 觸控事件（手機）

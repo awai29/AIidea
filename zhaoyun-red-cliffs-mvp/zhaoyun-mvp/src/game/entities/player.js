@@ -34,8 +34,8 @@ export function updatePlayer(state, { isDown }) {
         p.attackTimer  = CONFIG.PLAYER_ATTACK_DURATION;
         p.attackCooldown = CONFIG.PLAYER_ATTACK_COOLDOWN;
         p.vx           = 0;
-      // 取消：X 接跳躍
-      } else if (isDown('KeyX') && p.onGround) {
+      // 取消：X / Space 接跳躍
+      } else if ((isDown('KeyX') || isDown('Space')) && p.onGround) {
         p.dashTimer  = 0;
         p.jumpVy     = CONFIG.JUMP_FORCE;
         // state 將在下方由物理結果決定
@@ -62,7 +62,7 @@ export function updatePlayer(state, { isDown }) {
       p.attackTimer  = CONFIG.PLAYER_ATTACK_DURATION;
       p.attackCooldown = CONFIG.PLAYER_ATTACK_COOLDOWN;
       p.vx           = 0;
-    } else if (isDown('KeyX') && p.onGround) {
+    } else if ((isDown('KeyX') || isDown('Space')) && p.onGround) {
       p.jumpVy = CONFIG.JUMP_FORCE;
     }
   }

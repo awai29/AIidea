@@ -548,6 +548,29 @@ export function render(ctx, state) {
     ctx.drawImage(_titleCanvas, 0, 0);
   }
 
+  // Paused
+  if (state.mode === 'paused') {
+    const CW = CONFIG.CANVAS_WIDTH;
+    const CH = CONFIG.CANVAS_HEIGHT;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, CW, CH);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 40px serif';
+    ctx.fillText('暫停', CW / 2, CH / 2 - 50);
+
+    ctx.fillStyle = '#aabbff';
+    ctx.font = '18px monospace';
+    ctx.fillText('按 ESC 繼續', CW / 2, CH / 2);
+    ctx.fillStyle = '#aaa';
+    ctx.font = '14px monospace';
+    ctx.fillText('按 R 重新開始', CW / 2, CH / 2 + 30);
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
   // Victory
   if (state.mode === 'victory') {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
