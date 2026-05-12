@@ -1,5 +1,5 @@
 import { CONFIG } from './game/config.js';
-import { initInput, isDown } from './game/input.js';
+import { initInput, isDown, simulateKeyDown, simulateKeyUp } from './game/input.js';
 import { createInitialState } from './game/state.js';
 import { loadAssets } from './game/assets.js';
 import { initLevel, updateLevel } from './game/level.js';
@@ -90,6 +90,9 @@ window.startGame = startGame;
 
 async function init() {
   initInput();
+  // 暴露給 HTML 觸控按鍵使用
+  window.touchPressKey   = simulateKeyDown;
+  window.touchReleaseKey = simulateKeyUp;
   await loadAssets();
   requestAnimationFrame((ts) => { lastTime = ts; gameLoop(ts); });
 }
