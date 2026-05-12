@@ -169,7 +169,7 @@ function drawBackground(ctx, camX) {
   }
 
   // ── 層 2：中景（視差 0.25×）
-  const p2offset = ((camX * 0.25) % 800 + 800) % 800;
+  const p2offset = ((camX * 0.25) % W + W) % W;
 
   const imgTent = sceneImg('mid-tent');
   const imgFlag = sceneImg('mid-flag-pole');
@@ -274,7 +274,7 @@ function drawForeground(ctx, camX) {
     const off = ((camX * 0.85) % sp + sp) % sp;
     for (let i = -1; i < Math.ceil(W / sp) + 2; i++) {
       const rx = i * sp - off;
-      const yOff = ((i * 37) % 20) - 10; // 固定偏移，避免每幀閃動
+      const yOff = (((i * 37) % 20 + 20) % 20) - 10; // 固定偏移，避免每幀閃動
       ctx.drawImage(imgGrass, rx, G + yOff - imgGrass.naturalHeight, imgGrass.naturalWidth, imgGrass.naturalHeight);
     }
   }
@@ -478,7 +478,7 @@ export function render(ctx, state) {
     ctx.fillStyle = '#aabbff'; ctx.font = '20px monospace';
     ctx.fillText('按 Z / Space / Enter 開始', CONFIG.CANVAS_WIDTH / 2, 260);
     ctx.fillStyle = '#888'; ctx.font = '13px monospace';
-    ctx.fillText('← → 移動  ↑ ↓ 走位  X 跳躍  Z 攻擊  R 重開  F 全螢幕', CONFIG.CANVAS_WIDTH / 2, 310);
+    ctx.fillText('← → 移動  ↑ ↓ 走位  X 跳躍  Z 攻擊  C 衝刺  R 重開  F 全螢幕', CONFIG.CANVAS_WIDTH / 2, 310);
     ctx.textAlign = 'left';
   }
 
