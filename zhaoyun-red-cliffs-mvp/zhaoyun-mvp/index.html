@@ -2,14 +2,71 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>趙雲赤壁 MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>三國・一騎當千</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="game-container">
     <canvas id="game-canvas" width="800" height="450"></canvas>
+
+    <!-- 觸控按鍵覆蓋層 -->
+    <div id="touch-controls">
+      <!-- 左側方向鍵 -->
+      <div class="touch-btn dpad-up"    data-key="ArrowUp">↑</div>
+      <div class="touch-btn dpad-down"  data-key="ArrowDown">↓</div>
+      <div class="touch-btn dpad-left"  data-key="ArrowLeft">←</div>
+      <div class="touch-btn dpad-right" data-key="ArrowRight">→</div>
+
+      <!-- 右側動作鍵 -->
+      <div class="touch-btn action-x" data-key="KeyX">跳</div>
+      <div class="touch-btn action-z" data-key="KeyZ">攻</div>
+      <div class="touch-btn action-c" data-key="KeyC">衝</div>
+    </div>
   </div>
   <script type="module" src="src/main.js"></script>
+  <script>
+    // 觸控按鍵事件綁定（在 load 後執行，等待 main.js 初始化）
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.touch-btn').forEach(btn => {
+        const key = btn.dataset.key;
+
+        // 觸控事件（手機）
+        btn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (window.touchPressKey) window.touchPressKey(key);
+          btn.classList.add('pressed');
+        }, { passive: false });
+
+        btn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          if (window.touchReleaseKey) window.touchReleaseKey(key);
+          btn.classList.remove('pressed');
+        }, { passive: false });
+
+        btn.addEventListener('touchcancel', () => {
+          if (window.touchReleaseKey) window.touchReleaseKey(key);
+          btn.classList.remove('pressed');
+        });
+
+        // 滑鼠事件（桌機測試用）
+        btn.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          if (window.touchPressKey) window.touchPressKey(key);
+          btn.classList.add('pressed');
+        });
+
+        btn.addEventListener('mouseup', () => {
+          if (window.touchReleaseKey) window.touchReleaseKey(key);
+          btn.classList.remove('pressed');
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          if (window.touchReleaseKey) window.touchReleaseKey(key);
+          btn.classList.remove('pressed');
+        });
+      });
+    });
+  </script>
 </body>
 </html>

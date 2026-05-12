@@ -11,3 +11,56 @@ body {
   border: 2px solid #444;
   image-rendering: pixelated;
 }
+
+/* ── 觸控按鍵覆蓋層 ── */
+#game-container {
+  position: relative;
+  display: inline-block;
+}
+
+#touch-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* 預設不攔截，各按鈕自己開啟 */
+}
+
+.touch-btn {
+  position: absolute;
+  pointer-events: all;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 20px;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  transition: background 0.05s;
+}
+
+.touch-btn.pressed {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* 方向鍵位置（左下角，相對於 canvas） */
+.dpad-up    { bottom: 130px; left:  80px; }
+.dpad-down  { bottom:  20px; left:  80px; }
+.dpad-left  { bottom:  75px; left:  20px; }
+.dpad-right { bottom:  75px; left: 140px; }
+
+/* 動作鍵（右下角，三角排列） */
+.action-x { width: 65px; height: 65px; font-size: 18px; bottom: 115px; right: 90px; }
+.action-z { width: 65px; height: 65px; font-size: 18px; bottom: 115px; right: 20px; }
+.action-c { bottom:  30px; right:  55px; font-size: 16px; }
+
+/* 桌機：hover 能力時降低透明度 */
+@media (hover: hover) {
+  #touch-controls { opacity: 0.55; }
+}
