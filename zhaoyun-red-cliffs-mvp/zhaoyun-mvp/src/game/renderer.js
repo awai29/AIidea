@@ -483,14 +483,37 @@ export function render(ctx, state) {
 
   // Title
   if (state.mode === 'title') {
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
-    ctx.fillStyle = '#ffdd88'; ctx.font = 'bold 48px serif'; ctx.textAlign = 'center';
-    ctx.fillText('趙雲・赤壁', CONFIG.CANVAS_WIDTH / 2, 180);
-    ctx.fillStyle = '#aabbff'; ctx.font = '20px monospace';
-    ctx.fillText('按 Z / Space / Enter 開始', CONFIG.CANVAS_WIDTH / 2, 260);
-    ctx.fillStyle = '#888'; ctx.font = '13px monospace';
-    ctx.fillText('← → 移動  ↑ ↓ 走位  X 跳躍  Z 攻擊  C 衝刺  R 重開  F 全螢幕', CONFIG.CANVAS_WIDTH / 2, 310);
+    const CW = CONFIG.CANVAS_WIDTH;
+    const CH = CONFIG.CANVAS_HEIGHT;
+
+    // 半透明深色背板（只蓋文字區域，不遮全畫面）
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.fillRect(CW / 2 - 210, 90, 420, 170);
+
+    // 標題主字：三國・一騎當千
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#ff6600';
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 46px serif';
+    ctx.fillText('三國・一騎當千', CW / 2, 160);
+    ctx.shadowBlur = 0;
+
+    // 副標（小字）
+    ctx.fillStyle = 'rgba(200, 180, 140, 0.85)';
+    ctx.font = '14px serif';
+    ctx.fillText('長坂坡之戰', CW / 2, 185);
+
+    // 開始提示
+    ctx.fillStyle = '#aabbff';
+    ctx.font = '19px monospace';
+    ctx.fillText('按 Z / Space / Enter 開始', CW / 2, 228);
+
+    // 按鍵說明（底部小字）
+    ctx.fillStyle = 'rgba(160,160,160,0.7)';
+    ctx.font = '12px monospace';
+    ctx.fillText('← → 移動　↑ ↓ 走位　X 跳　Z 攻　C 衝刺　R 重開', CW / 2, CH - 16);
+
     ctx.textAlign = 'left';
   }
 
