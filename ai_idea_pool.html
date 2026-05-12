@@ -537,20 +537,28 @@ ngOnInit() {
    predict:'玩家開存款面板時，5 個貼近習慣的金額已備好，+10% 視覺突出，自然引導往上存。',
    api:'GET /api/user/deposit-presets → PresetOption[]（後端完成平均計算、去重、邊界過濾）'},
 
-  {id:'p5',cat:'platform',isNew:false,name:'熱門趨勢提前標籤',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
-   types:['ui','fe','ai'],diff:'easy',
-   problem:'熱門內容無法即時反映，玩家要自己去找。',
-   desc:'首頁上，重大賽事即將開始時，賽事相關遊戲和 Promotion 自動排到前面。在 Slot、Casino 頁，Provider 的位置則跟著全平台玩家的累積遊玩數動態調整。',
-   why:'玩家不需要看到排名數字，只要熱門的自然出現在眼前就夠了。動態排序比靜態順序更能反映當下趨勢，也不會讓畫面過於雜亂。',
-   angular:['ProviderList / GameList 從後端取已排序的陣列，不寫死順序','@for + trackBy 確保排序變動時只更新位移，不重繪卡片','Angular Animation 讓位置變動有平滑過渡','可搭配 polling 或 SSE 定期更新排序'],
-   code:`providerList = signal<Provider[]>([]);
+  {id:'p5',cat:'platform',isNew:false,name:'Provider 雙維度動態排序',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ui','fe','ai'],diff:'mid',
+   problem:'Provider 清單順序固定或靠人工排，跟不上實際熱度，也無法反映每個玩家的喜好。',
+   desc:'排序同時考慮兩個維度。全站維度：過去 30 天各 Provider 的累積流水，流水高的排前面，每天更新。個人維度：這個玩家最常玩 Pragmatic，那他的 Slot 頁 Pragmatic 自動置頂，不用自己找。兩個維度加權混合，也可以讓玩家自己切換「依平台熱度」或「依我的習慣」。首頁的賽事相關遊戲和 Promotion 在重大賽事前自動往前排。',
+   why:'GR8 和 Optimove 等頭部平台商都把 Provider 排序做成可配置模組，因為排序本身就決定哪些遊戲被看到、被玩到。我們資料庫裡已有 Provider Top 20 流水資料，差的只是接到前端。',
+   angular:['ProviderListComponent 接收 ranked Provider[]，不寫死順序','SortModeToggle 元件切換 global / personal 兩種模式','@for + trackBy 確保排序變動時只移動元素，不重繪卡片','Angular Animation 讓位置變動有平滑過渡','polling 或 SSE 每日同步全站排序'],
+   code:`type SortMode = 'global' | 'personal';
 
-ngOnInit() {
-  this.http.get<Provider[]>('/api/providers/ranked')
-    .subscribe(list => this.providerList.set(list));
-}`,
-   predict:'熱門的 Provider 和 Game 自然出現在最顯眼的位置，玩家不需思考就能找到當下最夯的選擇。',
-   api:'GET /api/providers/ranked → Provider[]（已依熱度排序）/ GET /api/games/ranked → Game[]'},
+sortMode = signal<SortMode>('personal');
+
+providerList = computed(() =>
+  this.sortMode() === 'personal'
+    ? this.providerSvc.personalRanked()
+    : this.providerSvc.globalRanked()
+);
+
+// 後端邏輯：
+// global:   rank by sum(turnover, last 30d)
+// personal: rank by user play_count per provider
+//           fallback to global if play_count < 3`,
+   predict:'玩家進 Slot 頁，常玩的 Pragmatic 已在第一格；切到「平台熱度」，看的是全站流水最高的排法。不需搜尋，不需滾動。',
+   api:'GET /api/providers/ranked?mode=global|personal → Provider[]（後端依 mode 排序後回傳）'},
 
   {id:'p8',cat:'platform',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['fe','ui','ux'],diff:'easy',
