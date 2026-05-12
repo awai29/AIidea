@@ -49,7 +49,7 @@ function tick() {
     else if (e.type === 'spearman') updateSpearman(e, state);
   }
 
-  state.hitboxes = [];
+  state.hitboxes.length = 0;  // 重用陣列，避免每幀分配
   updateCombat(state);
   updateLevel(state);
   updateCamera(state);

@@ -58,13 +58,14 @@ export function getFrame(character, action, frameIndex) {
 /**
  * 計算當前應顯示第幾幀（基於系統時間，適合 idle / walk 等 looping 動畫）。
  */
-export function calcFrameIndex(character, action) {
+export function calcFrameIndex(character, action, frameCount = 0) {
   const sprite = _cache[character];
   if (!sprite) return 0;
   const anim = sprite.atlas.animations[action];
   if (!anim || anim.frames.length === 0) return 0;
   const fps = anim.fps || 8;
-  return Math.floor(Date.now() / (1000 / fps)) % anim.frames.length;
+  // 用遊戲幀數計算，確保 hitFreeze 凍幀時動畫也暫停
+  return Math.floor(frameCount / (60 / fps)) % anim.frames.length;
 }
 
 /**

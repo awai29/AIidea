@@ -18,6 +18,50 @@ function sceneImg(key) {
   return (img && img.complete && img.naturalWidth > 0) ? img : null;
 }
 
+// 天空漸層快取（只建一次，不用每幀 createLinearGradient）
+let _skyGrad = null;
+
+// Title 畫面 UI 的 offscreen canvas（只建一次，避免每幀 shadowBlur GPU 消耗）
+let _titleCanvas = null;
+
+function buildTitleCanvas(CW, CH) {
+  const oc = document.createElement('canvas');
+  oc.width  = CW;
+  oc.height = CH;
+  const c = oc.getContext('2d');
+
+  // 半透明深色背板
+  c.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  c.fillRect(CW / 2 - 210, 90, 420, 170);
+
+  // 標題主字（shadowBlur 只在此執行一次）
+  c.textAlign = 'center';
+  c.shadowColor = '#ff6600';
+  c.shadowBlur = 18;
+  c.fillStyle = '#ffd700';
+  c.font = 'bold 46px serif';
+  c.fillText('三國・一騎當千', CW / 2, 160);
+  c.shadowBlur = 0;
+  c.shadowColor = 'transparent';
+
+  // 副標
+  c.fillStyle = 'rgba(200, 180, 140, 0.85)';
+  c.font = '14px serif';
+  c.fillText('長坂坡之戰', CW / 2, 185);
+
+  // 開始提示
+  c.fillStyle = '#aabbff';
+  c.font = '19px monospace';
+  c.fillText('按 Z / Space / Enter 開始', CW / 2, 228);
+
+  // 按鍵說明（底部小字）
+  c.fillStyle = 'rgba(160,160,160,0.7)';
+  c.font = '12px monospace';
+  c.fillText('← → 移動　↑ ↓ 走位　X 跳　Z 攻　C 衝刺　R 重開', CW / 2, CH - 16);
+
+  return oc;
+}
+
 // 角色 key 對應表
 const CHARACTER_KEY = {
   player:    'zhaoyun',
@@ -25,14 +69,17 @@ const CHARACTER_KEY = {
   spearman:  'wei-spearman',
 };
 
+// 渲染排序用的持久陣列（重用，不每幀分配）
+const _drawEntities = [];
+
 /**
  * 以 sprite 繪製 entity；若 sprite 未載入則 fallback 到色塊。
  * screenX：角色中心 X（canvas 座標）
  * screenY：角色腳底 Y（canvas 座標）
  */
-function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing, fallbackColor) {
+function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing, fallbackColor, frameCount = 0) {
   if (isLoaded(charKey)) {
-    const frameIdx = calcFrameIndex(charKey, action);
+    const frameIdx = calcFrameIndex(charKey, action, frameCount);
     const frame = getFrame(charKey, action, frameIdx);
     if (frame) {
       const dx = screenX - dispW / 2;
@@ -117,12 +164,14 @@ function drawBackground(ctx, camX) {
   const H = CONFIG.CANVAS_HEIGHT;
   const G = CONFIG.GROUND_Y;
 
-  // ── 層 0：天空漸層（固定不動）
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, G);
-  skyGrad.addColorStop(0,   '#0d1b2a');
-  skyGrad.addColorStop(0.5, '#1a1a3e');
-  skyGrad.addColorStop(1,   '#3d1a0a');
-  ctx.fillStyle = skyGrad;
+  // ── 層 0：天空漸層（快取為模組變數，只建一次）
+  if (!_skyGrad) {
+    _skyGrad = ctx.createLinearGradient(0, 0, 0, G);
+    _skyGrad.addColorStop(0,   '#0d1b2a');
+    _skyGrad.addColorStop(0.5, '#1a1a3e');
+    _skyGrad.addColorStop(1,   '#3d1a0a');
+  }
+  ctx.fillStyle = _skyGrad;
   ctx.fillRect(0, 0, W, G);
 
   // ── 層 1：遠景（視差 0.05×）
@@ -334,22 +383,24 @@ export function render(ctx, state) {
   }
 
   // ── 收集所有角色，依 beltY 排序後繪製（Painter's Algorithm）
-  const drawEntities = [];
+  // 使用持久陣列 _drawEntities 避免每幀分配，直接存 entity 物件不包裝
+  _drawEntities.length = 0;
 
-  state.enemies.forEach((e) => {
-    if (e.state === 'death' && e.deathTimer <= 0) return;
-    drawEntities.push({ kind: 'enemy', ent: e });
-  });
+  for (const e of state.enemies) {
+    if (e.state === 'death' && e.deathTimer <= 0) continue;
+    _drawEntities.push(e);
+  }
 
   const p = state.player;
   if (!(p.state === 'death' && p.deathTimer <= 0)) {
-    drawEntities.push({ kind: 'player', ent: p });
+    _drawEntities.push(p);
   }
 
   // beltY 小（遠景）先畫，beltY 大（近景）後畫，自然產生遮擋
-  drawEntities.sort((a, b) => getEntityBeltY(a.ent) - getEntityBeltY(b.ent));
+  _drawEntities.sort((a, b) => getEntityBeltY(a) - getEntityBeltY(b));
 
-  drawEntities.forEach(({ kind, ent }) => {
+  for (const ent of _drawEntities) {
+    const isPlayer = (ent === p);
     const beltY  = getEntityBeltY(ent);
     const scale  = getPerspectiveScale(beltY);
     const dispW  = ent.width  * scale;
@@ -363,13 +414,13 @@ export function render(ctx, state) {
       drawShadow(ctx, screenX, beltY, ent.width, scale, jumpH);
     }
 
-    if (kind === 'enemy') {
+    if (!isPlayer) {
       const e = ent;
       ctx.globalAlpha = e.state === 'death' ? 0.4 : 1;
       const enemyFallback = e.state === 'hurt' ? '#ff9999'
         : e.type === 'swordsman' ? '#cc3333' : '#cc6600';
       drawSprite(ctx, CHARACTER_KEY[e.type], getEnemyAction(e),
-        screenX, screenY, dispW, dispH, e.facing, enemyFallback);
+        screenX, screenY, dispW, dispH, e.facing, enemyFallback, state.frameCount);
       ctx.globalAlpha = 1;
 
       // 血條（縮放後位置）
@@ -387,7 +438,7 @@ export function render(ctx, state) {
         : p.state === 'dash'   ? '#88ffff'
         : '#5588ff';
       drawSprite(ctx, CHARACTER_KEY.player, getPlayerAction(p),
-        screenX, screenY, dispW, dispH, p.facing, playerFallback);
+        screenX, screenY, dispW, dispH, p.facing, playerFallback, state.frameCount);
 
       // 方向三角
       ctx.fillStyle = '#ffdd00';
@@ -400,13 +451,14 @@ export function render(ctx, state) {
       ctx.fill();
 
       // 攻擊框（調試可視）
-      state.hitboxes.filter(h => h.owner === 'player').forEach(h => {
+      for (const h of state.hitboxes) {
+        if (h.owner !== 'player') continue;
         ctx.strokeStyle = 'rgba(255,255,100,0.6)';
         ctx.lineWidth = 2;
         ctx.strokeRect(h.x - cam, h.y, h.width, h.height);
-      });
+      }
     }
-  });
+  }
 
   // 前景（蓋在角色上方，製造縱深感）
   drawForeground(ctx, cam);
@@ -485,36 +537,9 @@ export function render(ctx, state) {
   if (state.mode === 'title') {
     const CW = CONFIG.CANVAS_WIDTH;
     const CH = CONFIG.CANVAS_HEIGHT;
-
-    // 半透明深色背板（只蓋文字區域，不遮全畫面）
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-    ctx.fillRect(CW / 2 - 210, 90, 420, 170);
-
-    // 標題主字：三國・一騎當千
-    ctx.textAlign = 'center';
-    ctx.shadowColor = '#ff6600';
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = '#ffd700';
-    ctx.font = 'bold 46px serif';
-    ctx.fillText('三國・一騎當千', CW / 2, 160);
-    ctx.shadowBlur = 0;
-
-    // 副標（小字）
-    ctx.fillStyle = 'rgba(200, 180, 140, 0.85)';
-    ctx.font = '14px serif';
-    ctx.fillText('長坂坡之戰', CW / 2, 185);
-
-    // 開始提示
-    ctx.fillStyle = '#aabbff';
-    ctx.font = '19px monospace';
-    ctx.fillText('按 Z / Space / Enter 開始', CW / 2, 228);
-
-    // 按鍵說明（底部小字）
-    ctx.fillStyle = 'rgba(160,160,160,0.7)';
-    ctx.font = '12px monospace';
-    ctx.fillText('← → 移動　↑ ↓ 走位　X 跳　Z 攻　C 衝刺　R 重開', CW / 2, CH - 16);
-
-    ctx.textAlign = 'left';
+    // offscreen canvas 只建一次（避免每幀 shadowBlur 觸發 GPU blur pass）
+    if (!_titleCanvas) _titleCanvas = buildTitleCanvas(CW, CH);
+    ctx.drawImage(_titleCanvas, 0, 0);
   }
 
   // Victory
