@@ -17,6 +17,9 @@
 | `calcFrameIndex` 用 `Date.now()`（hitFreeze 不凍幀）| 改傳 `frameCount`，凍幀時動畫也暫停 | `assets.js`, `renderer.js` |
 | `state.hitboxes = []` 每幀建新陣列 | 改為 `.length = 0` 重用 | `main.js` |
 | 天空漸層 `createLinearGradient` 每幀重建 | 快取為模組變數 `_skyGrad`，只建一次 | `renderer.js` |
+| `getFrame` 每幀 `{ img, ...frame }` spread 分配物件 | loadSprite 時把 img bake 進每個 frame，getFrame 直接回傳無分配 | `assets.js` |
+| 受傷 vignette `createRadialGradient` 每幀重建 | 預建靜態 gradient，用 `ctx.globalAlpha` 控制強度 | `renderer.js` |
+| `updateLevel` + renderer 各自用 `filter/find` 計算存活數 | `updateLevel` 計算後存 `seg.aliveCount`，renderer 直接讀取 | `level.js`, `renderer.js` |
 
 ---
 
