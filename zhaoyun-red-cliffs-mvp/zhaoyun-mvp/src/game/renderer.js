@@ -1,6 +1,23 @@
 import { CONFIG } from './config.js';
 import { getFrame, calcFrameIndex, isLoaded } from './assets.js';
 
+// 場景圖層圖片（有圖用圖，沒圖 fallback 到 Canvas 形狀）
+const SCENE_IMGS = {};
+[
+  'bg-mountains', 'bg-river', 'bg-camp',
+  'mid-tent', 'mid-flag-pole', 'mid-bonfire',
+  'fg-flag-tall', 'fg-grass', 'fg-rock', 'fg-smoke',
+].forEach(key => {
+  const img = new Image();
+  img.src = `assets/scene/${key}.png`;
+  SCENE_IMGS[key] = img;
+});
+
+function sceneImg(key) {
+  const img = SCENE_IMGS[key];
+  return (img && img.complete && img.naturalWidth > 0) ? img : null;
+}
+
 // 角色 key 對應表
 const CHARACTER_KEY = {
   player:    'zhaoyun',
@@ -94,7 +111,7 @@ function getEnemyAction(enemy) {
   return 'idle';
 }
 
-// 視差背景：三國赤壁風格，4 層捲動
+// 視差背景：三國赤壁風格，分層系統（遠景/中景/地面）
 function drawBackground(ctx, camX) {
   const W = CONFIG.CANVAS_WIDTH;
   const H = CONFIG.CANVAS_HEIGHT;
@@ -108,61 +125,116 @@ function drawBackground(ctx, camX) {
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, W, G);
 
-  // ── 層 1：遠山輪廓（視差 0.05×）
-  const p1 = ((camX * 0.05) % W + W) % W;
-  ctx.fillStyle = '#1e1428';
-  for (let rx = -W; rx < W * 2; rx += 280) {
-    const mx = rx - p1;
-    ctx.beginPath();
-    ctx.moveTo(mx,       G - 10);
-    ctx.lineTo(mx + 50,  G - 90);
-    ctx.lineTo(mx + 130, G - 60);
-    ctx.lineTo(mx + 200, G - 110);
-    ctx.lineTo(mx + 280, G - 20);
-    ctx.lineTo(mx + 280, G);
-    ctx.lineTo(mx,       G);
-    ctx.closePath();
-    ctx.fill();
+  // ── 層 1：遠景（視差 0.05×）
+  const p1offset = ((camX * 0.05) % W + W) % W;
+
+  // 遠山
+  const imgMountains = sceneImg('bg-mountains');
+  if (imgMountains) {
+    for (let rx = -W; rx < W * 2; rx += W) {
+      ctx.drawImage(imgMountains, rx - p1offset, G - CONFIG.BELT_Y_RANGE - imgMountains.naturalHeight, W, imgMountains.naturalHeight);
+    }
+  } else {
+    // fallback：Canvas 山脈輪廓
+    ctx.fillStyle = '#1e1428';
+    for (let rx = -W; rx < W * 2; rx += 280) {
+      const mx = rx - p1offset;
+      ctx.beginPath();
+      ctx.moveTo(mx,       G - 10);
+      ctx.lineTo(mx + 50,  G - 90);
+      ctx.lineTo(mx + 130, G - 60);
+      ctx.lineTo(mx + 200, G - 110);
+      ctx.lineTo(mx + 280, G - 20);
+      ctx.lineTo(mx + 280, G);
+      ctx.lineTo(mx,       G);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
 
-  // ── 層 2：中景（帳篷 + 旗幟，視差 0.25×）
-  const p2 = ((camX * 0.25) % W + W) % W;
-  ctx.fillStyle = '#2a1810';
-  for (let rx = -W; rx < W * 2; rx += 160) {
-    const mx = rx - p2;
-    // 帳篷三角
-    ctx.beginPath();
-    ctx.moveTo(mx,       G - 5);
-    ctx.lineTo(mx + 30,  G - 55);
-    ctx.lineTo(mx + 60,  G - 5);
-    ctx.closePath();
-    ctx.fill();
-    // 旗杆
-    ctx.fillStyle = '#1a0e08';
-    ctx.fillRect(mx + 105, G - 70, 5, 70);
-    // 旗幟（小三角）
-    ctx.fillStyle = '#8b1a1a';
-    ctx.beginPath();
-    ctx.moveTo(mx + 110, G - 70);
-    ctx.lineTo(mx + 130, G - 60);
-    ctx.lineTo(mx + 110, G - 50);
-    ctx.closePath();
-    ctx.fill();
+  // 江面（遠景，底部對齊 beltY 最小值 - 35px）
+  const imgRiver = sceneImg('bg-river');
+  if (imgRiver) {
+    for (let rx = -W; rx < W * 2; rx += W) {
+      ctx.drawImage(imgRiver, rx - p1offset, G - CONFIG.BELT_Y_RANGE - 35, W, imgRiver.naturalHeight);
+    }
+  }
+
+  // 遠處大營（底部對齊 beltY 最小值）
+  const imgCamp = sceneImg('bg-camp');
+  if (imgCamp) {
+    for (let rx = -W; rx < W * 2; rx += W) {
+      ctx.drawImage(imgCamp, rx - p1offset, G - CONFIG.BELT_Y_RANGE - imgCamp.naturalHeight, W, imgCamp.naturalHeight);
+    }
+  }
+
+  // ── 層 2：中景（視差 0.25×）
+  const p2offset = ((camX * 0.25) % 800 + 800) % 800;
+
+  const imgTent = sceneImg('mid-tent');
+  const imgFlag = sceneImg('mid-flag-pole');
+  const imgFire = sceneImg('mid-bonfire');
+
+  if (imgTent || imgFlag || imgFire) {
+    // 帳篷：間距 240px
+    if (imgTent) {
+      const sp = 240;
+      const tentOff = ((camX * 0.25) % sp + sp) % sp;
+      for (let rx = -sp; rx < W + sp * 2; rx += sp) {
+        ctx.drawImage(imgTent, rx - tentOff, G - CONFIG.BELT_Y_RANGE - imgTent.naturalHeight + 10, imgTent.naturalWidth, imgTent.naturalHeight);
+      }
+    }
+    // 旗杆：間距 180px，相對於帳篷偏移
+    if (imgFlag) {
+      const sp = 180;
+      const flagOff = ((camX * 0.25) % sp + sp) % sp;
+      for (let rx = -sp; rx < W + sp * 2; rx += sp) {
+        ctx.drawImage(imgFlag, rx - flagOff + 60, G - CONFIG.BELT_Y_RANGE - imgFlag.naturalHeight + 5, imgFlag.naturalWidth, imgFlag.naturalHeight);
+      }
+    }
+    // 篝火：間距 320px
+    if (imgFire) {
+      const sp = 320;
+      const fireOff = ((camX * 0.25) % sp + sp) % sp;
+      for (let rx = -sp; rx < W + sp * 2; rx += sp) {
+        ctx.drawImage(imgFire, rx - fireOff + 100, G - CONFIG.BELT_Y_RANGE - imgFire.naturalHeight + 5, imgFire.naturalWidth, imgFire.naturalHeight);
+      }
+    }
+  } else {
+    // fallback：Canvas 帳篷 + 旗幟
     ctx.fillStyle = '#2a1810';
+    for (let rx = -W; rx < W * 2; rx += 160) {
+      const mx = rx - p2offset;
+      ctx.beginPath();
+      ctx.moveTo(mx,       G - 5);
+      ctx.lineTo(mx + 30,  G - 55);
+      ctx.lineTo(mx + 60,  G - 5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#1a0e08';
+      ctx.fillRect(mx + 105, G - 70, 5, 70);
+      ctx.fillStyle = '#8b1a1a';
+      ctx.beginPath();
+      ctx.moveTo(mx + 110, G - 70);
+      ctx.lineTo(mx + 130, G - 60);
+      ctx.lineTo(mx + 110, G - 50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#2a1810';
+    }
   }
 
-  // ── 層 3：地面（棕色，固定底色）
+  // ── 層 3：地面（走位帶底色 + 透視橫線）
   ctx.fillStyle = '#5c4033';
   ctx.fillRect(0, G - CONFIG.BELT_Y_RANGE, W, H - G + CONFIG.BELT_Y_RANGE);
 
-  // 透視橫線：越靠近下方間距越大（二次方分布），強化近大遠小感
-  const floorTop = G - CONFIG.BELT_Y_RANGE; // 260
+  const floorTop = G - CONFIG.BELT_Y_RANGE;
   ctx.strokeStyle = '#4a3028';
   ctx.lineWidth = 1;
   ctx.globalAlpha = 0.5;
   for (let row = 0; row <= 8; row++) {
     const t = row / 8;
-    const lineY = floorTop + CONFIG.BELT_Y_RANGE * t * t; // 二次方使間距遞增
+    const lineY = floorTop + CONFIG.BELT_Y_RANGE * t * t;
     ctx.beginPath();
     ctx.moveTo(0, lineY);
     ctx.lineTo(W, lineY);
@@ -170,7 +242,6 @@ function drawBackground(ctx, camX) {
   }
   ctx.globalAlpha = 1;
 
-  // 縱向紋路（視差 0.6×）
   const p3 = ((camX * 0.6) % 80 + 80) % 80;
   ctx.fillStyle = '#4a3028';
   ctx.globalAlpha = 0.4;
@@ -178,6 +249,59 @@ function drawBackground(ctx, camX) {
     ctx.fillRect(rx - p3, G - CONFIG.BELT_Y_RANGE, 2, H - G + CONFIG.BELT_Y_RANGE);
   }
   ctx.globalAlpha = 1;
+}
+
+function drawForeground(ctx, camX) {
+  const W = CONFIG.CANVAS_WIDTH;
+  const G = CONFIG.GROUND_Y;
+
+  // fg-flag-tall：間距 350px，底部超出畫面 (Y=470)，alpha 0.9
+  const imgFlagTall = sceneImg('fg-flag-tall');
+  if (imgFlagTall) {
+    ctx.globalAlpha = 0.9;
+    const sp = 350;
+    const off = ((camX * 0.85) % sp + sp) % sp;
+    for (let rx = -sp; rx < W + sp * 2; rx += sp) {
+      ctx.drawImage(imgFlagTall, rx - off, 470 - imgFlagTall.naturalHeight, imgFlagTall.naturalWidth, imgFlagTall.naturalHeight);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // fg-grass：間距 200px，底部對齊 Y=385，tile index 決定固定 Y 偏移
+  const imgGrass = sceneImg('fg-grass');
+  if (imgGrass) {
+    const sp = 200;
+    const off = ((camX * 0.85) % sp + sp) % sp;
+    for (let i = -1; i < Math.ceil(W / sp) + 2; i++) {
+      const rx = i * sp - off;
+      const yOff = ((i * 37) % 20) - 10; // 固定偏移，避免每幀閃動
+      ctx.drawImage(imgGrass, rx, G + yOff - imgGrass.naturalHeight, imgGrass.naturalWidth, imgGrass.naturalHeight);
+    }
+  }
+
+  // fg-rock：間距 280px，底部對齊 Y=382
+  const imgRock = sceneImg('fg-rock');
+  if (imgRock) {
+    const sp = 280;
+    const off = ((camX * 0.85) % sp + sp) % sp;
+    for (let i = -1; i < Math.ceil(W / sp) + 2; i++) {
+      const rx = i * sp - off + 80; // 相對帳篷偏移，避免完全對齊
+      ctx.drawImage(imgRock, rx, G - imgRock.naturalHeight + 2, imgRock.naturalWidth, imgRock.naturalHeight);
+    }
+  }
+
+  // fg-smoke：間距 450px，底部對齊 Y=360，globalAlpha 0.3
+  const imgSmoke = sceneImg('fg-smoke');
+  if (imgSmoke) {
+    ctx.globalAlpha = 0.3;
+    const sp = 450;
+    const off = ((camX * 0.85) % sp + sp) % sp;
+    for (let i = -1; i < Math.ceil(W / sp) + 2; i++) {
+      const rx = i * sp - off + 150;
+      ctx.drawImage(imgSmoke, rx, 360 - imgSmoke.naturalHeight, imgSmoke.naturalWidth, imgSmoke.naturalHeight);
+    }
+    ctx.globalAlpha = 1;
+  }
 }
 
 export function render(ctx, state) {
@@ -283,6 +407,9 @@ export function render(ctx, state) {
       });
     }
   });
+
+  // 前景（蓋在角色上方，製造縱深感）
+  drawForeground(ctx, cam);
 
   // 繪製命中粒子
   drawParticles(ctx, state, cam);
