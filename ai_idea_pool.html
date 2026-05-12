@@ -419,7 +419,7 @@ main {
   </div>
   <div class="stats-row">
     <div class="stat">
-      <div class="stat-n" id="sTotal">28</div>
+      <div class="stat-n" id="sTotal">29</div>
       <div class="stat-l">TOTAL IDEAS</div>
     </div>
     <div class="stat">
@@ -469,7 +469,7 @@ const CATS = [
 
 const ALL = [
   // ── PLATFORM ──
-  {id:'p1',cat:'platform',isNew:false,name:'首頁動態排版',ico:'≡',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+  {id:'p1',cat:'archive',isNew:false,name:'首頁動態排版',ico:'≡',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
    types:['ui','fe','be'],diff:'mid',
    problem:'首頁版面固定，所有玩家看到一樣的內容，無法反映個人興趣。',
    desc:'玩家玩什麼，首頁就長什麼樣。常玩板球的進來看到板球 Banner 和相關活動，Slot 玩家看到的是 Slot Promotion Banner、自己玩過的遊戲加系統推薦，區塊順序也跟著調。',
@@ -483,7 +483,7 @@ fetchLayout() {
    predict:'首頁結構本身就是預測結果，用戶不需滾動就能找到想看的區塊。',
    api:'GET /api/layout/user → string[]'},
 
-  {id:'p2',cat:'platform',isNew:false,name:'AI 推薦區塊（三層混合）',ico:'✦',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+  {id:'p2',cat:'archive',isNew:false,name:'AI 推薦區塊（三層混合）',ico:'✦',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
    types:['ux','fe','be','ai'],diff:'hard',
    problem:'推薦內容單一，玩家容易錯過適合自己的遊戲。',
    desc:'推薦區分三層：你玩過的、類似的、最近全站最熱的。每張卡片旁邊標注是哪種，讓玩家知道為什麼出現這個。',
@@ -597,7 +597,7 @@ export class BlurUpDirective implements AfterViewInit {
    predict:'玩家進頁面立刻看到有內容的畫面，不是白框；網路恢復後自動清晰，全程無感。',
    api:'後端 GET /api/images/:id?q=10 回傳極低品質縮圖（≤1KB）base64，前端 inline 寫入 lqip；或直接在資料預載時一併附上 lqipBase64 欄位'},
 
-  {id:'p6',cat:'platform',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
+  {id:'p6',cat:'archive',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
    types:['ux','be','ai'],diff:'hard',
    problem:'所有玩家看到相同活動，和自己無關的優惠容易被忽略。',
    desc:'Slot 玩家看到的是 Free Spin 優惠，Sports 玩家看到的是賽事加碼，不是所有人看同一張 Banner。',
@@ -661,6 +661,36 @@ completeSurvey(answers: SurveyAnswer[]) {
 }`,
    predict:'產品團隊每週看到標籤分佈報表，能快速找出最需要優化的流程；問卷資料補足 AI 分類的死角，形成玩家反饋的正向循環。',
    api:'GET /api/feedback/summary → { labels: TagCount[], trend: WeeklyTrend[], topIssues: Issue[] } / POST /api/survey/complete → { pointsAwarded } / GET /api/survey/active → Survey | null'},
+
+  {id:'p10',cat:'platform',isNew:true,name:'Smart Lobby — 內容個人化引擎',ico:'◈',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   problem:'Banner、推薦遊戲、活動 Offer 三個系統各跑各的，同一個玩家進站可能看到：Sports 版 Banner + Slot 推薦 + Casino Offer，三層方向不一致，個人化感全失。',
+   desc:'版型不變，變的是裡面填什麼。同一個首頁，Slot 玩家看到 Slot 相關的 Banner 圖、Slot 遊戲推薦列、Free Spin Offer；Sports 玩家看到今晚賽事 Banner、熱門賽事列表、賽事加碼 Offer。三層內容由同一個引擎在玩家進站瞬間一次決定，保證方向一致。重大活動期間，行銷可以設定強制廣播，優先級蓋過個人化——世界盃開打，所有人第一格都是世界盃 Banner，個人化在下方繼續跑。新用戶沒有行為資料，用來源渠道推斷：從體育廣告進來的，先給 Sports 版內容；累積足夠行為後自動切換成真正的個人化。',
+   why:'Optimove Opti-X 就是這個架構，Pragmatic 已直接接入。核心價值不是「多一個推薦功能」，而是讓三層內容說同一件事，玩家感受到的是「它了解我」，而不是「這 APP 很亂」。',
+   angular:['SmartLobbyService 單次 call /api/lobby/config，回傳 banner + recommendations + offer 三包內容','BannerComponent、GameListComponent、OfferBannerComponent 各自接收對應 Input，不互相依賴','覆寫模式：CampaignService.activeCampaign() 若有強制廣播，SmartLobbyService 優先填入 banner slot','新用戶 cold start：UTM source 判斷初始 segment，存入 SessionStorage，首次 API call 帶 segment 參數','Signal-based：三包內容各自是獨立 Signal，任一更新只重繪對應區塊'],
+   code:`interface LobbyConfig {
+  banner:          BannerContent;    // 填入 Banner 區
+  recommendations: GameItem[];       // 填入推薦列
+  offer:           OfferContent | null;  // 填入 Offer 區
+  source:          'personalized' | 'campaign' | 'cold_start';
+}
+
+// 優先級邏輯（後端）：
+// 1. 若有 active campaign（行銷設定強制廣播）→ banner = campaign
+// 2. 若 user 有足夠行為資料 → 全個人化
+// 3. 若 cold start → 依 utm_source segment 填充
+// 4. Fallback → 全站熱門
+
+lobbyConfig = signal<LobbyConfig | null>(null);
+
+ngOnInit() {
+  const segment = this.utmSvc.inferSegment(); // 'sports'|'casino'|'slot'|null
+  this.http.get<LobbyConfig>('/api/lobby/config', {
+    params: { segment: segment ?? '' }
+  }).subscribe(cfg => this.lobbyConfig.set(cfg));
+}`,
+   predict:'玩家進站，三層內容已經對齊。Slot 玩家的每一格都在說 Slot，Sports 玩家的每一格都在說 Sports。世界盃開打，Banner 強制換，推薦和 Offer 繼續個人化。',
+   api:'GET /api/lobby/config?segment= → LobbyConfig（後端統一決策：campaign > personal > cold_start > global_hot）'},
 
   // ── ACQUISITION ──
   {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 意圖偵測',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
