@@ -1,8 +1,22 @@
 # Codex 交接文件：已知問題與待修清單
 
 - 日期：2026-05-12
-- 來源：Code Review 結果 + Sprite 盤點
-- 狀態：待 Codex 處理
+- 來源：Code Review 結果 + Sprite 盤點 + 效能 Review
+- 狀態：部分已修，剩餘待 Codex 處理
+
+## 修復記錄（2026-05-12 已完成）
+
+以下問題已由 Claude Code 直接修復（commit `fb9c053`）：
+
+| 問題 | 修法 | 檔案 |
+|------|------|------|
+| Title `shadowBlur=18` 每幀觸發 GPU blur | 改用 offscreen canvas 預繪，每幀 `drawImage` | `renderer.js` |
+| `particles.filter()` 每幀建新陣列 | 改為雙指標原地壓縮 + `length = alive` 截斷 | `particles.js` |
+| 粒子 `maxLife: 20` 語義錯誤（life 可達 21）| 改為 `maxLife: life`，與初始值一致 | `particles.js` |
+| `drawEntities = []` + 包裝物件每幀分配 | 改用模組級持久陣列 `_drawEntities`，直接存 entity 不包裝 | `renderer.js` |
+| `calcFrameIndex` 用 `Date.now()`（hitFreeze 不凍幀）| 改傳 `frameCount`，凍幀時動畫也暫停 | `assets.js`, `renderer.js` |
+| `state.hitboxes = []` 每幀建新陣列 | 改為 `.length = 0` 重用 | `main.js` |
+| 天空漸層 `createLinearGradient` 每幀重建 | 快取為模組變數 `_skyGrad`，只建一次 | `renderer.js` |
 
 ---
 
