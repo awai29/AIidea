@@ -27,6 +27,9 @@ function tick() {
     state.screenShake.timer--;
   }
 
+  // 受傷紅光衰減（永遠執行）
+  if (state.hurtFlash > 0) state.hurtFlash--;
+
   if (state.mode === 'title') {
     if (isDown('KeyZ') || isDown('Space') || isDown('Enter')) startGame();
     return;

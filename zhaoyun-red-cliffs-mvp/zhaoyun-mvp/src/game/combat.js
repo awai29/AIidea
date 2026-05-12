@@ -62,7 +62,8 @@ export function updateCombat(state) {
         ? CONFIG.SPEARMAN_ATTACK_DAMAGE : CONFIG.SWORDSMAN_ATTACK_DAMAGE;
       hurtPlayer(p, dmg, enemy.x);
       enemy.hitPlayerThisAttack = true;
-      state.screenShake = { intensity: 10, timer: 12 };
+      state.screenShake = { intensity: 16, timer: 18 };
+      state.hurtFlash = 20;
     }
   });
 }

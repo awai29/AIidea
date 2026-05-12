@@ -415,6 +415,18 @@ export function render(ctx, state) {
   drawParticles(ctx, state, cam);
   ctx.restore();  // 移除震動偏移，確保 HUD 不抖動
 
+  // 受傷紅色 vignette（全畫面邊緣紅光，不跟著震動）
+  if (state.hurtFlash > 0) {
+    const vW = CONFIG.CANVAS_WIDTH;
+    const vH = CONFIG.CANVAS_HEIGHT;
+    const alpha = (state.hurtFlash / 20) * 0.55;
+    const grad = ctx.createRadialGradient(vW / 2, vH / 2, vH * 0.25, vW / 2, vH / 2, vH * 0.85);
+    grad.addColorStop(0, 'rgba(180,0,0,0)');
+    grad.addColorStop(1, `rgba(200,0,0,${alpha.toFixed(3)})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, vW, vH);
+  }
+
   // 玩家血條 HUD
   const pr = Math.max(0, p.hp / p.maxHp);
   ctx.fillStyle = '#333';
