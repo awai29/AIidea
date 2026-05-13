@@ -649,7 +649,7 @@ completeSurvey(answers: SurveyAnswer[]) {
    types:['ux','fe','be','ai'],diff:'hard',
    problem:'首頁 Banner、推薦遊戲、活動 Offer 三層各跑各的，Provider 清單又靠人工或固定順序排列，所有玩家看到的內容大同小異，個人化感全無。',
    desc:'Personal Lobby 讓進站的瞬間，三層內容（Banner、推薦、Offer）與 Provider 排序同時對齊。Slot 玩家看到 Slot 相關 Banner、常玩的 Pragmatic 自動置頂、Free Spin Offer；Sports 玩家看到今晚賽事 Banner、熱門賽事、賽事加碼。Provider 排序結合全站流水與個人習慣兩個維度，玩家可自己切換「依平台熱度 / 依我的習慣」。新用戶以 UTM 渠道推斷初始 segment，累積行為後自動切換真正個人化。行銷重大活動時可強制覆蓋 Banner，下方推薦與 Provider 繼續個人化。',
-   why:'Optimove Opti-X、GR8 均把這視為核心模組——讓三層內容說同一件事，玩家感受到的是「它了解我」而不是「這 APP 很亂」。Provider 排序本身就決定哪些遊戲被看到、被玩到，資料庫裡的流水資料差的只是接到前端。',
+   why:'玩家感受到的是「它了解我」而不是「這 APP 很亂」。Provider 排序本身就決定哪些遊戲被看到、被玩到，資料庫裡的流水資料差的只是接到前端。',
    angular:['SmartLobbyService 單次 call /api/lobby/config，回傳 banner + recommendations + offer + providerList 四包內容','ProviderListComponent 接收 ranked Provider[]，SortModeToggle 切換 global / personal 兩種模式','覆寫模式：CampaignService.activeCampaign() 若有強制廣播，優先填入 banner slot','新用戶 cold start：UTM source 判斷初始 segment，存入 SessionStorage，首次 API call 帶 segment 參數','Signal-based：四包內容各自是獨立 Signal，任一更新只重繪對應區塊'],
    code:`interface LobbyConfig {
   banner:          BannerContent;
@@ -677,9 +677,9 @@ ngOnInit() {
   // ── ACQUISITION ──
   {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['mkt','fe','be','ai'],diff:'mid',
-   problem:'所有訪客看同一個 LP，體育和娛樂場玩家的需求完全不同。',
-   desc:'從板球廣告點進來的，進站看到 Sports 版 LP；從娛樂場廣告來的看 Casino 版。同一個廣告投放，系統自己分流。',
-   why:'同一廣告受眾裡有不同偏好，AI 在第一秒就分流，提升後續轉換率。',
+   problem:'新玩家從廣告點進來，看到的是一個通用 LP，體育和 Slot 玩家看到一模一樣的內容，轉換動機不足。即使完成註冊，主站也不知道這個玩家偏好什麼，錯過了最佳個人化時機，Welcome Offer 和推薦遊戲與玩家完全無關。',
+   why:'玩家的偏好在「點擊廣告的那一刻」就已暴露，但這個訊號目前完全浪費掉了。從渠道分流 → LP 個人化 → 快速註冊 → 個人化 Lobby → 符合分類的 Welcome Offer → 推薦第一款遊戲，整條新客漏斗每一步都與玩家偏好對齊，可顯著提升 FTD 轉換率。',
+   desc:'依廣告渠道的 UTM 參數（廣告連結上的來源標籤）自動分流對應主題 LP（體育渠道 → Sports LP；Slot 渠道 → Slot LP）。LP 內嵌快速註冊表單，完成後系統自動標記玩家分類（Sports / Slot / Live Casino…）並產生臨時通行證（Token），帶著玩家直接跳轉主站自動登入，無需再輸入帳號密碼。主站 Lobby 依標籤優先呈現對應分類的 Banner、Provider 與推薦遊戲；同時彈出符合該分類的 Welcome Offer（如 Sports 玩家看體育首存 Bonus、Slot 玩家看 Free Spins）。Offer 關閉後再推薦 3 款該分類熱門遊戲，引導完成第一次下注體驗。',
    angular:['LP standalone component 讀 queryParams 取 UTM','IntentService 計算 intentScore → Signal','@switch 切換 SportsHero / CasinoHero / GenericHero','IntersectionObserver 追蹤看過哪些 section'],
    code:`detectIntent(params: Params, scroll: ScrollEvent[]): Intent {
   const utmHint = params['utm_content'];
