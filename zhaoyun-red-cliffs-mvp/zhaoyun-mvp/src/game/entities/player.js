@@ -68,7 +68,7 @@ export function updatePlayer(state, { isDown }) {
   }
 
   // ── 左右移動（不在衝刺/攻擊/受傷中）
-  if (canInput && p.state !== 'attack' && p.state !== 'dash') {
+  if (canInput) {
     if (isDown('ArrowLeft')) {
       p.vx = -CONFIG.PLAYER_SPEED;
       p.facing = -1;

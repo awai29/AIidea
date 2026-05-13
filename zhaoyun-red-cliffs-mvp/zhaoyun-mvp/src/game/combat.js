@@ -8,7 +8,8 @@ export function updateCombat(state) {
 
   // ── 玩家攻擊框
   // 攻擊動作前 30% 為蓄力，後 70% 才判定命中
-  const attackActive = p.state === 'attack'
+  const isAttacking = p.state === 'attack';
+  const attackActive = isAttacking
     && p.attackTimer < CONFIG.PLAYER_ATTACK_DURATION * 0.7;
 
   if (attackActive) {
@@ -29,10 +30,16 @@ export function updateCombat(state) {
       if (hitboxOverlapsEntity(hb, enemy)) {
         hurtEnemy(enemy, CONFIG.PLAYER_ATTACK_DAMAGE, p.x, state);
         enemy.hitThisAttack = true;
+        // 連擊 + 打擊閃光
+        state.combo++;
+        state.comboTimer = 150;
+        const hitX = (enemy.x + p.x) / 2;
+        const hitY = enemy.y - enemy.height * 0.55;
+        state.impactFlashes.push({ x: hitX, y: hitY, timer: 10, maxTimer: 10 });
       }
     });
-  } else {
-    // 攻擊結束，清除命中旗標
+  } else if (!isAttacking) {
+    // 攻擊完全結束才清除旗標（不在蓄力階段清除）
     state.enemies.forEach(e => { e.hitThisAttack = false; });
   }
 
