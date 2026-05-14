@@ -543,42 +543,35 @@ providerList = computed(() =>
    predict:'玩家進 Slot 頁，常玩的 Pragmatic 已在第一格；切到「平台熱度」，看的是全站流水最高的排法。不需搜尋，不需滾動。',
    api:'GET /api/providers/ranked?mode=global|personal → Provider[]（後端依 mode 排序後回傳）'},
 
-  {id:'p8',cat:'tech',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
-   types:['fe','ui','ux'],diff:'easy',
-   problem:'網路慢時頁面出現白框或破圖，影響第一印象。',
-   desc:'頁面先顯示極小縮圖並放大模糊（LQIP），真實圖片下載完成後以 CSS transition 清晰淡入。純 CSS + JS 實現，所有瀏覽器皆相容，無需任何新 API。',
-   why:'網路差的玩家看到白框或破圖，體驗差且跳出率高。Blur-Up 讓畫面立刻有內容，感知速度遠快於實際載入速度，不需等圖載完才有東西看。',
-   angular:['BlurUpDirective 掛在 <img>，接收 blurUp（原圖 URL）與 lqip（base64 縮圖 ~300B）兩個 Input','ngAfterViewInit 先把 lqip 放入 src，CSS filter:blur(12px) scale(1.05) 撐滿容器不留白邊','new Image() preload 原圖，onload 替換 src 並移除 blur，CSS transition 自動補間','純 CSS transition: filter .4s ease, transform .4s ease — IE11+ / iOS Safari / Android Chrome 全覆蓋'],
-   code:`// blur-up.directive.ts
-@Directive({ selector: 'img[blurUp]', standalone: true })
-export class BlurUpDirective implements AfterViewInit {
-  @Input() blurUp!: string;  // 原圖 URL
-  @Input() lqip!:   string;  // base64 縮圖（≤ 1KB）
-
-  constructor(private el: ElementRef<HTMLImageElement>) {}
-
-  ngAfterViewInit() {
-    const img = this.el.nativeElement;
-    img.src = this.lqip;
-    Object.assign(img.style, {
-      filter: 'blur(12px)',
-      transform: 'scale(1.05)',
-      transition: 'filter .4s ease, transform .4s ease',
-    });
-    const hi = new Image();
-    hi.src = this.blurUp;
-    hi.onload = () => {
-      img.src = this.blurUp;
-      img.style.filter = 'none';
-      img.style.transform = 'scale(1)';
-    };
-  }
+  {id:'p8',cat:'tech',isNew:true,name:'網速自適應圖片品質',ico:'◑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['fe','ux'],diff:'easy',
+   problem:'使用者在網路環境不佳（3G、弱訊號）時，仍載入與 4G 相同的原始高清圖片。大圖（Banner、活動圖）通常 200KB–1MB 以上，網速慢時圖片長時間空白或載入失敗，使用者體驗明顯下降，可能直接離開頁面。',
+   why:`<ul style="padding-left:1.1rem;line-height:2.2">
+<li>圖片載入時間過長 → 使用者流失率上升</li>
+<li>低網速仍傳輸大圖 → 流量浪費、載入逾時</li>
+<li>無品質分層機制 → 無法因地制宜適應用戶環境</li>
+</ul>行動裝置用戶（H5）網路環境差異大，東南亞市場尤其明顯。圖片是頁面最重的資源，是優化 CP 值最高的項目。`,
+   desc:`利用 <b>Cloudflare Image Resizing</b>（已使用 Cloudflare CDN）+ 前端網速偵測，動態決定載入圖片品質：<br><br>
+</tbody></table><br><b>前置確認</b>：Cloudflare 方案需 Pro 以上；優先套用 Banner / 活動大圖，vendor icon 等小圖效益有限。`,
+   angular:['CdnService.getImageUrl(src) 根據網速自動附加 quality 參數','Network Information API（navigator.connection.effectiveType）偵測 2g / 3g / 4g，不支援的瀏覽器 fallback quality=75','quality map：2g → 10、3g → 50、4g/wifi → 90','只改 CdnService，全站圖片自動受益，無需逐一修改元件'],
+   code:`// cdn.service.ts
+getImageUrl(src: string): string {
+  const q = this.getQuality();
+  return src.includes('?')
+    ? \`\${src}&quality=\${q}\`
+    : \`\${src}?quality=\${q}\`;
 }
 
-// 使用方式
-// <img [blurUp]="game.imageUrl" [lqip]="game.lqip" alt="..." />`,
-   predict:'玩家進頁面立刻看到有內容的畫面，不是白框；網路恢復後自動清晰，全程無感。',
-   api:'後端 GET /api/images/:id?q=10 回傳極低品質縮圖（≤1KB）base64，前端 inline 寫入 lqip；或直接在資料預載時一併附上 lqipBase64 欄位'},
+private getQuality(): number {
+  const conn = (navigator as any).connection;
+  const type = conn?.effectiveType ?? '4g';
+  return type === '2g' ? 10 : type === '3g' ? 50 : 90;
+}
+
+// 使用方式（template）
+// <img [src]="cdnSvc.getImageUrl(banner.imageUrl)" />`,
+   predict:'2G / 慢速網路玩家不再看到白框等待，頁面立刻有內容；4G 玩家畫質完全不受影響。東南亞低網速用戶留存率提升最明顯。',
+   api:'無需新 API，在現有 Cloudflare CDN URL 加 ?quality=N 即可；Cloudflare 自動處理壓縮，無需另存多份圖片'},
 
   {id:'p6',cat:'archive',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
    types:['ux','be','ai'],diff:'hard',
@@ -937,11 +930,17 @@ await sharp('input.png')
   // ── RISK ──
   {id:'r4',cat:'existing',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['ux','be','ai','mkt'],diff:'mid',
-   problem:'通用推播開啟率極低，等於在浪費每一次推播機會。',
-   desc:'依玩家行為與平台事件，分 8 種情境精準觸發 Push Notification，每則推播都帶個人化內容與深連結，直接帶回對應頁面，不是一句通用文字。',
-   why:'通用廣播推播開啟率 <2%；情境化推播搭配個人化文案開啟率可達 15%+。關鍵是「對的時機 + 對的理由 + 對的著陸頁」，不是發越多越好。',
+   problem:'目前推播 100% 只用於存款核准通知（Approved Deposit），推播管道幾乎沒有用於回流，是最被低度使用的成長工具。',
+   desc:`依玩家行為與平台事件精準觸發，每則推播帶個人化文案與深連結：<ul style="margin-top:8px;padding-left:1.1rem;line-height:2">
+<li><b>優惠券到期提醒</b> — 到期前 24hr + 2hr 各一次，避免玩家白白浪費</li>
+<li><b>新活動推播</b> — 新活動上架，依產品偏好篩選，每週上限 3 則</li>
+<li><b>新遊戲上線</b> — 依最常玩類型篩選，附首玩 Free Spins 誘因</li>
+<li><b>VIP 快升等</b> — 距升等差 &lt;10%，顯示具體差距與升等福利</li>
+<li><b>排行榜快到期</b> — 結算前 2hr，依目前排名個人化文案</li>
+</ul>`,
+   why:'現況：玩家收到的推播清一色是「You have a ৳XX deposit has been traded successfully」，沒有任何一則是為了吸引回訪或刺激行為。推播授權是玩家主動給的稀缺資源，現在卻只拿來做交易確認，等於把一條直達玩家手機的通道完全閒置。只要開始做，幾乎是零成本的成長槓桿。',
    angular:['PushService 封裝 Firebase Cloud Messaging（FCM），Web Push API 覆蓋所有瀏覽器','後端 event bus 發出觸發事件，前端 Service Worker 接收並顯示系統通知','每則推播帶 deepLink 欄位，點擊後 Angular Router 導向對應頁（投注單 / 優惠頁 / 活動頁）','PushPreferenceComponent 讓玩家自選接收哪些類型，存入 user.pushSettings，避免轟炸'],
-   code:`// 8 種觸發情境與文案邏輯
+   code:`// 11 種觸發情境與文案邏輯
 const PUSH_SCENARIOS = {
 
   // ✅ 賽事投注結果 — 比賽結束後立即推
@@ -1018,7 +1017,7 @@ const PUSH_SCENARIOS = {
    api:`POST /api/push/send → { scenario, userId, payload }
 GET  /api/push/preferences → UserPushSettings
 PUT  /api/push/preferences → 更新訂閱偏好
-後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff`},
+後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff / leaderboard.ending / odds.shifted / campaign.published`},
 
   {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['be','ai','ux'],diff:'hard',
