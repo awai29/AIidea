@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 點子池 — 平台體驗升級計劃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── SHADCN DESIGN SYSTEM ── */
+:root {
+  --background: #efefef;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --radius: 8px;
+
+  --blue: #2563eb;   --blue-bg: #eff6ff;   --blue-border: #bfdbfe;
+  --teal: #0d9488;   --teal-bg: #f0fdfa;   --teal-border: #99f6e4;
+  --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+  --amber: #d97706;  --amber-bg: #fffbeb;  --amber-border: #fde68a;
+  --pink: #db2777;   --pink-bg: #fdf2f8;   --pink-border: #fbcfe8;
+  --coral: #ea580c;  --coral-bg: #fff7ed;  --coral-border: #fed7aa;
+  --green: #16a34a;  --green-bg: #f0fdf4;  --green-border: #bbf7d0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 2rem 2.5rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+h1 {
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -.04em;
+  line-height: 1.15;
+}
+h1 span { color: var(--green); }
+.header-sub {
+  margin-top: .375rem;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -.01em;
+}
+.stats-row {
+  display: flex;
+  gap: .625rem;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 80px;
+}
+.stat-n {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-l {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  padding: .875rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(239,239,239,0.96);
+  backdrop-filter: blur(12px);
+}
+.filter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted-foreground);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.filters { display: flex; gap: 4px; flex-wrap: wrap; }
+.fb {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+.fb:hover { border-color: #d4d4d8; color: var(--foreground); background: var(--muted); }
+.fb.on { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+
+/* ── MAIN ── */
+main {
+  padding: 2rem 2.5rem 5rem;
+}
+
+.section { margin-bottom: 2.5rem; }
+.section-header { margin-bottom: 1.125rem; }
+.section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  color: var(--foreground);
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* ── CARD (Shadcn Card) ── */
+.card {
+  background: var(--card);
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+  transition: box-shadow .2s, transform .18s;
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+  transform: translateY(-1px);
+}
+
+.card-header {
+  padding: 24px 24px 0;
+}
+.card-body {
+  padding: 0 24px 24px;
+  flex: 1;
+}
+
+/* ── NEW BADGE ── */
+.new-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--pink);
+  border: 1px solid var(--pink-border);
+  background: var(--pink-bg);
+  border-radius: 9999px;
+  padding: 3px 10px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* ── CARD TITLE ── */
+.ctop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.cname {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.25;
+  letter-spacing: -.03em;
+}
+
+/* ── TAGS (Shadcn Badge) ── */
+.tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -.01em;
+  border: 1px solid;
+  line-height: 1.5;
+}
+.tag-ui      { background: var(--blue-bg);   border-color: var(--blue-border);   color: var(--blue); }
+.tag-ux      { background: var(--teal-bg);   border-color: var(--teal-border);   color: var(--teal); }
+.tag-fe      { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple); }
+.tag-be      { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+.tag-ai      { background: var(--pink-bg);   border-color: var(--pink-border);   color: var(--pink); }
+.tag-mkt     { background: var(--coral-bg);  border-color: var(--coral-border);  color: var(--coral); }
+.tag-predict { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+.tag-boost   { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+.tag-easy    { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+.tag-mid     { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+.tag-hard    { background: var(--coral-bg);  border-color: var(--coral-border);  color: var(--coral); }
+
+/* ── CARD SECTIONS ── */
+.dsec { margin-bottom: 0; }
+.dsec-main {
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+}
+.dsec-main:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.dl {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  text-transform: none;
+  color: #18181b;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin-bottom: 12px;
+}
+/* expandable section labels keep monospace */
+.angular-header .dl,
+.code-header .dl,
+.api-header .dl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .01em;
+}
+.db, .cdesc {
+  font-size: 15px;
+  color: #27272a;
+  line-height: 1.65;
+  font-weight: 400;
+}
+.db ul { padding-left: 1.1rem; }
+.db li { margin-bottom: 3px; }
+
+/* ── DETAIL (expandable) ── */
+.detail {
+  display: none !important;
+}
+
+/* ── CODE BLOCK ── */
+.code {
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: #d4d4d8;
+  margin-top: 8px;
+  line-height: 1.8;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ── EXPANDABLE HEADERS ── */
+.code-header, .angular-header, .api-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.code-header:last-child, .angular-header:last-child, .api-header:last-child { border-bottom: none; }
+.code-header:hover .dl, .angular-header:hover .dl, .api-header:hover .dl { color: var(--foreground); }
+
+.code-toggle, .angular-toggle, .api-toggle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted-foreground);
+  letter-spacing: .04em;
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--muted);
+  transition: all .15s;
+}
+.code-header:hover .code-toggle,
+.angular-header:hover .angular-toggle,
+.api-header:hover .api-toggle { border-color: #d4d4d8; color: var(--foreground); }
+
+.code-wrap.collapsed .code { display: none; }
+.angular-wrap.collapsed .db { display: none; }
+.api-wrap.collapsed .db { display: none; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--muted-foreground);
+  font-size: 14px;
+}
+
+/* ── LEGEND ── */
+.legend {
+  padding: .875rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .02em;
+}
+.legend-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.disc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Inter', sans-serif;
+  transition: all .15s;
+}
+.disc-btn:hover { background: var(--muted); color: var(--foreground); border-color: #d4d4d8; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="eyebrow">AI Strategy · iGaming Platform</div>
+    <h1>點子池 <span>全覽</span></h1>
+    <p class="header-sub">平台體驗 · 新客獲取 · 存款提升 · 風控保留 — Angular 技術方向</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-n" id="sTotal">30</div>
+      <div class="stat-l">TOTAL IDEAS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="sShown">24</div>
+      <div class="stat-l">SHOWING</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">4</div>
+      <div class="stat-l">CATEGORIES</div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span class="filter-label">篩選</span>
+  <div class="filters">
+    <button class="fb f-all on" onclick="fil('all',this)">全部</button>
+    <button class="fb f-archive" onclick="fil('archive',this)">ARCHIVE</button>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div>新加入點子</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#15803d"></div>低複雜度</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div>中複雜度</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c2410c"></div>高複雜度</div>
+</div>
+
+<script>
+const CATS = [
+  { key:'acquisition', label:'新客獲取', accent:'var(--coral)' },
+  { key:'existing',    label:'既有用戶', accent:'var(--blue)' },
+  { key:'tech',        label:'技術優化', accent:'var(--teal)' },
+  { key:'archive',     label:'ARCHIVE', accent:'#6b6b6b' },
+];
+
+const ALL = [
+  // ── PLATFORM ──
+  {id:'p1',cat:'archive',isNew:false,name:'首頁動態排版',ico:'≡',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['ui','fe','be'],diff:'mid',
+   problem:'首頁版面固定，所有玩家看到一樣的內容，無法反映個人興趣。',
+   desc:'玩家玩什麼，首頁就長什麼樣。常玩板球的進來看到板球 Banner 和相關活動，Slot 玩家看到的是 Slot Promotion Banner、自己玩過的遊戲加系統推薦，區塊順序也跟著調。',
+   why:'動態排版在 CTR 上持續優於固定版型，核心是讓首頁結構本身就是個人化的。',
+   angular:['LayoutService 取 moduleOrder[] 存入 Signal','@for + trackBy 依序渲染不寫死','Angular Animation 做位移動畫'],
+   code:`moduleOrder = signal<string[]>([]);
+fetchLayout() {
+  this.http.get<string[]>('/api/layout/user')
+    .subscribe(o => this.moduleOrder.set(o));
+}`,
+   predict:'首頁結構本身就是預測結果，用戶不需滾動就能找到想看的區塊。',
+   api:'GET /api/layout/user → string[]'},
+
+  {id:'p2',cat:'archive',isNew:false,name:'AI 推薦區塊（三層混合）',ico:'✦',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   problem:'推薦內容單一，玩家容易錯過適合自己的遊戲。',
+   desc:'推薦區分三層：你玩過的、類似的、最近全站最熱的。每張卡片旁邊標注是哪種，讓玩家知道為什麼出現這個。',
+   why:'三層混搭讓推薦兼顧個人化與新鮮感，避免同溫層效應。',
+   angular:['forkJoin 同時打三支 API','卡片帶 source badge（因為你玩過 / 熱門中）','Skeleton loading 避免版面跳動'],
+   code:`return forkJoin({
+  played:   this.http.get('/api/rec/played'),
+  similar:  this.http.get('/api/rec/similar'),
+  trending: this.http.get('/api/rec/trending')
+});`,
+   predict:'每次進 app AI 已根據最近行為預備好內容。',
+   api:'GET /api/rec/played, /similar, /trending'},
+
+  {id:'p3',cat:'archive',isNew:false,name:'導覽選單個人化排序',ico:'☰',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'mid',
+   problem:'選單順序固定，常用功能不一定在最顯眼的位置。',
+   desc:'常玩 Slot 的，導覽列裡 Slot 排第一；常看賽事的，Sports 靠最前。新玩家還沒資料，先走全站熱門順序。',
+   why:'選單重排能明顯提升常用功能的可達性，降低操作步驟數。',
+   angular:['UserPreferenceService 取 categoryOrder Signal','@for 渲染不寫死 nav item 陣列','新用戶 fallback 全站熱門排序','OnPush ChangeDetection 減少重繪'],
+   code:`categories = computed(() =>
+  this.prefSvc.categoryOrder()
+  ?? this.prefSvc.globalDefault());`,
+   predict:'最常去的頁面自然靠近拇指熱區，減少尋找時間。',
+   api:'GET /api/user/nav-order → CategoryItem[]'},
+
+  {id:'p4',cat:'existing',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'mid',
+   problem:'存款快捷按鈕金額固定，和玩家實際習慣落差大。',
+   desc:'平時都存 500 的玩家，快捷按鈕就出現 450、475、500、525、550，不是死板的 100/500/1000，＋10% 那顆特別顯眼。',
+   why:'固定金額按鈕與玩家習慣落差大，個人化預設讓玩家少一個輸入動作；+10% 引導往上存，降低存款摩擦同時提升客均存款。',
+   angular:['AmountPresetComponent 接收 presets:PresetOption[]，每個 option 含 amount / label / highlight','DepositService.getPresets() 取後端計算結果，SessionStorage 快取同 session 不重複 fetch','按鈕超出平台存款上下限時自動 disabled，避免玩家點了才報錯','5 個金額若有重複（平均值太小）後端去重，只回傳不重複選項'],
+   code:`interface PresetOption {
+  amount: number;    // 已無條件進位至整數
+  label: string;     // '' | '你常用' | '推薦'
+  highlight: boolean;
+}
+
+presets = signal<PresetOption[]>([]);
+
+ngOnInit() {
+  this.depositSvc.getPresets()
+    .subscribe(p => this.presets.set(p));
+}
+
+// 後端邏輯（偽碼）：
+// avg = mean(last 30 deposits)
+// 若筆數 < 3 → fallback 同層級群體平均
+// candidates = [avg×0.9, avg×0.95, avg, avg×1.05, avg×1.1].map(Math.ceil)
+// 去重 → 過濾平台 min/max → 組成 PresetOption[]
+// highlight = true 僅 +10% 選項`,
+   predict:'玩家開存款面板時，5 個貼近習慣的金額已備好，+10% 視覺突出，自然引導往上存。',
+   api:'GET /api/user/deposit-presets → PresetOption[]（後端完成平均計算、去重、邊界過濾）'},
+
+  {id:'p5',cat:'archive',isNew:false,name:'Provider 雙維度動態排序',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ui','fe','ai'],diff:'mid',
+   problem:'Provider 清單順序固定或靠人工排，跟不上實際熱度，也無法反映每個玩家的喜好。',
+   desc:'排序同時考慮兩個維度。全站維度：過去 30 天各 Provider 的累積流水，流水高的排前面，每天更新。個人維度：這個玩家最常玩 Pragmatic，那他的 Slot 頁 Pragmatic 自動置頂，不用自己找。兩個維度加權混合，也可以讓玩家自己切換「依平台熱度」或「依我的習慣」。首頁的賽事相關遊戲和 Promotion 在重大賽事前自動往前排。',
+   why:'GR8 和 Optimove 等頭部平台商都把 Provider 排序做成可配置模組，因為排序本身就決定哪些遊戲被看到、被玩到。我們資料庫裡已有 Provider Top 20 流水資料，差的只是接到前端。',
+   angular:['ProviderListComponent 接收 ranked Provider[]，不寫死順序','SortModeToggle 元件切換 global / personal 兩種模式','@for + trackBy 確保排序變動時只移動元素，不重繪卡片','Angular Animation 讓位置變動有平滑過渡','polling 或 SSE 每日同步全站排序'],
+   code:`type SortMode = 'global' | 'personal';
+
+sortMode = signal<SortMode>('personal');
+
+providerList = computed(() =>
+  this.sortMode() === 'personal'
+    ? this.providerSvc.personalRanked()
+    : this.providerSvc.globalRanked()
+);
+
+// 後端邏輯：
+// global:   rank by sum(turnover, last 30d)
+// personal: rank by user play_count per provider
+//           fallback to global if play_count < 3`,
+   predict:'玩家進 Slot 頁，常玩的 Pragmatic 已在第一格；切到「平台熱度」，看的是全站流水最高的排法。不需搜尋，不需滾動。',
+   api:'GET /api/providers/ranked?mode=global|personal → Provider[]（後端依 mode 排序後回傳）'},
+
+  {id:'p8',cat:'tech',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['fe','ui','ux'],diff:'easy',
+   problem:'網路慢時頁面出現白框或破圖，影響第一印象。',
+   desc:'頁面先顯示極小縮圖並放大模糊（LQIP），真實圖片下載完成後以 CSS transition 清晰淡入。純 CSS + JS 實現，所有瀏覽器皆相容，無需任何新 API。',
+   why:'網路差的玩家看到白框或破圖，體驗差且跳出率高。Blur-Up 讓畫面立刻有內容，感知速度遠快於實際載入速度，不需等圖載完才有東西看。',
+   angular:['BlurUpDirective 掛在 <img>，接收 blurUp（原圖 URL）與 lqip（base64 縮圖 ~300B）兩個 Input','ngAfterViewInit 先把 lqip 放入 src，CSS filter:blur(12px) scale(1.05) 撐滿容器不留白邊','new Image() preload 原圖，onload 替換 src 並移除 blur，CSS transition 自動補間','純 CSS transition: filter .4s ease, transform .4s ease — IE11+ / iOS Safari / Android Chrome 全覆蓋'],
+   code:`// blur-up.directive.ts
+@Directive({ selector: 'img[blurUp]', standalone: true })
+export class BlurUpDirective implements AfterViewInit {
+  @Input() blurUp!: string;  // 原圖 URL
+  @Input() lqip!:   string;  // base64 縮圖（≤ 1KB）
+
+  constructor(private el: ElementRef<HTMLImageElement>) {}
+
+  ngAfterViewInit() {
+    const img = this.el.nativeElement;
+    img.src = this.lqip;
+    Object.assign(img.style, {
+      filter: 'blur(12px)',
+      transform: 'scale(1.05)',
+      transition: 'filter .4s ease, transform .4s ease',
+    });
+    const hi = new Image();
+    hi.src = this.blurUp;
+    hi.onload = () => {
+      img.src = this.blurUp;
+      img.style.filter = 'none';
+      img.style.transform = 'scale(1)';
+    };
+  }
+}
+
+// 使用方式
+// <img [blurUp]="game.imageUrl" [lqip]="game.lqip" alt="..." />`,
+   predict:'玩家進頁面立刻看到有內容的畫面，不是白框；網路恢復後自動清晰，全程無感。',
+   api:'後端 GET /api/images/:id?q=10 回傳極低品質縮圖（≤1KB）base64，前端 inline 寫入 lqip；或直接在資料預載時一併附上 lqipBase64 欄位'},
+
+  {id:'p6',cat:'archive',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
+   types:['ux','be','ai'],diff:'hard',
+   problem:'所有玩家看到相同活動，和自己無關的優惠容易被忽略。',
+   desc:'Slot 玩家看到的是 Free Spin 優惠，Sports 玩家看到的是賽事加碼，不是所有人看同一張 Banner。',
+   why:'全站廣播 CTR 遠低於個人化推薦，推薦理由更能建立信任。',
+   angular:['PromoCard @Input reason 欄位渲染說明','PromotionService 取 /api/promo/personalized','IntersectionObserver 曝光追蹤回傳後端'],
+   code:`@Input() promo!: {
+  title: string;
+  reason: string; // '根據你的常玩類型'
+  cta: string;
+};`,
+   predict:'用戶看到的活動是系統預測他現在最感興趣的。',
+   api:'GET /api/promo/personalized → Promo[]（含 reason）'},
+
+  {id:'p7',cat:'archive',isNew:false,name:'情境式 AI 客服',ico:'◈',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['ui','ux','fe','ai'],diff:'mid',
+   problem:'客服回覆千篇一律，無法根據玩家當下情境給出有用建議。',
+   desc:'玩家卡在存款頁，小幫手直接問「選支付方式有問題嗎？」；在投注頁問問題，回的是賽事說明，不是通用 FAQ。',
+   why:'用戶卡關時最需要的是「這一步怎麼做」的即時引導，不是通用說明頁。',
+   angular:['ChatWidget 讀取 RouterService 取當前 route context','call API 時帶 currentPage / lastAction','CDK Overlay 浮動 chat 面板不影響 layout'],
+   code:`sendMessage(text: string) {
+  const ctx = {
+    page: this.router.url,
+    lastAction: this.actSvc.lastAction()
+  };
+  this.chatSvc.ask(text, ctx).subscribe(...);
+}`,
+   predict:'AI 知道此刻在做什麼，主動說出最相關的下一步。',
+   api:'POST /api/chat → { reply }（後端帶 context 給 LLM）'},
+
+  {id:'p9',cat:'existing',isNew:true,name:'客服反饋標籤化 + 問卷送 Point',ico:'⊕',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','be','ai','mkt'],diff:'mid',
+   problem:'客服工單散亂，難以找出哪些流程問題最集中。',
+   desc:'AI 自動將客服工單與玩家訊息分類標籤（存款問題 / 活動疑問 / 技術異常…），統整成可讀報表；反饋量不足時觸發「填問卷送 Point」活動，主動補充資料缺口。',
+   why:'客服工單是最真實的痛點來源，但散落各工單系統難以量化。AI 標籤化讓產品 / 設計團隊每週就能看出哪個流程問題最多；問卷送 Point 則把被動收集變成主動活動，玩家有誘因、平台有數據。',
+   angular:['FeedbackDashboard 顯示 AI 分類後的標籤分佈圓餅圖 + 每週趨勢折線圖（Angular Material Charts 或 lightweight ECharts wrapper）','SurveyTriggerService 監控過去 N 天反饋筆數，低於閾值時自動在 CMS 排程「問卷送 Point」活動','SurveyComponent 多步驟表單（CDK Stepper），完成後呼叫 /api/survey/complete 派發 Point','標籤雲端元件 TagCloudComponent 依出現頻率決定字體大小，點擊可下鑽查看原始工單'],
+   code:`// 後端 AI 分類流程（偽碼）
+// 1. 每 1hr batch job 取新工單 from CS 系統
+// 2. 呼叫 LLM / 分類模型：
+//    POST /internal/classify → { label, confidence, sentiment }
+//    labels: deposit | withdrawal | bonus | technical | account | other
+// 3. 寫入 feedback_tags table，串聯原工單 ID
+// 4. sentiment < 0 且 confidence > 0.8 → 標記為「高優先」
+
+// 前端：自動觸發問卷
+insufficientFeedback = computed(() =>
+  this.feedbackSvc.weeklyCount() < THRESHOLD
+);
+
+ngOnInit() {
+  if (this.insufficientFeedback()) {
+    this.campaignSvc.activate('survey_point_reward');
+  }
+}
+
+// 問卷完成派 Point
+completeSurvey(answers: SurveyAnswer[]) {
+  this.http.post('/api/survey/complete', { answers })
+    .subscribe(({ pointsAwarded }) => {
+      this.toast.show(\`+\${pointsAwarded} Points 已入帳！\`);
+    });
+}`,
+   predict:'產品團隊每週看到標籤分佈報表，能快速找出最需要優化的流程；問卷資料補足 AI 分類的死角，形成玩家反饋的正向循環。',
+   api:'GET /api/feedback/summary → { labels: TagCount[], trend: WeeklyTrend[], topIssues: Issue[] } / POST /api/survey/complete → { pointsAwarded } / GET /api/survey/active → Survey | null'},
+
+  {id:'p10',cat:'existing',isNew:true,name:'Personal Lobby',ico:'◈',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   problem:'首頁 Banner、推薦遊戲、活動 Offer 三層各跑各的，Provider 清單又靠人工或固定順序排列，所有玩家看到的內容大同小異，個人化感全無。',
+   desc:'Personal Lobby 讓進站的瞬間，三層內容（Banner、推薦、Offer）與 Provider 排序同時對齊。Slot 玩家看到 Slot 相關 Banner、常玩的 Pragmatic 自動置頂、Free Spin Offer；Sports 玩家看到今晚賽事 Banner、熱門賽事、賽事加碼。Provider 排序結合全站流水與個人習慣兩個維度，玩家可自己切換「依平台熱度 / 依我的習慣」。新用戶以 UTM 渠道推斷初始 segment，累積行為後自動切換真正個人化。行銷重大活動時可強制覆蓋 Banner，下方推薦與 Provider 繼續個人化。',
+   why:'玩家感受到的是「它了解我」而不是「這 APP 很亂」。Provider 排序本身就決定哪些遊戲被看到、被玩到，資料庫裡的流水資料差的只是接到前端。',
+   angular:['SmartLobbyService 單次 call /api/lobby/config，回傳 banner + recommendations + offer + providerList 四包內容','ProviderListComponent 接收 ranked Provider[]，SortModeToggle 切換 global / personal 兩種模式','覆寫模式：CampaignService.activeCampaign() 若有強制廣播，優先填入 banner slot','新用戶 cold start：UTM source 判斷初始 segment，存入 SessionStorage，首次 API call 帶 segment 參數','Signal-based：四包內容各自是獨立 Signal，任一更新只重繪對應區塊'],
+   code:`interface LobbyConfig {
+  banner:          BannerContent;
+  recommendations: GameItem[];
+  offer:           OfferContent | null;
+  providers:       Provider[];       // 排序後的 Provider 清單
+  source:          'personalized' | 'campaign' | 'cold_start';
+}
+
+// 後端優先級：
+// banner:    campaign > personal > cold_start > global_hot
+// providers: personal(play_count) > global(turnover 30d) > fallback
+
+sortMode = signal<'global' | 'personal'>('personal');
+
+ngOnInit() {
+  const segment = this.utmSvc.inferSegment();
+  this.http.get<LobbyConfig>('/api/lobby/config', {
+    params: { segment: segment ?? '', providerSort: this.sortMode() }
+  }).subscribe(cfg => this.lobbyConfig.set(cfg));
+}`,
+   predict:'玩家進站，Banner、推薦、Offer、Provider 同時對齊。Slot 玩家每一格都在說 Slot；世界盃開打，Banner 強制換，其他繼續個人化；常玩的 Provider 不需滾動就在第一格。',
+   api:'GET /api/lobby/config?segment=&providerSort=global|personal → LobbyConfig（後端統一決策）'},
+
+  // ── ACQUISITION ──
+  {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['mkt','fe','be','ai'],diff:'mid',
+   problem:'新玩家從廣告點進來，看到的是一個通用 LP，體育和 Slot 玩家看到一模一樣的內容，轉換動機不足。即使完成註冊，主站也不知道這個玩家偏好什麼，錯過了最佳個人化時機，Welcome Offer 和推薦遊戲與玩家完全無關。',
+   why:'玩家的偏好在「點擊廣告的那一刻」就已暴露，但這個訊號目前完全浪費掉了。從渠道分流 → LP 個人化 → 快速註冊 → 個人化 Lobby → 符合分類的 Welcome Offer → 推薦第一款遊戲，整條新客漏斗每一步都與玩家偏好對齊，可顯著提升 FTD 轉換率。',
+   desc:'依廣告渠道的 UTM 參數（廣告連結上的來源標籤）自動分流對應主題 LP（體育渠道 → Sports LP；Slot 渠道 → Slot LP）。LP 內嵌快速註冊表單，完成後系統自動標記玩家分類（Sports / Slot / Live Casino…）並產生臨時通行證（Token），帶著玩家直接跳轉主站自動登入，無需再輸入帳號密碼。主站 Lobby 依標籤優先呈現對應分類的 Banner、Provider 與推薦遊戲；同時彈出符合該分類的 Welcome Offer（如 Sports 玩家看體育首存 Bonus、Slot 玩家看 Free Spins）。Offer 關閉後再推薦 3 款該分類熱門遊戲，引導完成第一次下注體驗。',
+   angular:['LP standalone component 讀 queryParams 取 UTM','IntentService 計算 intentScore → Signal','@switch 切換 SportsHero / CasinoHero / GenericHero','IntersectionObserver 追蹤看過哪些 section'],
+   code:`detectIntent(params: Params, scroll: ScrollEvent[]): Intent {
+  const utmHint = params['utm_content'];
+  const seen = scroll.filter(s => s.ratio > 0.5)
+                     .map(s => s.section);
+  return this.scoreIntent(utmHint, seen);
+}`,
+   predict:'用戶在 LP 停留幾秒，系統已知要給他 Sports 還是 Casino offer。',
+   api:'POST /api/intent/lp → { intent, confidence }'},
+
+  {id:'a2',cat:'archive',isNew:true,name:'AI 精簡註冊流程',ico:'✎',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['ux','fe','be','ai'],diff:'hard',
+   problem:'表單欄位太多，每多一個欄位都在流失用戶。',
+   desc:'從 Sports 廣告進來的新用戶，系統自動預填偏好為「運動」，KYC 欄位留到後面再補，讓人先用最少步驟完成註冊。',
+   why:'每多一個欄位都會流失用戶，AI 判斷哪些可先省略、稍後補填。',
+   angular:['RegisterForm fields 從後端動態取，不寫死','Reactive Forms + 動態 FormControl 建構','依 intent 預填部分欄位','Progressive disclosure：必填先、KYC 最後'],
+   code:`formConfig$ = this.regSvc.getFormConfig(
+  this.intentSvc.current()
+);
+// → { fields, prefilled: { product: 'sports' },
+//     skipable: ['address'] }`,
+   predict:'系統知道這個用戶從哪個廣告來，給他最短的註冊路徑。',
+   api:'GET /api/register/config?intent=sports → FormConfig'},
+
+  {id:'a3',cat:'acquisition',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['mkt','ux','be','ai'],diff:'mid',
+   problem:'所有新用戶看同一張歡迎優惠，配對錯誤直接影響首次存款率。',
+   desc:'從體育相關渠道帶進來的新用戶，註冊完會看到體育首存 Bonus 並引導去體育投注；Slot 及 Casino 渠道也是相同的邏輯。不是同一張通用 Bonus Offer。',
+   why:'Welcome Offer 是黃金時刻，配對錯誤（給 Casino 用戶看 Sports 優惠）直接影響首次存款率。',
+   angular:['RegisterSuccess 完成後立即 call /api/offers/welcome','OfferCard 支援 sports / casino / combined variant','動畫呈現「為你專屬」的感受','Deep link 直接帶到對應 lobby'],
+   code:`ngOnInit() {
+  this.offerSvc.getWelcomeOffer({
+    intent: this.intentSvc.current(),
+    source: this.utmSvc.source()
+  }).subscribe(o => this.offer.set(o));
+}`,
+   predict:'新用戶完成註冊後 3 秒內看到的就是為他準備的 offer。',
+   api:'POST /api/offers/welcome → WelcomeOffer（依 intent + source）'},
+
+  {id:'a4',cat:'archive',isNew:true,name:'管道歸因鏈追蹤',ico:'⊞',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['mkt','be','ai'],diff:'mid',
+   problem:'只看最後轉換，不知道哪個廣告組合真正帶來高價值玩家。',
+   desc:'追蹤「板球廣告 → Sports LP → 首存 Offer → 存款」整條路，哪個廣告配哪種 Offer 帶來的玩家最值錢，AI 自己學、自己調。',
+   why:'AI 能分析哪個 LP + offer + 管道組合的 LTV 最高，而不只看最後轉換。',
+   angular:['SessionStorage 保存完整 utm 鏈和 intent 歷程','關鍵動作觸發 TrackingService.emit()','後台 Angular dashboard 視覺化完整漏斗'],
+   code:`trackFunnel(step: FunnelStep) {
+  this.http.post('/api/analytics/funnel', {
+    step, intent: this.intentSvc.current(),
+    utmSource: this.utmSvc.source(),
+    offerId: this.offerSvc.currentOffer()?.id
+  }).subscribe();
+}`,
+   predict:'AI 學習哪條路徑 LTV 最高，自動給相似管道配最好的 offer 組合。',
+   api:'POST /api/analytics/funnel → void'},
+
+  {id:'a5',cat:'archive',isNew:true,name:'LP 動態 A/B 自動優化',ico:'⚙',icoBg:'var(--blue-dim)',accentColor:'var(--blue)',
+   types:['mkt','fe','be','ai'],diff:'hard',
+   problem:'傳統 A/B 測試要等，結果出來前流量已經白白浪費。',
+   desc:'同時跑三個 LP 版本，哪個轉換率高 AI 就把更多流量導過去，不用等兩週測試期結束，好的版本邊跑邊放大。',
+   why:'傳統 A/B test 需人工設定時間，bandit 算法在測試期間就持續優化。',
+   angular:['VariantService 進站 call /api/ab/assign 取 variantId','LP 依 variantId lazy load 不同 Hero / CTA','每次 conversion event 回報 /api/ab/convert'],
+   code:`assignVariant(): Observable<string> {
+  return this.http.post<{variantId: string}>(
+    '/api/ab/assign',
+    { campaignId: this.utmSvc.campaign() }
+  ).pipe(map(r => r.variantId));
+}`,
+   predict:'不需等測試結束，AI 即時讓更多用戶看到更好的版本。',
+   api:'POST /api/ab/assign → { variantId } / POST /api/ab/convert'},
+
+  {id:'a6',cat:'archive',isNew:true,name:'OAuth 快速登入 + 意圖保留',ico:'⊛',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['ux','fe','be'],diff:'easy',
+   problem:'OAuth 跳轉後失去用戶意圖，需要重新選擇偏好。',
+   desc:'用 Google 一鍵註冊，系統記住你是從 Casino 廣告來的，授權跳轉回來直接進 Casino 歡迎頁，不用重新選偏好。',
+   why:'OAuth 常見問題是 redirect 後失去 LP context，AI 意圖必須跨越保留下來。',
+   angular:['OAuth redirect 前把 intentData 存 sessionStorage','Callback ngOnInit 取回 intentData 送後端','Angular Auth Guard 確保 state 驗證，防 CSRF'],
+   code:`initiateOAuth(provider: string) {
+  sessionStorage.setItem('pre_auth_intent',
+    JSON.stringify(this.intentSvc.current()));
+  window.location.href = \`/auth/\${provider}\`;
+}`,
+   predict:'即使有 OAuth redirect，系統仍記得這個用戶對什麼感興趣。',
+   api:'POST /api/auth/complete → { token, user, offerSuggestion }'},
+
+  // ── DEPOSIT ──
+  {id:'d1',cat:'archive',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','be','ai'],diff:'hard',
+   problem:'不知道什麼時候介入最有效，要嘛太早要嘛太晚。',
+   desc:'玩家連續瀏覽存款頁兩次、餘額又接近低點，系統判斷他快要存了，這時才出現優惠提示，不是一進站就給所有人看。',
+   why:'預測核心是在用戶準備好之前就知道，讓介入感覺像巧合，不像廣告。',
+   angular:['DepositIntentService 透過 SSE 接收 intent score 更新','Score 存入 Signal 全域訂閱','達閾值觸發 DepositNudgeComponent'],
+   code:`intentScore = signal<number>(0);
+connect() {
+  const sse = new EventSource('/api/stream/deposit-intent');
+  sse.onmessage = (e) => {
+    const { score } = JSON.parse(e.data);
+    this.intentScore.set(score);
+    if (score > 0.75) this.triggerNudge();
+  };
+}`,
+   predict:'用戶還沒點存款按鈕，系統已知道他快要存了。',
+   api:'SSE /api/stream/deposit-intent → { score, triggerReason }'},
+
+  {id:'d2',cat:'archive',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['predict','ux','fe','be'],diff:'easy',
+   problem:'玩家餘額快沒了自己不一定察覺，悄悄就離開了。',
+   desc:'Slot 玩家餘額剩不到平常最低的三成，頁面頂部輕輕出現一條提示，附的是 Slot 相關存款 Bonus，不是通用廣告。',
+   why:'餘額接近臨界是最強存款訊號，此時介入成本低、轉換率高，且用戶能立刻理解原因。',
+   angular:['BalanceService computed() 監控 balance ratio','CDK Overlay 插入頁面頂部','Banner 內容依 userProduct 動態化','Dismiss 後 cooldown 同天不重複'],
+   code:`lowBalanceAlert = computed(() => {
+  const ratio = this.balance() / this.avgMinBalance();
+  return ratio < 0.3
+    ? { show: true, nudgeType: this.userProduct() }
+    : { show: false };
+});`,
+   predict:'系統知道用戶快沒子彈了，主動提醒而不是等他自己發現。',
+   api:'GET /api/user/balance-status → { balance, threshold, nudgeContent }'},
+
+  {id:'d3',cat:'archive',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['predict','ux','fe','be'],diff:'mid',
+   problem:'進了存款頁又走掉，平台沒有任何挽回動作。',
+   desc:'玩家打開存款頁停了 20 秒沒動就離開，系統在下一個頁面底部滑出一個存款 Offer，不是強制彈窗，是給個理由讓他考慮一下。',
+   why:'開過存款頁是極強訊號，放棄通常因為「不覺得划算」，一個即時 offer 能扭轉。',
+   angular:['ngOnDestroy 偵測未完成離開','Router events 偵測離開 /deposit route','Bottom sheet 而非強制 modal','Offer 由後端即時生成非固定 bonus'],
+   code:`private enteredAt = Date.now();
+private completed = false;
+ngOnDestroy() {
+  const elapsed = Date.now() - this.enteredAt;
+  if (!this.completed && elapsed < 30000)
+    this.nudgeSvc.triggerAbandonOffer();
+}`,
+   predict:'系統偵測猶豫行為，在最後一刻給出最相關的理由讓他完成存款。',
+   api:'POST /api/deposit/abandon → { offer: AbandonOffer }（即時生成）'},
+
+  {id:'d4',cat:'archive',isNew:true,name:'存款金額升級 Offer',ico:'▲',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['boost','ux','fe','be'],diff:'mid',
+   problem:'玩家不知道多存一點能解鎖什麼，自然不會主動提高金額。',
+   desc:'玩家輸入 300，旁邊立刻出現「再存 200 可解鎖雙倍 Free Spin」，讓他自己決定要不要加碼，不是強迫，是告知。',
+   why:'讓用戶清楚看到多存一點的邊際收益，自然願意調高金額。API 需壓在 200ms 以內。',
+   angular:['監聽輸入事件 debounce 500ms 後 call API','UpgradeHint 在輸入框旁 computed 顯示','金額變化時平滑動畫過渡不閃爍'],
+   code:`this.amount$.pipe(
+  debounceTime(500),
+  distinctUntilChanged(),
+  switchMap(amt => this.depositSvc.getUpgradeHint(amt))
+).subscribe(hint => this.upgradeHint.set(hint));
+// hint: { targetAmt: 500, gain: '+50 free spins' }`,
+   predict:'用戶輸入 300，系統立刻顯示「再存 200 即可雙倍 bonus」。',
+   api:'GET /api/deposit/upgrade-hint?amount=N → UpgradeHint（<200ms）'},
+
+  {id:'d5',cat:'archive',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','be','ai'],diff:'mid',
+   problem:'提醒時機不準，太早玩家沒感覺，太晚已經錯過。',
+   desc:'這個玩家每週五晚上固定存款，系統週五下午推一則提醒附上當週最新活動，剛好在他準備存款前出現。',
+   why:'習慣性存款用戶有明確週期，提前提醒能搭配活動提前鎖單。',
+   angular:['NotificationService 接收後端排程 Web Push + 站內 badge','推播內容依偏好個人化（Sports 看賽事 / Casino 看 jackpot）','Angular badge component 顯示未讀'],
+   code:`// 後端排程邏輯（討論方向）
+// 1. 分析歷史存款時間序列
+// 2. 預測下次存款視窗 ± 12hr
+// 3. 視窗前 2hr 排程推播
+// 4. 依 user.preferredProduct 選模板`,
+   predict:'系統知道用戶通常週四晚上存款，週四下午就推最新活動。',
+   api:'後端排程 job + POST /api/notify/deposit-reminder'},
+
+  {id:'d6',cat:'archive',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['boost','ux','fe'],diff:'easy',
+   problem:'玩家不知道距離升等還差多少，缺乏繼續存款的動力。',
+   desc:'存款頁顯示「距離黃金會員還差 NT$800」，旁邊列明升等後的 Cashback，讓人覺得再存一點很值得。',
+   why:'Progress visualization 是提升消費的強力 UX 手法，「差一點」讓用戶願意多存。',
+   angular:['TierProgressComponent @Input tierStatus','Angular Animation 平滑填充進度條不瞬間跳','顯示具體差距：再存 NT$1,200 解鎖白金','點擊進度條展開 tier 福利說明'],
+   code:`@Input() tierStatus!: {
+  currentTier: string;
+  nextTier:    string;
+  progress:    number;    // 0~1
+  amountNeeded:number;
+  nextBenefit: string;    // '每週 cashback 5%'
+};`,
+   predict:'AI 計算最能打動這個用戶的里程碑，顯示在進度條旁。',
+   api:'GET /api/user/tier-status → TierStatus'},
+
+  {id:'d7',cat:'archive',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['boost','predict','be','ai'],diff:'hard',
+   problem:'固定時間發優惠，玩家預期甚至刻意等，稀缺感全無。',
+   desc:'玩家剛輸完一場、餘額降低，又剛好是週末賽事高峰，系統判斷這時最可能存款，限時 Offer 才出現，不是每天固定時間發給所有人。',
+   why:'固定排程 bonus 用戶會預期甚至等它，AI 動態時機讓 offer 更有稀缺感，轉換率更高。',
+   angular:['TimedOfferBanner 監聽 depositIntentScore Signal','score>0.6 且有活躍活動才觸發，避免打擾','Offer 帶倒數計時（Angular countdown pipe）','Dismiss 後同用戶當天只觸發一次'],
+   code:`showOffer = computed(() =>
+  this.intentSvc.intentScore() > 0.6 &&
+  this.offerSvc.hasActiveOffer() &&
+  !this.dismissed()
+);`,
+   predict:'系統判斷「現在最可能存款」，在精準時間點送出限時 offer。',
+   api:'GET /api/offers/timed → TimedOffer | null'},
+
+  {id:'d8',cat:'archive',isNew:true,name:'存款流程障礙分析',ico:'⊟',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+   types:['boost','ux','fe','be'],diff:'mid',
+   problem:'不知道玩家在哪個步驟放棄，只能靠猜來優化。',
+   desc:'發現一批玩家都在「選支付方式」那步流失，AI 標出來，產品才知道先去優化那個步驟，不用靠猜。',
+   why:'有時提升存款不是靠 offer，而是把讓用戶放棄的步驟移除。AI 能找到人工難以發現的障礙。',
+   angular:['存款流程每步驟埋 tracking（step_enter / step_exit / step_complete）','後台 Angular funnel dashboard 視覺化 drop-off rate','AI 分析哪類用戶在哪步放棄並推薦優化優先順序'],
+   code:`trackStep(step: DepositStep, action: 'enter'|'exit'|'complete') {
+  this.analytics.track('deposit_funnel', {
+    step, action,
+    timeOnStep: this.stepTimer.elapsed(),
+    balance:    this.balanceSvc.current()
+  });
+}`,
+   predict:'AI 識別哪類用戶更容易在哪個步驟放棄，推薦針對性簡化。',
+   api:'POST /api/analytics/deposit-step / GET /api/analytics/funnel-report'},
+
+  {id:'d9',cat:'existing',isNew:true,name:'快沒籌碼？再撐幾回合',ico:'⟲',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+   types:['predict','boost','ux','fe','be'],diff:'mid',
+   problem:'餘額快沒是最危險的時刻，平台卻沒有即時挽留機制。',
+   desc:'玩家餘額趨近於零時，系統即時給予固定金額免費籌碼（Free Credit），讓他多玩幾回合；完成指定輪數後解鎖存款 Bonus，把「快放棄」的時機轉換成再次存款的動力。',
+   why:'快沒錢的玩家最接近離開，但也最渴望「再試一次」。Free Credit 讓他留下來，Bonus 條件在他最有感的時刻出現，完成輪數後自然引導他存款繼續，感覺像平台在幫他，不像廣告。',
+   angular:['BalanceWatchService 監控餘額，低於個人歷史平均最低值 20% 時觸發','CDK Overlay 顯示底部 sheet（非強制彈窗，可關閉）','倒數計時 pipe 製造稀缺感（限時 10 分鐘）','輪數完成後自動判斷解鎖狀態，顯示存款 CTA'],
+   code:`lastChance = computed(() => {
+  const ratio = this.balance() / this.avgMinBalance();
+  return ratio < 0.2 && !this.claimed();
+});
+
+// 輪數追蹤
+this.roundCount$.pipe(
+  filter(n => n >= this.wagerRequired),
+  take(1)
+).subscribe(() => this.unlockBonus());`,
+   predict:'系統在玩家快放棄前主動出手，Free Credit 是橋樑，存款 Bonus 是目的地。',
+   api:'POST /api/offers/last-chance → { freeCredit, wagerRequired, bonusOnDeposit }'},
+
+  // ── TECH ──
+  {id:'t2',cat:'tech',isNew:true,name:'圖片格式轉換（PNG → WebP/JPG）',ico:'⟁',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['fe','be'],diff:'easy',
+   problem:'PNG 圖片體積大，頁面載入速度慢，在行動裝置上尤其明顯。',
+   desc:'遊戲縮圖、Banner 等靜態圖片從 PNG 轉為 WebP（支援 WebP 的瀏覽器）或 JPG fallback，檔案大小縮減 40–70%，載入速度大幅提升。現代瀏覽器以 <picture> 元素自動選擇最佳格式，或透過 CDN URL 參數（如 Cloudinary f_auto）一行解決。',
+   why:'WebP 在相同畫質下比 PNG 小約 25–34%，比 JPG 小約 25–35%。瀏覽器覆蓋率 95%+，實作成本極低，是最容易拿到的效能提升之一。對 iGaming 平台而言，遊戲縮圖量大，每張少幾十 KB 累積起來效果顯著。',
+   angular:['<picture> 元素搭配 <source type="image/webp"> 提供 WebP，<img> 作為 JPG fallback，瀏覽器自動選擇','若有 CDN（如 Cloudinary）：URL 參數 f_auto,q_80 一行搞定，無需改前端程式碼','Asset pipeline 或 CI 加入批次轉換腳本（sharp / cwebp），上傳時自動產生 .webp 版本','ImagePipe 統一處理 URL 轉換邏輯，元件不需各自處理'],
+   code:`// 方式一：<picture> fallback（純前端，零後端成本）
+// <picture>
+//   <source srcset="game.webp" type="image/webp">
+//   <img src="game.jpg" alt="...">
+// </picture>
+
+// 方式二：CDN 自動轉換（推薦，Cloudinary 範例）
+// 原始 URL：https://cdn.example.com/images/game.png
+// 轉換 URL：https://cdn.example.com/f_auto,q_80/images/game.png
+// ↑ CDN 自動偵測瀏覽器，送 WebP 或 JPG
+
+// 方式三：Node.js 批次轉換（CI/CD pipeline）
+const sharp = require('sharp');
+await sharp('input.png')
+  .webp({ quality: 80 })
+  .toFile('output.webp');`,
+   predict:'用戶無感知，但頁面圖片載入速度明顯加快，尤其對行動裝置用戶；搭配 Blur-Up 效果更佳。',
+   api:'若用 CDN：URL 參數即可（f_auto）；若自建：POST /api/images/convert → { webpUrl, jpgUrl }'},
+
+  // ── RISK ──
+  {id:'r4',cat:'existing',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['ux','be','ai','mkt'],diff:'mid',
+   problem:'通用推播開啟率極低，等於在浪費每一次推播機會。',
+   desc:'依玩家行為與平台事件，分 8 種情境精準觸發 Push Notification，每則推播都帶個人化內容與深連結，直接帶回對應頁面，不是一句通用文字。',
+   why:'通用廣播推播開啟率 <2%；情境化推播搭配個人化文案開啟率可達 15%+。關鍵是「對的時機 + 對的理由 + 對的著陸頁」，不是發越多越好。',
+   angular:['PushService 封裝 Firebase Cloud Messaging（FCM），Web Push API 覆蓋所有瀏覽器','後端 event bus 發出觸發事件，前端 Service Worker 接收並顯示系統通知','每則推播帶 deepLink 欄位，點擊後 Angular Router 導向對應頁（投注單 / 優惠頁 / 活動頁）','PushPreferenceComponent 讓玩家自選接收哪些類型，存入 user.pushSettings，避免轟炸'],
+   code:`// 8 種觸發情境與文案邏輯
+const PUSH_SCENARIOS = {
+
+  // ✅ 賽事投注結果 — 比賽結束後立即推
+  BET_RESULT: {
+    trigger: 'match_ended',
+    title: (d) => d.won ? '🏆 恭喜！你贏了' : '⚽ 比賽結束',
+    body:  (d) => d.won
+      ? \`+\${d.payout} 已入帳，下一場繼續？\`
+      : \`\${d.match} 結束，查看分析下次更準！\`,
+    deepLink: '/my-bets/:betId',
+  },
+
+  // ✅ 優惠券到期提醒 — 到期前 24hr + 2hr 各一次
+  COUPON_EXPIRY: {
+    trigger: 'coupon_expiring',
+    title: () => '⏰ 優惠券快到期了',
+    body:  (d) => \`「\${d.couponName}」剩 \${d.hoursLeft} 小時，立即使用！\`,
+    deepLink: '/promotions/my-coupons',
+    maxPerDay: 2,
+  },
+
+  // ✅ 限時活動開始 — 活動上線即推（依玩家偏好篩選）
+  EVENT_START: {
+    trigger: 'campaign_launched',
+    title: (d) => \`🎯 \${d.title} 現在開始\`,
+    body:  (d) => \`限時 \${d.durationHr}hr，\${d.highlight}\`,
+    deepLink: '/promotions/:campaignId',
+    filter: 'userInterestMatch',  // 只推相關產品的玩家
+  },
+
+  // 🔴 Jackpot 快到頂 — 累積獎金超過個人歷史關注閾值
+  JACKPOT_HOT: {
+    trigger: 'jackpot_threshold',
+    title: () => '💰 Jackpot 快爆了',
+    body:  (d) => \`現在累積 \${d.amount}，近期最高紀錄！\`,
+    deepLink: '/games/jackpot',
+  },
+
+  // 🔴 回歸禮包 — 沉睡 7 天首推，14 天再推一次
+  WIN_BACK: {
+    trigger: 'user_inactive_days',
+    title: () => '🎁 久違了，專屬禮包等你',
+    body:  (d) => \`回來就送 \${d.bonusDesc}，今天限定\`,
+    deepLink: '/promotions/winback',
+    cooldownDays: 7,
+  },
+
+  // 🔴 新遊戲上線 — 依玩家最常玩類型篩選推送
+  NEW_GAME: {
+    trigger: 'game_released',
+    title: (d) => \`✨ 新遊戲：\${d.gameName}\`,
+    body:  (d) => \`\${d.provider} 最新作，首玩享 \${d.freeSpins} Free Spins\`,
+    deepLink: '/games/:gameId',
+    filter: 'preferredCategory',
+  },
+
+  // 🔴 VIP 快升等 — 距升等差 < 10%
+  VIP_CLOSE: {
+    trigger: 'tier_progress_threshold',
+    title: (d) => \`⭐ 距 \${d.nextTier} 只差一步\`,
+    body:  (d) => \`再存 \${d.amountNeeded} 即可解鎖 \${d.benefit}\`,
+    deepLink: '/profile/vip',
+  },
+
+  // 🔴 比賽即將開始 — 已投注賽事，開賽前 30 分鐘
+  MATCH_SOON: {
+    trigger: 'match_kickoff_soon',
+    title: (d) => \`⏱ \${d.match} 30 分鐘後開賽\`,
+    body:  () => '你的投注已鎖定，加油！',
+    deepLink: '/live/:matchId',
+  },
+};`,
+   predict:'每種推播只在最相關的時刻送出，玩家看到的是「它知道我在做什麼」而不是廣告轟炸，開啟率與回流率都大幅提升。',
+   api:`POST /api/push/send → { scenario, userId, payload }
+GET  /api/push/preferences → UserPushSettings
+PUT  /api/push/preferences → 更新訂閱偏好
+後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff`},
+
+  {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+   types:['be','ai','ux'],diff:'hard',
+   problem:'只能事後看報表，玩家真的走了才知道，已經來不及。',
+   desc:'玩家三天沒登入、上次餘額還沒花完，系統標記高風險，自動在站內推一個回歸 Offer，趕在他真的消失之前出手。',
+   why:'流失預測精準度可達 80%+，在行為轉變初期介入比事後追回有效得多。',
+   angular:['WebSocket / SSE 接即時風控推播','RetentionBanner 監聽事件顯示個人化訊息','CDK Overlay 非侵入式提示，不強制彈窗'],
+   code:`this.ws.onmessage = (msg) => {
+  const evt = JSON.parse(msg.data);
+  if (evt.type === 'churn_risk')
+    this.showBanner(evt.payload);
+};`,
+   predict:'系統在行為開始轉冷之前就行動，不等用戶真的離開。',
+   api:'WebSocket /ws/retention → RetentionEvent'},
+
+  {id:'r2',cat:'archive',isNew:false,name:'零行為用戶早期分群',ico:'▣',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['ux','fe','be','ai'],diff:'mid',
+   problem:'新用戶引導千篇一律，不同類型玩家卻走同一套流程。',
+   desc:'新用戶進站先逛了 Cricket 頁和賽事列表，系統判斷他是 Sports 玩家，後續引導直接走 Sports Onboarding，不走 Casino 那套流程。',
+   why:'在第一次操作前就能預判用戶類型，顯著提升首次轉換率。',
+   angular:['SessionTrackingService 用 Router events 追蹤頁面序列','每 N 頁 POST 瀏覽序列到後端','後端回 segmentType，前端 @switch 切換 onboarding'],
+   code:`router.events.pipe(
+  filter(e => e instanceof NavigationEnd)
+).subscribe(e => {
+  this.pageSequence.push(e.urlAfterRedirects);
+  if (this.pageSequence.length % 3 === 0)
+    this.reportSegment();
+});`,
+   predict:'在用戶第一個操作前就已推斷類型，準備好對應引導內容。',
+   api:'POST /api/session/segment → { segmentType }'},
+
+  {id:'r3',cat:'archive',isNew:false,name:'異常行為視覺化後台',ico:'⊡',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+   types:['be','ai','ui'],diff:'hard',
+   problem:'風控依靠人工審查，發現問題時通常已經太晚。',
+   desc:'某帳號短時間大量異常投注，風控後台即時標紅排到最前面，不用等隔天報表才發現，也不用人工一筆一筆翻。',
+   why:'AI fraud detection 核心是把人工從例行審查解放，只處理真正需要判斷的 edge case。',
+   angular:['SSE / WebSocket 接即時事件流','RiskQueueComponent 依 confidence score 排序','Angular Material Table + CDK Virtual Scroll 處理大量事件','[class.high-risk] directive 色碼化樣式'],
+   code:`events$ = this.riskSvc.eventStream$.pipe(
+  scan((acc, e) => [e, ...acc].slice(0, 100), []),
+  map(evts => evts.sort((a, b) =>
+    b.confidenceScore - a.confidenceScore))
+);`,
+   predict:'AI 把最需要看的案件排到最前面，風控不需主動查。',
+   api:'SSE /api/stream/risk-events → RiskEvent[]'}
+];
+
+const DIFF_L = {easy:'低複雜',mid:'中複雜',hard:'高複雜'};
+const DIFF_C = {easy:'tag-easy',mid:'tag-mid',hard:'tag-hard'};
+const TYPE_L = {ui:'UI',ux:'UX',fe:'前端',be:'後端',ai:'AI 模型',mkt:'行銷',predict:'預測存款',boost:'提升金額'};
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function cardHTML(d){
+  const tags = d.types.map(t=>`<span class="tag tag-${t}">${TYPE_L[t]||t}</span>`).join('')
+    + `<span class="tag ${DIFF_C[d.diff]}">${DIFF_L[d.diff]}</span>`;
+  return `<div class="card" id="card-${d.id}" style="--accent-color:${d.accentColor}">
+    <div class="card-header">
+      <div class="ctop">
+        <div class="cname">${d.name}</div>
+        ${d.isNew ? '<div class="new-badge">New</div>' : ''}
+      </div>
+      <div class="tags">${tags}</div>
+    </div>
+    <div class="card-body">
+    <div class="dsec dsec-main"><div class="dl">問題</div><div class="db">${d.problem}</div></div>
+    <div class="dsec dsec-main"><div class="dl">為什麼做</div><div class="db">${d.why}</div></div>
+    <div class="dsec dsec-main"><div class="dl">解決方法</div><div class="cdesc">${d.desc}</div></div>
+    <div class="detail" id="det-${d.id}">
+      <div class="dsec angular-wrap collapsed" id="angular-${d.id}" onclick="event.stopPropagation();togAngular('${d.id}')">
+        <div class="angular-header">
+          <div class="dl">Angular 切入點</div>
+          <div class="angular-toggle" id="angular-toggle-${d.id}">展開 ▸</div>
+        </div>
+        <div class="db"><ul>${d.angular.map(a=>`<li>${a}</li>`).join('')}</ul></div>
+      </div>
+      <div class="dsec code-wrap collapsed" id="code-${d.id}" onclick="event.stopPropagation();togCode('${d.id}')">
+        <div class="code-header">
+          <div class="dl">程式碼方向</div>
+          <div class="code-toggle" id="code-toggle-${d.id}">展開 ▸</div>
+        </div>
+        <div class="code">${esc(d.code)}</div>
+      </div>
+      <div class="dsec api-wrap collapsed" id="api-${d.id}" onclick="event.stopPropagation();togApi('${d.id}')">
+        <div class="api-header">
+          <div class="dl">API 設計</div>
+          <div class="api-toggle" id="api-toggle-${d.id}">展開 ▸</div>
+        </div>
+        <div class="db">${d.api}</div>
+      </div>
+    </div>
+    </div>
+  </div>`;
+}
+
+function render(f) {
+  const main = document.getElementById('main');
+  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive') : f === 'archive' ? ALL.filter(d => d.cat === 'archive') : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
+  let html = '';
+  let shown = 0;
+  CATS.forEach(cat => {
+    const items = filtered.filter(d => d.cat === cat.key);
+    if (!items.length) return;
+    shown += items.length;
+    html += `<section class="section">
+      <div class="section-header">
+        <div class="section-title">${cat.label}</div>
+      </div>
+      <div class="grid" id="sec-${cat.key}">${items.map(cardHTML).join('')}</div>
+    </section>`;
+  });
+  if (!shown) html = '<div class="empty-state">沒有符合篩選條件的點子</div>';
+  main.innerHTML = html;
+  document.getElementById('sShown').textContent = shown;
+}
+
+function togSection(gridId, arrowId) {
+  const grid = document.getElementById(gridId);
+  const arrow = document.getElementById(arrowId);
+  if (!grid) return;
+  const hidden = grid.style.display === 'none';
+  grid.style.display = hidden ? 'grid' : 'none';
+  if (arrow) arrow.textContent = hidden ? '收合 ▾' : '展開 ▸';
+}
+
+function fil(f, btn) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  render(f);
+}
+
+function togApi(id) {
+  const wrap = document.getElementById('api-' + id);
+  const label = document.getElementById('api-toggle-' + id);
+  const collapsed = wrap.classList.toggle('collapsed');
+  label.textContent = collapsed ? '展開 ▸' : '收合 ▾';
+}
+
+function togAngular(id) {
+  const wrap = document.getElementById('angular-' + id);
+  const label = document.getElementById('angular-toggle-' + id);
+  const collapsed = wrap.classList.toggle('collapsed');
+  label.textContent = collapsed ? '展開 ▸' : '收合 ▾';
+}
+
+function togCode(id) {
+  const wrap = document.getElementById('code-' + id);
+  const label = document.getElementById('code-toggle-' + id);
+  const collapsed = wrap.classList.toggle('collapsed');
+  label.textContent = collapsed ? '展開 ▸' : '收合 ▾';
+}
+
+function tog(id) {
+  const card = document.getElementById('card-' + id);
+  const det = document.getElementById('det-' + id);
+  const was = det.classList.contains('open');
+  document.querySelectorAll('.detail').forEach(x => x.classList.remove('open'));
+  document.querySelectorAll('.card').forEach(x => x.classList.remove('open'));
+  if (!was) { det.classList.add('open'); card.classList.add('open'); }
+}
+
+render('all');
+
+</script>
+</body>
+</html>

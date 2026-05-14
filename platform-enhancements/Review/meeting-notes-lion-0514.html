@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一輪 Review — With Lion | 2025.05.14</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #efefef;
+    --foreground: #09090b;
+    --card: #ffffff;
+    --border: #e4e4e7;
+    --muted: #71717a;
+    --radius: 8px;
+
+    /* status colors */
+    --green:        #16a34a;
+    --green-bg:     #f0fdf4;
+    --green-border: #bbf7d0;
+
+    --red:          #dc2626;
+    --red-bg:       #fef2f2;
+    --red-border:   #fecaca;
+
+    --amber:        #d97706;
+    --amber-bg:     #fffbeb;
+    --amber-border: #fde68a;
+
+    --blue:         #2563eb;
+    --blue-bg:      #eff6ff;
+    --blue-border:  #bfdbfe;
+
+    --purple:       #7c3aed;
+    --purple-bg:    #f5f3ff;
+    --purple-border:#ddd6fe;
+
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  .header-left p {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 80px;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    display: block;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(239,239,239,0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem;
+  }
+
+  .toolbar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    overflow-x: auto;
+  }
+
+  .toolbar-inner::-webkit-scrollbar { display: none; }
+
+  .fb {
+    flex-shrink: 0;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .fb:hover { border-color: #a1a1aa; color: var(--foreground); }
+
+  .fb.on {
+    background: var(--foreground);
+    color: #ffffff;
+    border-color: var(--foreground);
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .section.visible { opacity: 1; transform: translateY(0); }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    font-family: var(--mono);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.18s;
+    margin-bottom: 12px;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    transform: translateY(-1px);
+  }
+
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ctop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cnum {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 24px;
+  }
+
+  .cname {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    flex: 1;
+  }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .tag-ok     { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+  .tag-warn   { background: var(--red-bg);    border-color: var(--red-border);    color: var(--red); }
+  .tag-info   { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+  .tag-q      { background: var(--blue-bg);   border-color: var(--blue-border);   color: var(--blue); }
+  .tag-idea   { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple); }
+
+  /* ── CARD BODY ── */
+  .card-body { padding: 20px 24px; }
+
+  .dsec {
+    margin-bottom: 16px;
+  }
+
+  .dsec:last-child { margin-bottom: 0; }
+
+  .dl {
+    font-size: 10px;
+    font-family: var(--mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .db {
+    font-size: 13.5px;
+    color: var(--foreground);
+    line-height: 1.6;
+  }
+
+  /* ── POINT LIST ── */
+  .point-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .point-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #3f3f46;
+    line-height: 1.55;
+  }
+
+  .pi {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .pi-warn { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .pi-ok   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .pi-q    { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+  .pi-tip  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+  .pi-dot  { background: #f4f4f5; color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── TWO-COL ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* sub-card inside card body */
+  .sub-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  /* ── HIGHLIGHT ROW ── */
+  .highlight-row {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #92400e;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+
+  .highlight-row .star { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SUMMARY TABLE ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  .summary-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-align: left;
+    padding: 0 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+    color: #3f3f46;
+  }
+
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover td { background: var(--background); }
+
+  .summary-table td:first-child {
+    font-weight: 600;
+    color: var(--foreground);
+    white-space: nowrap;
+    width: 28%;
+  }
+
+  /* ── NEXT STEPS ── */
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    color: #3f3f46;
+    line-height: 1.5;
+  }
+
+  .step-dot {
+    flex-shrink: 0;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin-top: 5px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 2.5rem;
+    background: var(--card);
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .footer-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    .page-header, .main, .footer { padding: 1.5rem; }
+    .toolbar { padding: 0 1.5rem; }
+    .header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>第一輪 Review — with Lion</h1>
+      <p>2025.05.14 &nbsp;·&nbsp; Wayno · Sam · Lion &nbsp;·&nbsp; 產品 Idea 第一輪討論</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <span class="stat-num">8</span>
+        <span class="stat-label">提案</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" style="color:var(--green)">1</span>
+        <span class="stat-label">認可</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" style="color:var(--red)">3</span>
+        <span class="stat-label">疑慮</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" style="color:var(--amber)">4</span>
+        <span class="stat-label">待釐清</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOLBAR ── -->
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <a href="#conclusion" class="fb on">結論 · 5/20</a>
+    <a href="#ideas" class="fb">提案內容</a>
+    <a href="#s4" class="fb" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green);">✓ 方向認可</a>
+    <a href="#s1" class="fb">Landing Page</a>
+    <a href="#s4" class="fb">Payment</a>
+    <a href="#s7" class="fb">推播</a>
+    <a href="#s8" class="fb">圖片優化</a>
+    <a href="#summary" class="fb">Lion 總結</a>
+    <a href="#todos" class="fb">Next Steps</a>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- ── 結論 ── -->
+  <div id="conclusion" class="section" style="margin-bottom:2.5rem;">
+    <div class="section-title">Lily & 阿昭 · 討論後結論</div>
+    <div class="card" style="border-color: var(--green-border);">
+      <div class="card-header" style="background: var(--green-bg);">
+        <div class="ctop">
+          <span class="cname">本輪優先推進的 3 個方向</span>
+        </div>
+        <div class="tags">
+          <span class="tag tag-ok">已確認</span>
+          <span class="tag tag-ok">下一步研究</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="dsec">
+          <div class="db">
+            <ul class="point-list">
+              <li><span class="pi pi-ok">1</span><span><strong>Payment</strong> — 存款個人設定</span></li>
+              <li><span class="pi pi-ok">2</span><span><strong>推播</strong> — 智慧推播通知</span></li>
+              <li><span class="pi pi-ok">3</span><span><strong>網速自適應圖片品質 + 圖片格式轉換</strong></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px; border-color: var(--border);">
+      <div class="card-header">
+        <div class="ctop">
+          <span class="cname">暫緩，有時間再深入研究</span>
+        </div>
+        <div class="tags">
+          <span class="tag tag-info">待後續</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="dsec">
+          <div class="db">
+            <ul class="point-list">
+              <li><span class="pi pi-dot">4</span><span><strong>Landing Page</strong></span></li>
+              <li><span class="pi pi-dot">5</span><span><strong>CRM 標簽</strong> — 看怎麼運用</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px; border-color: var(--purple-border); background: var(--purple-bg);">
+      <div class="card-body" style="padding: 16px 24px;">
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <div>
+            <div class="dl" style="color:var(--purple); margin-bottom:4px;">下次會議</div>
+            <div style="font-size:18px; font-weight:700; letter-spacing:-0.02em; color:var(--purple);">5/20（三）14:30</div>
+            <div style="font-size:13px; color:#6d28d9; margin-top:2px;">對一下進度</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 提案內容 ── -->
+  <div id="ideas">
+
+    <!-- S1 -->
+    <div id="s1" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">01</span>
+            <span class="cname">Landing Page 個人化標簽分類</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-idea">IDEA 1</span>
+            <span class="tag tag-warn">方向有疑慮</span>
+            <span class="tag tag-q">依賴廣告流量</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-dot">→</span><span>依遊戲類型（Sports / Slot / Casino）分類廣告，玩家點哪類廣告 → 進入對應 Landing Page → 導入個人化首頁</span></li>
+                <li><span class="pi pi-dot">→</span><span>Landing Page 採靜態 HTML 機制（每 10 分鐘同步線上版），可放客戶空間或 AWS S3</span></li>
+                <li><span class="pi pi-dot">→</span><span>玩家可直接在 Landing Page 完成<strong>註冊</strong>，進站後只顯示對應類型遊戲（千人千面）</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-warn">!</span><span>Sports / Casino 大分類<strong>已不夠用</strong>，許多玩家兩樣都玩 → 需參考 CRM 現有細分標簽系統</span></li>
+                <li><span class="pi pi-q">?</span><span>Guest（未登入）用戶的標簽怎麼設定？需有<strong>預設邏輯</strong></span></li>
+                <li><span class="pi pi-warn">!</span><span>整個架構依賴廣告流量，但廣告團隊轉換率差、常被封 → 做好了也可能沒效果</span></li>
+                <li><span class="pi pi-q">?</span><span>標簽來源與準確度如何驗證？具體怎麼落地？</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div id="s2" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">02</span>
+            <span class="cname">Landing Page 極簡化首頁</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-idea">IDEA 2</span>
+            <span class="tag tag-info">待釐清</span>
+            <span class="tag tag-q">需要 Wireframe</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-dot">→</span><span>不載入整個主站，改成極簡：Logo + 搜尋列 + 遊戲類型 Banner</span></li>
+                <li><span class="pi pi-dot">→</span><span>未登入：秀遊戲類型區塊，從點擊行為判斷喜好；已登入：直接秀「我的最愛」遊戲</span></li>
+                <li><span class="pi pi-dot">→</span><span>全站搜尋涵蓋遊戲 + Promotion；點 JILI → 進 JILI 大廳後可在大廳內切換遊戲</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-q">?</span><span>JILI Lobby 能否切換其他廠商遊戲？需先確認（Backend / AWC 錢包串接問題）</span></li>
+                <li><span class="pi pi-q">?</span><span>全站搜尋要做到什麼程度？跨 Casino / Slot 的 API 怎麼設定？</span></li>
+                <li><span class="pi pi-tip">↗</span><span>需要 <strong>Wireframe</strong>，否則概念太抽象難以評估</span></li>
+                <li><span class="pi pi-tip">↗</span><span>向 Tanya 取得 <strong>V2 / V3 首頁點擊率 Top 3</strong>，找出哪些可留、哪些可拿掉</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div id="s3" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">03</span>
+            <span class="cname">Welcome Offer / CRM 個人化</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-warn">方向有疑慮</span>
+            <span class="tag tag-q">依賴廣告團隊</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">新玩家從不同渠道（Sports / Slot）進入 → 根據來源客製化 Welcome Offer → 提升註冊轉換率</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-warn">!</span><span>廣告團隊問題嚴重：轉換率差、Facebook/TikTok 廣告一直被封、CAPI 也沒用好；SEO 相對較好</span></li>
+                <li><span class="pi pi-warn">!</span><span>這個方向<strong>太偏 CRM / 廣告渠道</strong>，成效完全取決於廣告團隊表現 → 我們做好了也可能看不出效果</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-row">
+            <span class="star">★</span>
+            <span>核心提醒：做的東西要不依賴別人，我們自己能控制的才有意義</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div id="s4" class="section">
+      <div class="card" style="border-color: var(--green-border);">
+        <div class="card-header" style="background: var(--green-bg);">
+          <div class="ctop">
+            <span class="cnum">04</span>
+            <span class="cname">存款個人設定</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-ok">方向認可 ✓</span>
+            <span class="tag tag-ok">不依賴外部</span>
+            <span class="tag tag-idea">Payment</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">記錄玩家上次存款設定（金額 + 支付方式），下次存款時自動帶入；用 JSON 檔儲存個人設定（機制已有，待確認儲存位置）</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-ok">✓</span><span><strong>方向正確：不依賴任何外部資源，自己就能做到</strong></span></li>
+                <li><span class="pi pi-q">?</span><span>永久記憶 vs 非永久記憶的定義是什麼？</span></li>
+                <li><span class="pi pi-q">?</span><span>帶入設定後，若玩家想改金額（上次存 1000，這次只存 10），UX 如何讓他方便修改？避免「記憶反而造成困擾」</span></li>
+                <li><span class="pi pi-tip">↗</span><span>可擴展：不只金額，連支付方式、上次完整設定都帶入</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div id="s5" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">05</span>
+            <span class="cname">TS 活化 / 問卷回饋</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-warn">需重新設計</span>
+            <span class="tag tag-warn">套利風險</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">鼓勵玩家填問卷，送小額獎勵（Free Spin / Bonus）；玩家提交 Bug 回饋 → 給予獎勵</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <div class="two-col" style="margin-top:4px;">
+                <div class="sub-card">
+                  <div class="dl" style="color:var(--red)">主要風險</div>
+                  <ul class="point-list">
+                    <li><span class="pi pi-warn">!</span><span>BOT 可大量註冊 → 大量填問卷 → 領獎金出金（套利）</span></li>
+                    <li><span class="pi pi-warn">!</span><span>玩家可能隨意亂填，問卷有效性存疑</span></li>
+                    <li><span class="pi pi-warn">!</span><span>客戶 TS 管理困難，很難教育標準化流程</span></li>
+                  </ul>
+                </div>
+                <div class="sub-card">
+                  <div class="dl" style="color:var(--green)">可行替代方向</div>
+                  <ul class="point-list">
+                    <li><span class="pi pi-ok">✓</span><span>讓玩家用<strong>簡單行為</strong>回報問題（遇 Bug 時一鍵回報）→ 目的明確、較難套利</span></li>
+                    <li><span class="pi pi-tip">↗</span><span>技術 TS ≠ 客戶 TS（面對玩家的客服）</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div id="s6" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">06</span>
+            <span class="cname">低 Balance 提醒 / 破產錢包</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-info">可做，需想清楚</span>
+            <span class="tag tag-warn">套利風險</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">玩家餘額快用完時彈出提醒或 Promotion，刺激繼續存款（對應 CRM 的「破產獎金」概念）</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-q">?</span><span>給的條件是什麼？（大戶？連存三次？讓利？）</span></li>
+                <li><span class="pi pi-warn">!</span><span>給完獎勵後，玩家的「下一步」是否會<strong>再存款</strong>？若拿完打完就走 → 對營運方沒有意義</span></li>
+                <li><span class="pi pi-warn">!</span><span>需防套利：機制要讓玩家感覺「平台在幫我」而非隨意補貼</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-row">
+            <span class="star">★</span>
+            <span>核心目標：給完之後玩家要有動力再存款，才對營運方有價值</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S7 -->
+    <div id="s7" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">07</span>
+            <span class="cname">智慧推播通知</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-info">可做，需數據支撐</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">推播不只用在存款成功，也推送 Promotion、新遊戲、VIP 升等提醒、新任務</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-tip">★</span><span><strong>數據是關鍵</strong>：要用數據找出最佳推播時機，而不是亂推</span></li>
+                <li><span class="pi pi-tip">↗</span><span>分析玩家點擊 Promotion 的<strong>前一步行為</strong> → 例如：存款後最多人看 Promotion → 存款成功後推播最有效</span></li>
+                <li><span class="pi pi-tip">↗</span><span>建立<strong>迴推機制</strong>：若多次推播都沒被點 → 自動判定時機不對 → 調整策略</span></li>
+                <li><span class="pi pi-warn">!</span><span>推播若設在首頁登入時觸發 → 會加重首頁 loading 負擔</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8 -->
+    <div id="s8" class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="ctop">
+            <span class="cnum">08</span>
+            <span class="cname">網頁圖片載入優化</span>
+          </div>
+          <div class="tags">
+            <span class="tag tag-info">待落地方案</span>
+            <span class="tag tag-q">孟加拉市場</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="dsec">
+            <div class="dl">提案概念</div>
+            <div class="db">網路不佳時先載低解析圖，網速夠再換高清（孟加拉市場為主要痛點）；PNG 全面改為 WebP / JPG</div>
+          </div>
+          <div class="dsec">
+            <div class="dl">Lion 回饋</div>
+            <div class="db">
+              <ul class="point-list">
+                <li><span class="pi pi-warn">!</span><span>Cloudflare CDN 本身有自適應圖片功能，但<strong>我們沒有開啟</strong></span></li>
+                <li><span class="pi pi-warn">!</span><span>目前 Lazy Loading 用原始高解析圖，沒依網速調整；1x / 2x / 3x 多版本當初沒落地</span></li>
+                <li><span class="pi pi-tip">↗</span><span>用<strong>孟加拉 VPN</strong> 實際測試 UAT，親身體驗低網速下的真實表現</span></li>
+                <li><span class="pi pi-tip">↗</span><span>先測出數據：1x vs 3x 圖的載入差異有多大？有數據才能說服後端</span></li>
+                <li><span class="pi pi-q">?</span><span>WebP 部分舊手機不支援時要怎麼 fallback？兩套圖同時存在，總大小會不會比 PNG 更大？</span></li>
+                <li><span class="pi pi-q">?</span><span>PNG 當初選因 Brian 要求顏色不被壓縮 → 改格式需提出完整落地方案說服後端</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ideas -->
+
+  <!-- ── SUMMARY ── -->
+  <div id="summary" class="section" style="margin-top:3rem;">
+    <div class="section-title">Lion 整體 Feedback 總結</div>
+    <div class="card">
+      <div style="overflow:hidden; border-radius:20px;">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th style="width:28%">核心建議</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>不要依賴別人</td>
+              <td>太多 idea 依賴廣告投放品質或 CRM 標簽，我們做好了也可能沒效果 → 要找自己能控制的方向</td>
+            </tr>
+            <tr>
+              <td>用數據支撐</td>
+              <td>提案要有數據基礎，先從現有 V2 / V3 數據找佐證，再開始規劃功能</td>
+            </tr>
+            <tr>
+              <td>想清楚套利風險</td>
+              <td>任何有獎勵機制的功能，都要先設計好防套利方案再提出</td>
+            </tr>
+            <tr>
+              <td>Payment 方向最對 ✓</td>
+              <td>個人設定存款不依賴任何外部資源，自己可以做到，優先推進</td>
+            </tr>
+            <tr>
+              <td>做你們想做的</td>
+              <td>Lion 希望大家選自己有熱情的方向，而不是被指派任務 → 選出最想做的 1–2 個深入推進</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEXT STEPS ── -->
+  <div id="todos" class="section">
+    <div class="section-title">Next Steps · 待確認事項</div>
+    <ul class="step-list">
+      <li class="step-item"><div class="step-dot"></div><span>討論並決定要 focus 哪 1–2 個方向深入推進</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>向 Tanya 取得 V2 / V3 首頁點擊率 Top 3 數據</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>確認 JILI Lobby 能否切換其他廠商遊戲（詢問後端）</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>用孟加拉 VPN 測試低網速下 V3 的真實表現</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>Payment 個人設定：釐清 JSON 檔存放位置</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>研究 CRM 現有標簽系統的內容與結構</span></li>
+      <li class="step-item"><div class="step-dot"></div><span>整理各 idea 落地難易度評估，下次討論時帶入</span></li>
+    </ul>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── FOOTER ── -->
+<div class="footer">
+  <div class="footer-inner">
+    <span class="footer-text">第一輪討論 · 2025.05.14 · 內部文件，請勿外傳</span>
+    <span class="footer-text">Round 1 / 1st Draft</span>
+  </div>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.06 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
