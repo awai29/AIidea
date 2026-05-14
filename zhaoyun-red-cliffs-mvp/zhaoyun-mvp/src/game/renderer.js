@@ -215,15 +215,17 @@ function getEntityBeltY(entity) {
   return entity.beltY !== undefined ? entity.beltY : entity.y;
 }
 
-// 跳躍陰影：角色跳起時在地板上顯示落點提示
+// 地面橢圓陰影：平時固定顯示，跳躍時縮小並淡化
 function drawShadow(ctx, screenX, beltY, baseWidth, scale, jumpHeight) {
-  if (jumpHeight <= 0) return;
-  const fadeT = Math.max(0, 1 - jumpHeight / 80); // jumpHeight 越高，陰影越淡
+  const jumpH  = jumpHeight || 0;
+  const fadeT  = Math.max(0, 1 - jumpH / 80); // 跳越高越淡（1→0）
+  const alpha  = 0.28 * fadeT + (jumpH <= 0 ? 0.28 : 0); // 地面時固定 0.28，跳躍時淡化
+  const wScale = fadeT * 0.5 + 0.5;  // 跳躍時影子寬度縮到 0.5×
   ctx.save();
-  ctx.globalAlpha = 0.3 * fadeT;
+  ctx.globalAlpha = Math.min(0.42, alpha);
   ctx.fillStyle = '#000';
-  const w = baseWidth * scale * 0.7;
-  const h = Math.max(3, 8 * scale * fadeT);
+  const w = baseWidth * scale * 0.75 * wScale;
+  const h = Math.max(3, 7 * scale * (0.5 + 0.5 * fadeT));
   ctx.beginPath();
   ctx.ellipse(screenX, beltY, w / 2, h / 2, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -731,11 +733,8 @@ export function render(ctx, state) {
     const screenX = ent.x - cam;
     const screenY = ent.y;   // y 已含 jumpHeight 偏移
 
-    // 跳躍陰影（在角色本體之前畫，讓陰影在角色底下）
-    const jumpH = ent.jumpHeight || 0;
-    if (jumpH > 0) {
-      drawShadow(ctx, screenX, beltY, ent.width, scale, jumpH);
-    }
+    // 地面陰影（永遠顯示，跳躍時自動縮小淡化）
+    drawShadow(ctx, screenX, beltY, ent.width, scale, ent.jumpHeight || 0);
 
     if (!isPlayer) {
       const e = ent;
