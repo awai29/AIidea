@@ -5,7 +5,8 @@ export function createSpearman(id, x, y) {
   return {
     id, type: 'spearman', x,
     beltY: y, y, vx: 0,
-    width: 36, height: 60,
+    width: 48, height: 64,
+    renderScale: CONFIG.SPEARMAN_RENDER_SCALE,
     hp: CONFIG.SPEARMAN_HP,
     state: 'idle', facing: -1, onGround: true,
     attackTimer: 0, attackCooldown: 0, hurtTimer: 0,
@@ -41,24 +42,36 @@ export function updateSpearman(enemy, state) {
   const p = state.player;
   const dx = p.x - enemy.x;
   const dist = Math.abs(dx);
+  const beltDelta = p.beltY - enemy.beltY;
+  const beltDistance = Math.abs(beltDelta);
   enemy.facing = dx > 0 ? 1 : -1;
+  const inAttackLane = beltDistance <= CONFIG.BELT_ATTACK_TOLERANCE;
 
   // 距離太近時後退，保持長槍的有效距離
   const tooClose = dist < CONFIG.SPEARMAN_APPROACH_RANGE * 0.5;
 
-  if (tooClose) {
+  if (beltDistance > 0) {
+    const beltStep = Math.min(CONFIG.SPEARMAN_BELT_SPEED, beltDistance);
+    enemy.beltY += Math.sign(beltDelta) * beltStep;
+    enemy.beltY = Math.max(CONFIG.GROUND_Y - CONFIG.BELT_Y_RANGE, Math.min(CONFIG.GROUND_Y, enemy.beltY));
+  }
+
+  if (tooClose && inAttackLane) {
     // 後退以維持長槍最佳刺擊距離
-    enemy.vx = -enemy.facing * CONFIG.SPEARMAN_SPEED;
+    enemy.vx = -enemy.facing * Math.min(CONFIG.SPEARMAN_SPEED, CONFIG.SPEARMAN_APPROACH_RANGE * 0.5 - dist);
     enemy.state = 'approach';
-  } else if (dist <= CONFIG.SPEARMAN_APPROACH_RANGE && enemy.attackCooldown === 0) {
+  } else if (inAttackLane && dist <= CONFIG.SPEARMAN_APPROACH_RANGE && enemy.attackCooldown === 0) {
     // 進入攻擊範圍且冷卻完畢：執行長槍直刺
     enemy.state = 'attack';
     enemy.attackTimer = CONFIG.SPEARMAN_ATTACK_DURATION;
     enemy.attackCooldown = CONFIG.SPEARMAN_ATTACK_COOLDOWN;
     enemy.vx = 0;
-  } else if (dist > CONFIG.SPEARMAN_APPROACH_RANGE) {
+  } else if (dist > CONFIG.SPEARMAN_APPROACH_RANGE || !inAttackLane) {
     // 超出範圍：向前靠近
-    enemy.vx = enemy.facing * CONFIG.SPEARMAN_SPEED;
+    const xStep = dist > CONFIG.SPEARMAN_APPROACH_RANGE
+      ? Math.min(CONFIG.SPEARMAN_SPEED, dist - CONFIG.SPEARMAN_APPROACH_RANGE)
+      : 0;
+    enemy.vx = enemy.facing * xStep;
     enemy.state = 'approach';
   } else {
     // 在範圍內但冷卻中：原地等待
@@ -67,6 +80,6 @@ export function updateSpearman(enemy, state) {
   }
 
   enemy.x += enemy.vx;
-  enemy.beltY = CONFIG.GROUND_Y;
+  enemy.y = enemy.beltY;
   applyGroundCollision(enemy);
 }

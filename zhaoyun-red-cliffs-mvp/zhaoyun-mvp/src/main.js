@@ -13,9 +13,14 @@ import { getTextState } from './game/text-state.js';
 import { updateParticles } from './game/particles.js';
 
 const canvas = document.getElementById('game-canvas');
+const gameContainer = document.getElementById('game-container');
 const ctx = canvas.getContext('2d');
 let state = createInitialState();
 let lastTime = 0;
+
+function syncUiMode() {
+  if (gameContainer) gameContainer.dataset.mode = state.mode;
+}
 
 function tick() {
   // 更新粒子（永遠執行，不受 hitFreeze 影響）
@@ -36,6 +41,22 @@ function tick() {
   }
   if (state.mode === 'paused') return;
   if (state.mode !== 'running') return;
+
+  // 連擊計時器
+  if (state.comboTimer > 0) {
+    state.comboTimer--;
+    if (state.comboTimer === 0) state.combo = 0;
+  }
+
+  // 打擊閃光更新（原地壓縮）
+  let aliveFlashes = 0;
+  for (let i = 0; i < state.impactFlashes.length; i++) {
+    state.impactFlashes[i].timer--;
+    if (state.impactFlashes[i].timer > 0) {
+      state.impactFlashes[aliveFlashes++] = state.impactFlashes[i];
+    }
+  }
+  state.impactFlashes.length = aliveFlashes;
 
   // 打擊凍幀：跳過本幀的遊戲邏輯
   if (state.hitFreeze > 0) {
@@ -63,6 +84,7 @@ function gameLoop(timestamp) {
   const steps = Math.min(Math.round(dt / (1000 / CONFIG.TARGET_FPS)), 2);
   for (let i = 0; i < steps; i++) tick();
   render(ctx, state);
+  syncUiMode();
   requestAnimationFrame(gameLoop);
 }
 
@@ -89,8 +111,9 @@ window.advanceTime = (ms) => {
   const frames = Math.round((ms / 1000) * CONFIG.TARGET_FPS);
   for (let i = 0; i < frames; i++) tick();
   render(ctx, state);
+  syncUiMode();
 };
-window.renderNow = () => render(ctx, state);
+window.renderNow = () => { render(ctx, state); syncUiMode(); };
 window.startGame = startGame;
 
 async function init() {
@@ -98,6 +121,7 @@ async function init() {
   // 暴露給 HTML 觸控按鍵使用
   window.touchPressKey   = simulateKeyDown;
   window.touchReleaseKey = simulateKeyUp;
+  syncUiMode();
   await loadAssets();
   requestAnimationFrame((ts) => { lastTime = ts; gameLoop(ts); });
 }

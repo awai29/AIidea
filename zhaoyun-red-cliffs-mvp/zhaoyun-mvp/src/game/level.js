@@ -5,27 +5,24 @@ import { createSpearman } from './entities/enemy-spearman.js';
 let enemyIdCounter = 0;
 
 // 關卡腳本：4 段（3 推進段 + 1 終點清場段）
+// enemies 只定義類型，x 位置在 spawnSegment 內隨機產生
 const LEVEL_SCRIPT = [
-  // 區段 0：教學 - 2 刀兵
   { lockXRatio: 0.22, enemies: [
-    { type: 'swordsman', xRatio: 0.18 },
-    { type: 'swordsman', xRatio: 0.20 },
+    { type: 'swordsman' },
+    { type: 'swordsman' },
   ]},
-  // 區段 1：1 刀兵 + 1 槍兵
   { lockXRatio: 0.47, enemies: [
-    { type: 'swordsman', xRatio: 0.42 },
-    { type: 'spearman',  xRatio: 0.45 },
+    { type: 'swordsman' },
+    { type: 'spearman'  },
   ]},
-  // 區段 2：2 刀兵 + 1 槍兵
   { lockXRatio: 0.72, enemies: [
-    { type: 'swordsman', xRatio: 0.66 },
-    { type: 'swordsman', xRatio: 0.69 },
-    { type: 'spearman',  xRatio: 0.71 },
+    { type: 'swordsman' },
+    { type: 'swordsman' },
+    { type: 'spearman'  },
   ]},
-  // 終點段：2 槍兵（lockXRatio=1.0，不鎖，清完就通關）
   { lockXRatio: 1.0, enemies: [
-    { type: 'spearman', xRatio: 0.88 },
-    { type: 'spearman', xRatio: 0.92 },
+    { type: 'spearman' },
+    { type: 'spearman' },
   ]},
 ];
 
@@ -35,15 +32,23 @@ function randomBeltY() {
   return Math.round(min + Math.random() * CONFIG.BELT_Y_RANGE);
 }
 
+// 敵人從畫面左右兩側外部衝入（製造被包圍感）
+// 偶數 index 從右側、奇數 index 從左側，加隨機偏移讓出場時間錯開
 function spawnSegment(state, segment) {
   if (segment.spawned) return;
   segment.spawned = true;
-  segment.enemyDefs.forEach(def => {
-    const id = ++enemyIdCounter;
-    const beltY = randomBeltY();
+  const camX = state.camera.x;
+  const W    = CONFIG.CANVAS_WIDTH;
+  segment.enemyDefs.forEach((def, i) => {
+    const id     = ++enemyIdCounter;
+    const beltY  = randomBeltY();
+    const offset = 60 + Math.floor(Math.random() * 120); // 60~180px 外
+    const x      = i % 2 === 0
+      ? camX + W + offset   // 右側畫面外
+      : camX - offset;      // 左側畫面外
     const enemy = def.type === 'swordsman'
-      ? createSwordsman(id, def.x, beltY)
-      : createSpearman(id, def.x, beltY);
+      ? createSwordsman(id, x, beltY)
+      : createSpearman(id, x, beltY);
     state.enemies.push(enemy);
     segment.enemies.push(id);
   });
@@ -58,10 +63,7 @@ export function initLevel(state) {
     status: index === 0 ? 'active' : 'locked',
     lockX: script.lockXRatio * CONFIG.LEVEL_WIDTH,
     enemies: [],
-    enemyDefs: script.enemies.map(def => ({
-      type: def.type,
-      x: Math.round(def.xRatio * CONFIG.LEVEL_WIDTH),
-    })),
+    enemyDefs: script.enemies.map(def => ({ type: def.type })),
     spawned: false,
   }));
 

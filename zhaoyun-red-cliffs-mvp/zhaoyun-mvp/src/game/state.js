@@ -4,7 +4,7 @@ export function createInitialState() {
   return {
     mode: 'title',
     player: {
-      x: 100,
+      x: 350,
       beltY: CONFIG.GROUND_Y - Math.round(CONFIG.BELT_Y_RANGE / 2),
       jumpHeight: 0,
       jumpVy: 0,
@@ -12,6 +12,7 @@ export function createInitialState() {
       vx: 0,
       width: 48,
       height: 64,
+      renderScale: CONFIG.PLAYER_RENDER_SCALE,
       hp: CONFIG.PLAYER_HP,
       maxHp: CONFIG.PLAYER_HP,
       state: 'idle',
@@ -35,6 +36,9 @@ export function createInitialState() {
     hurtFlash: 0,
     hitFreeze: 0,
     particles: [],
+    impactFlashes: [],  // 打擊星形閃光 [{x,y,timer,maxTimer}]
+    combo: 0,           // 連擊數
+    comboTimer: 0,      // 連擊冷卻（歸零時重置 combo）
     frameCount: 0,
   };
 }
