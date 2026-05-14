@@ -27,17 +27,10 @@ function sceneImg(key) {
   return (img && img.complete && img.naturalWidth > 0) ? img : null;
 }
 
-// UI 素材（有圖用圖，fallback 到純 Canvas）
+// UI 素材（預留接口，目前 assets/ui/ 尚未有圖，一律走 Canvas fallback）
+// 待 AI 生成圖片後，將 null 改回 new Image() 載入即可
 const UI_IMGS = {};
-['portrait-frame', 'hud-panel-bg', 'skill-dash-frame', 'dash-icon'].forEach(key => {
-  const img = new Image();
-  img.src = `assets/ui/${key}.png`;
-  UI_IMGS[key] = img;
-});
-function uiImg(key) {
-  const img = UI_IMGS[key];
-  return (img && img.complete && img.naturalWidth > 0) ? img : null;
-}
+function uiImg(_key) { return null; }
 
 // 天空漸層快取（只建一次，不用每幀 createLinearGradient）
 let _skyGrad = null;
@@ -47,6 +40,52 @@ let _vignetteGrad = null;
 
 // Title 畫面 UI 的 offscreen canvas（只建一次，避免每幀 shadowBlur GPU 消耗）
 let _titleCanvas = null;
+const CALLIGRAPHY_FONT_STACK = '"BiauKai","DFKai-SB","Kaiti TC","STKaiti","KaiTi TC","Songti TC",serif';
+
+function drawPixelCalligraphyText(ctx, {
+  text,
+  x,
+  y,
+  width,
+  height,
+  fontSize,
+  fillStyle,
+  strokeStyle,
+  glowColor,
+  glowBlur = 18,
+  fontWeight = 'bold',
+}) {
+  const supersample = 4;
+  const hi = document.createElement('canvas');
+  hi.width = width * supersample;
+  hi.height = height * supersample;
+  const hc = hi.getContext('2d');
+  hc.scale(supersample, supersample);
+  hc.textAlign = 'center';
+  hc.textBaseline = 'middle';
+  hc.lineJoin = 'round';
+  hc.lineCap = 'round';
+  hc.shadowColor = glowColor;
+  hc.shadowBlur = glowBlur;
+  hc.strokeStyle = strokeStyle;
+  hc.lineWidth = Math.max(2, fontSize * 0.1);
+  hc.fillStyle = fillStyle;
+  hc.font = `${fontWeight} ${fontSize}px ${CALLIGRAPHY_FONT_STACK}`;
+  hc.strokeText(text, width / 2, height / 2);
+  hc.fillText(text, width / 2, height / 2);
+
+  const low = document.createElement('canvas');
+  low.width = width;
+  low.height = height;
+  const lc = low.getContext('2d');
+  lc.imageSmoothingEnabled = true;
+  lc.drawImage(hi, 0, 0, width, height);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(low, Math.round(x - width / 2), Math.round(y - height / 2));
+  ctx.restore();
+}
 
 function buildTitleCanvas(CW, CH) {
   const oc = document.createElement('canvas');
@@ -69,20 +108,35 @@ function buildTitleCanvas(CW, CH) {
   c.lineWidth = 1;
   c.beginPath(); c.moveTo(CW / 2 - 180, 113); c.lineTo(CW / 2 + 180, 113); c.stroke();
 
-  // 主標題
+  // 主標題：書法字體 + 像素化重採樣
   c.textAlign = 'center';
-  c.shadowColor = '#cc4400';
-  c.shadowBlur = 28;
-  c.fillStyle = '#f5d060';
-  c.font = 'bold 52px serif';
-  c.fillText('三國・一騎當千', CW / 2, 170);
-  c.shadowBlur = 0;
-  c.shadowColor = 'transparent';
+  drawPixelCalligraphyText(c, {
+    text: '三國・一騎當千',
+    x: CW / 2,
+    y: 164,
+    width: 520,
+    height: 92,
+    fontSize: 44,
+    fillStyle: '#f5d060',
+    strokeStyle: '#71460d',
+    glowColor: 'rgba(255,136,34,0.48)',
+    glowBlur: 24,
+  });
 
-  // 副標
-  c.fillStyle = 'rgba(220,195,140,0.9)';
-  c.font = '16px serif';
-  c.fillText('長坂坡之戰', CW / 2, 196);
+  // 副標：較細的書法字，保留像素邊緣
+  drawPixelCalligraphyText(c, {
+    text: '長坂坡之戰',
+    x: CW / 2,
+    y: 196,
+    width: 220,
+    height: 40,
+    fontSize: 19,
+    fillStyle: 'rgba(227,205,164,0.96)',
+    strokeStyle: 'rgba(96,58,22,0.92)',
+    glowColor: 'rgba(255,170,90,0.18)',
+    glowBlur: 10,
+    fontWeight: '600',
+  });
 
   // 金色裝飾橫線（下）
   c.strokeStyle = '#7a540f';

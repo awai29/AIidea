@@ -1,29 +1,12 @@
 """
 recover：從 pose board 抽取單幀。
-使用 chroma key 去背 + bounding box 緊剪，不用死板的格線裁切。
+使用背景色偵測 + soft alpha 去背 + bounding box 緊剪。
 """
 from PIL import Image
-import numpy as np
 import os
 import argparse
 
-
-def detect_bg_color(img: Image.Image, sample_size: int = 10) -> tuple:
-    """
-    從四角取樣偵測背景色。
-    回傳 (R, G, B) tuple。
-    """
-    arr = np.array(img.convert('RGB'))
-    corners = [
-        arr[:sample_size, :sample_size],
-        arr[:sample_size, -sample_size:],
-        arr[-sample_size:, :sample_size],
-        arr[-sample_size:, -sample_size:],
-    ]
-    flat = np.concatenate([c.reshape(-1, 3) for c in corners])
-    from collections import Counter
-    counts = Counter(map(tuple, flat.tolist()))
-    return counts.most_common(1)[0][0]
+from pipeline.matte import apply_distance_matte, detect_bg_color, strip_residual_bg_fringe
 
 
 def recover_frames(
@@ -46,21 +29,20 @@ def recover_frames(
     W, H = img.size
     cell_w, cell_h = W // cols, H // rows
 
-    bg_color = np.array(detect_bg_color(img), dtype=np.int32)
+    bg_color = detect_bg_color(img)
 
     paths = []
     for row in range(rows):
         for col in range(cols):
             x0, y0 = col * cell_w, row * cell_h
             cell = img.crop((x0, y0, x0 + cell_w, y0 + cell_h)).convert('RGBA')
-            arr = np.array(cell)
-
-            rgb = arr[:, :, :3].astype(np.int32)
-            diff = np.abs(rgb - bg_color)
-            is_bg = np.all(diff <= tolerance, axis=2)
-            arr[is_bg, 3] = 0
-
-            result = Image.fromarray(arr.astype(np.uint8))
+            result = apply_distance_matte(
+                cell,
+                bg_color=bg_color,
+                low=float(tolerance),
+                high=float(max(tolerance * 5, tolerance + 90)),
+            )
+            result = strip_residual_bg_fringe(result, bg_color=bg_color, passes=2)
 
             # 緊剪：找非透明區域邊界，但至少保留 1px 邊界
             bbox = result.getbbox()

@@ -66,3 +66,27 @@ def test_recovered_frames_have_transparent_background():
         pixels = list(frame.getdata())
         transparent = [p for p in pixels if p[3] == 0]
         assert len(transparent) > 0
+
+
+def test_recover_softens_chroma_spill_on_edges():
+    with tempfile.TemporaryDirectory() as d:
+        bg = (255, 0, 255)
+        img = Image.new('RGB', (64, 64), bg)
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([18, 18, 46, 46], fill=(40, 80, 220))
+        # 模擬被洋紅背景污染的抗鋸齒邊
+        draw.rectangle([17, 17, 47, 47], outline=(180, 40, 180))
+
+        pb_path = os.path.join(d, 'pb.png')
+        img.save(pb_path)
+        out = os.path.join(d, 'recovered')
+        os.makedirs(out)
+
+        [frame_path] = recover_frames(pb_path, out, rows=1, cols=1, tolerance=24)
+        frame = Image.open(frame_path).convert('RGBA')
+        pixels = list(frame.getdata())
+        magentaish = [
+            p for p in pixels
+            if p[3] > 0 and p[0] > 170 and p[2] > 170 and p[1] < 120
+        ]
+        assert len(magentaish) == 0
