@@ -3,11 +3,11 @@ import { getFrame, calcFrameIndex, isLoaded } from './assets.js';
 
 // 場景圖層圖片（有圖用圖，沒圖 fallback 到 Canvas 形狀）
 const SCENE_IMGS = {};
-const SCENE_ASSET_VERSION = '20260514-fg4';
+const SCENE_ASSET_VERSION = '20260514-ground2';
 [
   'bg-mountains', 'bg-river', 'bg-camp',
   'mid-tent', 'mid-flag-pole', 'mid-bonfire',
-  'fg-flag-tall', 'fg-grass', 'fg-rock', 'fg-smoke',
+  'fg-flag-tall', 'fg-grass', 'fg-rock', 'fg-smoke', 'ground-stone',
 ].forEach(key => {
   const img = new Image();
   img.src = `assets/scene/${key}.png?v=${SCENE_ASSET_VERSION}`;
@@ -18,6 +18,7 @@ function sceneImg(key) {
   const allowLayer =
     key.startsWith('bg-') ||
     key.startsWith('mid-') ||
+    key === 'ground-stone' ||
     key === 'fg-smoke' ||
     key === 'fg-rock' ||
     key === 'fg-grass' ||
@@ -182,6 +183,7 @@ function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing
       const dx = screenX - dispW / 2;
       const dy = screenY - dispH;
       ctx.save();
+      ctx.imageSmoothingEnabled = false;  // 像素風格：關閉插值避免模糊
       if (facing === -1) {
         ctx.translate(screenX, 0);
         ctx.scale(-1, 1);
@@ -496,18 +498,22 @@ function drawBackground(ctx, camX) {
     }
   }
 
-  // ── 層 3：地面（走位帶底色 + 透視橫線）
-  const floorGrad = ctx.createLinearGradient(0, G - CONFIG.BELT_Y_RANGE, 0, H);
-  floorGrad.addColorStop(0, '#6a4a39');
-  floorGrad.addColorStop(0.55, '#5d4032');
-  floorGrad.addColorStop(1, '#463127');
-  ctx.fillStyle = floorGrad;
-  ctx.fillRect(0, G - CONFIG.BELT_Y_RANGE, W, H - G + CONFIG.BELT_Y_RANGE);
-
   const floorTop = G - CONFIG.BELT_Y_RANGE;
-  ctx.strokeStyle = '#4a3028';
+  const imgGroundStone = sceneImg('ground-stone');
+  if (imgGroundStone) {
+    ctx.drawImage(imgGroundStone, 0, floorTop, W, H - floorTop);
+  } else {
+    const floorGrad = ctx.createLinearGradient(0, floorTop, 0, H);
+    floorGrad.addColorStop(0, '#677486');
+    floorGrad.addColorStop(0.55, '#505968');
+    floorGrad.addColorStop(1, '#343944');
+    ctx.fillStyle = floorGrad;
+    ctx.fillRect(0, floorTop, W, H - floorTop);
+  }
+
+  ctx.strokeStyle = 'rgba(54, 61, 72, 0.46)';
   ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.5;
+  ctx.globalAlpha = 0.4;
   for (let row = 0; row <= 8; row++) {
     const t = row / 8;
     const lineY = floorTop + CONFIG.BELT_Y_RANGE * t * t;
@@ -519,25 +525,24 @@ function drawBackground(ctx, camX) {
   ctx.globalAlpha = 1;
 
   const p3 = ((camX * 0.6) % 80 + 80) % 80;
-  ctx.fillStyle = '#4a3028';
-  ctx.globalAlpha = 0.4;
+  ctx.fillStyle = 'rgba(74, 84, 100, 0.24)';
+  ctx.globalAlpha = 0.28;
   for (let rx = -80; rx < W + 80; rx += 80) {
     ctx.fillRect(rx - p3, G - CONFIG.BELT_Y_RANGE, 2, H - G + CONFIG.BELT_Y_RANGE);
   }
   ctx.globalAlpha = 1;
 
-  // 塵土帶與地面暖色反光
-  const dustGrad = ctx.createLinearGradient(0, floorTop + 10, 0, floorTop + 80);
-  dustGrad.addColorStop(0, 'rgba(255, 190, 120, 0.10)');
-  dustGrad.addColorStop(1, 'rgba(255, 190, 120, 0)');
-  ctx.fillStyle = dustGrad;
-  ctx.fillRect(0, floorTop, W, 84);
+  const mistGrad = ctx.createLinearGradient(0, floorTop + 8, 0, floorTop + 88);
+  mistGrad.addColorStop(0, 'rgba(172, 190, 222, 0.08)');
+  mistGrad.addColorStop(1, 'rgba(172, 190, 222, 0)');
+  ctx.fillStyle = mistGrad;
+  ctx.fillRect(0, floorTop, W, 92);
 
-  ctx.fillStyle = 'rgba(35, 20, 14, 0.22)';
+  ctx.fillStyle = 'rgba(16, 18, 24, 0.18)';
   for (let i = -1; i < 12; i++) {
     const x = i * 86 - (camX * 0.45 % 86);
     ctx.beginPath();
-    ctx.ellipse(x + 32, G - 18, 28, 6, -0.12, 0, Math.PI * 2);
+    ctx.ellipse(x + 32, G - 18, 26, 5, -0.1, 0, Math.PI * 2);
     ctx.fill();
   }
 }

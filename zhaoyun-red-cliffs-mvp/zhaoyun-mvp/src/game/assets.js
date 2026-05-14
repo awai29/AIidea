@@ -19,6 +19,9 @@
 // 快取：{ characterKey: { img: HTMLImageElement, atlas: Object } }
 const _cache = {};
 
+// 精靈圖版本號：每次重新生成 sprite sheet 後更新此版本，強制瀏覽器清除快取
+const SPRITE_VERSION = '20260514-v2';
+
 /**
  * 非同步載入某角色的 spritesheet + atlas.json。
  * 若已載入則直接回傳快取。
@@ -29,8 +32,8 @@ export async function loadSprite(character) {
   const base = `assets/sprites/${character}/runtime`;
 
   const [img, atlas] = await Promise.all([
-    _loadImage(`${base}/sheet.png`),
-    fetch(`${base}/atlas.json`).then(r => {
+    _loadImage(`${base}/sheet.png?v=${SPRITE_VERSION}`),
+    fetch(`${base}/atlas.json?v=${SPRITE_VERSION}`).then(r => {
       if (!r.ok) throw new Error(`atlas.json not found for ${character}`);
       return r.json();
     }),
