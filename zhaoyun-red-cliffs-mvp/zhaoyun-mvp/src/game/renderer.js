@@ -3,20 +3,39 @@ import { getFrame, calcFrameIndex, isLoaded } from './assets.js';
 
 // 場景圖層圖片（有圖用圖，沒圖 fallback 到 Canvas 形狀）
 const SCENE_IMGS = {};
+const SCENE_ASSET_VERSION = '20260514-fg4';
 [
   'bg-mountains', 'bg-river', 'bg-camp',
   'mid-tent', 'mid-flag-pole', 'mid-bonfire',
   'fg-flag-tall', 'fg-grass', 'fg-rock', 'fg-smoke',
 ].forEach(key => {
   const img = new Image();
-  img.src = `assets/scene/${key}.png`;
+  img.src = `assets/scene/${key}.png?v=${SCENE_ASSET_VERSION}`;
   SCENE_IMGS[key] = img;
 });
 
 function sceneImg(key) {
-  const allowLayer = key.startsWith('bg-') || key.startsWith('mid-');
+  const allowLayer =
+    key.startsWith('bg-') ||
+    key.startsWith('mid-') ||
+    key === 'fg-smoke' ||
+    key === 'fg-rock' ||
+    key === 'fg-grass' ||
+    key === 'fg-flag-tall';
   if (!CONFIG.USE_SCENE_IMAGE_PLACEHOLDERS && !allowLayer) return null;
   const img = SCENE_IMGS[key];
+  return (img && img.complete && img.naturalWidth > 0) ? img : null;
+}
+
+// UI 素材（有圖用圖，fallback 到純 Canvas）
+const UI_IMGS = {};
+['portrait-frame', 'hud-panel-bg', 'skill-dash-frame', 'dash-icon'].forEach(key => {
+  const img = new Image();
+  img.src = `assets/ui/${key}.png`;
+  UI_IMGS[key] = img;
+});
+function uiImg(key) {
+  const img = UI_IMGS[key];
   return (img && img.complete && img.naturalWidth > 0) ? img : null;
 }
 
@@ -35,32 +54,51 @@ function buildTitleCanvas(CW, CH) {
   oc.height = CH;
   const c = oc.getContext('2d');
 
-  // 半透明深色背板
-  c.fillStyle = 'rgba(0, 0, 0, 0.55)';
-  c.fillRect(CW / 2 - 210, 90, 420, 170);
+  // 中央光暈背板
+  const bgGrad = c.createRadialGradient(CW / 2, CH / 2 - 20, 30, CW / 2, CH / 2 - 20, 280);
+  bgGrad.addColorStop(0, 'rgba(0,0,0,0.80)');
+  bgGrad.addColorStop(1, 'rgba(0,0,0,0.0)');
+  c.fillStyle = bgGrad;
+  c.fillRect(0, 0, CW, CH);
 
-  // 標題主字（shadowBlur 只在此執行一次）
+  // 金色裝飾橫線（上）
+  c.strokeStyle = '#7a540f';
+  c.lineWidth = 2;
+  c.beginPath(); c.moveTo(CW / 2 - 220, 110); c.lineTo(CW / 2 + 220, 110); c.stroke();
+  c.strokeStyle = '#d4aa50';
+  c.lineWidth = 1;
+  c.beginPath(); c.moveTo(CW / 2 - 180, 113); c.lineTo(CW / 2 + 180, 113); c.stroke();
+
+  // 主標題
   c.textAlign = 'center';
-  c.shadowColor = '#ff6600';
-  c.shadowBlur = 18;
-  c.fillStyle = '#ffd700';
-  c.font = 'bold 46px serif';
-  c.fillText('三國・一騎當千', CW / 2, 160);
+  c.shadowColor = '#cc4400';
+  c.shadowBlur = 28;
+  c.fillStyle = '#f5d060';
+  c.font = 'bold 52px serif';
+  c.fillText('三國・一騎當千', CW / 2, 170);
   c.shadowBlur = 0;
   c.shadowColor = 'transparent';
 
   // 副標
-  c.fillStyle = 'rgba(200, 180, 140, 0.85)';
-  c.font = '14px serif';
-  c.fillText('長坂坡之戰', CW / 2, 185);
+  c.fillStyle = 'rgba(220,195,140,0.9)';
+  c.font = '16px serif';
+  c.fillText('長坂坡之戰', CW / 2, 196);
+
+  // 金色裝飾橫線（下）
+  c.strokeStyle = '#7a540f';
+  c.lineWidth = 2;
+  c.beginPath(); c.moveTo(CW / 2 - 220, 212); c.lineTo(CW / 2 + 220, 212); c.stroke();
+  c.strokeStyle = '#d4aa50';
+  c.lineWidth = 1;
+  c.beginPath(); c.moveTo(CW / 2 - 180, 209); c.lineTo(CW / 2 + 180, 209); c.stroke();
 
   // 開始提示
-  c.fillStyle = '#aabbff';
-  c.font = '19px monospace';
-  c.fillText('按 Z / Space / Enter 開始', CW / 2, 228);
+  c.fillStyle = '#aaccff';
+  c.font = '20px monospace';
+  c.fillText('按 Z / Space / Enter 開始', CW / 2, 250);
 
-  // 按鍵說明（底部小字）
-  c.fillStyle = 'rgba(160,160,160,0.7)';
+  // 按鍵說明
+  c.fillStyle = 'rgba(160,150,120,0.75)';
   c.font = '12px monospace';
   c.fillText('← → 移動　↑ ↓ 走位　X 跳　Z 攻　C 衝刺　R 重開', CW / 2, CH - 16);
 
@@ -454,22 +492,28 @@ function drawForeground(ctx, camX) {
   const W = CONFIG.CANVAS_WIDTH;
   const G = CONFIG.GROUND_Y;
 
-  // fg-flag-tall：間距 350px，底部超出畫面 (Y=470)，alpha 0.9
+  // fg-flag-tall：刻意錯開玩家常駐區，避免過度遮擋角色與 title 文案
   const imgFlagTall = sceneImg('fg-flag-tall');
   if (imgFlagTall) {
-    ctx.globalAlpha = 0.9;
-    const sp = 350;
+    ctx.globalAlpha = 0.58;
+    const sp = 420;
     const off = ((camX * 0.85) % sp + sp) % sp;
     for (let rx = -sp; rx < W + sp * 2; rx += sp) {
-      ctx.drawImage(imgFlagTall, rx - off, 470 - imgFlagTall.naturalHeight, imgFlagTall.naturalWidth, imgFlagTall.naturalHeight);
+      ctx.drawImage(
+        imgFlagTall,
+        rx - off + 120,
+        466 - imgFlagTall.naturalHeight,
+        imgFlagTall.naturalWidth,
+        imgFlagTall.naturalHeight
+      );
     }
     ctx.globalAlpha = 1;
   } else {
-    ctx.globalAlpha = 0.72;
-    const sp = 350;
+    ctx.globalAlpha = 0.54;
+    const sp = 420;
     const off = ((camX * 0.85) % sp + sp) % sp;
     for (let rx = -sp; rx < W + sp * 2; rx += sp) {
-      const x = rx - off;
+      const x = rx - off + 120;
       ctx.fillStyle = '#1e120b';
       ctx.fillRect(x + 14, G - 118, 4, 116);
       ctx.fillStyle = '#8a1f1c';
@@ -641,13 +685,25 @@ export function render(ctx, state) {
         screenX, screenY, dispW, dispH, e.facing, enemyFallback, state.frameCount);
       ctx.globalAlpha = 1;
 
-      // 血條（縮放後位置）
+      // 敵人血條（8px 高，帶外框和高光）
       const maxHp = e.type === 'swordsman' ? CONFIG.SWORDSMAN_HP : CONFIG.SPEARMAN_HP;
-      const barY = screenY - dispH - 10;
-      ctx.fillStyle = '#333';
-      ctx.fillRect(screenX - dispW / 2, barY, dispW, 5);
-      ctx.fillStyle = '#ff4444';
-      ctx.fillRect(screenX - dispW / 2, barY, dispW * Math.max(0, e.hp / maxHp), 5);
+      const barW  = dispW * 1.1;
+      const barH  = 8;
+      const barX  = screenX - barW / 2;
+      const barY  = screenY - dispH - 14;
+      const eHpR  = Math.max(0, e.hp / maxHp);
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      ctx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
+      const eHpGrad = ctx.createLinearGradient(barX, barY, barX, barY + barH);
+      eHpGrad.addColorStop(0, '#ff5555');
+      eHpGrad.addColorStop(1, '#aa1111');
+      ctx.fillStyle = eHpGrad;
+      ctx.fillRect(barX, barY, barW * eHpR, barH);
+      ctx.fillStyle = 'rgba(255,255,255,0.20)';
+      ctx.fillRect(barX, barY, barW * eHpR, Math.ceil(barH * 0.4));
+      ctx.strokeStyle = '#660000';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(barX, barY, barW, barH);
 
     } else {
       // 玩家
@@ -701,106 +757,176 @@ export function render(ctx, state) {
     ctx.globalAlpha = 1;
   }
 
-  // ── HUD：TMNT 風格角色面板 ─────────────────────────────────
+  // ── HUD：精緻玩家面板 ─────────────────────────────────────────
   const pr      = Math.max(0, p.hp / p.maxHp);
-  const panelW  = 176;
-  const panelH  = 48;
   const panelX  = 8;
-  const panelY  = 6;
-  const iconSz  = 36;
+  const panelY  = 8;
+  const panelW  = 220;
+  const panelH  = 64;
+  const iconSz  = 56;
 
-  // 面板背景 + 外框（黑底 + 藍邊）
-  ctx.fillStyle = 'rgba(6, 8, 18, 0.92)';
-  ctx.fillRect(panelX, panelY, panelW, panelH);
-  ctx.strokeStyle = '#5577cc';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(panelX + 1, panelY + 1, panelW - 2, panelH - 2);
-  ctx.strokeStyle = '#aabbff';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(panelX, panelY, panelW, panelH);
+  // 面板底板
+  const panelBg = uiImg('hud-panel-bg');
+  if (panelBg) {
+    ctx.drawImage(panelBg, panelX, panelY, panelW, panelH);
+  } else {
+    const panelGrad = ctx.createLinearGradient(panelX, panelY, panelX + panelW, panelY);
+    panelGrad.addColorStop(0, 'rgba(8,14,30,0.94)');
+    panelGrad.addColorStop(1, 'rgba(18,22,42,0.88)');
+    ctx.fillStyle = panelGrad;
+    ctx.fillRect(panelX, panelY, panelW, panelH);
+    ctx.strokeStyle = '#7a540f';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(panelX + 1, panelY + 1, panelW - 2, panelH - 2);
+    ctx.strokeStyle = '#d4aa50';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(panelX + 3, panelY + 3, panelW - 6, panelH - 6);
+  }
 
-  // 角色圖示（藍色方塊 + 趙字）
-  ctx.fillStyle = '#1a3a88';
-  ctx.fillRect(panelX + 4, panelY + 6, iconSz, iconSz);
-  ctx.strokeStyle = '#4477ff';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(panelX + 4, panelY + 6, iconSz, iconSz);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 17px serif';
+  // 頭像底色
+  const portraitX = panelX + 4;
+  const portraitY = panelY + 4;
+  ctx.fillStyle = '#0d1e48';
+  ctx.fillRect(portraitX, portraitY, iconSz, iconSz);
+
+  // 「趙」字
+  ctx.fillStyle = '#c8d8ff';
+  ctx.font = 'bold 26px serif';
   ctx.textAlign = 'center';
-  ctx.fillText('趙', panelX + 4 + iconSz / 2, panelY + 6 + iconSz / 2 + 6);
+  ctx.fillText('趙', portraitX + iconSz / 2, portraitY + iconSz / 2 + 9);
+
+  // 頭像外框
+  const frameImg = uiImg('portrait-frame');
+  if (frameImg) {
+    ctx.drawImage(frameImg, portraitX, portraitY, iconSz, iconSz);
+  } else {
+    ctx.strokeStyle = '#c8982a';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(portraitX, portraitY, iconSz, iconSz);
+    ctx.strokeStyle = '#f0cc66';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(portraitX + 3, portraitY + 3, iconSz - 6, iconSz - 6);
+  }
 
   // 名稱
+  const nameX = panelX + iconSz + 10;
+  const nameY = panelY + 18;
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#eeeeff';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.fillText('趙雲', panelX + iconSz + 10, panelY + 18);
+  ctx.fillStyle = '#e8d8a0';
+  ctx.font = 'bold 13px serif';
+  ctx.fillText('趙雲', nameX, nameY);
 
-  // HP 數值（右對齊）
+  // HP 數值
   ctx.textAlign = 'right';
-  ctx.fillStyle = '#88aaff';
-  ctx.font = '10px sans-serif';
-  ctx.fillText(`${p.hp}`, panelX + panelW - 5, panelY + 18);
+  ctx.fillStyle = '#aaccff';
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText(`${p.hp}`, panelX + panelW - 6, nameY);
 
   // HP 條
-  const hpBarX = panelX + iconSz + 8;
-  const hpBarW = panelX + panelW - hpBarX - 6;
-  const hpBarY = panelY + 22;
-  const hpBarH = 9;
-  const hpColor = pr > 0.5 ? '#2299ff' : pr > 0.25 ? '#ffcc22' : '#ff2222';
-  ctx.fillStyle = '#0a0a1a';
+  const hpBarX  = nameX;
+  const hpBarW  = panelX + panelW - nameX - 6;
+  const hpBarY  = panelY + 22;
+  const hpBarH  = 12;
+  const hpColor = pr > 0.5 ? '#1e88e5' : pr > 0.25 ? '#f9a825' : '#e53935';
+  ctx.fillStyle = '#060c20';
   ctx.fillRect(hpBarX, hpBarY, hpBarW, hpBarH);
-  ctx.fillStyle = hpColor;
+  const hpGrad = ctx.createLinearGradient(hpBarX, hpBarY, hpBarX, hpBarY + hpBarH);
+  hpGrad.addColorStop(0, hpColor);
+  hpGrad.addColorStop(1, 'rgba(0,0,0,0.3)');
+  ctx.fillStyle = hpGrad;
   ctx.fillRect(hpBarX, hpBarY, hpBarW * pr, hpBarH);
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
-  ctx.fillRect(hpBarX, hpBarY, hpBarW * pr, Math.floor(hpBarH * 0.38));
-  ctx.strokeStyle = '#334488';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fillRect(hpBarX, hpBarY, hpBarW * pr, Math.floor(hpBarH * 0.4));
+  // 條紋刻線
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
   ctx.lineWidth = 1;
+  for (let t = 0.2; t < 1.0; t += 0.2) {
+    const lx = Math.floor(hpBarX + hpBarW * t);
+    ctx.beginPath(); ctx.moveTo(lx, hpBarY); ctx.lineTo(lx, hpBarY + hpBarH); ctx.stroke();
+  }
+  ctx.strokeStyle = '#7a5c10';
+  ctx.lineWidth = 1.5;
   ctx.strokeRect(hpBarX, hpBarY, hpBarW, hpBarH);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffee88';
+  ctx.font = 'bold 8px monospace';
+  ctx.fillText('HP', hpBarX - 1, hpBarY - 2);
 
   // 波次 / 殘敵
   if (state.mode === 'running') {
     const seg = state.level.segments[state.level.currentSegment];
     if (seg) {
       const alive = seg.aliveCount ?? 0;
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffdd44';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillText(`波次 ${state.level.currentSegment + 1}/${CONFIG.NUM_SEGMENTS}`, hpBarX, panelY + panelH - 5);
-      ctx.fillStyle = '#ff8844';
-      ctx.fillText(`殘敵 ${alive}`, hpBarX + 58, panelY + panelH - 5);
+      ctx.fillStyle = '#d4aa50';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText(`波次 ${state.level.currentSegment + 1}/${CONFIG.NUM_SEGMENTS}`, nameX, panelY + panelH - 6);
+      ctx.fillStyle = alive > 0 ? '#ff8844' : '#44ff88';
+      ctx.fillText(`殘敵 ${alive}`, nameX + 68, panelY + panelH - 6);
     }
   }
 
-  // 衝刺冷卻面板（右上）
-  const dashPW = 92;
-  const dashPH = 28;
-  const dashPX = CONFIG.CANVAS_WIDTH - dashPW - 8;
-  const dashPY = 6;
-  const dashReady    = p.dashCooldown === 0 && p.state !== 'dash';
-  const dashProgress = p.dashCooldown > 0 ? 1 - p.dashCooldown / CONFIG.DASH_COOLDOWN : 1;
-  ctx.fillStyle = 'rgba(6, 8, 18, 0.92)';
-  ctx.fillRect(dashPX, dashPY, dashPW, dashPH);
-  ctx.strokeStyle = '#886622';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(dashPX + 1, dashPY + 1, dashPW - 2, dashPH - 2);
-  ctx.strokeStyle = '#ffcc88';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(dashPX, dashPY, dashPW, dashPH);
+  // ── 衝刺技能槽（右上角）─────────────────────────────────────
+  const dashSlotSz = 52;
+  const dashSlotX  = CONFIG.CANVAS_WIDTH - dashSlotSz - 10;
+  const dashSlotY  = 8;
+  const dashReady  = p.dashCooldown === 0 && p.state !== 'dash';
+  const dashProg   = p.dashCooldown > 0 ? 1 - p.dashCooldown / CONFIG.DASH_COOLDOWN : 1;
+
+  const slotFrame = uiImg('skill-dash-frame');
+  if (slotFrame) {
+    ctx.globalAlpha = dashReady ? 1.0 : 0.5;
+    ctx.drawImage(slotFrame, dashSlotX, dashSlotY, dashSlotSz, dashSlotSz);
+    ctx.globalAlpha = 1.0;
+  } else {
+    ctx.fillStyle = dashReady ? 'rgba(10,14,32,0.92)' : 'rgba(6,8,14,0.92)';
+    ctx.fillRect(dashSlotX, dashSlotY, dashSlotSz, dashSlotSz);
+    ctx.strokeStyle = dashReady ? '#d4aa50' : '#5a4010';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(dashSlotX + 1, dashSlotY + 1, dashSlotSz - 2, dashSlotSz - 2);
+    ctx.strokeStyle = dashReady ? '#f0cc66' : '#8a6018';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(dashSlotX + 3, dashSlotY + 3, dashSlotSz - 6, dashSlotSz - 6);
+  }
+
+  // 技能圖示
+  const dashIco = uiImg('dash-icon');
+  const icoInset = 8;
+  if (dashIco) {
+    ctx.globalAlpha = dashReady ? 1.0 : 0.4;
+    ctx.drawImage(dashIco, dashSlotX + icoInset, dashSlotY + icoInset,
+                  dashSlotSz - icoInset * 2, dashSlotSz - icoInset * 2);
+    ctx.globalAlpha = 1.0;
+  } else {
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 24px serif';
+    ctx.fillStyle = dashReady
+      ? (p.state === 'dash' ? '#88ffff' : '#f5d060')
+      : 'rgba(180,150,60,0.4)';
+    ctx.fillText('衝', dashSlotX + dashSlotSz / 2, dashSlotY + dashSlotSz / 2 + 9);
+  }
+
+  // 冷卻扇形遮罩
+  if (!dashReady && p.state !== 'dash') {
+    const cx = dashSlotX + dashSlotSz / 2;
+    const cy = dashSlotY + dashSlotSz / 2;
+    const rad = dashSlotSz / 2 - 2;
+    ctx.save();
+    ctx.globalAlpha = 0.62;
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, rad, -Math.PI / 2, -Math.PI / 2 + (1 - dashProg) * Math.PI * 2, false);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // [C] 鍵位標示
+  ctx.textAlign = 'center';
+  ctx.fillStyle = dashReady ? '#d4aa50' : 'rgba(180,140,40,0.5)';
+  ctx.font = 'bold 9px monospace';
+  ctx.fillText('[C]', dashSlotX + dashSlotSz / 2, dashSlotY + dashSlotSz + 12);
   ctx.textAlign = 'left';
-  ctx.fillStyle = dashReady ? '#ffee88' : 'rgba(255,255,255,0.4)';
-  ctx.font = 'bold 9px sans-serif';
-  ctx.fillText('衝刺 [C]', dashPX + 5, dashPY + 11);
-  ctx.fillStyle = '#0a0a1a';
-  ctx.fillRect(dashPX + 4, dashPY + 14, dashPW - 8, 8);
-  const dColor = p.state === 'dash'
-    ? (state.frameCount % 6 < 3 ? '#88ffff' : '#44aaaa')
-    : dashReady ? '#ffcc44' : '#664422';
-  ctx.fillStyle = dColor;
-  ctx.fillRect(dashPX + 4, dashPY + 14, (dashPW - 8) * dashProgress, 8);
-  ctx.strokeStyle = '#886644';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(dashPX + 4, dashPY + 14, dashPW - 8, 8);
 
   // ── Combo 計數器（浮在玩家頭上）
   if (state.combo >= 2 && state.comboTimer > 0) {
@@ -872,23 +998,57 @@ export function render(ctx, state) {
 
   // Victory
   if (state.mode === 'victory') {
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
-    ctx.fillStyle = '#ffdd44'; ctx.font = 'bold 52px serif'; ctx.textAlign = 'center';
-    ctx.fillText('通關！', CONFIG.CANVAS_WIDTH / 2, 200);
-    ctx.fillStyle = '#aaffaa'; ctx.font = '20px monospace';
-    ctx.fillText('按 R 重新挑戰', CONFIG.CANVAS_WIDTH / 2, 270);
+    const CW = CONFIG.CANVAS_WIDTH;
+    const CH = CONFIG.CANVAS_HEIGHT;
+    ctx.fillStyle = 'rgba(0,0,0,0.68)';
+    ctx.fillRect(0, 0, CW, CH);
+    const vGlow = ctx.createRadialGradient(CW / 2, CH / 2, 20, CW / 2, CH / 2, 240);
+    vGlow.addColorStop(0, 'rgba(255,210,60,0.28)');
+    vGlow.addColorStop(1, 'rgba(255,210,60,0)');
+    ctx.fillStyle = vGlow;
+    ctx.fillRect(0, 0, CW, CH);
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#ffaa00';
+    ctx.shadowBlur = 32;
+    ctx.fillStyle = '#f5d060';
+    ctx.font = 'bold 64px serif';
+    ctx.fillText('通關！', CW / 2, CH / 2 - 20);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = '#d4aa50';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(CW / 2 - 160, CH / 2 + 10); ctx.lineTo(CW / 2 + 160, CH / 2 + 10); ctx.stroke();
+    ctx.fillStyle = '#aaffaa';
+    ctx.font = '20px monospace';
+    ctx.fillText('按 R 重新挑戰', CW / 2, CH / 2 + 50);
     ctx.textAlign = 'left';
   }
 
   // GameOver
   if (state.mode === 'gameover') {
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
-    ctx.fillStyle = '#ff4444'; ctx.font = 'bold 52px serif'; ctx.textAlign = 'center';
-    ctx.fillText('陣亡', CONFIG.CANVAS_WIDTH / 2, 200);
-    ctx.fillStyle = '#ffaaaa'; ctx.font = '20px monospace';
-    ctx.fillText('按 R 再戰', CONFIG.CANVAS_WIDTH / 2, 270);
+    const CW = CONFIG.CANVAS_WIDTH;
+    const CH = CONFIG.CANVAS_HEIGHT;
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fillRect(0, 0, CW, CH);
+    const goGlow = ctx.createRadialGradient(CW / 2, CH / 2, 20, CW / 2, CH / 2, 220);
+    goGlow.addColorStop(0, 'rgba(200,30,30,0.35)');
+    goGlow.addColorStop(1, 'rgba(200,30,30,0)');
+    ctx.fillStyle = goGlow;
+    ctx.fillRect(0, 0, CW, CH);
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#cc0000';
+    ctx.shadowBlur = 32;
+    ctx.fillStyle = '#ff4444';
+    ctx.font = 'bold 64px serif';
+    ctx.fillText('陣亡', CW / 2, CH / 2 - 20);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = '#881111';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(CW / 2 - 120, CH / 2 + 10); ctx.lineTo(CW / 2 + 120, CH / 2 + 10); ctx.stroke();
+    ctx.fillStyle = '#ffaaaa';
+    ctx.font = '20px monospace';
+    ctx.fillText('按 R 再戰', CW / 2, CH / 2 + 50);
     ctx.textAlign = 'left';
   }
 }
