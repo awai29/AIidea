@@ -180,12 +180,13 @@ function drawSprite(ctx, charKey, action, screenX, screenY, dispW, dispH, facing
     const frameIdx = calcFrameIndex(charKey, action, frameCount);
     const frame = getFrame(charKey, action, frameIdx);
     if (frame) {
-      const dx = screenX - dispW / 2;
-      const dy = screenY - dispH;
+      // 所有座標取整數，保持像素精確對齊
+      const dx = Math.round(screenX - dispW / 2);
+      const dy = Math.round(screenY - dispH);
       ctx.save();
       ctx.imageSmoothingEnabled = false;  // 像素風格：關閉插值避免模糊
       if (facing === -1) {
-        ctx.translate(screenX, 0);
+        ctx.translate(Math.round(screenX), 0);
         ctx.scale(-1, 1);
         ctx.drawImage(frame.img, frame.x, frame.y, frame.w, frame.h,
                       -dispW / 2, dy, dispW, dispH);
@@ -724,8 +725,9 @@ export function render(ctx, state) {
     const isPlayer = (ent === p);
     const beltY  = getEntityBeltY(ent);
     const scale  = getPerspectiveScale(beltY) * (ent.renderScale || 1);
-    const dispW  = ent.width  * scale;
-    const dispH  = ent.height * scale;
+    // 取整數像素，避免 drawImage 非整數大小造成模糊
+    const dispW  = Math.round(ent.width  * scale);
+    const dispH  = Math.round(ent.height * scale);
     const screenX = ent.x - cam;
     const screenY = ent.y;   // y 已含 jumpHeight 偏移
 
