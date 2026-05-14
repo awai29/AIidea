@@ -1,12 +1,27 @@
 # Codex 交接文件：已知問題與待修清單
 
-- 日期：2026-05-12
+- 日期：2026-05-12（最後更新：2026-05-12）
 - 來源：Code Review 結果 + Sprite 盤點 + 效能 Review
-- 狀態：部分已修，剩餘待 Codex 處理
+- 狀態：Issues 1/2/3/4 已修，Issues 5/6 **仍待處理**
+
+## 待辦摘要（最新狀態）
+
+| Issue | 標題 | 狀態 |
+|-------|------|------|
+| 1 | 槍兵 Sprite 只有 2 幀 | ✅ 已修（已接上 5 組真實動作） |
+| 2 | 動畫時間源用 Date.now() | ✅ 已修（frameCount） |
+| 3 | 粒子 maxLife 語義錯誤 | ✅ 已修 |
+| 4 | Title shadowColor 沒重置 | ✅ 已修（改用 offscreen canvas，ctx 狀態已隔離）|
+| 5 | combat.js hitThisAttack 蓄力階段被誤清除 | **⚠️ 待處理** |
+| 6 | player.js 冗餘狀態檢查 | **⚠️ 待處理** |
+| 7 | Sprite 去背不乾淨（白邊鋸齒） | **⚠️ 需重做 sprite 資產** |
+| 8 | Sprite 各幀腳底基準線不一致（動作切換跳動）| **⚠️ 需重做 sprite 資產** |
+
+---
 
 ## 修復記錄（2026-05-12 已完成）
 
-以下問題已由 Claude Code 直接修復（commit `fb9c053`）：
+### 第一批：效能優化（commit `fb9c053`）
 
 | 問題 | 修法 | 檔案 |
 |------|------|------|
@@ -21,6 +36,25 @@
 | 受傷 vignette `createRadialGradient` 每幀重建 | 預建靜態 gradient，用 `ctx.globalAlpha` 控制強度 | `renderer.js` |
 | `updateLevel` + renderer 各自用 `filter/find` 計算存活數 | `updateLevel` 計算後存 `seg.aliveCount`，renderer 直接讀取 | `level.js`, `renderer.js` |
 
+### 第二批：操作體驗（commit `bd94e11`）
+
+| 新增功能 | 說明 | 檔案 |
+|----------|------|------|
+| ESC 暫停 / 繼續 | 按 ESC 切換 paused ↔ running | `main.js`, `renderer.js` |
+| Space 跳躍替代鍵 | 可用 Space 或 X 跳 | `player.js` |
+| 觸控按鈕顯示對應鍵盤鍵 | 按鈕標示「跳 X」「攻 Z」「衝 C」 | `index.html`, `styles.css` |
+| 觸控暫停按鈕 | 右上角 ⏸，發送 Escape 事件 | `index.html`, `styles.css` |
+
+### 第三批：renderer.js 增強（Codex/linter，未記錄 commit）
+
+| 新增功能 | 說明 | 位置 |
+|----------|------|------|
+| `CONFIG.USE_SCENE_IMAGE_PLACEHOLDERS` | 控制是否載入場景圖片占位符的 flag | `renderer.js` `sceneImg()` |
+| `ent.renderScale` 支援 | 透視縮放乘以 `ent.renderScale || 1` | `renderer.js` entity 渲染 |
+| `drawFallbackSkyDetails()` | 月亮光暈 + 月盤 + 10 顆固定星點 + 地平線薄霧 | `renderer.js` |
+| `drawFallbackRiver()` | 漸層河流 + 波紋線條 | `renderer.js` |
+| `drawFallbackCamp()` | 帳篷 + 旗桿 + 火焰輻射漸層 | `renderer.js` |
+
 ---
 
 ## 專案背景
@@ -33,7 +67,7 @@
 
 ---
 
-## Issue 1：槍兵 Sprite 只有 2 幀（最優先）
+## ✅ Issue 1：槍兵 Sprite 只有 2 幀（已修）
 
 ### 問題描述
 
@@ -66,30 +100,32 @@
 
 完整格式請參考：`assets/sprites/wei-swordsman/runtime/atlas.json`
 
-### 解決方案
+### 實際修復結果
 
-**方案 A（建議）：生成新的槍兵 spritesheet（12 幀）**
+- 已生成並接入槍兵第一輪真實素材：
+  - `reference-v1.png`
+  - `idle-poseboard-v1.png`
+  - `walk-poseboard-v1.png`
+  - `attack-poseboard-v1.png`
+  - `hurt-poseboard-v1.png`
+  - `death-poseboard-v1.png`
+- `assets/sprites/wei-spearman/runtime/atlas.json` 現已包含：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 槍兵不再是 2 幀 runtime，也不再是 placeholder runtime sprite
 
-生成一張 576 × 320 px 的 PNG 圖（`assets/sprites/wei-spearman/runtime/sheet.png`），
-然後更新 `atlas.json` 為 12 幀格式，與刀兵相同。
+### 驗證方式
 
-槍兵視覺特徵：
-- 手持長槍（比角色身高長的武器）
-- 顏色偏橘褐（`#cc6600`，與刀兵的紅色 `#cc3333` 區別）
-- 動作節奏比刀兵慢一點（較重的武器）
-- 攻擊動作是向前突刺，而非揮砍
-
-**方案 B（臨時）：複製刀兵 atlas.json 給槍兵**
-
-如果暫時不想生成新圖，可以讓槍兵暫時使用與刀兵相同的 `sheet.png`，
-只需把 `atlas.json` 格式從 2 幀改為 12 幀（幀座標與刀兵相同）。
-注意：兩者外觀會一樣，但動畫不會卡頓。
-
-修改檔案：`assets/sprites/wei-spearman/runtime/atlas.json`
+- 啟動本地伺服器：`cd zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 執行：`cd zhaoyun-red-cliffs-mvp && python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 目前結果：`23/23 passed`
 
 ---
 
-## Issue 2：動畫時間源用 Date.now() 而非遊戲 frameCount
+## ✅ Issue 2（已修）：動畫時間源用 Date.now() 而非遊戲 frameCount
 
 ### 問題描述
 
@@ -135,7 +171,7 @@ const frameIdx = calcFrameIndex(charKey, action, state.frameCount);
 
 ---
 
-## Issue 3：粒子 maxLife 語義錯誤
+## ✅ Issue 3（已修）：粒子 maxLife 語義錯誤
 
 ### 問題描述
 
@@ -171,7 +207,7 @@ function spawnParticle(state, x, y, color) {
 
 ---
 
-## Issue 4：Title 畫面 shadowColor 沒有重置
+## ✅ Issue 4（已修）：Title 畫面 shadowColor 沒有重置
 
 ### 問題描述
 
@@ -265,6 +301,110 @@ if (canInput && p.state !== 'attack' && p.state !== 'dash') {  // ← attack/das
 ```js
 if (canInput) {  // 直接用 canInput 即可
 ```
+
+---
+
+---
+
+## Issue 7：Sprite 去背不乾淨（白色鋸齒邊緣）
+
+### 問題描述
+
+三張 spritesheet（`zhaoyun`、`wei-swordsman`、`wei-spearman`）的 PNG 邊緣帶有白色/灰色 anti-aliasing 鋸齒，在遊戲的深色背景上明顯可見，角色看起來有白邊。
+
+### 原因
+
+原始 PNG 在生成時沒有乾淨的透明度（alpha channel），邊緣的半透明像素是白色底，而非透明底。
+
+### 解決方式
+
+重新生成三張 spritesheet，要求：
+- 背景必須是 **完全透明**（RGBA alpha = 0）
+- 角色邊緣 anti-aliasing 要對著透明底做（premultiplied alpha 或 straight alpha on transparent）
+- **不能**對著白色底做 anti-aliasing 再轉存 PNG
+
+驗收：在深色背景（`#111` 或 `#1a1a2e`）上看不到任何白邊或亮色鋸齒。
+
+---
+
+## Issue 8：Sprite 幀殘影 + 高度不一致（pipeline 根本問題）
+
+### 問題描述（2026-05-14 診斷）
+
+視覺上角色會「忽高忽矮」、某些幀有殘影/破片。根本原因有兩層：
+
+**層 1：各動作 canvas 高度不一致**
+
+`align.py` 對每個動作獨立計算 `max_height`，導致：
+```
+wei-swordsman: idle=356px, walk=356px, attack=352px (差 4px)
+wei-spearman:  idle=362px, walk=362px, attack=356px (差 6px)
+```
+`pack.py` 再把它們全部縮放到 64px，不同高度的 canvas 縮放比例不同，角色視覺高度就會跳動。
+
+**層 2：攻擊動作幀內角色位置偏移劇烈**
+
+量測 wei-swordsman 攻擊幀的角色頂部 Y（在 352px canvas 內）：
+```
+frame 1: top=81  → 角色高 271px
+frame 2: top=51  → 角色高 301px  ← 差 30px！
+frame 3: top=96  → 角色高 256px
+```
+縮放到 64px 後，角色高度在 46~55px 之間跳動，肉眼可見。
+
+**層 3：部分幀有殘影（spearman idle 幀 8~10）**
+
+`sheet-wei-spearman.png` idle row 的右側幾格頂部有明顯殘影（看起來像另一個角色的腳/身體），推測是 poseboard 去背不完整 或 bounding box 裁切到相鄰格的像素。
+
+### 根本修法
+
+**Step 1：讓所有動作共用同一 canvas 尺寸**
+
+在 `pipeline/pack.py` 或呼叫它的腳本中，先跑一次全動作掃描取得最大寬高，再用這個全局尺寸執行 `align_frames_by_feet`：
+
+```python
+# 呼叫 align_frames_by_feet 前，先算全角色最大尺寸
+all_paths = [p for paths in animations.values() for p in paths]
+all_imgs = [Image.open(p) for p in all_paths]
+global_w = max(img.width for img in all_imgs)
+global_h = max(img.height for img in all_imgs)
+
+# 每個動作都用同一個 canvas 大小
+for action, paths in animations.items():
+    aligned, _, _ = align_frames_by_feet(paths, aligned_dir,
+                                          canvas_width=global_w,
+                                          canvas_height=global_h)
+```
+
+**Step 2：修掉殘影**
+
+對 `wei-spearman` idle 動作的 poseboard 重新執行 recover（提高 tolerance 或 passes），或手動清除 `idle/frame-08.png` ~ `frame-10.png` 頂部的殘像素後再 pack。
+
+```bash
+cd zhaoyun-red-cliffs-mvp
+# 重新 recover（加大 tolerance）
+python3 -m pipeline.recover \
+  pipeline/input/wei-spearman/idle-poseboard-v1.png \
+  assets/sprites/wei-spearman/idle/recovered \
+  --rows 4 --cols 3 --tolerance 45
+
+# 對齊 + 打包
+python3 -m pipeline.align ...
+python3 -m pipeline.pack ...
+```
+
+**Step 3：修完後更新版本號**
+
+每次重新 pack 後，必須更新 `assets.js` 的 `SPRITE_VERSION`（目前是 `v3`）：
+```js
+const SPRITE_VERSION = '20260514-v4';  // 改成新版本
+```
+
+### 驗收
+
+1. 截圖所有動作切換過程，確認角色頭頂高度不跳動
+2. spearman idle 幀 8~10 頂部無殘影
+3. `python3 -m pytest tests/ -q` 仍然 46/46 通過
 
 ---
 
