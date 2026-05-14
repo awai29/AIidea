@@ -6,16 +6,18 @@
 
 ## 目前狀態
 
-✅ **MVP 全部完成（Phase 1–5）**
+✅ **MVP 主幹已完成，Phase 1–8 均已有實作與驗證紀錄**
 
 - 遊戲可玩：移動、belt-scroll 走位、跳躍、攻擊、受傷、死亡、清場推進 4 段、勝利/死亡畫面
 - 敵人 AI：刀兵（近戰追擊）、槍兵（保距長槍）
 - 關卡系統：4 段清場，清空解鎖下一段
-- Playwright 自動化測試：**12/12 全部通過**
+- Playwright 自動化測試：**23/23 全部通過**
 - 所有程式碼在 `zhaoyun-mvp/`，測試在 `tests/`
+- 趙雲、魏刀兵、魏槍兵都已接上第一輪真實 sprite（`idle / walk / attack / hurt / death`）
+- title 畫面已清理完成：首頁不再渲染戰鬥角色，DOM 觸控按鈕會在 title mode 自動隱藏
 
-**下一步（Phase 6）：** 替換色塊為 AI 生成 sprite
-→ 詳見 `docs/pixel-sprite-game-workflow-handoff.md`
+**目前下一步：** 正式場景素材、Boss/物件資產，或第二輪角色美術 polish
+→ 詳見最新交接記錄與 `README.md`
 
 ## 核心文件（依閱讀優先順序）
 
@@ -593,3 +595,1067 @@ cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
 python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
 # 23/23 passed
 ```
+
+---
+
+## [2026-05-11] 趙雲真實素材第一輪接入（reference + idle + walk）
+
+### 目前進度
+- 已生成並選定 `pipeline/input/zhaoyun/reference-v1.png`
+- 已生成 `pipeline/input/zhaoyun/idle-poseboard-v1.png`
+- 已生成 `pipeline/input/zhaoyun/walk-poseboard-v1.png`
+- 已成功執行：
+  - `python3 pipeline/run.py all --character zhaoyun --action idle ...`
+  - `python3 pipeline/run.py all --character zhaoyun --action walk ...`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 目前包含 `idle + walk`
+- 主角在 `idle / walk` 狀態可用真實 sprite，其他動作目前仍會 fallback 到色塊
+
+### 改了哪些檔案
+- `pipeline/input/zhaoyun/reference-v1.png`
+- `pipeline/input/zhaoyun/reference-candidate-a.png`
+- `pipeline/input/zhaoyun/idle-poseboard-v1.png`
+- `pipeline/input/zhaoyun/walk-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/idle/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/idle/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/walk/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/walk/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- 趙雲 `attack / hurt / death` 尚未生成真實 poseboard
+- `wei-swordsman / wei-spearman` 仍是 placeholder runtime sprite
+
+### 下一步
+- 先做趙雲 `attack-poseboard-v1.png`
+- 跑 `pipeline/run.py all --character zhaoyun --action attack --poseboard ...`
+- 再補 `hurt` 與 `death`
+- 主角 5 個動作齊後，再開始 `wei-swordsman`
+
+### 驗證方式
+- 檢查 `pipeline/input/zhaoyun/` 是否已有：
+  - `reference-v1.png`
+  - `idle-poseboard-v1.png`
+  - `walk-poseboard-v1.png`
+- 檢查 `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 是否同時有 `idle` 和 `walk`
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+---
+
+## [2026-05-11] 趙雲 attack poseboard 接入完成，23/23 通過
+
+### 目前進度
+- 已建立 `pipeline/input/zhaoyun/attack-poseboard-prompt.txt` 與 `attack-negative.txt`
+- 已生成 `pipeline/input/zhaoyun/attack-poseboard-v1.png`
+- 已成功執行 `python3 pipeline/run.py all --character zhaoyun --action attack --poseboard ...`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 現在包含 `idle + walk + attack`
+- 主角普通攻擊狀態可改用真實 sprite，不再只靠 fallback 色塊
+
+### 改了哪些檔案
+- `pipeline/input/zhaoyun/attack-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/attack-negative.txt`
+- `pipeline/input/zhaoyun/attack-poseboard-v1.png`
+- `pipeline/input/zhaoyun/agent-sprite-forge-runbook.md`
+- `pipeline/input/README.md`
+- `docs/zhaoyun-sprite-prompt-pack.md`
+- `README.md`
+- `docs/project-progress.md`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/attack/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/attack/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- 趙雲 `hurt / death` 尚未生成真實 poseboard
+- 槍兵與刀兵仍是 placeholder runtime sprite
+
+### 下一步
+- 先做 `hurt-poseboard-v1.png`
+- 再做 `death-poseboard-v1.png`
+- 主角五動作齊全後，再開始 `wei-swordsman`
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 是否同時有 `idle`、`walk`、`attack`
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+---
+
+## [2026-05-12] 修正趙雲 attack 頭部造型漂移（移除頭盔）
+
+### 目前進度
+- 發現第一版 `attack-poseboard-v1.png` 錯把趙雲做成頭盔版，與 `reference-v1` 的頭帶 + 露髮設定不一致
+- 已修正 `attack-poseboard-prompt.txt`，強制沿用：
+  - 無頭盔
+  - 銀色頭帶
+  - 額前藍寶石
+  - 深色頭髮
+  - 白色高馬尾
+- 已重新生成 `attack-poseboard-v1.png`
+- 已重跑 `pipeline/run.py all --character zhaoyun --action attack ...`
+- `runtime atlas` 已更新為無頭盔版攻擊動畫
+
+### 改了哪些檔案
+- `pipeline/input/zhaoyun/attack-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/attack-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/attack/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/attack/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/sheet.png`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- 趙雲 `hurt / death` 尚未生成真實 poseboard
+- 刀兵與槍兵仍是 placeholder runtime sprite
+
+### 下一步
+- 先做 `hurt-poseboard-v1.png`
+- 再做 `death-poseboard-v1.png`
+- 主角五動作齊全後，再開始 `wei-swordsman`
+
+### 驗證方式
+- 目視檢查 `pipeline/input/zhaoyun/attack-poseboard-v1.png` 是否為頭帶版趙雲
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+---
+
+## [2026-05-12] 趙雲五個核心動作全部接入完成，23/23 通過
+
+### 目前進度
+- 已生成並接入：
+  - `reference-v1.png`
+  - `idle-poseboard-v1.png`
+  - `walk-poseboard-v1.png`
+  - `attack-poseboard-v1.png`
+  - `hurt-poseboard-v1.png`
+  - `death-poseboard-v1.png`
+- 已成功執行：
+  - `python3 pipeline/run.py all --character zhaoyun --action hurt ...`
+  - `python3 pipeline/run.py all --character zhaoyun --action death ...`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 現在完整包含：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 趙雲主角目前五個核心狀態都已脫離 placeholder/fallback 色塊
+
+### 改了哪些檔案
+- `pipeline/input/zhaoyun/hurt-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/hurt-negative.txt`
+- `pipeline/input/zhaoyun/death-poseboard-prompt.txt`
+- `pipeline/input/zhaoyun/death-negative.txt`
+- `pipeline/input/zhaoyun/hurt-poseboard-v1.png`
+- `pipeline/input/zhaoyun/death-poseboard-v1.png`
+- `pipeline/input/zhaoyun/agent-sprite-forge-runbook.md`
+- `README.md`
+- `docs/zhaoyun-sprite-prompt-pack.md`
+- `docs/project-progress.md`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/hurt/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/hurt/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/death/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/death/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- `wei-swordsman` 與 `wei-spearman` 仍是 placeholder runtime sprite
+
+### 下一步
+- 開始做 `wei-swordsman`
+- 優先順序：`reference → idle → walk`
+- 等刀兵穩定後，再做 `wei-spearman`
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/sprites/zhaoyun/runtime/atlas.json` 是否同時有：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+
+---
+
+## [2026-05-12] 魏刀兵五個核心動作全部接入完成，23/23 通過
+
+### 目前進度
+- 已生成並接入 `wei-swordsman`：
+  - `reference-v1.png`
+  - `idle-poseboard-v1.png`
+  - `walk-poseboard-v1.png`
+  - `attack-poseboard-v1.png`
+  - `hurt-poseboard-v1.png`
+  - `death-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/atlas.json` 現在完整包含：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 魏刀兵目前五個核心狀態都已脫離 placeholder/fallback 色塊
+
+### 改了哪些檔案
+- `pipeline/input/wei-swordsman/reference-v1.png`
+- `pipeline/input/wei-swordsman/idle-poseboard-v1.png`
+- `pipeline/input/wei-swordsman/walk-poseboard-v1.png`
+- `pipeline/input/wei-swordsman/attack-poseboard-v1.png`
+- `pipeline/input/wei-swordsman/hurt-poseboard-v1.png`
+- `pipeline/input/wei-swordsman/death-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/idle/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/idle/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/walk/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/walk/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/attack/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/attack/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/hurt/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/hurt/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/death/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/death/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/atlas.json`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- `wei-spearman` 仍是 placeholder runtime sprite
+- `wei-swordsman` 的 prompt txt / negative txt / runbook 還沒像趙雲那樣完整補到 `attack / hurt / death`
+
+### 下一步
+- 開始做 `wei-spearman`
+- 優先順序：`reference → idle → walk`
+- 等槍兵穩定後，再決定是否補完整五動作，或回頭把刀兵文件補齊
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/sprites/wei-swordsman/runtime/atlas.json` 是否同時有：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+---
+
+## [2026-05-12] 魏槍兵五個核心動作全部接入完成，23/23 通過
+
+### 目前進度
+- 已生成並接入 `wei-spearman`：
+  - `reference-v1.png`
+  - `idle-poseboard-v1.png`
+  - `walk-poseboard-v1.png`
+  - `attack-poseboard-v1.png`
+  - `hurt-poseboard-v1.png`
+  - `death-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/atlas.json` 現在完整包含：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 目前 MVP 三個角色線都已脫離 placeholder/fallback 色塊：
+  - `zhaoyun`
+  - `wei-swordsman`
+  - `wei-spearman`
+
+### 改了哪些檔案
+- `pipeline/input/wei-spearman/agent-sprite-forge-runbook.md`
+- `pipeline/input/wei-spearman/reference-prompt-a.txt`
+- `pipeline/input/wei-spearman/reference-negative.txt`
+- `pipeline/input/wei-spearman/idle-poseboard-prompt.txt`
+- `pipeline/input/wei-spearman/idle-negative.txt`
+- `pipeline/input/wei-spearman/walk-poseboard-prompt.txt`
+- `pipeline/input/wei-spearman/walk-negative.txt`
+- `pipeline/input/wei-spearman/attack-poseboard-prompt.txt`
+- `pipeline/input/wei-spearman/hurt-poseboard-prompt.txt`
+- `pipeline/input/wei-spearman/death-poseboard-prompt.txt`
+- `pipeline/input/wei-spearman/reference-v1.png`
+- `pipeline/input/wei-spearman/idle-poseboard-v1.png`
+- `pipeline/input/wei-spearman/walk-poseboard-v1.png`
+- `pipeline/input/wei-spearman/attack-poseboard-v1.png`
+- `pipeline/input/wei-spearman/hurt-poseboard-v1.png`
+- `pipeline/input/wei-spearman/death-poseboard-v1.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/idle/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/idle/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/walk/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/walk/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/attack/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/attack/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/hurt/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/hurt/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/death/recovered/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/death/aligned/frame-*.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/atlas.json`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- 沒有功能性阻塞；目前主要剩美術一致性與遊戲內視覺驗證
+- `wei-swordsman` 的 negative / runbook 還可以補得更完整，和趙雲、槍兵對齊
+
+### 下一步
+- 在遊戲內驗證三個角色的實戰可讀性
+- 視需要微調比例、槍長、命中姿態與倒地輪廓
+- 再決定要進 Boss、場景物件，還是第二輪角色美術 polish
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/sprites/wei-spearman/runtime/atlas.json` 是否同時有：
+  - `idle`
+  - `walk`
+  - `attack`
+  - `hurt`
+  - `death`
+- 跑：
+  ```bash
+  cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp
+  python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v
+  ```
+
+---
+
+## [2026-05-12] 遊戲內視覺驗證完成，角色縮放與場景 fallback 已調整
+
+### 目前進度
+- 已在遊戲內重新檢查真實素材上線後的戰鬥畫面
+- 角色 sprite 現在比先前更大、更容易辨識：
+  - 趙雲使用 `PLAYER_RENDER_SCALE`
+  - 魏刀兵使用 `SWORDSMAN_RENDER_SCALE`
+  - 魏槍兵使用 `SPEARMAN_RENDER_SCALE`
+- 已暫時關閉帶標籤的場景 placeholder PNG，改回較乾淨的 Canvas fallback 場景
+- `docs/screenshots/running.png` 與 `docs/screenshots/title.png` 已由測試重寫，可作為目前畫面基準
+
+### 改了哪些檔案
+- `zhaoyun-mvp/src/game/config.js`
+- `zhaoyun-mvp/src/game/state.js`
+- `zhaoyun-mvp/src/game/entities/enemy-swordsman.js`
+- `zhaoyun-mvp/src/game/entities/enemy-spearman.js`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 指令：`python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 視覺驗證結論
+- 角色尺寸已比上一版明顯更好讀，刀、槍與倒地輪廓在戰鬥畫面中更容易辨識
+- 場景 fallback 在關掉 placeholder PNG 後更乾淨，不再被 `FG / MID / FAR` 文字與高飽和紅柱干擾
+- 目前仍可再提升的方向：
+  - 之後補正式場景素材，取代現在的 Canvas fallback
+  - 視需要微調趙雲與槍兵的槍長、近景縮放或血條位置
+
+### 下一步
+- 做正式場景素材，或先補 Boss / 物件資產
+- 如果繼續 polish 角色，先從趙雲與槍兵的近景比例微調開始
+
+---
+
+## [2026-05-13] Title 畫面清理驗證完成，測試前置條件已補充
+
+### 目前進度
+- 已確認 title mode 不再渲染戰鬥角色或 HUD 主體，只保留首頁標題卡與 canvas 內控制提示
+- 已確認 DOM 觸控按鈕在 title mode 會隱藏，不會再覆蓋在首頁上
+- `docs/screenshots/title.png` 與 `docs/screenshots/running.png` 已重新檢查，可作為目前 UI 基準
+- 今日第一次跑 pytest 失敗並非程式回歸，而是本地 `http://localhost:8080/` 未啟動；補起 `http.server` 後測試恢復全綠
+
+### 改了哪些檔案
+- `README.md`
+- `docs/project-progress.md`
+- `docs/plans/2026-05-12-codex-issues-handoff.md`
+
+### 跑了哪些測試
+- 先啟動：`cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 再跑：`cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp && python3 -m pytest tests/test_zhaoyun_mvp.py tests/test_sprite_integration.py -v`
+- 結果：**23/23 passed**
+
+### 阻塞點
+- 無功能性阻塞
+- 目前最容易造成假性失敗的點是：忘記先啟動 `zhaoyun-mvp/` 下的 `python3 -m http.server 8080`
+
+### 下一步
+- 若優先做畫面品質：先製作正式場景素材，取代目前 Canvas fallback 背景
+- 若優先做玩法內容：補 Boss 或可互動場景物件
+- 若優先做美術 polish：第二輪微調趙雲、魏刀兵、魏槍兵的近景比例與武器長度
+
+### 驗證方式
+- 開 `http.server 8080` 後執行 `pytest`，確認 `23/23 passed`
+- 檢查 `docs/screenshots/title.png`：首頁不應看到戰鬥角色，也不應看到 DOM 觸控按鈕
+- 檢查 `docs/screenshots/running.png`：三個角色應維持真實 sprite，場景背景應為乾淨的 Canvas fallback
+
+---
+
+## [2026-05-13] 場景素材線正式啟動，先建立遠景三張生成規格
+
+### 目前進度
+- 已決定場景產圖採分批替換，不一次重做 10 張
+- 第一批先做遠景三張：
+  - `bg-mountains.png`
+  - `bg-river.png`
+  - `bg-camp.png`
+- 已建立 `pipeline/input/scene-far/`，專門存放遠景生成規格
+- 已補齊遠景 runbook 與 3 組 prompt / negative prompt
+- 這一輪只整理上游產圖規格，尚未替換 `zhaoyun-mvp/assets/scene/` 內的 placeholder PNG
+
+### 改了哪些檔案
+- `pipeline/input/scene-far/agent-scene-runbook.md`
+- `pipeline/input/scene-far/bg-mountains-prompt.txt`
+- `pipeline/input/scene-far/bg-mountains-negative.txt`
+- `pipeline/input/scene-far/bg-river-prompt.txt`
+- `pipeline/input/scene-far/bg-river-negative.txt`
+- `pipeline/input/scene-far/bg-camp-prompt.txt`
+- `pipeline/input/scene-far/bg-camp-negative.txt`
+- `pipeline/input/README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些測試
+- 無
+- 原因：本輪只新增場景 prompt 與交接規格，未改動 renderer、資產載入或遊戲邏輯
+
+### 阻塞點
+- 無功能性阻塞
+- 下一步若要真正換圖，需要在圖像流程中依這份 runbook 生成透明 PNG，並覆蓋 `zhaoyun-mvp/assets/scene/` 的對應檔案
+
+### 下一步
+- 依 `pipeline/input/scene-far/agent-scene-runbook.md` 先生成 `bg-mountains` 候選圖
+- 選定山脈色調後，再生成 `bg-river`
+- 最後生成 `bg-camp`
+- 三張遠景替換完成後，再進遊戲內重拍 `title.png` 與 `running.png`
+
+### 驗證方式
+- 檢查 `pipeline/input/scene-far/` 是否已有：
+  - `agent-scene-runbook.md`
+  - `bg-mountains-prompt.txt`
+  - `bg-river-prompt.txt`
+  - `bg-camp-prompt.txt`
+- 確認 `zhaoyun-mvp/assets/scene/` 目前尚未被這一輪覆蓋，避免誤以為正式場景已上線
+
+---
+
+## [2026-05-13] 修正角色粉紅殘色與場景白邊，重打 runtime 與 scene 資產
+
+### 目前進度
+- 已在 `pipeline` 層級補上共用 matte 工具，統一處理：
+  - 角落背景色偵測
+  - soft alpha 去背
+  - 邊緣去染色（despill）
+  - 背景 fringe 清理
+- 角色素材線已重打：
+  - `zhaoyun/runtime/sheet.png`
+  - `wei-swordsman/runtime/sheet.png`
+  - `wei-spearman/runtime/sheet.png`
+- 角色 runtime 重新掃描後，`magentaish = 0`
+- 場景素材線已重打：
+  - `bg-mountains`
+  - `bg-river`
+  - `bg-camp`
+  - `mid-tent`
+  - `mid-flag-pole`
+  - `mid-bonfire`
+- 場景縮放已改成 `premultiplied alpha resize`，避免透明邊在縮放時長出白線
+
+### 改了哪些檔案
+- `pipeline/matte.py`
+- `pipeline/recover.py`
+- `pipeline/process_scene_generated.py`
+- `tests/pipeline/test_recover.py`
+- `tests/pipeline/test_process_scene_generated.py`
+- `zhaoyun-mvp/assets/sprites/*/runtime/sheet.png`
+- `zhaoyun-mvp/assets/sprites/*/runtime/atlas.json`
+- `zhaoyun-mvp/assets/scene/*.png`
+
+### 跑了哪些驗證
+- 以可 import `PIL` 的 Python 執行自訂驗證腳本：
+  - 模擬洋紅背景污染邊，確認 `magentaish left = 0`
+  - 模擬白底 fringe，確認 `semi_whitish left = 0`
+- 重新掃描實際 runtime PNG：
+  - `zhaoyun / wei-swordsman / wei-spearman` 三份 spritesheet 都為 `magentaish = 0`
+
+### 阻塞點
+- 這台 shell 當前無法直接用 `pytest`，因此這一輪沒有用 pytest 驗證，而是用自訂腳本驗證 matte 邏輯與實際輸出 PNG
+- 場景圖仍可能保留極少量 `alpha=1` 的亮點殘值，但已不是整圈白邊問題
+
+### 下一步
+- 若玩家仍肉眼看到白邊，優先檢查「source 圖本身」是否帶假透明棋盤或高亮邊，而不是再調 recover / matte 邏輯
+- 若要繼續美術 polish，優先重做：
+  - `bg-camp`
+  - `mid-tent`
+- 不需要回頭重修整條角色 sprite pipeline
+
+### 驗證方式
+- 檢查三份 runtime spritesheet：不應再看到可辨識的粉紅色塊
+- 檢查場景 PNG：邊緣不應有一整圈發亮白線
+- 若要追查，先看 source 圖，再看 `pipeline/process_scene_generated.py`
+
+---
+
+## [2026-05-13] 第二輪場景 source 微調：更新 bg-camp 與 mid-tent
+
+### 目前進度
+- 已重生成兩張最影響觀感的 source：
+  - `pipeline/input/scene-far/bg-camp-source-v3.png`
+  - `pipeline/input/scene-mid/mid-tent-source-v2.png`
+- 已用新 source 覆蓋：
+  - `zhaoyun-mvp/assets/scene/bg-camp.png`
+  - `zhaoyun-mvp/assets/scene/mid-tent.png`
+- `mid-tent` 目前已明顯優於上一版，帳篷輪廓、開口火光、邊緣可讀性都更穩
+- `bg-camp` 已收斂成目前最佳版本，剩下的是少量極低 alpha 殘值，不再是大面積白邊
+
+### 改了哪些檔案
+- `pipeline/input/scene-far/bg-camp-source-v3.png`
+- `pipeline/input/scene-mid/mid-tent-source-v2.png`
+- `pipeline/input/scene-far/bg-camp-candidate-a.png`
+- `pipeline/input/scene-mid/mid-tent-candidate-a.png`
+- `zhaoyun-mvp/assets/scene/bg-camp.png`
+- `zhaoyun-mvp/assets/scene/mid-tent.png`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- 直接檢視 source 圖與最終輸出圖
+- 再次掃描輸出像素，確認 `mid-tent` 已無可見粉紅殘色，`bg-camp` 僅剩極低 alpha 的極少量亮點
+
+### 阻塞點
+- 目前沒有功能性阻塞
+- 若還要讓 `bg-camp` 更乾淨，重點在 source 圖風格與背景品質，不在現有 pipeline 邏輯
+
+### 下一步
+- 重新拍一張最新 `running` 截圖，確認 camp / tent 疊進場景後的實戰觀感
+- 若要再往前做畫面品質，下一個最值得重做的是：
+  - `mid-bonfire`
+  - `bg-river`
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/scene/mid-tent.png`：帳篷邊緣應比舊版乾淨
+- 檢查 `zhaoyun-mvp/assets/scene/bg-camp.png`：軍營剪影應更像曹營遠景，不像一般村落或帳篷列
+
+---
+
+## [2026-05-13] 場景第二輪收尾：更新 mid-bonfire 與 bg-river，並用實際遊戲畫面檢查
+
+### 目前進度
+- 已重生成並接入：
+  - `pipeline/input/scene-mid/mid-bonfire-source-v2.png`
+  - `pipeline/input/scene-far/bg-river-source-v2.png`
+- 已覆蓋最終輸出：
+  - `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+  - `zhaoyun-mvp/assets/scene/bg-river.png`
+- `mid-bonfire` 目前已無 `semi_whitish` 與 `magentaish` 殘值
+- 已用本機 Chrome + Computer Use 檢查實際遊戲畫面，確認：
+  - `bg-camp`
+  - `mid-tent`
+  - `mid-bonfire`
+  已成功疊入場景中
+
+### 改了哪些檔案
+- `pipeline/input/scene-mid/mid-bonfire-source-v2.png`
+- `pipeline/input/scene-far/bg-river-source-v2.png`
+- `pipeline/input/scene-mid/mid-bonfire-candidate-a.png`
+- `pipeline/input/scene-far/bg-river-candidate-a.png`
+- `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+- `zhaoyun-mvp/assets/scene/bg-river.png`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- 重新掃描 `mid-bonfire.png`：
+  - `semi_whitish = 0`
+  - `magentaish = 0`
+- 以本機 `http.server 8080` 啟動遊戲後，用 Chrome 實際查看畫面
+
+### 阻塞點
+- Chrome 中遊戲目前會落在既有存檔/狀態導致的 `Game Over` 疊層，不影響場景美術檢查，但若要補正式 running 截圖，之後可再加一個穩定的重置入口
+- `bg-river` 雖已比第一版合理，但仍偏 stylized；若要更像遠處水面，可再做第三輪 source 微調
+
+### 下一步
+- 若繼續 polish，優先順序建議：
+  - `bg-river` 第三輪微調（更低對比、更少高亮）
+  - `bg-mountains` 與 `bg-camp` 的色溫一致性
+  - 最後才做前景 `fg-*`
+
+### 驗證方式
+- 檢查 `zhaoyun-mvp/assets/scene/mid-bonfire.png`：火焰與石圈應清楚且沒有白邊
+- 檢查 `zhaoyun-mvp/assets/scene/bg-river.png`：應呈現遠處江面，不應像 UI 發光條
+
+---
+
+## [2026-05-14] 遠景河面第三輪、營火第二輪完成
+
+### 目前進度
+- 已重生成並接入：
+  - `pipeline/input/scene-mid/mid-bonfire-source-v2.png`
+  - `pipeline/input/scene-far/bg-river-source-v3.png`
+- 已覆蓋最終輸出：
+  - `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+  - `zhaoyun-mvp/assets/scene/bg-river.png`
+- `mid-bonfire` 目前已掃描為：
+  - `semi_whitish = 0`
+  - `magentaish = 0`
+- `bg-river` 已從「像 UI 亮條」收斂到更接近遠處江面反光，但仍屬 stylized 解法，不是最終美術定稿
+
+### 改了哪些檔案
+- `pipeline/input/scene-mid/mid-bonfire-source-v2.png`
+- `pipeline/input/scene-far/bg-river-source-v3.png`
+- `pipeline/input/scene-mid/mid-bonfire-candidate-a.png`
+- `pipeline/input/scene-far/bg-river-candidate-a.png`
+- `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+- `zhaoyun-mvp/assets/scene/bg-river.png`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- 直接檢查最終 PNG
+- 再次掃描像素殘值
+- 用本機 Chrome 實際打開遊戲頁面，確認 camp / tent / bonfire 都已疊入畫面
+
+### 阻塞點
+- Chrome 目前打開遊戲時會停在既有 `Game Over` 疊層，因此這輪主要做場景疊層檢查，沒有補正式 `running` 截圖檔
+- 若之後要穩定產出整合截圖，建議補一個可由 query param 或 debug API 觸發的乾淨開場狀態
+
+### 下一步
+- 若繼續場景 polish，優先建議：
+  - `bg-mountains` / `bg-camp` / `bg-river` 做同一輪色溫統一
+  - 開始替換 `fg-*` 前景層
+- 若改走玩法向，場景這一輪已經夠支撐 MVP，不必再回頭修背景
+
+### 驗證方式
+- 檢查 `mid-bonfire.png`：火焰與石圈應乾淨、無白邊
+- 檢查 `bg-river.png`：應為低對比遠處水面，不應像介面發光條
+
+---
+
+## [2026-05-14] 安全接入第一個前景層：fg-smoke
+
+### 目前進度
+- 已新增可重跑的前景煙霧生成器：
+  - `pipeline/generate_fg_smoke.py`
+- 已生成並接入：
+  - `pipeline/input/scene-fg/fg-smoke-source-v1.png`
+  - `zhaoyun-mvp/assets/scene/fg-smoke.png`
+- 已修改 `renderer.js` 的場景放行規則，在 `USE_SCENE_IMAGE_PLACEHOLDERS = false` 的情況下，單獨允許 `fg-smoke`
+- 其餘前景：
+  - `fg-flag-tall`
+  - `fg-grass`
+  - `fg-rock`
+  仍保持禁用，避免 placeholder 一起出現在畫面中
+- 已用本機 Chrome 實際查看 title 畫面，確認新煙霧有增加縱深感，但不會洗白帳篷、火光與主標題
+
+### 改了哪些檔案
+- `pipeline/generate_fg_smoke.py`
+- `pipeline/input/scene-fg/fg-smoke-source-v1.png`
+- `zhaoyun-mvp/assets/scene/fg-smoke.png`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- 直接解析 PNG alpha，確認 `fg-smoke.png` 不是空圖：
+  - `nonzero alpha = 6204`
+  - `max alpha = 127`
+- 用 `view_image` 檢查輸出輪廓，確認煙霧為透明背景而非灰底色塊
+- 啟動 `http.server 8080` 後，用本機 Chrome 檢查實際場景疊圖效果
+
+### 阻塞點
+- 目前尚未建立自動化截圖基線，因此這輪仍以人工畫面檢查為主
+- 其餘前景資產還是 placeholder，不能直接打開 `USE_SCENE_IMAGE_PLACEHOLDERS`
+
+### 下一步
+- 先做 `fg-rock`
+- 再做 `fg-grass`
+- 最後才做 `fg-flag-tall`
+- 每次都維持「只放行真實資產、不要整批開前景」的策略
+
+### 驗證方式
+- 打開 `http://127.0.0.1:8080/`
+- 檢查 title 畫面中景前方是否有淡煙霧層，但不應遮住標題主字
+- 檢查 `renderer.js` 的 `sceneImg()`：應只額外允許 `fg-smoke`
+
+---
+
+## [2026-05-14] 安全接入第二個前景層：fg-rock，並補場景資產 cache-bust
+
+### 目前進度
+- 已新增可重跑的前景石塊生成器：
+  - `pipeline/generate_fg_rock.py`
+- 已生成並接入：
+  - `pipeline/input/scene-fg/fg-rock-source-v1.png`
+  - `zhaoyun-mvp/assets/scene/fg-rock.png`
+- 已在 `renderer.js` 補上場景資產版本參數：
+  - `SCENE_ASSET_VERSION = '20260514-fg'`
+- 已修改 `sceneImg()` 放行規則，在 `USE_SCENE_IMAGE_PLACEHOLDERS = false` 時，單獨允許：
+  - `fg-smoke`
+  - `fg-rock`
+- `fg-grass` 與 `fg-flag-tall` 仍維持禁用
+
+### 改了哪些檔案
+- `pipeline/generate_fg_rock.py`
+- `pipeline/input/scene-fg/fg-rock-source-v1.png`
+- `zhaoyun-mvp/assets/scene/fg-rock.png`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- 直接解析 `fg-rock.png` alpha：
+  - `nonzero alpha = 1603`
+  - `max alpha = 255`
+- `curl -I http://127.0.0.1:8080/assets/scene/fg-rock.png`
+  - `Content-Length = 4827`
+  - `Last-Modified = Thu, 14 May 2026 04:35:07 GMT`
+- 以 `view_image` 檢查輸出輪廓，確認為透明背景石塊，不是文字 placeholder
+
+### 阻塞點
+- 本機 Chrome 分頁曾經黏住舊 placeholder 快取，因此這輪補了 scene asset version query 來避免前景圖誤讀舊檔
+- 目前仍沒有自動化 screenshot baseline，畫面確認以人工檢查與 HTTP 資產比對為主
+
+### 下一步
+- 先做 `fg-grass`
+- 最後才做 `fg-flag-tall`
+- 維持「真實資產做完一張，就只放行一張」的策略
+
+### 驗證方式
+- 打開 `http://127.0.0.1:8080/?v=20260514fg`
+- 檢查前景近地面位置是否不再依賴 `FG:fg-rock` placeholder
+- 檢查 `renderer.js` 是否已有 `SCENE_ASSET_VERSION`
+
+---
+
+## [2026-05-14] 補齊剩餘前景層：fg-grass 與 fg-flag-tall
+
+### 目前進度
+- 已新增可重跑生成器：
+  - `pipeline/generate_fg_grass.py`
+  - `pipeline/generate_fg_flag_tall.py`
+- 已生成並接入：
+  - `pipeline/input/scene-fg/fg-grass-source-v1.png`
+  - `pipeline/input/scene-fg/fg-flag-tall-source-v1.png`
+  - `zhaoyun-mvp/assets/scene/fg-grass.png`
+  - `zhaoyun-mvp/assets/scene/fg-flag-tall.png`
+- 已把 `renderer.js` 場景資產版本更新為：
+  - `SCENE_ASSET_VERSION = '20260514-fg4'`
+- 已修改 `sceneImg()` 放行規則，現在在 `USE_SCENE_IMAGE_PLACEHOLDERS = false` 時，前景可安全使用：
+  - `fg-smoke`
+  - `fg-rock`
+  - `fg-grass`
+  - `fg-flag-tall`
+- 到這裡為止，前景四層都已脫離 placeholder
+
+### 改了哪些檔案
+- `pipeline/generate_fg_grass.py`
+- `pipeline/generate_fg_flag_tall.py`
+- `pipeline/input/scene-fg/fg-grass-source-v1.png`
+- `pipeline/input/scene-fg/fg-flag-tall-source-v1.png`
+- `zhaoyun-mvp/assets/scene/fg-grass.png`
+- `zhaoyun-mvp/assets/scene/fg-flag-tall.png`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `README.md`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- `fg-grass.png` alpha 檢查：
+  - `nonzero alpha = 1145`
+  - `max alpha = 255`
+- `fg-flag-tall.png` alpha 檢查：
+  - `nonzero alpha = 3926`
+  - `max alpha = 255`
+  - `min_nonzero = 180`
+- `curl -I 'http://127.0.0.1:8080/assets/scene/fg-grass.png?v=20260514-fg3'`
+  - `Content-Length = 2801`
+- `curl -I 'http://127.0.0.1:8080/assets/scene/fg-flag-tall.png?v=20260514-fg4'`
+  - `Content-Length = 3485`
+- 以 `view_image` 檢查：
+  - `fg-grass.png` 為透明背景草叢
+  - `fg-flag-tall.png` 為透明背景高旗
+
+### 阻塞點
+- 目前尚未建立「前景四層完整接入後」的自動化整合截圖基線
+- 本機 Chrome 偶爾會黏住舊 cache，因此這一輪依賴場景 asset version query 來保證拿到新 PNG
+
+### 下一步
+- 進遊戲內做整體畫面驗證：
+  - title
+  - running
+  - game over / victory
+- 確認前景四層不會遮住：
+  - 主標題
+  - 角色血條
+  - HUD
+- 若有衝突，再調整前景的：
+  - alpha
+  - spacing
+  - Y offset
+
+### 驗證方式
+- 打開 `http://127.0.0.1:8080/?v=20260514fg4`
+- 檢查不應再出現：
+  - `FG:fg-grass`
+  - `FG:fg-rock`
+  - `FG:fg-smoke`
+  - `FG:fg-flag-tall`
+  等 placeholder 字樣
+
+---
+
+## [2026-05-14] 完成四個關鍵畫面的整體視覺驗證，並做桌機 UI / 前景小修
+
+### 目前進度
+- 已完成四個關鍵畫面的最新截圖驗證：
+  - `title`
+  - `running`
+  - `victory`
+  - `gameover`
+- 已修正桌機執行時仍顯示觸控按鈕的問題，現在桌機會自動隱藏 `#touch-controls`
+- 已調整 `fg-flag-tall`：
+  - 降低透明度
+  - 拉大間距
+  - 整體往右錯位
+  讓它不要一直壓在玩家常駐區與 title 主文案下方
+- 已把最新驗證截圖同步回 `docs/screenshots/`
+
+### 改了哪些檔案
+- `zhaoyun-mvp/styles.css`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `README.md`
+- `docs/project-progress.md`
+- `docs/screenshots/title.png`
+- `docs/screenshots/running.png`
+- `docs/screenshots/victory.png`
+- `docs/screenshots/gameover.png`
+
+### 跑了哪些驗證
+- `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+  - 結果：`2 passed`
+- 驗證內容：
+  - 重新產生 `title.png`
+  - 重新產生 `running.png`
+  - 產生 `victory.png`
+  - 產生 `gameover.png`
+- 以 `view_image` 實際檢查四張截圖，確認：
+  - 桌機 running 畫面已不再顯示觸控按鈕
+  - `victory / gameover` 疊層仍可清楚閱讀
+  - 前景旗幟不再直接壓在玩家出生區中央
+
+### 阻塞點
+- shell 內直接用 Playwright 腳本啟動 Chromium 仍可能受 sandbox 影響；本輪改用暫存 pytest 檔做瀏覽器驗證
+- Safari 能看本機頁面，但不適合作為穩定的自動化控制入口，因此最終以 pytest 截圖驗證為準
+
+### 下一步
+- 如果要繼續 polish 場景，優先調 `bg-river / mid-bonfire` 的色溫與亮度一致性
+- 如果要往玩法前進，下一段比較適合接 Boss、可破壞場景物件，或第二輪角色美術 polish
+
+### 驗證方式
+- 啟動：
+  - `cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 驗證：
+  - `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+- 檢查：
+  - `docs/screenshots/title.png`
+  - `docs/screenshots/running.png`
+  - `docs/screenshots/victory.png`
+  - `docs/screenshots/gameover.png`
+
+---
+
+## [2026-05-14] 微調 bg-river 與 mid-bonfire，統一夜戰場景色溫
+
+### 目前進度
+- 已新增可重跑的場景調色工具：
+  - `pipeline/tune_scene_asset.py`
+- 已用調色 preset 產生新的 tuned source：
+  - `pipeline/input/scene-far/bg-river-source-v4.png`
+  - `pipeline/input/scene-mid/mid-bonfire-source-v3.png`
+- 已重新輸出遊戲資產：
+  - `zhaoyun-mvp/assets/scene/bg-river.png`
+  - `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+- 已重新驗證四張關鍵畫面，確認：
+  - 江面反光比前一版更暗、更低對比
+  - 營火仍有辨識度，但不再比整體場景過度刺眼
+
+### 改了哪些檔案
+- `pipeline/tune_scene_asset.py`
+- `pipeline/input/scene-far/bg-river-source-v4.png`
+- `pipeline/input/scene-far/bg-river-candidate-b.png`
+- `pipeline/input/scene-mid/mid-bonfire-source-v3.png`
+- `pipeline/input/scene-mid/mid-bonfire-candidate-b.png`
+- `zhaoyun-mvp/assets/scene/bg-river.png`
+- `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+- `README.md`
+- `docs/project-progress.md`
+- `docs/screenshots/title.png`
+- `docs/screenshots/running.png`
+- `docs/screenshots/victory.png`
+- `docs/screenshots/gameover.png`
+
+### 跑了哪些驗證
+- `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+  - 結果：`2 passed`
+- 以 `view_image` 檢查：
+  - `zhaoyun-mvp/assets/scene/bg-river.png`
+  - `zhaoyun-mvp/assets/scene/mid-bonfire.png`
+  - `docs/screenshots/title.png`
+  - `docs/screenshots/running.png`
+  - `docs/screenshots/victory.png`
+  - `docs/screenshots/gameover.png`
+
+### 阻塞點
+- 這輪是色溫與亮度收斂，不是重做構圖；如果之後還覺得營地層次不夠，下一輪應該處理 `bg-camp / mid-tent`，不是再把 river 拉亮
+- 由於目前 thread 的 writable root 不含 `aiproject/`，寫入這個專案時需要授權或沿用已批准的命令前綴
+
+### 下一步
+- 如果繼續 polish 場景，優先做：
+  - `bg-camp`
+  - `mid-tent`
+- 如果轉回玩法內容，下一段適合接：
+  - Boss
+  - 可破壞物件
+  - 第二輪角色美術 polish
+
+### 驗證方式
+- 啟動：
+  - `cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 驗證：
+  - `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+- 檢查：
+  - `docs/screenshots/running.png` 中的江面不應再像冷藍 UI 亮條
+  - `docs/screenshots/title.png` 與 `docs/screenshots/victory.png` 中的營火應亮，但不應搶過主文案
+
+---
+
+## [2026-05-14] 重畫 title 主標與副標，改成書法字體帶像素風格
+
+### 目前進度
+- 已重做 title 畫面的主標與副標繪法
+- 不是單純改 `font-family`，而是改成：
+  - 書法字體堆疊
+  - 高解析文字先繪製
+  - 再做低解析重採樣
+  - 最後以 `imageSmoothingEnabled = false` 回貼
+- 結果是：
+  - 主標更像招牌式書法字
+  - 邊緣保留像素塊感
+  - 副標也跟著變成較一致的書法系視覺
+
+### 改了哪些檔案
+- `zhaoyun-mvp/src/game/renderer.js`
+- `docs/project-progress.md`
+- `docs/screenshots/title.png`
+
+### 跑了哪些驗證
+- `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+  - 結果：`2 passed`
+- 以 `view_image` 檢查最新：
+  - `docs/screenshots/title.png`
+- 確認：
+  - 主標與副標已明顯不同於前一版 serif 標題
+  - 仍保留金色光暈與原本的版面結構
+
+### 阻塞點
+- 這一輪是程式生成式 title，不是獨立 PNG logo；如果之後要更強的「毛筆飛白」效果，下一輪就要考慮單獨出 title 素材
+
+### 下一步
+- 如果要繼續收首頁視覺，最值得做的是：
+  - 把 title logo 做成獨立像素招牌圖
+  - 或補一層更細的黑底牌匾紋理
+- 如果不再收首頁，現在這版已可作為交接基準
+
+### 驗證方式
+- 啟動：
+  - `cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 驗證：
+  - `python3 -m pytest /private/tmp/test_zrc_visual_verify.py -q`
+- 檢查：
+  - `docs/screenshots/title.png`
+  - 主標應呈現書法字形，且邊緣有像素化塊感
+
+---
+
+## [2026-05-14] 依附件重畫冷灰石板地面與殘牆石塊
+
+### 目前進度
+- 已把戰場地板從暖棕土路改成偏冷灰藍的石板地面
+- 石板加入大塊拼縫、裂縫與磨耗紋理，方向參考使用者提供的街機場景
+- `fg-rock` 已重畫成斷裂石牆/石塊感，不再是圓滑土石
+- `renderer` 已接入新地板資產 `ground-stone.png`，並保留較淡的 belt 走位輔助線
+
+### 改了哪些檔案
+- `pipeline/generate_ground_stone.py`
+- `pipeline/generate_fg_rock.py`
+- `pipeline/input/scene-ground/ground-stone-source-v1.png`
+- `pipeline/input/scene-fg/fg-rock-source-v2.png`
+- `zhaoyun-mvp/assets/scene/ground-stone.png`
+- `zhaoyun-mvp/assets/scene/fg-rock.png`
+- `zhaoyun-mvp/src/game/renderer.js`
+- `docs/project-progress.md`
+
+### 跑了哪些驗證
+- `view_image` 檢查：
+  - `zhaoyun-mvp/assets/scene/ground-stone.png`
+  - `zhaoyun-mvp/assets/scene/fg-rock.png`
+- 啟動本機頁面：
+  - `open http://127.0.0.1:8080`
+- 以 Chrome 實機檢查：
+  - 地板已呈現冷灰石板而非土路
+  - 石頭已呈現斷裂石牆塊感
+  - 中景與前景疊上後仍保有角色可讀性
+
+### 阻塞點
+- 這輪只重畫地板與石塊，沒有同步重拍 `docs/screenshots/running.png`
+- 目前系統 Python 與 bundled Python 都沒有 `pytest`，這輪無法直接重跑 `/private/tmp/test_zrc_visual_verify.py`
+
+### 下一步
+- 如果要繼續收場景，優先做：
+  - 用同一套冷灰石材語言重畫 `mid-tent` 前的低矮石基
+  - 微調 `ground-stone` 明暗，讓玩家腳下區域再亮半級
+- 如果先停在這裡，這版已可作為新的場景基準
+
+### 驗證方式
+- 啟動：
+  - `cd /Users/weiwumbp2024/aiproject/zhaoyun-red-cliffs-mvp/zhaoyun-mvp && python3 -m http.server 8080`
+- 檢查：
+  - `zhaoyun-mvp/assets/scene/ground-stone.png`
+  - `zhaoyun-mvp/assets/scene/fg-rock.png`
+  - Chrome 本機頁面中的戰鬥畫面
+- 預期：
+  - 地板應接近冷灰石板城牆地面，不再是棕色泥土地
+  - 石頭應像殘牆碎塊，不應像圓滑的小石頭
