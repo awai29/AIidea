@@ -29,6 +29,24 @@
   </div>
   <script type="module" src="src/main.js"></script>
   <script>
+    // 整數縮放：考慮 Retina DPR，以物理像素計算最大整數倍
+    // Retina(DPR=2) 1440px 視窗 → 物理 2880px → 可放 3× game → CSS 1440px
+    function applyIntegerScale() {
+      const W = 800, H = 450;
+      const dpr = window.devicePixelRatio || 1;
+      // 用物理像素算最大整數倍，再換回 CSS 像素
+      const physScaleX = Math.floor(window.innerWidth  * dpr / W);
+      const physScaleY = Math.floor(window.innerHeight * dpr / H);
+      const physScale  = Math.max(dpr, Math.min(physScaleX, physScaleY));
+      const cssW = Math.round(W * physScale / dpr);
+      const cssH = Math.round(H * physScale / dpr);
+      const c = document.getElementById('game-container');
+      if (c) { c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; }
+    }
+    applyIntegerScale();
+    window.addEventListener('resize', applyIntegerScale);
+  </script>
+  <script>
     // 觸控按鍵事件綁定（在 load 後執行，等待 main.js 初始化）
     window.addEventListener('load', () => {
       // 暫停按鈕（不走 data-key 機制，直接觸發 ESC）

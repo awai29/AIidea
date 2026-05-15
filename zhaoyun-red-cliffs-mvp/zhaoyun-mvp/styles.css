@@ -8,12 +8,12 @@ body {
   overflow: hidden;
 }
 
-/* ── 遊戲容器：縮放填滿視窗（保持 16:9） ── */
+/* ── 遊戲容器：整數縮放（由 JS 動態設定，防止非整數縮放模糊） ── */
 #game-container {
   position: relative;
-  /* 取視窗寬度 vs 視窗高度換算成16:9寬度，取小的那個 */
-  width: min(100vw, calc(100vh * 800 / 450));
-  aspect-ratio: 800 / 450;
+  /* 預設 1× 大小，JS 啟動後會立即更新為最大整數倍 */
+  width: 800px;
+  height: 450px;
 }
 
 #game-canvas {
