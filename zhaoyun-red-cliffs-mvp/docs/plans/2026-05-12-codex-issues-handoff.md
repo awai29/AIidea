@@ -352,7 +352,24 @@ frame 3: top=96  → 角色高 256px
 ```
 縮放到 64px 後，角色高度在 46~55px 之間跳動，肉眼可見。
 
-**層 3：部分幀有殘影（spearman idle 幀 8~10）**
+**層 3：趙雲 walk 幀 [9] 角色位置異常（2026-05-15 新增診斷）**
+
+用 Python + PIL 量測 `zhaoyun/runtime/sheet.png` 的 walk 行（y=64~128），各幀非透明像素範圍：
+
+```
+walk[0]: content rows 11-63（底部對齊 ✅）
+walk[1]: content rows 11-63（底部對齊 ✅）
+...
+walk[9]: content rows  0-53（⚠️ 底部在第 53 行！比其他幀高 10px）
+...
+walk[11]: content rows 10-63（底部對齊 ✅）
+```
+
+Walk frame [9] 的角色底部比其他幀高 10 像素。遊戲縮放 2× 後，每次播到第 9 幀（每 6 個 game frame 出現一次），角色視覺上瞬間跳高 20px，這就是「趙雲走路時走一走會跳起來」的根本原因。
+
+修法：重新產生趙雲 walk poseboard（或手動修正 `walk/frame-09.png` 的對齊），確保角色腳底對齊 canvas 底部後再重新 pack。
+
+**層 4：部分幀有殘影（spearman idle 幀 8~10）**
 
 `sheet-wei-spearman.png` idle row 的右側幾格頂部有明顯殘影（看起來像另一個角色的腳/身體），推測是 poseboard 去背不完整 或 bounding box 裁切到相鄰格的像素。
 
