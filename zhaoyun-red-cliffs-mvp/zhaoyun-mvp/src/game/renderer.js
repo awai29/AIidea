@@ -31,7 +31,15 @@ function sceneImg(key) {
 // UI 素材（預留接口，目前 assets/ui/ 尚未有圖，一律走 Canvas fallback）
 // 待 AI 生成圖片後，將 null 改回 new Image() 載入即可
 const UI_IMGS = {};
-function uiImg(_key) { return null; }
+['title-logo-gold'].forEach(key => {
+  const img = new Image();
+  img.src = `assets/ui/${key}.png?v=${SCENE_ASSET_VERSION}`;
+  UI_IMGS[key] = img;
+});
+function uiImg(key) {
+  const img = UI_IMGS[key];
+  return (img && img.complete && img.naturalWidth > 0) ? img : null;
+}
 
 // 天空漸層快取（只建一次，不用每幀 createLinearGradient）
 let _skyGrad = null;
@@ -109,35 +117,47 @@ function buildTitleCanvas(CW, CH) {
   c.lineWidth = 1;
   c.beginPath(); c.moveTo(CW / 2 - 180, 113); c.lineTo(CW / 2 + 180, 113); c.stroke();
 
-  // 主標題：書法字體 + 像素化重採樣
-  c.textAlign = 'center';
-  drawPixelCalligraphyText(c, {
-    text: '三國・一騎當千',
-    x: CW / 2,
-    y: 164,
-    width: 520,
-    height: 92,
-    fontSize: 44,
-    fillStyle: '#f5d060',
-    strokeStyle: '#71460d',
-    glowColor: 'rgba(255,136,34,0.48)',
-    glowBlur: 24,
-  });
+  const titleLogo = uiImg('title-logo-gold');
+  if (titleLogo) {
+    const targetW = Math.min(620, titleLogo.naturalWidth * 0.42);
+    const targetH = titleLogo.naturalHeight * (targetW / titleLogo.naturalWidth);
+    c.save();
+    c.imageSmoothingEnabled = true;
+    c.shadowColor = 'rgba(255, 170, 60, 0.22)';
+    c.shadowBlur = 28;
+    c.drawImage(titleLogo, CW / 2 - targetW / 2, 110, targetW, targetH);
+    c.restore();
+  } else {
+    // 主標題：書法字體 + 像素化重採樣
+    c.textAlign = 'center';
+    drawPixelCalligraphyText(c, {
+      text: '三國・一騎當千',
+      x: CW / 2,
+      y: 164,
+      width: 520,
+      height: 92,
+      fontSize: 44,
+      fillStyle: '#f5d060',
+      strokeStyle: '#71460d',
+      glowColor: 'rgba(255,136,34,0.48)',
+      glowBlur: 24,
+    });
 
-  // 副標：較細的書法字，保留像素邊緣
-  drawPixelCalligraphyText(c, {
-    text: '長坂坡之戰',
-    x: CW / 2,
-    y: 196,
-    width: 220,
-    height: 40,
-    fontSize: 19,
-    fillStyle: 'rgba(227,205,164,0.96)',
-    strokeStyle: 'rgba(96,58,22,0.92)',
-    glowColor: 'rgba(255,170,90,0.18)',
-    glowBlur: 10,
-    fontWeight: '600',
-  });
+    // 副標：較細的書法字，保留像素邊緣
+    drawPixelCalligraphyText(c, {
+      text: '長坂坡之戰',
+      x: CW / 2,
+      y: 196,
+      width: 220,
+      height: 40,
+      fontSize: 19,
+      fillStyle: 'rgba(227,205,164,0.96)',
+      strokeStyle: 'rgba(96,58,22,0.92)',
+      glowColor: 'rgba(255,170,90,0.18)',
+      glowBlur: 10,
+      fontWeight: '600',
+    });
+  }
 
   // 金色裝飾橫線（下）
   c.strokeStyle = '#7a540f';
@@ -701,7 +721,7 @@ export function render(ctx, state) {
 
     const CW = CONFIG.CANVAS_WIDTH;
     const CH = CONFIG.CANVAS_HEIGHT;
-    if (!_titleCanvas) _titleCanvas = buildTitleCanvas(CW, CH);
+    _titleCanvas = buildTitleCanvas(CW, CH);
     ctx.drawImage(_titleCanvas, 0, 0);
     return;
   }
