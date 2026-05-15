@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款體驗優化提案 · Payment UX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #efefef;
+    --foreground: #09090b;
+    --card: #ffffff;
+    --border: #e4e4e7;
+    --muted: #71717a;
+    --radius: 8px;
+    --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fecaca;
+    --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+    --blue: #2563eb; --blue-bg: #eff6ff; --blue-border: #bfdbfe;
+    --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+    --font: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  /* HEADER */
+  .page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 2.5rem; }
+  .header-inner { max-width: 960px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .header-inner h1 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 10px; }
+  .header-inner p { font-size: 14px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+  .header-meta { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+  .badge-green { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+  .badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+  .badge-blue  { background: var(--blue-bg);  border-color: var(--blue-border);  color: var(--blue); }
+  .badge-purple{ background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple); }
+  .badge-red   { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red); }
+
+  /* TOOLBAR */
+  .toolbar { position: sticky; top: 0; z-index: 100; background: rgba(239,239,239,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2.5rem; }
+  .toolbar-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 8px; height: 48px; overflow-x: auto; }
+  .toolbar-inner::-webkit-scrollbar { display: none; }
+  .fb { flex-shrink: 0; padding: 4px 14px; border-radius: 9999px; border: 1px solid var(--border); background: var(--card); font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; white-space: nowrap; }
+  .fb:hover { border-color: #a1a1aa; color: var(--foreground); }
+  .fb.on { background: var(--foreground); color: #fff; border-color: var(--foreground); }
+
+  /* MAIN */
+  .main { max-width: 960px; margin: 0 auto; padding: 2.5rem; }
+
+  /* BASELINE */
+  .baseline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .metric-num { font-size: 26px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+  .metric-label { font-size: 11px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .metric-note { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* SECTION */
+  .section { margin-bottom: 3rem; opacity: 0; transform: translateY(12px); transition: opacity 0.4s, transform 0.4s; }
+  .section.visible { opacity: 1; transform: none; }
+  .section-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* FEATURE CARD */
+  .feature { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: box-shadow 0.2s, transform 0.18s; }
+  .feature:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.09); transform: translateY(-1px); }
+  .feature-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .feature-title { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 520px; }
+  .feature-body { padding: 0; }
+
+  /* PANEL */
+  .panel { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+  .panel:last-child { border-bottom: none; }
+  .panel-title { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
+
+  /* DATA ROW */
+  .data-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .data-row { grid-template-columns: 1fr; } }
+  .data-box { background: var(--background); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .data-box.highlight-green { background: var(--green-bg); border-color: var(--green-border); }
+  .data-box.highlight-amber { background: var(--amber-bg); border-color: var(--amber-border); }
+  .data-box.highlight-red   { background: var(--red-bg);   border-color: var(--red-border); }
+  .data-num { font-size: 22px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 3px; }
+  .data-num.red    { color: var(--red); }
+  .data-num.green  { color: var(--green); }
+  .data-num.amber  { color: var(--amber); }
+  .data-label { font-size: 11px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .data-note { font-size: 12px; color: #52525b; line-height: 1.5; }
+
+  /* IMPACT ROW */
+  .impact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .impact-row { grid-template-columns: 1fr; } }
+
+  /* RULE LIST */
+  .rule-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .rule-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #3f3f46; line-height: 1.55; }
+  .ri { flex-shrink: 0; width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-top: 1px; }
+  .ri-ok   { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .ri-warn { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .ri-tip  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .ri-dot  { background: #f4f4f5; color: var(--muted); border: 1px solid var(--border); font-size: 8px; }
+
+  /* INSIGHT BOX */
+  .insight { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 10px; font-size: 13px; color: #92400e; line-height: 1.55; margin-top: 12px; }
+  .insight strong { color: #78350f; }
+
+  /* KPI TABLE */
+  .kpi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .kpi-table th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); text-align: left; padding: 0 14px 10px; border-bottom: 1px solid var(--border); }
+  .kpi-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: #3f3f46; line-height: 1.4; }
+  .kpi-table tr:last-child td { border-bottom: none; }
+  .kpi-table tr:hover td { background: var(--background); }
+  .kpi-table td:first-child { font-weight: 500; color: var(--foreground); }
+  .kpi-table td.num { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .kpi-table td.up { color: var(--green); }
+  .kpi-table td.down { color: var(--red); }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid var(--border); padding: 24px 2.5rem; background: var(--card); margin-top: 2rem; }
+  .footer-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* PRIORITY MATRIX */
+  .matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .matrix { grid-template-columns: 1fr; } }
+  .matrix-cell { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .matrix-cell h4 { font-size: 12px; font-weight: 600; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .matrix-cell.q1 { border-color: var(--green-border); background: var(--green-bg); }
+  .matrix-cell.q1 h4 { color: var(--green); }
+  .matrix-cell.q2 { border-color: var(--blue-border); background: var(--blue-bg); }
+  .matrix-cell.q2 h4 { color: var(--blue); }
+  .matrix-cell.q3 { border-color: var(--amber-border); background: var(--amber-bg); }
+  .matrix-cell.q3 h4 { color: var(--amber); }
+  .matrix-cell.q4 { border-color: var(--border); background: #f4f4f5; }
+  .matrix-cell.q4 h4 { color: var(--muted); }
+  .matrix-item { font-size: 12.5px; color: #3f3f46; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .matrix-item:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-tag">Product Proposal · Payment UX</div>
+    <h1>存款體驗優化<br>降低摩擦、提升客均存款</h1>
+    <p>針對存款流程的三大痛點（重複輸入、促銷感知差、步驟過多），透過個人化設計與行為引導，提升轉換率與平均存款金額。</p>
+    <div class="header-meta">
+      <span class="badge badge-green">Payment Team</span>
+      <span class="badge badge-amber">Round 1 After Lion Review</span>
+      <span class="badge badge-blue">2025.05.14</span>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <a href="#baseline" class="fb on">現況數據</a>
+    <a href="#f1" class="fb">個人化金額按鈕</a>
+    <a href="#f2" class="fb">一鍵重複存款</a>
+    <a href="#f3" class="fb">金額引導</a>
+    <a href="#f4" class="fb">Promotion 感知</a>
+    <a href="#f5" class="fb">VIP 提示</a>
+    <a href="#f6" class="fb">成功儀式感</a>
+    <a href="#f7" class="fb">即時狀態</a>
+    <a href="#summary" class="fb">優先矩陣</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- BASELINE -->
+  <div id="baseline" class="section">
+    <div class="section-label">現況基準 · Baseline Metrics（假設值，需 Tonya 提供實際數據）</div>
+    <div class="baseline-grid">
+      <div class="metric-card">
+        <div class="metric-label">存款頁轉換率</div>
+        <div class="metric-num" style="color:var(--red)">62%</div>
+        <div class="metric-note">38% 進了存款頁但未完成，業界標準約 72–78%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">平均存款金額</div>
+        <div class="metric-num">500</div>
+        <div class="metric-note">ADS（Average Deposit Size），以 BDT 計</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">存款流程時長</div>
+        <div class="metric-num" style="color:var(--amber)">3.5 分</div>
+        <div class="metric-note">從進入頁面到成功到帳，體驗差的主因之一</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">月存款人次</div>
+        <div class="metric-num">10,000</div>
+        <div class="metric-note">月總存款筆數（活躍存款玩家）</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">D30 再存率</div>
+        <div class="metric-num" style="color:var(--red)">40%</div>
+        <div class="metric-note">首次存款後 30 天內再次存款的比率</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Promotion 點擊率</div>
+        <div class="metric-num" style="color:var(--red)">8%</div>
+        <div class="metric-note">進入存款頁的玩家中，有去看 Promotion 的比率</div>
+      </div>
+    </div>
+    <div class="insight">
+      <span style="flex-shrink:0;font-size:14px;">★</span>
+      <span>以上數據為業界參考估算值。<strong>所有改動的優先順序與預期收益，都應以 Tonya 提供的真實數據重新驗算後再拍板。</strong>數據方向對了，ROI 估算才有說服力。</span>
+    </div>
+  </div>
+
+  <!-- F1 -->
+  <div id="f1" class="section">
+    <div class="section-label">功能一 · 個人化金額按鈕</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">根據歷史習慣，動態替換固定金額按鈕</div>
+          <div class="feature-desc">現有固定按鈕（如 100/200/500）和多數玩家的存款習慣有落差，導致玩家必須手動輸入，增加摩擦與放棄率。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-green">高價值</span>
+          <span class="badge badge-blue">低開發成本</span>
+        </div>
+      </div>
+      <div class="feature-body">
+
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">痛點</div>
+              <div class="data-num red">~55%</div>
+              <div class="data-note">玩家存款金額不在預設按鈕選項中，必須手動輸入（估算）。每多一個輸入步驟，流失率上升約 10–15%。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">行為研究佐證</div>
+              <div class="data-num amber">3× </div>
+              <div class="data-note">金融 App 研究顯示：一鍵選取比手動輸入的完成率高出 3 倍，尤其在行動裝置上（Baymard Institute, 2023）。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期轉換率提升</div>
+              <div class="data-num green">+4–6%</div>
+              <div class="data-note">假設月存款 10,000 筆，轉換率從 62% 升至 66%，增加 ~400 筆有效存款 / 月。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>啟動條件：</strong>歷史成功存款 ≥ 3 次才個人化；不足 3 次顯示後台預設金額</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>計算邏輯：</strong>取最近 10 次成功存款，加時間權重（近 30 天 ×2；超過 90 天 ×0.5），找出前 3 個加權眾數</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>4 個按鈕：</strong>最常存 / 第二常存 / 第三常存 / 最近一次（標注「上次」標籤）；4 個必須不重複，重複時往下找補位</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>特例 — 全部相同：</strong>若 10 次都存同一金額，按鈕 2/3 改顯示 ×0.5 / ×0.2（向下選項），給玩家靈活度而非向上推銷</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>邊界保護：</strong>計算結果低於平台最低門檻 → 拉至最低；超過單筆上限 → 降至上限</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>更新時機：</strong>每次成功存款後重算，下次進頁才生效（不即時更新，避免按鈕跳動讓玩家困惑）</span></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">衡量指標 (KPI)</div>
+          <table class="kpi-table">
+            <thead><tr><th>指標</th><th>現況</th><th>目標</th><th>衡量方式</th></tr></thead>
+            <tbody>
+              <tr><td>金額按鈕點擊率</td><td class="num">45%</td><td class="num up">65%</td><td>個人化按鈕被點擊 vs 手動輸入的比例</td></tr>
+              <tr><td>存款頁轉換率</td><td class="num">62%</td><td class="num up">66%</td><td>進入存款頁 → 成功存款的比率</td></tr>
+              <tr><td>存款流程時長</td><td class="num">3.5 分</td><td class="num up">2.5 分</td><td>存款頁進入到成功的平均秒數</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- F2 -->
+  <div id="f2" class="section">
+    <div class="section-label">功能二 · 一鍵重複上次存款</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">老玩家一鍵帶入上次的全部設定</div>
+          <div class="feature-desc">回流玩家存款意圖明確，卻要重新走完整個流程，是最可以消除的無效摩擦。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-green">最快落地</span>
+          <span class="badge badge-green">高頻使用</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">回流玩家佔比</div>
+              <div class="data-num red">~70%</div>
+              <div class="data-note">每月存款人次中，重複存款的老玩家佔約 7 成。這 7 成人都在重複做同樣的事，是最大的優化機會。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">步驟減少效果</div>
+              <div class="data-num amber">4→1 步</div>
+              <div class="data-note">原流程：選方式 → 輸入金額 → 確認 → 送出。一鍵重複後直接到「確認 → 送出」，操作時間縮短約 60%。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期轉換率提升</div>
+              <div class="data-num green">+5–8%</div>
+              <div class="data-note">Fintech 研究：減少重複輸入步驟可提升回流用戶轉換率 5–12%（Stripe UX Report, 2023）。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>顯示條件（全部符合才顯示）：</strong>有 ≥1 次成功存款；上次存款在 30 天內；上次支付方式仍可用</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>帶入：</strong>金額 + 支付方式。不帶入銀行帳號/卡號（安全）、優惠碼（避免帶入過期碼）</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>支付方式失效時：</strong>不整個灰掉，而是金額預填 + 支付方式留空 + 提示「請重新選擇支付方式」（保留金額的價值）</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>30 天截斷軟化：</strong>30 天內完整顯示；30–60 天顯示但加灰色「較久前」標記；60 天後隱藏</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>玩家修改金額後：</strong>不消失，改顯示「重置為上次設定」讓他反悔，避免一改就找不回來</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>上次存款為失敗紀錄：</strong>不顯示此按鈕（避免重複帶入問題設定）</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">衡量指標 (KPI)</div>
+          <table class="kpi-table">
+            <thead><tr><th>指標</th><th>現況</th><th>目標</th><th>衡量方式</th></tr></thead>
+            <tbody>
+              <tr><td>一鍵重複使用率</td><td class="num">0%（新功能）</td><td class="num up">30%+</td><td>回流玩家中點擊「再存一次」的比率</td></tr>
+              <tr><td>回流玩家完成時長</td><td class="num">3.5 分</td><td class="num up">&lt;1.5 分</td><td>使用一鍵功能的存款平均耗時</td></tr>
+              <tr><td>回流玩家轉換率</td><td class="num">~68%</td><td class="num up">75%+</td><td>回流玩家進入存款頁 → 成功率</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F3 -->
+  <div id="f3" class="section">
+    <div class="section-label">功能三 · 金額引導（門檻提示 + +10% 引導）</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">引導玩家存到「剛好觸發優惠」的金額</div>
+          <div class="feature-desc">玩家存款時不知道差多少可以拿到優惠，導致大量玩家錯過門檻、平台也損失了 Promotion 的引導效果。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-amber">直接提升 ADS</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">門檻差距錯過率</div>
+              <div class="data-num red">~35%</div>
+              <div class="data-note">估算 35% 的存款金額落在「距優惠門檻不到 20%」的區間內，這些人只需一個小提示就能轉換。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">錨定效應研究</div>
+              <div class="data-num amber">+12%</div>
+              <div class="data-note">行為經濟學錨定效應：展示一個略高的金額作為參考，可使平均消費提升 8–15%（Ariely, Predictably Irrational）。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期 ADS 提升</div>
+              <div class="data-num green">+5–10%</div>
+              <div class="data-note">ADS 從 500 升至 525–550，月新增存款額 = 250,000–500,000 BDT（10,000 筆 × 差額）。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>門檻提示觸發：</strong>（門檻金額 - 玩家輸入）÷ 門檻金額 ≤ 20%，且有對應的有效 Promotion</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>多個門檻時：</strong>顯示差距最小、最近可達的那一個門檻，一次只提示一個</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>超過所有門檻時：</strong>改顯示「已符合優惠資格」（綠色），取代提示文字</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>+10% 引導：</strong>無法觸發門檻提示時才顯示；且只在有 Promotion 可搭配時顯示（無優惠時「更划算」說不通）</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>+10% 防過度：</strong>+10% 後金額 &gt; 玩家近 30 天平均存款 ×3 時，不顯示（避免嚇到玩家）</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>優先級：</strong>門檻提示 &gt; +10% 引導，兩者不同時顯示</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>互動：</strong>玩家主動點擊 +10% 才更新金額欄位，不自動更新</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">衡量指標 (KPI)</div>
+          <table class="kpi-table">
+            <thead><tr><th>指標</th><th>現況</th><th>目標</th><th>衡量方式</th></tr></thead>
+            <tbody>
+              <tr><td>平均存款金額 (ADS)</td><td class="num">500</td><td class="num up">525–550</td><td>看到提示的玩家 vs 未看到的 ADS 對比（A/B test）</td></tr>
+              <tr><td>提示點擊率</td><td class="num">0%（新功能）</td><td class="num up">15–25%</td><td>顯示門檻提示 → 玩家調整金額到門檻以上的比率</td></tr>
+              <tr><td>優惠觸發率</td><td class="num">—</td><td class="num up">+8%</td><td>每月存款中符合 Promotion 門檻的比率變化</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F4 -->
+  <div id="f4" class="section">
+    <div class="section-label">功能四 · 存款頁內嵌 Promotion 感知</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">把 Promotion 帶到存款當下，而不是讓玩家自己去找</div>
+          <div class="feature-desc">玩家存款意圖最強的時刻，卻只有 8% 的人會去看 Promotion 頁。把優惠資訊放在正確的地方，效果遠大於 Push 通知。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-purple">影響 ADS 最大</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">Promotion 曝光問題</div>
+              <div class="data-num red">8%</div>
+              <div class="data-note">進入存款頁的玩家中，只有 8% 有先查看 Promotion。92% 的存款行為對優惠是「無感」的，是巨大的損失。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">業界研究佐證</div>
+              <div class="data-num amber">+25%</div>
+              <div class="data-note">iGaming 研究：在存款關鍵時刻展示相關優惠，可使平均存款金額提升 20–40%（H2 Gambling Capital, 2022）。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期 ADS 提升</div>
+              <div class="data-num green">+15–25%</div>
+              <div class="data-note">保守估計 ADS 從 500 升至 575–625，月新增存款額 = 750,000–1,250,000 BDT，是所有功能中 ROI 最高的。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>顯示條件：</strong>當前有針對存款的有效 Promotion，且玩家尚未使用過該 Promotion</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>優先級（只顯示 1 個）：</strong>① Welcome Offer（首次存款）② 今日到期的優惠 ③ 玩家常玩遊戲類型相關優惠 ④ 一般存款優惠；同等級多個時，顯示獎勵金額最高的</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>動態門檻顯示：</strong>玩家輸入金額時即時判斷：未達門檻顯示「還差 [X] 可享此優惠」；已達門檻改為「已符合資格」綠色提示</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>如何參加說明：</strong>展開優惠說明時必須明確：「存款後自動套用」或「存款後至優惠頁領取」，不能含糊</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>關閉後：</strong>24 小時不再顯示同一條。此設定存至後端（與 JSON 檔整合），跨裝置一致，清快取不失效</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>位置：</strong>橫幅在金額選擇區上方，不遮擋輸入欄，有 × 關閉按鈕</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">衡量指標 (KPI)</div>
+          <table class="kpi-table">
+            <thead><tr><th>指標</th><th>現況</th><th>目標</th><th>衡量方式</th></tr></thead>
+            <tbody>
+              <tr><td>Promotion 曝光率</td><td class="num">8%</td><td class="num up">60%+</td><td>存款頁展示 Promotion 橫幅的玩家佔比</td></tr>
+              <tr><td>Promotion 參與率</td><td class="num">—</td><td class="num up">25%+</td><td>看到橫幅 → 最終符合並使用優惠的比率</td></tr>
+              <tr><td>ADS（有優惠 vs 無）</td><td class="num">500</td><td class="num up">575–625</td><td>A/B Test：顯示橫幅組 vs 控制組的 ADS 對比</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F5 -->
+  <div id="f5" class="section">
+    <div class="section-label">功能五 · VIP 升等提示</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">在玩家快升等時，於存款頁顯示激勵提示</div>
+          <div class="feature-desc">玩家不知道自己距離下一個 VIP 等級還差多少，錯過了最容易存多一點的心理時機。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-blue">提升 LTV</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">VIP 升等感知</div>
+              <div class="data-num red">低</div>
+              <div class="data-note">玩家通常不清楚自己的 VIP 進度。「接近升等」是存款動機最強的時刻，但目前沒有任何系統在這個時機主動觸發。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">損失厭惡效應</div>
+              <div class="data-num amber">2.5×</div>
+              <div class="data-note">行為研究：損失的痛苦是同等收益的 2.5 倍。「快升等了，差一點就達不到」比「升等有獎勵」更有驅動力。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期 ADS 提升</div>
+              <div class="data-num green">+3–5%</div>
+              <div class="data-note">僅對「接近升等」的玩家生效（估計 15–20% 的存款人次），整體 ADS 提升有限，但對 VIP 玩家留存有較大貢獻。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>前提：</strong>需先確認平台 VIP 升等的實際計算指標（存款金額？投注流水？），確認前此功能暫緩</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>顯示條件：</strong>距下一 VIP 等級的差距 ≤ 玩家月均存款的 30%（快升等了才顯示）</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>月均計算：</strong>需至少 2 個月資料；新玩家（不足 2 個月）改用固定文案「再存 [差額] 升等」，不依賴月均</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>最高 VIP：</strong>已達最高等級的玩家不顯示</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>優先級：</strong>低於門檻提示，僅在無門檻提示時顯示</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F6 -->
+  <div id="f6" class="section">
+    <div class="section-label">功能六 · 存款成功儀式感</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">把存款成功頁變成「留住玩家繼續玩」的入口</div>
+          <div class="feature-desc">目前成功頁只是一個確認通知，玩家得自己找路回遊戲。這個頁面是玩家心情最好的時刻，卻沒有被利用。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-green">提升 D30 留存</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">存款後的行為</div>
+              <div class="data-num red">~25%</div>
+              <div class="data-note">估算約 25% 的玩家存款成功後，沒有立刻回去玩遊戲（可能迷失在頁面中或直接離開 App）。這代表平台剛收到錢，玩家卻走了。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">引導效果研究</div>
+              <div class="data-num amber">+18%</div>
+              <div class="data-note">App 研究顯示：交易成功後提供明確的下一步 CTA，可提升繼續使用率 15–20%（Nielsen Norman Group）。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">預期 D30 留存提升</div>
+              <div class="data-num green">+2–4%</div>
+              <div class="data-note">存款後立刻回到遊戲的玩家，30 天留存率顯著高於存完就離開的玩家。這是 LTV 長期效益最明顯的一個功能。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>必定顯示，不可跳過：</strong>成功動畫（2 秒）→ 靜止畫面等待玩家操作</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>主要 CTA：</strong>「繼續遊戲 →」跳回玩家上次玩的遊戲；若無上次遊戲紀錄 → 改為「探索遊戲」跳首頁</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>次要 CTA：</strong>「查看可用優惠」，僅在當前有可領取的 Promotion 時顯示</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>首次存款版本：</strong>帳號有史以來第一次成功存款，顯示「歡迎加入」特別動畫（只觸發一次）</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>VIP 升等觸發：</strong>本次存款後恰好達到升等門檻，額外顯示「恭喜升等！」提示</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>與推播串聯：</strong>若玩家在等待到帳期間關閉 App，到帳後需觸發 Push 通知「[金額] 已成功到帳」</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- F7 -->
+  <div id="f7" class="section">
+    <div class="section-label">功能七 · 即時存款狀態追蹤</div>
+    <div class="feature">
+      <div class="feature-header">
+        <div>
+          <div class="feature-title">消除「送出後不知道有沒有成功」的焦慮</div>
+          <div class="feature-desc">目前玩家送出存款後只能自己刷餘額確認，等待期的不確定感是客服投訴最常見的來源之一。</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;">
+          <span class="badge badge-blue">降低客服量</span>
+        </div>
+      </div>
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">為什麼要改 · 數據邏輯</div>
+          <div class="data-row">
+            <div class="data-box highlight-red">
+              <div class="data-label">存款相關客服比率</div>
+              <div class="data-num red">估算高</div>
+              <div class="data-note">「我存款了但還沒到帳」是最常見的客服問題之一。這類問題 80% 是玩家等待中的焦慮，而非真正的失敗。</div>
+            </div>
+            <div class="data-box">
+              <div class="data-label">透明度效果</div>
+              <div class="data-num amber">-30%</div>
+              <div class="data-note">Fintech 研究：即時顯示交易狀態可減少約 30% 的「查詢交易狀態」類客服票（Plaid UX Study, 2022）。</div>
+            </div>
+            <div class="data-box highlight-green">
+              <div class="data-label">間接收益</div>
+              <div class="data-num green">客服成本↓</div>
+              <div class="data-note">客服量減少 = 直接省成本。同時，等待焦慮降低 → 玩家不因此離開平台 → 保留了遊玩時間。</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">完整規則</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">✓</span><span><strong>狀態流程：</strong>送出中 → 銀行確認中 → 到帳（三個明確狀態）</span></li>
+            <li><span class="ri ri-ok">✓</span><span><strong>預估時間：</strong>依支付方式設定不同門檻（如即時轉帳 &lt;1 分鐘；銀行轉帳 5–30 分鐘）</span></li>
+            <li><span class="ri ri-tip">→</span><span><strong>銀行未回應（逾時）：</strong>顯示「處理中，通常 X 分鐘內到帳，如有問題請聯繫客服」，不顯示「失敗」</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>銀行明確回傳失敗：</strong>顯示「本次存款未成功，請重試或聯繫客服」+ 提供「重新存款」快捷入口（帶入本次設定）</span></li>
+            <li><span class="ri ri-warn">!</span><span><strong>玩家關 App 後到帳：</strong>與推播串聯，到帳後發「[金額] 已成功到帳」Push 通知</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="summary" class="section">
+    <div class="section-label">優先矩陣 · 建議執行順序</div>
+
+    <div class="matrix" style="margin-bottom:20px;">
+      <div class="matrix-cell q1">
+        <h4>第一波 · 立刻做（高價值 × 低成本）</h4>
+        <div class="matrix-item">一鍵重複上次存款</div>
+        <div class="matrix-item">個人化金額按鈕</div>
+        <div class="matrix-item">存款成功儀式感 + CTA</div>
+        <div class="matrix-item">即時存款狀態（逾時文案）</div>
+      </div>
+      <div class="matrix-cell q2">
+        <h4>第二波 · 搭配 Promotion 做（高價值 × 中成本）</h4>
+        <div class="matrix-item">存款頁內嵌 Promotion 橫幅</div>
+        <div class="matrix-item">金額門檻提示</div>
+        <div class="matrix-item">+10% 引導（與優惠掛鉤）</div>
+      </div>
+      <div class="matrix-cell q3">
+        <h4>第三波 · 需先確認數據（中價值 × 需研究）</h4>
+        <div class="matrix-item">VIP 升等提示（需確認 VIP 指標）</div>
+        <div class="matrix-item">即時存款狀態完整版（需後端 API）</div>
+      </div>
+      <div class="matrix-cell q4">
+        <h4>暫緩 · 依賴外部或複雜度高</h4>
+        <div class="matrix-item">Landing Page 個人化（依賴廣告）</div>
+        <div class="matrix-item">CRM 標簽整合（依賴 CRM 架構）</div>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-body">
+        <div class="panel">
+          <div class="panel-title">整體預期影響（全部功能上線後）</div>
+          <table class="kpi-table">
+            <thead><tr><th>指標</th><th>現況（估算）</th><th>目標</th><th>核心驅動功能</th></tr></thead>
+            <tbody>
+              <tr><td>存款頁轉換率</td><td class="num">62%</td><td class="num up">70–73%</td><td>個人化按鈕 + 一鍵重複</td></tr>
+              <tr><td>平均存款金額 ADS</td><td class="num">500</td><td class="num up">575–625</td><td>Promotion 感知 + 門檻提示</td></tr>
+              <tr><td>存款流程時長</td><td class="num">3.5 分</td><td class="num up">&lt;2 分</td><td>一鍵重複 + 個人化按鈕</td></tr>
+              <tr><td>D30 再存率</td><td class="num">40%</td><td class="num up">44–47%</td><td>儀式感 + 即時狀態 + 推播串聯</td></tr>
+              <tr><td>存款相關客服量</td><td class="num">—</td><td class="num up">-25–30%</td><td>即時狀態追蹤</td></tr>
+              <tr><td>月新增存款金額（估算）</td><td class="num">5,000,000 BDT</td><td class="num up">6,250,000+</td><td>ADS ↑ + 轉換率 ↑ 複合效果</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-title">最重要的下一步</div>
+          <ul class="rule-list">
+            <li><span class="ri ri-ok">1</span><span>向 Tonya 取得：存款頁轉換率、ADS、流程時長、Promotion 點擊率的實際數據，驗算上方所有預估值</span></li>
+            <li><span class="ri ri-ok">2</span><span>確認 VIP 升等的實際計算指標（存款金額 or 投注流水？），決定功能五是否可行</span></li>
+            <li><span class="ri ri-ok">3</span><span>與後端確認 JSON 個人設定檔的儲存位置，這是所有記憶功能的技術前提</span></li>
+            <li><span class="ri ri-tip">→</span><span>第一波 4 個功能建議做 A/B Test，以 2 週為一個觀察週期，有數據後再決定是否全量上線</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <span class="footer-text">Payment UX Proposal · 2025.05.14 · 內部文件</span>
+    <span class="footer-text">數據為估算值，需以實際數據驗證</span>
+  </div>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.05 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
