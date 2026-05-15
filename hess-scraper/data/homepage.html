@@ -1,0 +1,155 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" class=" js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><head><title>
+	Hippo eSchool 登入
+</title>
+    <!-- favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/Images/Hess.ico"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta charset="utf-8">
+    <!-- 設定手機行動版網頁的 viewport 資訊 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="hippo eSchool">
+
+    
+    
+    <!--integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"/>-->
+    <link rel="stylesheet" type="text/css" href="css/animate.css"><link rel="stylesheet" href="Assets/bootstrap/css/bootstrap.css" type="text/css"><link rel="stylesheet" href="fontawesome/css/all.css" type="text/css">
+     <!-- RWD css -->
+    <link href="css/RWD/login1.css" rel="stylesheet">
+
+    <!-- js -->
+    <script src="Assets/jquery/jquery-3.6.0.js"></script>
+    <script src="Assets/bootstrap/js/bootstrap.js"></script>
+
+    <!--<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>-->
+    
+
+    <script>
+        function checkmode(obj) {
+            if (obj.id == 'checkboxTeacher' && obj.checked == true) {
+                document.getElementById('checkboxStudent').checked = false;
+                document.getElementById('lableTeacher').className = "switch-slide-label-background";
+                document.getElementById('lableStudent').className = "switch-slide-label";
+            }
+            else if (obj.id == 'checkboxStudent' && obj.checked == true) {
+                document.getElementById('checkboxTeacher').checked = false;
+                document.getElementById('lableTeacher').className = "switch-slide-label";
+                document.getElementById('lableStudent').className = "switch-slide-label-background";
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+    <div class="logo-wrapper">
+        <div class="logo-form">
+
+            <div class="logo_w">
+                <img src="images/logo_w.png">
+            </div>
+
+            <form method="post" action="./" id="form1" class="login_form">
+<div class="aspNetHidden">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJMTg4MzY3NzMwD2QWAgIBD2QWAgIGDw8WAh4EVGV4dAUG55m75YWlZGQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgMFD2NoZWNrYm94VGVhY2hlcgUPY2hlY2tib3hTdHVkZW50BQtyZW1lbWJlcl9tZRaeO/Vy2ztF1XH3bPBO+NmEOIrx0ldzPN0wk6yTAZf2" style="">
+</div>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="C2EE9ABB" style="">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAj3cwyQlIwlLHJTTHWPMZiZN3uwZalf/CmNG1fcMBfB0zzxn3XyuG1ICiNTQ9b2jHtPJMUQEnqhlgwoa8NMOWpVVOn1dS3exwIRrEXdVk4OHE/b1f1ZHUN/N81z+DiLCs7Vm3xhCPozftcrKsY557qoop4oRunf14dz2Zt2+QKDEHT22xaddBOLFcfiNPBZVxlPWDhyo+e8hmqqjAY/mld8" style="">
+</div>
+
+                <p class="btn_question"><a href="faq.html">?</a></p>
+
+                <div class="form-group text-center">
+                    <label class="switch-slide">
+                        <!--<input type ="checkbox" id='checkboxTeacher' onclick = 'checkmode(this)' hidden/>-->
+                        <span hidden=""><input id="checkboxTeacher" type="checkbox" name="checkboxTeacher" onclick="checkmode(this);" style=""></span>
+                        <!--AutoPostBack="true" OnCheckedChanged="checkmode_click"-->
+                        <label id="lableTeacher" for="checkboxTeacher" class="switch-slide-label">教師</label>
+                    </label>
+                    <label class="switch-slide right">
+                        <!--<input type ="checkbox" id='checkboxStudent' onclick = 'checkmode(this)' hidden checked/>-->
+                        <span hidden=""><input id="checkboxStudent" type="checkbox" name="checkboxStudent" checked="checked" onclick="checkmode(this);" style=""></span>
+                        <!--AutoPostBack="true" OnCheckedChanged="checkmode_click"-->
+                        <label id="lableStudent" for="checkboxStudent" class="switch-slide-label-background" style="border-radius: 0 30px 30px 0; padding: 15px 0 15px 0; left: -6px; border-left: none;">學生</label>
+                    </label>
+                </div>
+
+                <div class="input-wrapper">
+                    <img src="images/icon_man.png">
+                    
+                    <input name="username1" type="text" maxlength="20" id="username1" class="text_field" placeholder="帳號" style="">
+                </div>
+
+                <div class="input-wrapper">
+                    <img src="images/icon_lock.png">
+                    
+                    <input name="password1" type="password" maxlength="20" id="password1" class="text_field" placeholder="密碼" style="">
+                </div>
+
+                <div class="remember">
+                    <!--<span class="remember_me"><input id="remember_me" type="checkbox" name="remember_me" /></span> 記住我 -->
+                    <input id="remember_me" class="remember_me" type="checkbox" value="1" style="">
+                    記住我
+                    <!--<input type="submit" name="btnForgetPwd" value="忘記密碼" id="btnForgetPwd" class="btn_forget_pwd" />-->
+                    <!--<a class="btn_forget_pwd" href="forget_pwd.html">忘記密碼</a>-->
+                </div>
+
+                
+
+                <div style="text-align: center;">
+                    <input type="submit" name="btnLogin" value="登入" onclick="return keepName();" id="btnLogin" class="btn_login" autopostback="true" style="">
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+<script>
+    document.getElementById("username1").placeholder = "帳號";
+    document.getElementById("password1").placeholder = "密碼";
+    document.getElementById("username1").text = "";
+    document.getElementById("password1").text = "";
+    document.getElementById("checkboxTeacher").checked = false;
+    document.getElementById("checkboxStudent").checked = true;
+    if (false == true)
+        checkmode(document.getElementById("checkboxTeacher"));
+
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var
+
+            s = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+    //取得cookie值 
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    function keepName() {
+        if (document.getElementById("remember_me").checked == true && document.getElementById("usernamehippo1").value != "") {
+            setCookie("unamehippo", document.getElementById("usernamehippo1").value, 100);
+        }
+    }
+
+    var unamehippo = getCookie("unamehippo");
+
+    if (unamehippo != "")
+        document.getElementById("usernamehippo1").value = unamehippo;
+
+</script>
+</body></html>

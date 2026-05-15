@@ -1,0 +1,127 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><title>
+	登入
+</title>
+    <!-- favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/Images/Hess.ico"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta charset="utf-8">
+    <!-- 設定手機行動版網頁的 viewport 資訊 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="hippo eSchool"><link rel="stylesheet" type="text/css" href="css/animate.css"><link rel="stylesheet" href="Assets/bootstrap/css/bootstrap.css" type="text/css"><link rel="stylesheet" href="fontawesome/css/all.css" type="text/css"><link rel="stylesheet" href="Assets/select2/css/select2.css" type="text/css"><link rel="stylesheet" href="Assets/select2/css/select2.custom.css" type="text/css">
+     <!-- RWD css -->
+    <link href="css/RWD/login2.css" rel="stylesheet">
+
+    <!-- js -->
+    <script src="Assets/jquery/jquery-3.6.0.js"></script>
+    <script src="Assets/bootstrap/js/bootstrap.js"></script>
+    <script src="Assets/select2/js/select2.js"></script>
+
+</head>
+
+<body>
+    <div class="logo-wrapper">
+        <div class="logo-form">
+            <div class="logo_w">
+                <img src="images/logo_w.png">
+            </div>
+
+            <form method="post" action="./Login2?UserID=111110436&amp;UserMode=S" id="form1" class="login_form animated jello">
+<div class="aspNetHidden">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTExMTg5MzM4NTAPZBYCAgEPZBYCZg8PFgIeBFRleHQFBueiuuWummRkZCwBD9RmVBxWvEvndGOZcrTSp4WqRSU8puFPiQY9o0Hy" style="">
+</div>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="076E324C" style="">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAIbWGYlB+e0YTlh8vo9uepTop4oRunf14dz2Zt2+QKDEPIE618NSHCKyJGfMEornpWDqCEJjf2SpbF9eD1MCWmi" style="">
+</div>
+
+                <p class="name_txt">Hi~<span id="span_username">吳昕澄</span></p>
+
+                
+
+                <p class="select_title">選擇課程</p>
+
+                <select class="form-control myselect select2-hidden-accessible" id="c1" name="radiocourse" data-select2-id="select2-data-c1" tabindex="-1" aria-hidden="true">
+                    <option value="" data-select2-id="select2-data-2-1ia0"></option>
+                    
+                    <option value="PA31">全美大班上學期</option>
+                    
+                    <option value="PA32">全美大班下學期</option>
+                    
+                </select><span class="select2 select2-container select2-container--default" dir="ltr" data-select2-id="select2-data-1-d27i" style="width: 390px;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-disabled="false" aria-labelledby="select2-c1-container" aria-controls="select2-c1-container"><span class="select2-selection__rendered" id="select2-c1-container" role="textbox" aria-readonly="true" title="-- 請選擇 --"><span class="select2-selection__placeholder">-- 請選擇 --</span></span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+
+                <p style="text-align: center;">
+                    <input type="submit" name="btnLogin" value="確定" id="btnLogin" class="btn_login" autopostback="true" style="">
+                </p>
+
+                </form>
+
+        </div>
+    </div>
+
+
+<script>
+     $(document).ready(function () {
+        //select2套件
+        $('.myselect').select2({
+            placeholder: "-- 請選擇 --",
+            allowClear: true
+        });
+    });
+
+    document.getElementById("span_username").innerHTML = "吳昕澄";
+    document.getElementById("form1").className = "login_form animated jello";
+
+    
+
+     var student_genders = document.getElementsByName("radiocourse");
+    if (student_genders.length > 0) {
+        if ("" != "") {
+            let options = document.getElementsByName("radiocourse")[0].options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value == "")
+                    options[i].selected = true;
+            }
+        }
+    }
+    var school_genders = document.getElementsByName("radiocourse2");
+    if (school_genders.length > 0) {
+        if ("" != "") {
+            let options = document.getElementsByName("radiocourse2")[0].options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value == "")
+                    options[i].selected = true;
+            }
+        }
+    }
+    var genderss = document.getElementsByName("radioschool");
+      if ("" != "") {
+        for (var i = 0; i < genderss.length; i++) {
+            if (genderss[i].value == "")
+                genderss[i].checked = true;
+        }
+    }
+    var gendersc = document.getElementsByName("radioclass");
+    if ("" != "") {
+        for (var i = 0; i < gendersc.length; i++) {
+            if (gendersc[i].value == "")
+                gendersc[i].checked = true;
+        }
+    }
+
+    /*$(document).ready(function () {
+        $.ajax({
+            url: "json-test/CourseList.aspx",
+            type: 'POST',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $('#result').text(data);
+            },
+            error: function (err) {
+                console.log("err:");
+                console.log(err);
+                alert(err);
+            }
+        });
+    });*/
+</script>
+</body></html>

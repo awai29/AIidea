@@ -193,11 +193,19 @@ async def scrape(username: str, password: str, state: dict):
 
                 wp.on("request", capture)
                 try:
-                    await wp.goto(item["url"], wait_until="networkidle", timeout=15000)
-                    await wp.wait_for_timeout(800)
-                    item["media"] = list(captured)
-                except Exception as e:
-                    item["media_error"] = str(e)
+                    # 最多自動重試 2 次（應對網路短暫抖動）
+                    for attempt in range(3):
+                        try:
+                            captured.clear()
+                            await wp.goto(item["url"], wait_until="networkidle", timeout=15000)
+                            await wp.wait_for_timeout(800)
+                            item["media"] = list(captured)
+                            break   # 成功就跳出重試迴圈
+                        except Exception as e:
+                            if attempt == 2:   # 三次都失敗才記錄錯誤
+                                item["media_error"] = str(e)
+                            else:
+                                await asyncio.sleep(1.5)   # 等 1.5 秒再試
                 finally:
                     wp.remove_listener("request", capture)
                     await page_queue.put(wp)   # 歸還分頁供下一個任務使用

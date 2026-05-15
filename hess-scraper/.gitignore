@@ -1,0 +1,26 @@
+# ── 敏感資料（絕對不能上傳）──────────────────────────
+dropbox_config.json        # Dropbox App Key / Secret / Refresh Token
+data/accounts.json         # 帳號密碼
+
+# ── 下載的音檔（檔案太大，不適合放 git）────────────────
+data/downloads/
+
+# ── 備份暫存目錄（上傳完立即刪除，不需要追蹤）──────────
+data/tmp/
+
+# ── Dropbox 已備份索引（含個人資料）────────────────────
+data/dropbox_index_*.json
+
+# ── 爬蟲結果（含學生個資）─────────────────────────────
+data/result_*.json
+
+# ── 截圖（偵錯用，不需要備份）──────────────────────────
+data/screenshots/
+
+# ── Python 虛擬環境 ──────────────────────────────────
+.venv/
+__pycache__/
+*.pyc
+
+# ── macOS 系統檔 ─────────────────────────────────────
+.DS_Store

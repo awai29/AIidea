@@ -1,0 +1,953 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>
+	Hippo eSchool學生版
+</title>
+    <!-- favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/Images/Hess.ico"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta charset="utf-8">
+    <!-- 設定手機行動版網頁的 viewport 資訊 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- css -->
+    
+
+    
+    <link rel="stylesheet" type="text/css" href="css/animate.css"><link rel="stylesheet" href="Assets/bootstrap/css/bootstrap.css" type="text/css"><link rel="stylesheet" href="fontawesome/css/all.css" type="text/css">
+     <!-- RWD css -->
+    <link href="css/RWD/layout.css" rel="stylesheet">
+
+    <!-- js -->
+    <script src="Assets/jquery/jquery-3.6.0.js"></script>
+    <script src="Assets/bootstrap/js/bootstrap.js"></script>
+    
+
+    <script type="text/javascript">
+        $(function () {
+            $('.page_top').click(function () {
+                $('html,body').animate({ scrollTop: 0 }, 'slow');
+                return false;
+            });
+
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 200) {
+                    $('.page_top').fadeIn();
+                } else {
+                    $('.page_top').fadeOut();
+                }
+            });
+        });
+
+        //$(document).ready(function () {
+        //    $('#a1').click(function () { $('#b1 , #a1 .e1').fadeToggle(0); });
+        //    $("#b1 , #a1 .e1").mouseleave(function () { $('#b1 , #a1 .e1').fadeToggle(0); });
+        //});
+
+        //$(document).ready(function () {
+        //    $(".tree label").click(function () {
+        //        var isChecked = $(this).next("input[type='checkbox']").is(':checked');
+        //        if (isChecked) {
+        //            $(this).css(
+        //                "background-image", "url(images/icon_plus.png)"
+        //            );
+        //        } else {
+        //            $(this).css(
+        //                "background-image", "url(images/icon_less.png)"
+        //            );
+        //        }
+        //    });
+        //    $(".tree2 label").click(function () {
+        //        var isChecked = $(this).parent().children("input[type='checkbox']").is(':checked');
+        //        if (isChecked) {
+                   
+        //            $(this).css(
+        //                "background-image", "url(images/mybar_btn_down.png)"
+        //            );
+        //        } else {
+        //            $(this).css(
+        //                "background-image", "url(images/mybar_btn_up.png)"
+                        
+        //            );
+        //        }
+        //    });
+        //});
+    </script>
+</head>
+<body oncontextmenu="return false" style="background: url(&quot;images/bg_main.png&quot;) center center;">
+
+    <div class="header">
+        <div class="header_inner">
+
+            <div class="header_login">
+                <a href="index" class="logo_b">
+                    <img src="Images/logo_b.png">
+                </a>
+            </div>
+
+            <div class="member_login">
+                <a href="faq.html" class="faq">
+                    <img style="display: block; width: 100%; height: auto;" src="/Images/faq.png">
+                </a>
+                <a href="member">
+                    <img src="https://hippoeschooladmin.hess.com.tw/photos/be6800b7-597e-4505-b783-f44948b1ee1d.jpeg">
+                    <span id="span_username">吳昕澄</span>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+
+    <form method="post" action="./index" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTEyMDIzMDcyMzgPZBYCZg8PFgQeD19fQW50aVhzcmZUb2tlbgUgYjVlZTU4M2Q3NjhiNGIwYzkyYmJjODliYTI4ZWVmMjAeEl9fQW50aVhzcmZVc2VyTmFtZWVkZGRXbFkA/stZCeCAl16AOgor52VVRzPCtPD7CYdMUiEA7A==" style="">
+</div>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="90059987" style="">
+</div>
+        <div class="main">
+            
+            <section class="content-wrapper main-content clear-fix">
+                
+    <!-- RWD css -->
+    <link href="css/RWD/index.css" rel="stylesheet">
+    <!-- swiper css -->
+    <link href="Assets/swiper/css/swiper-bundle.css" rel="stylesheet">
+    <link rel="stylesheet" href="js/web/viewer.css">
+    <script src="js/build/pdf.js"></script>
+    <script src="js/web/viewer.js"></script>
+
+    <div class="index_wrapper">
+        <!-- menu -->
+        <div class="menu-wrapper">
+            <img class="mobile-menu-icon" src="Images/menu00.png">
+
+            <ul class="accordion-menu">
+                
+                <li class="open">
+                    <div class="dropdownlink">
+                        課程導覽  Programs
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=91&amp;lesson=100" class="active">
+                                學習資源 Learning Resource
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        概念一 Theme 1
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=92&amp;lesson=101">
+                                課程大綱 Course Outline
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=92&amp;lesson=102">
+                                彩虹童年
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=92&amp;lesson=103">
+                                Rainbow Explorers
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=92&amp;lesson=178">
+                                Stargazers
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        概念二 Theme 2
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=93&amp;lesson=101">
+                                課程大綱 Course Outline
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=93&amp;lesson=102">
+                                彩虹童年
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=93&amp;lesson=103">
+                                Rainbow Explorers
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=93&amp;lesson=178">
+                                Stargazers
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        概念三 Theme 3
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=94&amp;lesson=101">
+                                課程大綱 Course Outline
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=94&amp;lesson=102">
+                                彩虹童年
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=94&amp;lesson=103">
+                                Rainbow Explorers
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=94&amp;lesson=178">
+                                Stargazers
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        概念四 Theme 4
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=95&amp;lesson=101">
+                                課程大綱 Course Outline
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=95&amp;lesson=102">
+                                彩虹童年
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=95&amp;lesson=103">
+                                Rainbow Explorers
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=95&amp;lesson=178">
+                                Stargazers
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        其他課程 Others
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=96&amp;lesson=105">
+                                期初活動 Prep. Week
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=96&amp;lesson=106">
+                                節慶活動 Holidays
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=96&amp;lesson=107">
+                                數學課程 Hippo Math
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=96&amp;lesson=108">
+                                日語課程 Mini Blue
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <a href="?unit=96&amp;lesson=169">
+                                法語課程 Toutou 5
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+                <li>
+                    <div class="dropdownlink">
+                        兒歌庫 Songs
+                        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                    </div>
+                    
+                    <ul class="submenuItems">
+                        
+                        <li>
+                            <a href="?unit=97&amp;lesson=109">
+                                兒歌總覽 Songs
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
+                
+            </ul>
+        </div>
+
+        <!-- schedule -->
+        <div class="schedule_wrapper">
+
+            <div class="swiper-container swiper-initialized swiper-horizontal swiper-pointer-events swiper-backface-hidden">
+                
+                <ul class="nav nav-tabs swiper-wrapper" id="lesson-tab" role="tablist" aria-live="polite">
+                    
+                    <li class="nav-item swiper-slide swiper-slide-active" role="group" aria-label="1 / 4" style="width: 376px;">
+                        <a class="nav-link active" data-toggle="tab" onclick="tabClickEvent(this)" data-id="all" role="tab" title="全部">全部 All</a>
+                    </li>
+                    
+                    <li class="nav-item swiper-slide swiper-slide-next" role="group" aria-label="2 / 4" style="width: 376px;">
+                        <a class="nav-link" data-toggle="tab" onclick="tabClickEvent(this)" data-id="4" role="tab" title="課程大綱 Course Outline">課程大綱 Course Outline</a>
+                    </li>
+                    
+                    <li class="nav-item swiper-slide" role="group" aria-label="3 / 4" style="width: 376px;">
+                        <a class="nav-link" data-toggle="tab" onclick="tabClickEvent(this)" data-id="28" role="tab" title="中文教材資源連結 Link to Chinese Materials">中文教材資源連結 Link to Chinese Materials</a>
+                    </li>
+                    
+                    <li class="nav-item swiper-slide" role="group" aria-label="4 / 4" style="width: 376px;">
+                        <a class="nav-link" data-toggle="tab" onclick="tabClickEvent(this)" data-id="29" role="tab" title="英文教材資源連結 Link to English Materials">英文教材資源連結 Link to English Materials</a>
+                    </li>
+                    
+                </ul>
+                
+            <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+
+            
+            <div id="tab-content">
+                
+                <div class="tab-pane fade show active" id="all">
+                    
+                    <div class="schedule_item">
+                        <span></span>
+                        <div class="schedule_title">
+                            課程大綱 Course Outline
+                        </div>
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    全美課程學習資源導覽_大班(上)_中文
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="learn_1?unit=91&amp;lesson=100&amp;id=3314&amp;group=課程內容 Curriculum&amp;type=課程大綱 Course Outline" class="btn_mp4">
+                                        <img src="images/icon_video.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    全美課程學習資源導覽_大班(上)_English
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="learn_1?unit=91&amp;lesson=100&amp;id=3315&amp;group=課程內容 Curriculum&amp;type=課程大綱 Course Outline" class="btn_mp4">
+                                        <img src="images/icon_video.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="schedule_item">
+                        <span></span>
+                        <div class="schedule_title">
+                            中文教材資源連結 Link to Chinese Materials
+                        </div>
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    故事書 Storybook
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/7c3aa14ac4624084ab6472da53ae0c74.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    兒歌 Songs
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/f399a15b159e41b79aa9dd0f96bc4e1e.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="schedule_item">
+                        <span></span>
+                        <div class="schedule_title">
+                            英文教材資源連結 Link to English Materials
+                        </div>
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—故事書 Storybook
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/b0213fd2289e4aeb84dbfb394739a5f7.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—課本 Student Book
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/eab2f8f80ccb4c3c861876b74c58a990.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—字卡遊戲 Flashcards &amp; Games
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/2475fa2d515f4c719130020ac9d16552.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Stargazers 5_對話及角色扮演課本 Showcase!
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/9b18202e2d83467fa439b2db6bd102db.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+
+
+                
+
+                <div class="tab-pane fade show" id="4">
+                    <div class="schedule_item no_title">
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    全美課程學習資源導覽_大班(上)_中文
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="learn_1?unit=91&amp;lesson=100&amp;id=3314&amp;group=課程內容 Curriculum&amp;type=課程大綱 Course Outline" class="btn_mp4">
+                                        <img src="images/icon_video.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    全美課程學習資源導覽_大班(上)_English
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="learn_1?unit=91&amp;lesson=100&amp;id=3315&amp;group=課程內容 Curriculum&amp;type=課程大綱 Course Outline" class="btn_mp4">
+                                        <img src="images/icon_video.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+
+                
+
+                <div class="tab-pane fade show" id="28">
+                    <div class="schedule_item no_title">
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    故事書 Storybook
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/7c3aa14ac4624084ab6472da53ae0c74.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    兒歌 Songs
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/f399a15b159e41b79aa9dd0f96bc4e1e.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+
+                
+
+                <div class="tab-pane fade show" id="29">
+                    <div class="schedule_item no_title">
+
+                        
+                        <div class="schedule_content_wrapper">
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—故事書 Storybook
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/b0213fd2289e4aeb84dbfb394739a5f7.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—課本 Student Book
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/eab2f8f80ccb4c3c861876b74c58a990.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Rainbow Explorers 5—字卡遊戲 Flashcards &amp; Games
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/2475fa2d515f4c719130020ac9d16552.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+
+
+                            <div class="schedule_content" onclick="openLink(this)">
+
+                                <div class="content_text">
+                                    Stargazers 5_對話及角色扮演課本 Showcase!
+                                </div>
+
+                                
+                                <div class="content_link">
+                                    
+                                    <a href="js/web/viewer.html?file=https://hippoeschooladmin.hess.com.tw/mp4/Schedule/9b18202e2d83467fa439b2db6bd102db.pdf" target="_blank" class="btn_pdf">
+                                        <img src="/images/icon_pdf.png">
+                                        
+                                    </a>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- swiper js -->
+    <script src="Assets/swiper/js/swiper-bundle.js"></script>
+    <script>
+        //swiper套件
+        var swiper = new Swiper('.swiper-container', {
+            slidesPerView: 2.5,
+            allowTouchMove: true,
+        });
+
+        $(document).ready(function () {
+            var allDropDownLink = document.querySelectorAll('.dropdownlink');
+
+            for (let i = 0; i < allDropDownLink.length; i++) {
+                allDropDownLink[i].addEventListener('click', function (event) {
+                    //點擊物件
+                    let element = event.target;
+                    //點擊物件上一層的li
+                    let li = element.closest('li');
+
+                    if (li.classList.contains('open')) {
+                        //刪除class
+                        li.classList.remove("open");
+                        li.querySelector('ul').style.display = "none";
+                    } else {
+                        //新增class
+                        li.classList.add("open");
+                        li.querySelector('ul').style.display = "block";
+                    }
+                });
+            }
+
+            document.querySelector('.mobile-menu-icon').addEventListener('click', function () {
+                document.querySelector('.accordion-menu').classList.toggle('active');
+            });
+
+            //螢幕寬度小於等於901停用swiper套件
+            if (window.innerWidth <= 901)
+                swiper.enabled = false;
+            else
+                swiper.enabled = true;
+     
+            $('#lesson-tab .nav-item').on('show.bs.tab', function (e) {
+                if ($(window).outerWidth() >= 902) {
+                    let thisID = $(this).index();
+                    let lastID = $(this).parents('.nav-tabs').find('.nav-link.active').parent('li').index();
+
+                    if (lastID == 0) {
+                        swiper.slideTo(thisID, 400, true);
+                    } else if (thisID > lastID) {
+                        if ($(window).outerWidth() <= 991) {
+                            swiper.slideTo(thisID, 400, true);
+                        } else {
+                            // swiper.slideTo(_thisID + 1, 400, true);
+                            swiper.slideTo(thisID, 400, true); // 20191014 Modified by Cecil: 修正tab滑動出顯示範圍問題
+                        }
+                    } else if (thisID < lastID) {
+                        swiper.slideTo(thisID - 1, 400, true);
+                    }
+                }
+            });
+
+        });
+
+        //小於等於901停用swiper套件
+        window.addEventListener('resize', function () {
+            if (window.innerWidth <= 901) {
+                swiper.slideTo(0);
+                swiper.enabled = false;
+            }
+            else
+                swiper.enabled = true;
+        });
+
+        //tab點擊事件
+        function tabClickEvent(e) {
+            let id = $(e).attr("data-id");
+            $('.tab-pane.active').removeClass('active');
+            $('#' + id).addClass('active');
+        }
+
+        //開啟素材連結
+        function openSource(e) {
+            $(e).find('.content_link a').click();
+        }
+
+        //內容點擊事件
+        function openLink(e) {
+            let url = $(e).find('.content_link a').attr('href');
+            window.location.href = url;
+        }
+
+        //function showhide_tree() {
+        //    if (screen.width <= 768) {
+        //        var div = document.getElementById("tree_all");
+        //        var div1 = document.getElementById("schedule_all");
+        //        var div2 = document.getElementById("button_tree");
+        //        if (div.style.display !== "none") {
+        //            div.style.display = "none";
+        //            div1.style.display = "inline-block";
+        //            div2.style.background = "url(images/menu00.png";
+        //            //div1.style.width = "90%";
+        //        }
+        //        else {
+        //            div.style.display = "block";
+        //            div1.style.display = "none";
+        //            div2.style.background = "url(images/menu01.png";
+        //            //div1.style.width = "60%";
+        //        }
+        //    }
+        //}
+    </script>
+
+            </section>
+        </div>
+    </form>
+
+    <footer id="footer">
+        <span id="span_footer">何嘉仁國際文教團隊 © 2026</span>
+    </footer>
+
+    <div class="page_top"></div>
+
+
+
+<script>
+    document.getElementById("span_username").innerHTML = "吳昕澄";    
+    document.body.style.background = 'url(images/bg_main.png) center';
+      
+
+    function ConfirmOnLogout() {
+        if (confirm("你確定要登出嗎?") == true)
+            return true;
+        else
+            return false;
+    }
+    
+    function lang_board() {
+        var lb = document.getElementsByClassName("title");   
+        if (lb[0].style.display == "none" || lb[0].style.display == "") {
+            lb[0].style.display = "block";
+            lb[1].style.display = "block";
+            lb[2].style.display = "block";
+        }
+        else {
+            lb[0].style.display = "none";
+            lb[1].style.display = "none";
+            lb[2].style.display = "none";
+        }
+    }
+</script></body></html>

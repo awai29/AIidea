@@ -4,9 +4,12 @@ Hess Hippo eSchool - FastAPI 後端
 
 import re
 import json
+import threading
+from concurrent.futures import ThreadPoolExecutor, wait as fut_wait
 from pathlib import Path
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
+from cryptography.fernet import Fernet, InvalidToken
 
 # 關閉自動產生的 API 文件頁面（/docs 和 /redoc），避免暴露端點資訊
 app = FastAPI(docs_url=None, redoc_url=None)
@@ -50,6 +53,35 @@ def _load_state(username: str, kind: str) -> dict | None:
         return None
 
 MEDIA_TYPES = {"mp3", "mp4"}          # 支援的媒體類型
+KEY_FILE    = DATA_DIR / ".secret_key"  # 加密金鑰（本機保存，請勿外傳）
+
+
+# ── 密碼加密工具 ──
+
+def _get_fernet() -> Fernet:
+    """
+    取得（或自動建立）加密金鑰。
+    金鑰存在 data/.secret_key，遺失後舊密碼無法解密，需重新新增帳號。
+    """
+    DATA_DIR.mkdir(exist_ok=True)
+    if KEY_FILE.exists():
+        key = KEY_FILE.read_bytes()
+    else:
+        key = Fernet.generate_key()
+        KEY_FILE.write_bytes(key)
+    return Fernet(key)
+
+
+def _encrypt(text: str) -> str:
+    return _get_fernet().encrypt(text.encode()).decode()
+
+
+def _decrypt(text: str) -> str:
+    """解密失敗時回傳原文（相容尚未加密的舊帳號）"""
+    try:
+        return _get_fernet().decrypt(text.encode()).decode()
+    except (InvalidToken, Exception):
+        return text   # 舊版明文，直接回傳
 
 
 # ── 安全工具 ──
@@ -74,12 +106,21 @@ def safe_username(username: str):
 def load_accounts() -> list:
     if not ACCOUNTS_FILE.exists():
         return []
-    return json.loads(ACCOUNTS_FILE.read_text(encoding="utf-8"))
+    accounts = json.loads(ACCOUNTS_FILE.read_text(encoding="utf-8"))
+    # 解密密碼（若是舊版明文，_decrypt 會原文回傳）
+    for acc in accounts:
+        if "password" in acc:
+            acc["password"] = _decrypt(acc["password"])
+    return accounts
 
 
 def save_accounts(accounts: list):
     DATA_DIR.mkdir(exist_ok=True)
-    ACCOUNTS_FILE.write_text(json.dumps(accounts, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 儲存前加密密碼，明文不落地
+    encrypted = [
+        {**acc, "password": _encrypt(acc["password"])} for acc in accounts
+    ]
+    ACCOUNTS_FILE.write_text(json.dumps(encrypted, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def get_state(username: str) -> dict:
@@ -299,6 +340,9 @@ async def backup_list(username: str):
     return JSONResponse(result)
 
 
+_index_lock = threading.Lock()   # 保護索引檔案的讀寫，避免並發時互相覆蓋
+
+
 def _append_to_index(username: str, entry: dict):
     """
     將已備份記錄寫入（或更新）dropbox_index_{username}.json。
@@ -320,18 +364,133 @@ def _append_to_index(username: str, entry: dict):
     else:
         index["items"].append(entry)
 
-    index_file.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+    with _index_lock:
+        index_file.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _process_task(task: dict, idx: int, cfg: dict, username: str, student: str,
+                  state: dict, lock: threading.Lock) -> str:
+    """
+    單一備份任務（在工作執行緒中執行）：
+    下載 → 上傳 Dropbox → 刪暫存 → 記索引
+    回傳：'uploaded' / 'skipped' / 'hess_error' / 'error'
+    """
+    import re as _re, requests, dropbox as dbx_mod
+
+    # 每個執行緒自己建立 Dropbox 連線（執行緒安全）
+    dbx = dbx_mod.Dropbox(
+        oauth2_refresh_token=cfg["refresh_token"],
+        app_key=cfg["app_key"],
+        app_secret=cfg["app_secret"],
+    )
+
+    def safe(s):
+        s = _re.sub(r'[\\/:*?"<>|]', '_', s.strip())
+        return _re.sub(r'\s+', ' ', s)[:80]
+
+    ext      = task["type"]
+    tmp_path = TMP_DIR / f"{username}_{idx}.{ext}"
+    dbx_path = f"/{student}/{task['course']}/{task['lesson']}/{task['name']}.{ext}"
+    item_key = f"{task['course_id']}:{task['lesson_id']}:{task['item_name']}:{ext}"
+
+    with lock:
+        state["current"] = task["name"]
+
+    # ── 步驟 1：下載到暫存 ──
+    try:
+        r = requests.get(task["url"], timeout=30, stream=True)
+        if r.status_code in (403, 404):
+            with lock:
+                state["errors"].append(
+                    f"{task['name']}：Hess 連結失效（HTTP {r.status_code}），建議重新抓取"
+                )
+            return "hess_error"
+        r.raise_for_status()
+        with open(tmp_path, "wb") as f:
+            for chunk in r.iter_content(65536):
+                f.write(chunk)
+    except Exception as e:
+        with lock:
+            state["errors"].append(f"{task['name']}：下載失敗：{e}")
+        tmp_path.unlink(missing_ok=True)
+        return "error"
+
+    # ── 步驟 2：上傳到 Dropbox ──
+    try:
+        try:
+            meta = dbx.files_get_metadata(dbx_path)
+            if meta.size == tmp_path.stat().st_size:
+                with lock:
+                    state["skipped"] += 1
+                    _append_to_index(username, {
+                        "key": item_key, "course": task["course_name"],
+                        "lesson": task["lesson_name"], "name": task["item_name"],
+                        "type": ext, "dropbox_path": dbx_path, "size": meta.size,
+                    })
+                tmp_path.unlink(missing_ok=True)
+                return "skipped"
+        except Exception:
+            pass
+
+        CHUNK = 128 * 1024 * 1024
+        file_size = tmp_path.stat().st_size
+        if file_size <= CHUNK:
+            with open(tmp_path, "rb") as f:
+                upload_meta = dbx.files_upload(
+                    f.read(), dbx_path,
+                    mode=dbx_mod.files.WriteMode.overwrite, mute=True
+                )
+        else:
+            with open(tmp_path, "rb") as f:
+                chunk = f.read(CHUNK)
+                session = dbx.files_upload_session_start(chunk)
+                cursor = dbx_mod.files.UploadSessionCursor(
+                    session_id=session.session_id, offset=len(chunk)
+                )
+                while True:
+                    chunk = f.read(CHUNK)
+                    if not chunk:
+                        break
+                    if file_size - cursor.offset <= len(chunk):
+                        commit = dbx_mod.files.CommitInfo(
+                            path=dbx_path,
+                            mode=dbx_mod.files.WriteMode.overwrite,
+                            mute=True
+                        )
+                        upload_meta = dbx.files_upload_session_finish(chunk, cursor, commit)
+                        break
+                    else:
+                        dbx.files_upload_session_append_v2(chunk, cursor)
+                        cursor.offset += len(chunk)
+
+        with lock:
+            state["uploaded"] += 1
+            _append_to_index(username, {
+                "key": item_key, "course": task["course_name"],
+                "lesson": task["lesson_name"], "name": task["item_name"],
+                "type": ext, "dropbox_path": dbx_path, "size": upload_meta.size,
+            })
+
+    except Exception as e:
+        with lock:
+            state["errors"].append(f"{task['name']} 上傳失敗：{e}")
+        tmp_path.unlink(missing_ok=True)
+        return "error"
+
+    # ── 步驟 3：刪除暫存檔 ──
+    tmp_path.unlink(missing_ok=True)
+    return "uploaded"
 
 
 def run_backup(username: str, selected_keys: list):
     """
-    背景執行：
+    背景執行（並發 3 個執行緒同時下載+上傳）：
     1. 下載媒體到 data/tmp/（暫存）
     2. 上傳到 Dropbox App Folder（路徑：/{student}/{course}/{lesson}/{name}.{ext}）
     3. 上傳成功後立即刪除暫存檔
     4. 記錄到 dropbox_index_{username}.json
     """
-    import re as _re, time, requests, dropbox as dbx_mod
+    import re as _re
 
     state = backup_states[username]
     config_file = BASE_DIR / "dropbox_config.json"
@@ -340,11 +499,6 @@ def run_backup(username: str, selected_keys: list):
         return
 
     cfg = json.loads(config_file.read_text())
-    dbx = dbx_mod.Dropbox(
-        oauth2_refresh_token=cfg["refresh_token"],
-        app_key=cfg["app_key"],
-        app_secret=cfg["app_secret"],
-    )
 
     def safe(s):
         """移除不合法的檔名字元"""
@@ -376,7 +530,7 @@ def run_backup(username: str, selected_keys: list):
                             "course":      safe(course["name"]),
                             "lesson":      safe(lesson["name"]),
                             "name":        safe(item["name"]),
-                            "course_name": course["name"],   # 原始名稱（記入索引）
+                            "course_name": course["name"],
                             "lesson_name": lesson["name"],
                             "item_name":   item["name"],
                             "course_id":   course["id"],
@@ -387,138 +541,29 @@ def run_backup(username: str, selected_keys: list):
     state["total"] = total
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
-    hess_errors = 0      # Hess URL 失效計數
-    _prev_lesson_key = None  # 用於偵測課次切換
+    lock = threading.Lock()
+    hess_errors = [0]   # 用 list 當可變計數器（跨執行緒）
 
-    for idx, task in enumerate(tasks):
-        lesson_key = f"{task['course_id']}:{task['lesson_id']}"
+    def wrapped(idx: int, task: dict) -> str:
+        result = _process_task(task, idx, cfg, username, student, state, lock)
+        with lock:
+            state["done_count"] += 1
+            if result == "hess_error":
+                hess_errors[0] += 1
+        return result
 
-        # 當課次切換時，把上一個課次標為已完成
-        if _prev_lesson_key and _prev_lesson_key != lesson_key:
-            if _prev_lesson_key not in state["completed_lessons"]:
-                state["completed_lessons"].append(_prev_lesson_key)
-        _prev_lesson_key = lesson_key
-        state["current_lesson_key"] = lesson_key
+    # 同時最多 3 個執行緒並發下載+上傳，速度約提升 2-3 倍
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {executor.submit(wrapped, idx, task): task
+                   for idx, task in enumerate(tasks)}
+        fut_wait(futures)
 
-        state["current"]    = task["name"]
-        state["done_count"] = idx
+    # 全部完成後，把所有選取的課次標為已完成
+    state["completed_lessons"] = list(set(selected_keys))
 
-        ext      = task["type"]   # mp3 or mp4
-        tmp_path = TMP_DIR / f"{username}_{idx}.{ext}"
-        # App Folder 路徑：不需要寫 /Apps/{AppName}，SDK 自動處理
-        dbx_path = f"/{student}/{task['course']}/{task['lesson']}/{task['name']}.{ext}"
-        item_key = f"{task['course_id']}:{task['lesson_id']}:{task['item_name']}:{ext}"
-
-        # ── 步驟 1：下載到暫存 ──
-        try:
-            r = requests.get(task["url"], timeout=30, stream=True)
-            if r.status_code in (403, 404):
-                hess_errors += 1
-                state["errors"].append(
-                    f"{task['name']}：Hess 連結失效（HTTP {r.status_code}），建議重新抓取"
-                )
-                continue
-            r.raise_for_status()
-            with open(tmp_path, "wb") as f:
-                for chunk in r.iter_content(65536):
-                    f.write(chunk)
-        except Exception as e:
-            state["errors"].append(f"{task['name']}：下載失敗：{e}")
-            tmp_path.unlink(missing_ok=True)
-            continue
-
-        # ── 步驟 2：上傳到 Dropbox ──
-        try:
-            # 檢查 Dropbox 是否已有相同大小的檔案（跳過重複）
-            try:
-                meta = dbx.files_get_metadata(dbx_path)
-                if meta.size == tmp_path.stat().st_size:
-                    state["skipped"] += 1
-                    tmp_path.unlink(missing_ok=True)
-                    # 已存在也要確保索引有記錄
-                    _append_to_index(username, {
-                        "key":          item_key,
-                        "course":       task["course_name"],
-                        "lesson":       task["lesson_name"],
-                        "name":         task["item_name"],
-                        "type":         ext,
-                        "dropbox_path": dbx_path,
-                        "size":         meta.size,
-                    })
-                    continue
-            except Exception:
-                pass   # 檔案不存在是正常情況，繼續上傳
-
-            # Dropbox 規定：超過 150MB 必須用分塊上傳，否則會失敗
-            CHUNK = 128 * 1024 * 1024   # 每塊 128MB
-            file_size = tmp_path.stat().st_size
-            if file_size <= CHUNK:
-                # 小檔案：一次讀完直接上傳
-                with open(tmp_path, "rb") as f:
-                    upload_meta = dbx.files_upload(
-                        f.read(), dbx_path,
-                        mode=dbx_mod.files.WriteMode.overwrite, mute=True
-                    )
-            else:
-                # 大檔案（>128MB）：分塊上傳，避免撐爆記憶體
-                with open(tmp_path, "rb") as f:
-                    # 第一塊：開啟上傳 session
-                    chunk = f.read(CHUNK)
-                    session = dbx.files_upload_session_start(chunk)
-                    cursor = dbx_mod.files.UploadSessionCursor(
-                        session_id=session.session_id,
-                        offset=len(chunk)
-                    )
-                    # 中間塊
-                    while True:
-                        chunk = f.read(CHUNK)
-                        if not chunk:
-                            break
-                        remaining = file_size - cursor.offset
-                        if remaining <= len(chunk):
-                            # 最後一塊：用 finish 結束
-                            commit = dbx_mod.files.CommitInfo(
-                                path=dbx_path,
-                                mode=dbx_mod.files.WriteMode.overwrite,
-                                mute=True
-                            )
-                            upload_meta = dbx.files_upload_session_finish(chunk, cursor, commit)
-                            break
-                        else:
-                            dbx.files_upload_session_append_v2(chunk, cursor)
-                            cursor.offset += len(chunk)
-            state["uploaded"] += 1
-            file_size = upload_meta.size
-
-        except Exception as e:
-            state["errors"].append(f"{task['name']} 上傳失敗：{e}")
-            tmp_path.unlink(missing_ok=True)
-            continue
-
-        # ── 步驟 3：刪除暫存檔 ──
-        tmp_path.unlink(missing_ok=True)
-
-        # ── 步驟 4：記錄到索引 ──
-        _append_to_index(username, {
-            "key":          item_key,
-            "course":       task["course_name"],
-            "lesson":       task["lesson_name"],
-            "name":         task["item_name"],
-            "type":         ext,
-            "dropbox_path": dbx_path,
-            "size":         file_size,
-        })
-
-        time.sleep(0.05)
-
-    # 迴圈結束後，把最後一個課次也標為已完成
-    if _prev_lesson_key and _prev_lesson_key not in state["completed_lessons"]:
-        state["completed_lessons"].append(_prev_lesson_key)
-
-    # 統一回報 Hess 連結失效數量
-    if hess_errors:
+    if hess_errors[0]:
         state["errors"].insert(
-            0, f"共 {hess_errors} 個 Hess 連結已失效（建議重新抓取後再備份）"
+            0, f"共 {hess_errors[0]} 個 Hess 連結已失效（建議重新抓取後再備份）"
         )
 
     state.update({"running": False, "done": True, "done_count": total,

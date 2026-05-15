@@ -1,0 +1,22 @@
+{
+  "status": "completed",
+  "pages": [
+    {
+      "title": "首頁",
+      "headings": [],
+      "paragraphs": [],
+      "links": [],
+      "images": [
+        {
+          "src": "https://hippoeschool.hess.com.tw/images/logo_w.png",
+          "alt": ""
+        }
+      ],
+      "audio": [],
+      "video": [],
+      "tables": [],
+      "url": "https://hippoeschool.hess.com.tw/Login2?UserID=111110436&UserMode=S"
+    }
+  ],
+  "error": null
+}
