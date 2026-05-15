@@ -333,29 +333,23 @@ def run_backup(username: str, selected_keys: list):
                 if lesson_key not in key_set:
                     continue
                 for item in lesson.get("items", []):
-                    # 優先 mp3，其次 mp4
-                    media_url = None
-                    media_type = None
+                    # MP3 和 MP4 都備份（各自是獨立任務）
                     for m_type in ("mp3", "mp4"):
                         url = next((m["url"] for m in item.get("media", []) if m["type"] == m_type), None)
-                        if url:
-                            media_url = url
-                            media_type = m_type
-                            break
-                    if not media_url:
-                        continue
-                    tasks.append({
-                        "url":         media_url,
-                        "type":        media_type,
-                        "course":      safe(course["name"]),
-                        "lesson":      safe(lesson["name"]),
-                        "name":        safe(item["name"]),
-                        "course_name": course["name"],   # 原始名稱（記入索引）
-                        "lesson_name": lesson["name"],
-                        "item_name":   item["name"],
-                        "course_id":   course["id"],
-                        "lesson_id":   lesson["id"],
-                    })
+                        if not url:
+                            continue
+                        tasks.append({
+                            "url":         url,
+                            "type":        m_type,
+                            "course":      safe(course["name"]),
+                            "lesson":      safe(lesson["name"]),
+                            "name":        safe(item["name"]),
+                            "course_name": course["name"],   # 原始名稱（記入索引）
+                            "lesson_name": lesson["name"],
+                            "item_name":   item["name"],
+                            "course_id":   course["id"],
+                            "lesson_id":   lesson["id"],
+                        })
 
     total = len(tasks)
     state["total"] = total
@@ -381,7 +375,7 @@ def run_backup(username: str, selected_keys: list):
         tmp_path = TMP_DIR / f"{username}_{idx}.{ext}"
         # App Folder 路徑：不需要寫 /Apps/{AppName}，SDK 自動處理
         dbx_path = f"/{student}/{task['course']}/{task['lesson']}/{task['name']}.{ext}"
-        item_key = f"{task['course_id']}:{task['lesson_id']}:{task['item_name']}"
+        item_key = f"{task['course_id']}:{task['lesson_id']}:{task['item_name']}:{ext}"
 
         # ── 步驟 1：下載到暫存 ──
         try:
