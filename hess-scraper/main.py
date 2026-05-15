@@ -20,6 +20,35 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 scrape_states:  dict[str, dict] = {}
 backup_states:  dict[str, dict] = {}
 
+
+# ── 狀態持久化工具 ──
+
+def _state_file(username: str, kind: str) -> Path:
+    """kind: 'scrape' 或 'backup'"""
+    return DATA_DIR / f"{kind}_state_{username}.json"
+
+
+def _save_state(username: str, kind: str, state: dict):
+    """把狀態寫入 JSON 檔（只儲存結果，不儲存 running=True）"""
+    DATA_DIR.mkdir(exist_ok=True)
+    _state_file(username, kind).write_text(
+        json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+def _load_state(username: str, kind: str) -> dict | None:
+    """從 JSON 檔讀取上次的狀態；若檔案不存在則回傳 None"""
+    f = _state_file(username, kind)
+    if not f.exists():
+        return None
+    try:
+        state = json.loads(f.read_text(encoding="utf-8"))
+        # 重啟後不可能還在跑，強制重設
+        state["running"] = False
+        return state
+    except Exception:
+        return None
+
 MEDIA_TYPES = {"mp3", "mp4"}          # 支援的媒體類型
 
 
@@ -55,7 +84,9 @@ def save_accounts(accounts: list):
 
 def get_state(username: str) -> dict:
     if username not in scrape_states:
-        scrape_states[username] = {
+        # 先嘗試從上次儲存的檔案還原，還原後 running 會被強制設為 False
+        saved = _load_state(username, "scrape")
+        scrape_states[username] = saved if saved is not None else {
             "running": False, "logs": [], "done": False,
             "error": None, "progress": {}
         }
@@ -75,6 +106,7 @@ async def run_scraper(username: str, password: str):
     finally:
         state["running"] = False
         state["done"] = True
+        _save_state(username, "scrape", state)   # 儲存結果，重啟後可還原
 
 
 # ── 頁面 ──
@@ -491,6 +523,7 @@ def run_backup(username: str, selected_keys: list):
 
     state.update({"running": False, "done": True, "done_count": total,
                   "current": "", "current_lesson_key": ""})
+    _save_state(username, "backup", state)   # 儲存結果，重啟後可還原
 
 
 @app.post("/backup/start")
@@ -516,6 +549,11 @@ async def start_backup(body: dict, background_tasks: BackgroundTasks):
 @app.get("/backup/{username}/status")
 async def backup_status(username: str):
     safe_username(username)   # 驗證格式
+    if username not in backup_states:
+        # 嘗試從檔案還原上次備份結果
+        saved = _load_state(username, "backup")
+        if saved:
+            backup_states[username] = saved
     state = backup_states.get(username, {"running": False, "done": False, "total": 0, "done_count": 0})
     return JSONResponse(state)
 
