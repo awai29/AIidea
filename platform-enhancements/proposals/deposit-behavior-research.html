@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款行為研究 · 主動 vs 被動存款情境</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #efefef;
+    --fg: #09090b;
+    --card: #ffffff;
+    --border: #e4e4e7;
+    --muted: #71717a;
+    --radius: 8px;
+    --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fecaca;
+    --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+    --blue: #2563eb;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --purple: #7c3aed;--purple-bg: #f5f3ff;--purple-border:#ddd6fe;
+    --font: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  .page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 2.5rem; }
+  .header-inner { max-width: 960px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-size: clamp(20px, 3vw, 30px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.15; margin-bottom: 10px; }
+  .header-desc { font-size: 14px; color: var(--muted); max-width: 600px; line-height: 1.6; }
+  .header-meta { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+  .badge-green  { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+  .badge-amber  { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+  .badge-blue   { background: var(--blue-bg);   border-color: var(--blue-border);   color: var(--blue); }
+  .badge-red    { background: var(--red-bg);    border-color: var(--red-border);    color: var(--red); }
+  .badge-purple { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple); }
+  .badge-gray   { background: #f4f4f5; border-color: var(--border); color: var(--muted); }
+
+  .toolbar { position: sticky; top: 0; z-index: 100; background: rgba(239,239,239,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2.5rem; }
+  .toolbar-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 8px; height: 48px; overflow-x: auto; }
+  .toolbar-inner::-webkit-scrollbar { display: none; }
+  .fb { flex-shrink: 0; padding: 4px 14px; border-radius: 9999px; border: 1px solid var(--border); background: var(--card); font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; white-space: nowrap; transition: all 0.15s; }
+  .fb:hover { border-color: #a1a1aa; color: var(--fg); }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 2.5rem; }
+
+  .section { margin-bottom: 3rem; opacity: 0; transform: translateY(12px); transition: opacity 0.4s, transform 0.4s; }
+  .section.visible { opacity: 1; transform: none; }
+  .sec-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 12px; transition: box-shadow 0.2s, transform 0.18s; }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-1px); }
+  .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+  .card-header.red-bg   { background: var(--red-bg);   border-color: var(--red-border); }
+  .card-header.green-bg { background: var(--green-bg); border-color: var(--green-border); }
+  .card-header.amber-bg { background: var(--amber-bg); border-color: var(--amber-border); }
+  .card-header.blue-bg  { background: var(--blue-bg);  border-color: var(--blue-border); }
+  .card-header.purple-bg{ background: var(--purple-bg);border-color: var(--purple-border); }
+  .ctop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .cname { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+  .csub  { font-size: 13px; color: var(--muted); line-height: 1.55; }
+  .card-body { padding: 18px 22px; }
+
+  .panel { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .panel:first-child { padding-top: 0; }
+  .panel:last-child { border-bottom: none; padding-bottom: 0; }
+  .panel-title { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; }
+
+  .pl { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .pl li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: #3f3f46; line-height: 1.55; }
+  .pi { flex-shrink: 0; width: 18px; height: 18px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-top: 2px; }
+  .pi-ok   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .pi-warn { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .pi-q    { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+  .pi-tip  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+  .pi-dot  { background: #f4f4f5; color: var(--muted); border: 1px solid var(--border); font-size: 8px; }
+
+  .callout { display: flex; gap: 10px; padding: 13px 15px; border-radius: var(--radius); font-size: 13px; line-height: 1.6; margin-top: 12px; }
+  .callout.amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: #92400e; }
+  .callout.red   { background: var(--red-bg);   border: 1px solid var(--red-border);   color: #991b1b; }
+  .callout.green { background: var(--green-bg); border: 1px solid var(--green-border); color: #14532d; }
+  .callout.blue  { background: var(--blue-bg);  border: 1px solid var(--blue-border);  color: #1e3a8a; }
+  .callout.purple{ background: var(--purple-bg);border: 1px solid var(--purple-border);color: #5b21b6; }
+  .callout-icon  { flex-shrink: 0; margin-top: 1px; }
+
+  /* 情境卡片 grid */
+  .scenario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .scenario-grid { grid-template-columns: 1fr; } }
+
+  .s-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .s-card.active-type { border-left: 3px solid var(--blue); }
+  .s-card.passive-type { border-left: 3px solid var(--purple); }
+  .s-card.warn-type { border-left: 3px solid var(--red); }
+  .s-num { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .s-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .s-desc { font-size: 12.5px; color: #52525b; line-height: 1.6; }
+  .s-data { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .s-data strong { color: var(--fg); }
+  .s-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; margin-bottom: 8px; }
+  .s-tag.active  { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+  .s-tag.passive { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  .s-tag.risk    { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+
+  /* 數據表 */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tbl th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); text-align: left; padding: 0 14px 10px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: #3f3f46; line-height: 1.5; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: var(--bg); }
+  .tbl td:first-child { font-weight: 500; color: var(--fg); }
+  .tbl .num { font-family: var(--mono); font-weight: 700; color: var(--red); font-size: 14px; }
+  .tbl .num.green { color: var(--green); }
+  .tbl .num.amber { color: var(--amber); }
+
+  /* 意義卡片 */
+  .implication { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
+  .impl-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .impl-icon.blue   { background: var(--blue-bg); }
+  .impl-icon.green  { background: var(--green-bg); }
+  .impl-icon.red    { background: var(--red-bg); }
+  .impl-icon.amber  { background: var(--amber-bg); }
+  .impl-icon.purple { background: var(--purple-bg); }
+  .impl-body {}
+  .impl-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .impl-desc { font-size: 12.5px; color: #52525b; line-height: 1.55; }
+  .impl-arrow { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .impls { display: flex; flex-direction: column; gap: 8px; }
+
+  /* 來源 */
+  .sources { margin-top: 12px; }
+  .source-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .source-item:last-child { border-bottom: none; }
+  .source-item a { color: var(--blue); text-decoration: none; }
+  .source-item a:hover { text-decoration: underline; }
+  .source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; margin-top: 5px; }
+
+  .footer { border-top: 1px solid var(--border); padding: 24px 2.5rem; background: var(--card); margin-top: 1rem; }
+  .footer-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  @media (max-width: 640px) { .page-header, .main, .footer { padding: 1.5rem; } .toolbar { padding: 0 1.5rem; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-tag">研究整理 · Deposit Behavior Research</div>
+    <h1>博弈平台存款行為研究<br>主動 vs 被動存款的情境與數據</h1>
+    <p class="header-desc">整理自學術論文與業界研究，說明玩家在什麼情況下會存款、心理驅動是什麼，以及對我們平台設計的影響。</p>
+    <div class="header-meta">
+      <span class="badge badge-blue">主動存款 6 情境</span>
+      <span class="badge badge-purple">被動存款 4 情境</span>
+      <span class="badge badge-red">高風險行為識別</span>
+      <span class="badge badge-gray">資料來源：學術期刊 + iGaming 業界研究</span>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <a href="#definition" class="fb">定義</a>
+    <a href="#active" class="fb">主動存款</a>
+    <a href="#passive" class="fb">被動存款</a>
+    <a href="#data" class="fb">關鍵數據</a>
+    <a href="#implications" class="fb">對我們的意義</a>
+    <a href="#sources" class="fb">資料來源</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 定義 -->
+  <div id="definition" class="section">
+    <div class="sec-label">定義 · 什麼是主動 / 被動存款</div>
+    <div class="card">
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:12px;padding:18px 20px;">
+            <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);margin-bottom:8px;">主動存款 · Active</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:6px;">玩家自己決定要存</div>
+            <div style="font-size:13px;color:#3f3f46;line-height:1.6;">平台沒有發出任何提示，玩家出於自身動機進入存款頁面。<br><br>特徵：有明確目的，情緒驅動（想玩、輸了要追、贏了要加碼）</div>
+          </div>
+          <div style="background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:12px;padding:18px 20px;">
+            <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--purple);margin-bottom:8px;">被動存款 · Passive</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:6px;">平台觸發，玩家被喚醒</div>
+            <div style="font-size:13px;color:#3f3f46;line-height:1.6;">玩家原本沒有存款意圖，因為通知、優惠、提示而被引導去存款。<br><br>特徵：需要誘因才行動，轉換率取決於優惠吸引力與時機精準度</div>
+          </div>
+        </div>
+        <div class="callout blue" style="margin-top:14px;">
+          <span class="callout-icon">→</span>
+          <span>兩種存款的設計邏輯完全不同。<strong>主動存款</strong>要做的是「不要擋路」— 越快越好；<strong>被動存款</strong>要做的是「說服」— 文案、誘因、時機缺一不可。把兩種混在一起設計，兩個都做不好。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主動存款 -->
+  <div id="active" class="section">
+    <div class="sec-label">主動存款 · 6 個情境</div>
+
+    <div class="scenario-grid">
+
+      <div class="s-card active-type">
+        <span class="s-tag active">主動 · 最常見</span>
+        <div class="s-num">情境 01</div>
+        <div class="s-title">開始新局前 — Session Start</div>
+        <div class="s-desc">玩家決定「今天要玩」，進來第一件事就是存款。這是最理性、最健康的存款行為，玩家情緒穩定、有計畫。</div>
+        <div class="s-data">設計重點：<strong>流程越快越好，不需要說服</strong>，玩家已下定決心，不要讓他在存款頁多想。</div>
+      </div>
+
+      <div class="s-card warn-type">
+        <span class="s-tag risk">高風險 · 最需要注意</span>
+        <div class="s-num">情境 02</div>
+        <div class="s-title">輸錢後追損 — Loss Chasing</div>
+        <div class="s-desc">玩家輸了，情緒激動，想「追回來」，立刻存款繼續玩。這是業界研究最多的行為，也是問題賭博的核心特徵。</div>
+        <div class="s-data">研究數據：<strong>33–40%</strong> 的定期賭客承認曾追損。短時間內連續存款頻率是預測高風險玩家的最佳指標之一。損失帶來的痛苦約是等額獲利喜悅的 <strong>2 倍</strong>（損失厭惡效應）。</div>
+      </div>
+
+      <div class="s-card active-type">
+        <span class="s-tag active">主動</span>
+        <div class="s-num">情境 03</div>
+        <div class="s-title">贏錢後想繼續 — Win Streak</div>
+        <div class="s-desc">玩家贏了，信心高漲，存更多錢想趁勢加碼。心態是「我今天手氣好」，與追損相反，但同樣是情緒驅動。</div>
+        <div class="s-data">研究發現：<strong>輸了立刻加大賭注</strong>（追損）；但累積大量損失後反而降低投入。兩種「追」的模式行為邏輯不同。</div>
+      </div>
+
+      <div class="s-card active-type">
+        <span class="s-tag active">主動 · 最急迫</span>
+        <div class="s-num">情境 04</div>
+        <div class="s-title">遊戲中餘額不足 — Low Balance</div>
+        <div class="s-desc">玩家正在玩遊戲，餘額快見底，中途跳出去存款再回來繼續。這是從遊戲頁跳進存款頁最常見的入口，情緒急迫。</div>
+        <div class="s-data">設計重點：玩家被「打斷」遊戲，<strong>存款頁要極簡</strong>，讓他最快速度存完回去玩。這時候放優惠推薦只會讓他更煩。</div>
+      </div>
+
+      <div class="s-card active-type">
+        <span class="s-tag active">主動 · 有計畫</span>
+        <div class="s-num">情境 05</div>
+        <div class="s-title">優惠門檻驅動 — Promotion-Motivated</div>
+        <div class="s-desc">玩家看到優惠（首存 100% 配對、週五 reload bonus），主動存款達到門檻。這類玩家有明確的數字目標。</div>
+        <div class="s-data">研究觀察：玩家存款金額通常<strong>剛好卡在門檻</strong>（行為錨定效應）— 門檻是 ৳500，大多數人存 ৳500，不多也不少。</div>
+      </div>
+
+      <div class="s-card warn-type">
+        <span class="s-tag risk">高風險 · 留存關鍵</span>
+        <div class="s-num">情境 06</div>
+        <div class="s-title">首次存款 — First Time Deposit (FTD)</div>
+        <div class="s-desc">玩家完成註冊後第一次存款。業界研究公認這是整個玩家生命週期最難完成的一步，信任度低、會比較多平台。</div>
+        <div class="s-data"><strong>FTD 後 7 天是留存關鍵期</strong>。這 7 天沒有好體驗，幾乎不會有第二次存款。最影響重複存款的因素不是存款有多方便，而是<strong>提款速度的信任感</strong>。</div>
+      </div>
+
+    </div>
+
+    <div class="callout red" style="margin-top:4px;">
+      <span class="callout-icon">!</span>
+      <span><strong>情境 02（追損）和情境 04（餘額不足）的玩家情緒狀態最激動。</strong>這兩個情境如果存款流程順暢，短期存款量會上升 — 但同時也可能加速問題玩家的燒錢速度，是雙刃劍。設計時需要有冷靜保護機制（見 Round 2 提案）。</span>
+    </div>
+  </div>
+
+  <!-- 被動存款 -->
+  <div id="passive" class="section">
+    <div class="sec-label">被動存款 · 4 個情境</div>
+
+    <div class="scenario-grid">
+
+      <div class="s-card passive-type">
+        <span class="s-tag passive">被動 · 效果最好</span>
+        <div class="s-num">情境 A</div>
+        <div class="s-title">即時推播通知 — Real-time Push</div>
+        <div class="s-desc">玩家註冊後、或一段時間未登入，平台在關鍵時刻推送個人化訊息，引導存款。</div>
+        <div class="s-data">業界研究：<strong>即時觸發推播</strong>的轉換率遠優於批量推播（定時群發）。自動化流程：註冊 → 24 小時未存款 → 推個人化 FTD 優惠 → 仍未存 → 第二波更強力優惠。</div>
+      </div>
+
+      <div class="s-card passive-type">
+        <span class="s-tag passive">被動 · 緊迫感驅動</span>
+        <div class="s-num">情境 B</div>
+        <div class="s-title">優惠即將到期 — Bonus Expiry</div>
+        <div class="s-desc">玩家有未使用的紅利或優惠快過期，平台發出提醒，製造時間壓力觸發存款。</div>
+        <div class="s-data">研究發現：優惠時限讓玩家傾向更<strong>高風險、高金額</strong>的存款策略，因為需要在更少次數內觸發足夠的回報。時間壓力是強力驅動因素。</div>
+      </div>
+
+      <div class="s-card passive-type">
+        <span class="s-tag passive">被動</span>
+        <div class="s-num">情境 C</div>
+        <div class="s-title">VIP / 等級升等提示 — Tier Upgrade</div>
+        <div class="s-desc">平台提示玩家「再存 X 就升等」，以身份地位的誘因觸發存款，適合有 VIP 制度的平台。</div>
+        <div class="s-data">前提：<strong>VIP 計算指標必須清楚</strong>（看存款金額還是投注流水）。指標不透明，玩家不知道自己差多少，提示完全沒用。</div>
+      </div>
+
+      <div class="s-card passive-type">
+        <span class="s-tag passive">被動 · 最容易做錯</span>
+        <div class="s-num">情境 D</div>
+        <div class="s-title">休眠玩家喚醒 — Re-engagement</div>
+        <div class="s-desc">玩家久未登入，平台發送 reload bonus 或 free spins 把他拉回來。</div>
+        <div class="s-data">常見錯誤：<strong>不能對已存款玩家發首存歡迎禮包</strong>，會讓玩家覺得被當成新人，效果適得其反。休眠玩家要用 reload bonus，新玩家才用 FTD 優惠。</div>
+      </div>
+
+    </div>
+
+    <div class="callout purple" style="margin-top:4px;">
+      <span class="callout-icon">→</span>
+      <span>被動存款的核心是<strong>「對的訊息，在對的時間，給對的人」</strong>。批量推播（所有人同時收到同一則通知）效果最差，因為時機不對的通知會被當成垃圾。精準的行為觸發才有效。</span>
+    </div>
+  </div>
+
+  <!-- 關鍵數據 -->
+  <div id="data" class="section">
+    <div class="sec-label">關鍵數據 · 學術與業界研究</div>
+
+    <!-- 玩家行為數據 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <div class="cname">玩家行為數據</div>
+        <div class="csub">追損心理、存款動機、留存關鍵</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">數據</th>
+              <th style="padding-top:18px;">數值</th>
+              <th style="padding-top:18px;">說明</th>
+              <th style="padding-top:18px;">來源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>承認追損的定期賭客比例</td>
+              <td><span class="num">33–40%</span></td>
+              <td>每 3 個定期賭客，就有 1 個會在輸錢後繼續存款想追回來</td>
+              <td style="color:var(--muted);font-size:12px;">Journal of Behavioral Addictions, 2024</td>
+            </tr>
+            <tr>
+              <td>損失 vs 獲利的心理感受比</td>
+              <td><span class="num">×2</span></td>
+              <td>損失帶來的痛苦約是等額獲利喜悅的 2 倍，這是追損行為的心理根源</td>
+              <td style="color:var(--muted);font-size:12px;">行為經濟學 · 損失厭惡理論</td>
+            </tr>
+            <tr>
+              <td>最影響重複存款的因素</td>
+              <td><span class="num amber">提款速度</span></td>
+              <td>不是存款有多方便，而是玩家第一次提款有多快，決定他會不會再存</td>
+              <td style="color:var(--muted);font-size:12px;">z2adigital iGaming 研究</td>
+            </tr>
+            <tr>
+              <td>FTD 後最關鍵留存窗口</td>
+              <td><span class="num amber">7 天</span></td>
+              <td>首次存款後的前 7 天，是玩家決定留下來還是離開的關鍵期</td>
+              <td style="color:var(--muted);font-size:12px;">xtremepush iGaming 研究</td>
+            </tr>
+            <tr>
+              <td>最大流失發生點</td>
+              <td><span class="num">FTD → 第 2 次存款</span></td>
+              <td>大多數玩家流失不是在首存之前，而是在首存之後、第二次存款之前這個空窗</td>
+              <td style="color:var(--muted);font-size:12px;">iGaming CRM 研究</td>
+            </tr>
+            <tr>
+              <td>活躍玩家中新玩家佔比</td>
+              <td><span class="num">6.19%</span></td>
+              <td>2024 Q4 活躍玩家中只有 6.19% 是新人，平台收入幾乎來自留住的舊玩家</td>
+              <td style="color:var(--muted);font-size:12px;">smartico.ai, 2024</td>
+            </tr>
+            <tr>
+              <td>有遊戲消費習慣者的賭博頻率</td>
+              <td><span class="num">顯著更高</span></td>
+              <td>有過線上遊戲內購習慣的玩家，在博弈平台的存款頻率和金額顯著更高（742人研究）</td>
+              <td style="color:var(--muted);font-size:12px;">PLOS One, 南韓研究, 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 支付失敗與流失數據 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header red-bg">
+        <div class="cname">支付失敗與流失數據</div>
+        <div class="csub">存款失敗的代價遠比想像中大</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">數據</th>
+              <th style="padding-top:18px;">數值</th>
+              <th style="padding-top:18px;">說明</th>
+              <th style="padding-top:18px;">來源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>存款失敗後不再嘗試的玩家比例</td>
+              <td><span class="num">40%</span></td>
+              <td>每 10 個遇到存款失敗的玩家，有 4 個直接離開不回來 — 不是技術問題，是玩家信任問題</td>
+              <td style="color:var(--muted);font-size:12px;">morefin.com iGaming 研究</td>
+            </tr>
+            <tr>
+              <td>支付問題造成的流失率</td>
+              <td><span class="num">8–10%</span></td>
+              <td>支付系統出問題（失敗、卡住、不支援的方式），直接造成平台 8–10% 的玩家流失</td>
+              <td style="color:var(--muted);font-size:12px;">gamingsoft.com, 2026</td>
+            </tr>
+            <tr>
+              <td>iGaming 支付核准率範圍</td>
+              <td><span class="num amber">75–95%</span></td>
+              <td>同樣的平台，好的支付路由可以讓核准率從 75% 提升到 95%，差距達 20%</td>
+              <td style="color:var(--muted);font-size:12px;">fluidpayments.io 研究</td>
+            </tr>
+            <tr>
+              <td>iGaming 誤拒率 vs 電商</td>
+              <td><span class="num">3×</span></td>
+              <td>博弈平台的誤拒（正常交易被判定失敗）比例是一般電商的 3 倍，有大量合法存款被擋掉</td>
+              <td style="color:var(--muted);font-size:12px;">morefin.com 研究</td>
+            </tr>
+            <tr>
+              <td>流程太複雜造成的放棄率</td>
+              <td><span class="num">47%</span></td>
+              <td>47% 的玩家在存款流程步驟太多時會放棄，每多一個步驟都在損失轉換率</td>
+              <td style="color:var(--muted);font-size:12px;">fullstory.com iGaming 研究</td>
+            </tr>
+            <tr>
+              <td>憤怒點擊率 vs 其他產業</td>
+              <td><span class="num">3×</span></td>
+              <td>博弈平台使用者的「憤怒點擊」（重複狂點同一個地方）是其他產業平均的 3 倍，代表 UX 卡點很多</td>
+              <td style="color:var(--muted);font-size:12px;">fullstory.com iGaming 研究</td>
+            </tr>
+            <tr>
+              <td>可預防的流失比例</td>
+              <td><span class="num green">80%+</span></td>
+              <td>業界研究指出，超過 80% 的玩家流失是可以透過更好的設計和介入措施來避免的</td>
+              <td style="color:var(--muted);font-size:12px;">smartico.ai, 2024</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 存款轉換率基準 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header blue-bg">
+        <div class="cname">存款轉換率基準</div>
+        <div class="csub">業界正常水準 vs 頂尖水準 — 我們在哪裡？</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">指標</th>
+              <th style="padding-top:18px;">一般水準</th>
+              <th style="padding-top:18px;">頂尖水準</th>
+              <th style="padding-top:18px;">來源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>註冊 → 首次存款（FTD）轉換率</td>
+              <td><span class="num amber">40–50%</span></td>
+              <td><span class="num green">60–65%</span></td>
+              <td style="color:var(--muted);font-size:12px;">igaming.cx 研究</td>
+            </tr>
+            <tr>
+              <td>即時觸發推播轉換率</td>
+              <td colspan="2" style="color:var(--green);font-weight:600;">顯著優於定時批量推播（無具體百分比，但業界一致認可）</td>
+              <td style="color:var(--muted);font-size:12px;">xtremepush, customer.io</td>
+            </tr>
+            <tr>
+              <td>AI 預測流失後介入效果</td>
+              <td colspan="2"><span class="num green">降低流失 18–25%</span></td>
+              <td style="color:var(--muted);font-size:12px;">smartico.ai, 2024</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 時段行為數據 -->
+    <div class="card">
+      <div class="card-header amber-bg">
+        <div class="cname">玩家存款時段行為</div>
+        <div class="csub">什麼時候存款、什麼時候最容易被觸發</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">時段 / 情況</th>
+              <th style="padding-top:18px;">行為特徵</th>
+              <th style="padding-top:18px;">對設計的意義</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>晚上 8 PM – 凌晨 2 AM</td>
+              <td>最高峰時段，活躍玩家最多，存款最集中</td>
+              <td>推播通知和優惠在這個時段觸發效果最好</td>
+            </tr>
+            <tr>
+              <td>行動裝置用戶（佔流量 60%+）</td>
+              <td>短時間、高頻率，午休、通勤、睡前</td>
+              <td>存款頁必須手機優先，步驟最少、鍵盤最少</td>
+            </tr>
+            <tr>
+              <td>月底（最後 2–3 天）</td>
+              <td>博彩活動明顯集中在月底，可能與薪資週期相關</td>
+              <td>月底優惠、reload bonus 效果最佳</td>
+            </tr>
+            <tr>
+              <td>晚上 11 PM 後</td>
+              <td>研究顯示決策能力明顯下降，玩家更衝動</td>
+              <td style="color:var(--red);font-weight:500;">⚠ 深夜存款是高風險信號，可考慮加入確認步驟保護</td>
+            </tr>
+            <tr>
+              <td>大型賽事期間（IPL、世界盃）</td>
+              <td>存款量大幅異常，玩家行為完全不同於日常</td>
+              <td>A/B Test 必須避開賽事期間，否則數據失真</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 對我們的意義 -->
+  <div id="implications" class="section">
+    <div class="sec-label">對我們的意義 · 影響提案方向</div>
+
+    <div class="impls">
+
+      <div class="implication">
+        <div class="impl-icon red">⚠</div>
+        <div class="impl-body">
+          <div class="impl-title">追損（情境 02）是最高頻的主動存款 — 但也最危險</div>
+          <div class="impl-desc">如果存款頁流程順暢，短期存款量會上升。但同時可能加速問題玩家燒錢速度，長期 LTV 反而下降。</div>
+          <div class="impl-arrow">→ Round 2 提案：一鍵重複存款加入冷靜保護機制（30 分鐘內不觸發）</div>
+        </div>
+      </div>
+
+      <div class="implication">
+        <div class="impl-icon amber">⚡</div>
+        <div class="impl-body">
+          <div class="impl-title">餘額不足跳來存款（情境 04）的玩家最急迫</div>
+          <div class="impl-desc">這類玩家是從遊戲頁被打斷過來的，情緒急迫，不需要被說服，只需要快速完成存款回去玩。</div>
+          <div class="impl-arrow">→ 存款頁設計要極簡。這個入口不是放優惠推薦的地方，只需要讓他最快完成存款。</div>
+        </div>
+      </div>
+
+      <div class="implication">
+        <div class="impl-icon blue">🎯</div>
+        <div class="impl-body">
+          <div class="impl-title">被動存款要做即時觸發，不要做批量推播</div>
+          <div class="impl-desc">玩家在對的時機（剛輸完、剛看完賽事、剛達到某個行為）收到通知，轉換率遠高於定時群發。</div>
+          <div class="impl-arrow">→ 推播策略應以「行為事件」觸發為主，而非「時間排程」觸發</div>
+        </div>
+      </div>
+
+      <div class="implication">
+        <div class="impl-icon green">💳</div>
+        <div class="impl-body">
+          <div class="impl-title">改存款 UX 的效果，比不上改提款體驗</div>
+          <div class="impl-desc">研究明確指出：重複存款最大的驅動力是「提款速度的信任感」。玩家第一次提款很快，他才會再存。</div>
+          <div class="impl-arrow">→ 如果提款體驗差，改再多存款 UX 都留不住人。建議同步評估提款流程。</div>
+        </div>
+      </div>
+
+      <div class="implication">
+        <div class="impl-icon purple">🔔</div>
+        <div class="impl-body">
+          <div class="impl-title">FTD 後 7 天是留存關鍵，但我們幾乎沒有針對這段時間設計</div>
+          <div class="impl-desc">業界最大的流失點是「首存後、第二次存款前」這個空窗期，不是首存本身。</div>
+          <div class="impl-arrow">→ 建議把「首存後 7 天的引導流程」列為下一個討論議題（超出本次存款頁範疇）</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 資料來源 -->
+  <div id="sources" class="section">
+    <div class="sec-label">資料來源 · Sources</div>
+    <div class="card">
+      <div class="card-body">
+        <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;">學術論文</div>
+        <div class="sources">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Within-session chasing of losses and wins in an online eCasino · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11368930/" target="_blank">PMC / Scientific Reports, 2024</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Between-session chasing of losses and wins in an online eCasino · <a href="https://akjournals.com/view/journals/2006/aop/article-10.1556-2006.2024.00022/article-10.1556-2006.2024.00022.xml" target="_blank">Journal of Behavioral Addictions, 2024</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Behavioural Tracking and Profiling Studies Involving Objective Data Derived from Online Operators · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11272745/" target="_blank">PMC, 2024</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>The impact of prior online gaming experience on the migration of offline gamblers to online gambling platforms · <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0331451" target="_blank">PLOS One, 2025</a></div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:16px 0 12px;">iGaming 業界研究</div>
+        <div class="sources">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>The psychology of the first-time deposit in the iGaming industry · <a href="https://www.z2adigital.com/blog-content/the-psychology-of-the-first-time-deposit-in-the-igaming-industry" target="_blank">Z2A Digital</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Best CRM for iGaming: Conversion Rate Optimization & FTD Funnel · <a href="https://www.xtremepush.com/blog/best-crm-for-igaming-conversion-rate-optimization-ftd-funnel" target="_blank">Xtremepush</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Gamification for new player onboarding: How to engage first-time depositors in their first 7 days · <a href="https://www.xtremepush.com/blog/gamification-new-player-onboarding-ftd" target="_blank">Xtremepush</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>First Time Deposit (FTD) in iGaming: Definition & Importance · <a href="https://www.optikpi.com/first-time-deposit/" target="_blank">OptikPI</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Failed Transactions in iGaming: Cost & Fixes for Payment Failures · <a href="https://www.morefin.com/blog-posts/failed-transactions-igaming-payment-failure-cost-fix" target="_blank">Morefin</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>How Bad Payment Systems Lose You Players · <a href="https://www.gamingsoft.com/blog/2026/03/how-bad-payment-systems-lose-you-players/" target="_blank">Gamingsoft, 2026</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>How to Optimize Payment Conversion Rates in iGaming · <a href="https://fluidpayments.io/articles/how-to-optimize-payment-conversion-rates-in-igaming" target="_blank">Fluid Payments</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>High-Value Player Retention in iGaming · <a href="https://www.fullstory.com/blog/high-value-player-retention-igaming/" target="_blank">Fullstory</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>The Complete Guide to Player Churn Prevention in Online Casinos · <a href="https://www.smartico.ai/blog-post/the-complete-guide-to-player-churn-prevention-in-online-casinos-proven-strategies-to-boost-player-retention-in-2025" target="_blank">Smartico.ai, 2024</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Optimizing Your Onboarding Funnel: From Signup to First Deposit · <a href="https://igaming.cx/lifetime-value-optimization-a-framework-for-igaming-operators-2/" target="_blank">iGaming CX</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>How Times of Day Shape Online Gambling Patterns · <a href="https://time.now/blog/how-times-of-day-shape-online-gambling-patterns" target="_blank">Time.now</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <span class="footer-text">存款行為研究 · 2026.05.17 · 內部文件</span>
+    <span class="footer-text">資料來源：學術期刊 + iGaming 業界研究報告</span>
+  </div>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.05 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -359,72 +359,131 @@
 
   <!-- 流失漏斗 -->
   <div id="funnel" class="section">
-    <div class="sec-label">流失漏斗 · 我們需要的數據</div>
-    <div class="card">
-      <div class="card-header">
+    <div class="sec-label">向 Tonya 請求的資料 · 具體清單</div>
+
+    <div class="card" style="border-color:var(--blue-border);">
+      <div class="card-header blue-bg">
         <div class="ctop">
-          <div class="cname">目前我們只知道最後一步，不知道哪裡最痛</div>
+          <div class="cname">為什麼要先拿數據？</div>
         </div>
-        <div class="csub">現況只有「整體轉換率 62%」，但不知道玩家是在哪一步放棄的。這個數據是所有改動的起點。</div>
+        <div class="csub">我們現在只知道「100 個進來存款的玩家，最後只有 62 個成功」。但不知道那 38 個人是在哪一步放棄的、為什麼放棄。<br>就像你知道一個杯子漏水，但不知道洞在哪裡 — 不找到洞，補了也沒用。</div>
       </div>
       <div class="card-body">
         <div class="panel">
-          <div class="panel-title">應該要有的 Funnel 數據（需向 Tonya 取得）</div>
+          <div class="panel-title">存款流程的 5 個步驟（哪一步流失最多？）</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">玩家存款要經過以下步驟。目前我們完全不知道每步各有多少人離開，需要請 Tonya 提供每一步的完成人數（或百分比）。</div>
           <div class="funnel">
             <div class="funnel-step">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">進入存款頁</div>
-              <div class="funnel-pct green">100%（基準）</div>
+              <div class="funnel-label">第 1 步：進入存款頁面</div>
+              <div class="funnel-pct green">100%（起點）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">選擇支付方式</div>
-              <div class="funnel-pct">? %（未知）</div>
+              <div class="funnel-label">第 2 步：選好付款方式（如：bKash、Nagad、銀行轉帳）</div>
+              <div class="funnel-pct">? %（待填）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">輸入金額</div>
-              <div class="funnel-pct">? %（未知）</div>
+              <div class="funnel-label">第 3 步：輸入存款金額、填完所有欄位</div>
+              <div class="funnel-pct">? %（待填）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">送出確認</div>
-              <div class="funnel-pct">? %（未知）</div>
+              <div class="funnel-label">第 4 步：按下「確認存款」按鈕</div>
+              <div class="funnel-pct">? %（待填）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">等待到帳（支付處理中）</div>
-              <div class="funnel-pct">? %（未知）</div>
+              <div class="funnel-label">第 5 步：等待到帳（系統在處理，玩家在等）</div>
+              <div class="funnel-pct">? %（待填）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">成功到帳</div>
-              <div class="funnel-pct red">62%（目前唯一已知）</div>
+              <div class="funnel-label">錢成功進帳戶</div>
+              <div class="funnel-pct red">62%（目前唯一已知的數字）</div>
             </div>
           </div>
           <div class="callout blue" style="margin-top:16px;">
             <span class="callout-icon">→</span>
             <div>
-              <strong>如果流失集中在「選擇支付方式」這步</strong>→ 優先改支付方式 UI 和備援引導<br>
-              <strong>如果流失集中在「等待到帳」這步</strong>→ 優先改即時狀態顯示和逾時文案<br>
-              <strong>如果流失集中在「輸入金額」這步</strong>→ 個人化按鈕和一鍵重複才真的有用
+              <strong>數據出來後，我們就知道該改哪裡：</strong><br>
+              流失最多在「第 2 步：選付款方式」→ 代表支付選項有問題，或某個方式常出錯<br>
+              流失最多在「第 5 步：等待到帳」→ 代表玩家以為出錯了就關掉，要改等待頁面設計<br>
+              流失最多在「第 3 步：填金額」→ Round 1 的個人化按鈕才真的有用
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0;">
+      <div class="card-header">
+        <div class="ctop">
+          <div class="cname">完整資料請求清單 — 可直接轉給 Tonya</div>
+        </div>
+        <div class="csub">以下共 4 類資料。如果一次給不全，優先給第 1 類（步驟流失數據），其他可後補。</div>
+      </div>
+      <div class="card-body">
+
         <div class="panel">
-          <div class="panel-title">同時需要的數據</div>
+          <div class="panel-title">第 1 類：每個步驟的流失數據 ← 最重要，先給這個</div>
           <ul class="pl">
-            <li><span class="pi pi-q">?</span><span>存款放棄的原因分佈（支付失敗 / 改變主意 / 網路問題 / 帳號問題）— 看客服票分類</span></li>
-            <li><span class="pi pi-q">?</span><span>玩家進入存款頁的來源（從哪個頁面跳過來）— 影響「存款入口」是否是真正的問題</span></li>
-            <li><span class="pi pi-q">?</span><span>新玩家 vs 回流玩家的轉換率分開看 — 兩群人的問題可能完全不同</span></li>
-            <li><span class="pi pi-q">?</span><span>存款失敗的錯誤類型分佈 — 知道最常見的失敗原因才能針對性修復</span></li>
+            <li><span class="pi pi-q">1</span><span>
+              <strong>每個步驟各有多少 % 的人完成？</strong><br>
+              <span style="color:var(--muted);">也就是：進來 100 人，到第 2 步還剩幾人、第 3 步幾人⋯⋯以此類推。<br>如果 GA / 分析後台有「存款漏斗」或「Funnel」報表，直接截圖就好。</span>
+            </span></li>
+            <li><span class="pi pi-q">2</span><span>
+              <strong>哪個支付方式的失敗率最高？</strong><br>
+              <span style="color:var(--muted);">例如：bKash 的成功率是多少、Nagad 是多少。有沒有某個方式特別常出錯？</span>
+            </span></li>
           </ul>
         </div>
+
+        <div class="panel">
+          <div class="panel-title">第 2 類：玩家為什麼放棄 — 可以問客服</div>
+          <ul class="pl">
+            <li><span class="pi pi-q">3</span><span>
+              <strong>最近 1 個月，玩家因為存款問題聯絡客服，最常見的投訴是什麼？</strong><br>
+              <span style="color:var(--muted);">例如：「存了沒到帳」/ 「不知道選哪個付款方式」/ 「一直轉圈沒反應」。把最常見的前 3 個說出來就好。</span>
+            </span></li>
+            <li><span class="pi pi-q">4</span><span>
+              <strong>存款失敗的時候，系統回傳的錯誤原因，哪個最多？</strong><br>
+              <span style="color:var(--muted);">例如：逾時（等太久沒回應）/ 帳號問題 / 金額不符最低限制 / 銀行拒絕。如果後台有錯誤紀錄，哪個錯誤代碼出現最多次？</span>
+            </span></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">第 3 類：玩家從哪裡來 — 幫我們判斷問題根源</div>
+          <ul class="pl">
+            <li><span class="pi pi-q">5</span><span>
+              <strong>玩家進入存款頁之前，通常在哪個頁面？</strong><br>
+              <span style="color:var(--muted);">是從首頁的「存款」按鈕進來？還是玩遊戲中間跳出來？還是收到推播通知點進來？<br>（這影響他們存款時的心態：主動存款 vs 被打斷去存款，體驗完全不同。）</span>
+            </span></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">第 4 類：新玩家 vs 老玩家的差別</div>
+          <ul class="pl">
+            <li><span class="pi pi-q">6</span><span>
+              <strong>第一次存款的玩家，成功率是多少？老玩家的成功率是多少？</strong><br>
+              <span style="color:var(--muted);">如果兩個數字差很多，代表「第一次存款」可能有特別的障礙需要解決（例如不熟悉流程、不知道最低金額），需要另外設計。</span>
+            </span></li>
+          </ul>
+        </div>
+
+        <div class="callout amber" style="margin-top:4px;">
+          <span class="callout-icon">★</span>
+          <span><strong>一句話說明為什麼要這些數據：</strong>我們現在有幾個改善存款流程的方向，但每個方向要花工程時間開發。在動手之前，我們想先確認「到底哪裡流失最多」，才不會花了時間做的功能，結果不是玩家真正卡住的地方。</span>
+        </div>
+
       </div>
     </div>
   </div>
