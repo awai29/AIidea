@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款 UX · 研究應用原型 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #efefef; --fg: #09090b; --card: #ffffff; --border: #e4e4e7; --muted: #71717a;
+    --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fecaca;
+    --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+    --blue: #2563eb;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --purple: #7c3aed;--purple-bg: #f5f3ff;--purple-border:#ddd6fe;
+    --font: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  .page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 2.5rem; }
+  .header-inner { max-width: 1100px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: clamp(20px, 3vw, 28px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.2; margin-bottom: 8px; }
+  .header-desc { font-size: 13px; color: var(--muted); max-width: 620px; line-height: 1.65; }
+  .header-meta { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+  .badge-green { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+  .badge-blue  { background: var(--blue-bg);  border-color: var(--blue-border);  color: var(--blue); }
+  .badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+  .badge-purple{ background: var(--purple-bg);border-color: var(--purple-border);color: var(--purple); }
+
+  .proto-tabs { position: sticky; top: 0; z-index: 100; background: rgba(239,239,239,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2.5rem; }
+  .proto-tabs-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 4px; height: 52px; align-items: center; }
+  .ptab { padding: 7px 18px; border-radius: 9999px; border: 1px solid transparent; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--muted); background: transparent; white-space: nowrap; }
+  .ptab:hover { background: var(--card); border-color: var(--border); color: var(--fg); }
+  .ptab.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 2.5rem; }
+
+  .proto { display: none; animation: fadeIn 0.25s ease; }
+  .proto.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 36px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  /* INFO SIDE */
+  .proto-head { margin-bottom: 24px; }
+  .proto-num  { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+  .proto-title{ font-size: 22px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.2; margin-bottom: 8px; }
+  .proto-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .card-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+  .card-header.green-bg { background: var(--green-bg); border-color: var(--green-border); }
+  .card-header.red-bg   { background: var(--red-bg);   border-color: var(--red-border); }
+  .card-header.amber-bg { background: var(--amber-bg); border-color: var(--amber-border); }
+  .card-header.blue-bg  { background: var(--blue-bg);  border-color: var(--blue-border); }
+  .cname { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .csub  { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+  .card-body { padding: 16px 20px; }
+  .panel { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .panel:first-child { padding-top: 0; }
+  .panel:last-child   { border-bottom: none; padding-bottom: 0; }
+  .panel-title { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+  .pl { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .pl li { display: flex; gap: 9px; font-size: 13px; color: #3f3f46; line-height: 1.55; }
+  .pi { flex-shrink: 0; width: 17px; height: 17px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; margin-top: 2px; }
+  .pi-ok   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .pi-warn { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .pi-tip  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+  .callout { display: flex; gap: 9px; padding: 12px 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; margin-top: 10px; }
+  .callout.blue  { background: var(--blue-bg);  border: 1px solid var(--blue-border);  color: #1e3a8a; }
+  .callout.amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: #92400e; }
+  .callout.green { background: var(--green-bg); border: 1px solid var(--green-border); color: #14532d; }
+  .callout.red   { background: var(--red-bg);   border: 1px solid var(--red-border);   color: #991b1b; }
+
+  /* STATE SWITCHER */
+  .state-switcher { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .state-btn { padding: 6px 14px; border-radius: 9999px; border: 1.5px solid var(--border); background: var(--card); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: var(--muted); }
+  .state-btn:hover { border-color: #a1a1aa; color: var(--fg); }
+  .state-btn.active { border-color: var(--fg); background: var(--fg); color: #fff; }
+  .state-btn.s-green.active  { border-color: var(--green);  background: var(--green);  color: #fff; }
+  .state-btn.s-amber.active  { border-color: var(--amber);  background: var(--amber);  color: #fff; }
+  .state-btn.s-red.active    { border-color: var(--red);    background: var(--red);    color: #fff; }
+  .state-btn.s-purple.active { border-color: var(--purple); background: var(--purple); color: #fff; }
+
+  /* PHONE */
+  .phone-wrap { position: sticky; top: 72px; }
+  .phone-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; text-align: center; }
+  .phone { width: 320px; height: 640px; background: #fff; border-radius: 40px; border: 7px solid #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; overflow: hidden; margin: 0 auto; }
+  .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #1a1a1a; border-radius: 0 0 14px 14px; z-index: 10; }
+  .phone-screen { width: 100%; height: 100%; border-radius: 33px; overflow: hidden; position: relative; background: #f8f8f8; }
+
+  /* phone states */
+  .pstate { display: none; width: 100%; height: 100%; flex-direction: column; }
+  .pstate.active { display: flex; }
+
+  /* APP COMPONENTS */
+  .app-bar { background: #fff; padding: 38px 16px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
+  .app-bar-back { width: 30px; height: 30px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #555; flex-shrink: 0; }
+  .app-bar-title { font-size: 15px; font-weight: 600; color: #111; }
+  .app-bar-sub { font-size: 11px; color: #aaa; margin-left: auto; }
+  .scroll { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .bottom-bar { padding: 12px 14px 20px; background: #fff; border-top: 1px solid #f0f0f0; flex-shrink: 0; }
+
+  /* shared app ui */
+  .amt-box { background: #fff; border: 1.5px solid #e8e8e8; border-radius: 14px; padding: 14px 16px; text-align: center; }
+  .amt-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .amt-val { font-size: 30px; font-weight: 700; color: #111; letter-spacing: -0.04em; }
+  .amt-currency { font-size: 15px; font-weight: 400; color: #aaa; }
+  .amt-hint { font-size: 11px; color: #bbb; margin-top: 3px; }
+
+  .qgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .qbtn { padding: 9px 6px; border-radius: 11px; border: 1.5px solid #e8e8e8; background: #fff; text-align: center; cursor: pointer; }
+  .qbtn.ai   { border-color: #2563eb; background: #eff6ff; }
+  .qbtn.used { border-color: #e8e8e8; }
+  .qbtn-n { font-size: 13px; font-weight: 700; color: #111; }
+  .qbtn.ai .qbtn-n { color: #2563eb; }
+  .qbtn-s { font-size: 10px; color: #bbb; margin-top: 1px; }
+  .qbtn.ai .qbtn-s { color: #93c5fd; }
+
+  .method-row { background: #fff; border: 1.5px solid #e8e8e8; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .method-row.sel { border-color: #2563eb; background: #eff6ff; }
+  .mico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .mico.bk { background: #e2136e; }
+  .mico.na { background: #f05a28; }
+  .mico.ro { background: #8b2fc9; }
+  .minfo { flex: 1; }
+  .mname { font-size: 12px; font-weight: 600; color: #111; }
+  .msub  { font-size: 10px; color: #aaa; }
+  .mbadge { font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 9999px; }
+  .mbadge.ok  { background: #dcfce7; color: #16a34a; }
+  .mbadge.war { background: #fef3c7; color: #d97706; }
+
+  .ai-chip { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 9999px; padding: 4px 10px; font-size: 10px; font-weight: 600; color: #2563eb; display: inline-flex; align-items: center; gap: 4px; }
+
+  .big-btn { width: 100%; height: 46px; border-radius: 14px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .big-btn.primary { background: #111; color: #fff; }
+  .big-btn.green   { background: #16a34a; color: #fff; }
+  .big-btn.outline { background: #f5f5f5; color: #111; border: 1px solid #e8e8e8; }
+  .big-btn.red-btn { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+  .alert { border-radius: 12px; padding: 11px 13px; font-size: 12px; line-height: 1.6; }
+  .alert.amber { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .alert.red   { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .alert.blue  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+  .alert.green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+  .alert strong { display: block; margin-bottom: 2px; font-size: 12px; }
+
+  /* progress steps */
+  .prog-wrap { background: #fff; border: 1.5px solid #e8e8e8; border-radius: 14px; overflow: hidden; }
+  .prog-row { display: flex; align-items: center; gap: 10px; padding: 10px 13px; border-bottom: 1px solid #f5f5f5; }
+  .prog-row:last-child { border-bottom: none; }
+  .pdot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .pdot.done   { background: #f0fdf4; color: #16a34a; border: 2px solid #bbf7d0; }
+  .pdot.now    { background: #eff6ff; color: #2563eb; border: 2px solid #bfdbfe; animation: pulse 1.5s infinite; }
+  .pdot.wait   { background: #f5f5f5; color: #ccc; border: 2px solid #e8e8e8; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .pinfo { flex: 1; }
+  .pname { font-size: 12px; font-weight: 500; color: #111; }
+  .pname.dim { color: #bbb; }
+  .ptime { font-size: 10px; color: #aaa; margin-top: 1px; }
+  .ptime.blue { color: #2563eb; }
+
+  /* success hero */
+  .success-hero { background: #fff; border: 1.5px solid #bbf7d0; border-radius: 16px; padding: 20px 14px; text-align: center; }
+  .s-icon-wrap { width: 56px; height: 56px; background: #f0fdf4; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .s-title { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 3px; }
+  .s-amount { font-size: 26px; font-weight: 700; letter-spacing: -0.04em; color: #16a34a; margin: 6px 0 2px; }
+  .s-sub { font-size: 11px; color: #aaa; }
+
+  /* game card */
+  .game-card { background: linear-gradient(135deg, #1e293b, #334155); border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .game-thumb { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #f97316, #dc2626); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .game-info { flex: 1; }
+  .game-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .game-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .game-btn  { background: #fff; color: #111; border: none; padding: 7px 14px; border-radius: 9999px; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+  /* network banner */
+  .net-banner { background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; font-size: 11px; color: #92400e; }
+  .net-dot { width: 8px; height: 8px; border-radius: 50%; background: #d97706; flex-shrink: 0; animation: pulse 1s infinite; }
+
+  /* vip bar */
+  .vip-bar { background: linear-gradient(135deg, #7c3aed, #5b21b6); border-radius: 12px; padding: 11px 14px; }
+  .vip-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .vip-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .vip-val   { font-size: 12px; font-weight: 700; color: #fff; }
+  .vip-track { background: rgba(255,255,255,0.2); border-radius: 9999px; height: 6px; }
+  .vip-fill  { background: #fff; border-radius: 9999px; height: 6px; width: 78%; }
+  .vip-sub   { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 5px; }
+
+  /* mini separator */
+  .sep { font-size: 10px; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* footer */
+  .footer { border-top: 1px solid var(--border); padding: 24px 2.5rem; background: var(--card); margin-top: 3rem; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-tag">研究應用原型 · Payment UX Prototypes v2</div>
+    <h1>把研究轉化成畫面<br>每個情境都有多種狀態可切換</h1>
+    <p class="header-desc">整合存款行為研究、孟加拉市場特殊性、AI 預測應用，設計出能真正解決問題的存款體驗。每個原型都有「為什麼這樣設計」的說明。</p>
+    <div class="header-meta">
+      <span class="badge badge-blue">原型 1 · 情境自適應</span>
+      <span class="badge badge-amber">原型 2 · 智慧失敗處理</span>
+      <span class="badge badge-green">原型 3 · 存款後 AI 引導</span>
+    </div>
+  </div>
+</div>
+
+<div class="proto-tabs">
+  <div class="proto-tabs-inner">
+    <button class="ptab active" onclick="switchProto('p1',this)">原型 1 — 情境自適應存款頁</button>
+    <button class="ptab" onclick="switchProto('p2',this)">原型 2 — 智慧失敗處理</button>
+    <button class="ptab" onclick="switchProto('p3',this)">原型 3 — 存款後 AI 引導</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════
+     原型 1：情境自適應存款頁
+═══════════════════════════════════════ -->
+<div id="p1" class="proto active">
+  <div class="proto-head">
+    <div class="proto-num">原型 1</div>
+    <div class="proto-title">情境自適應存款頁</div>
+    <p class="proto-desc">同一個存款頁，根據 AI 判斷玩家當前狀態，自動顯示不同的內容與提示。玩家不會看到「一個固定的存款頁」，而是一個「懂他的存款頁」。</p>
+  </div>
+
+  <div class="state-switcher">
+    <button class="state-btn s-green active" onclick="switchState('p1','s1',this)">狀態 1 · 正常開局</button>
+    <button class="state-btn s-amber" onclick="switchState('p1','s2',this)">狀態 2 · 遊戲中餘額不足</button>
+    <button class="state-btn s-red" onclick="switchState('p1','s3',this)">狀態 3 · AI 偵測到連輸</button>
+    <button class="state-btn s-purple" onclick="switchState('p1','s4',this)">狀態 4 · 快升 VIP</button>
+  </div>
+
+  <div class="layout">
+    <div class="info">
+
+      <!-- 說明：狀態1 -->
+      <div class="p1-info" id="p1-s1-info">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">狀態 1 — 正常開局（Session Start）</div>
+            <div class="csub">玩家今天第一次進來，主動想存款，情緒穩定，目的明確。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">AI 判斷依據</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>今日第一次登入，沒有任何輸贏紀錄</span></li>
+                <li><span class="pi pi-ok">✓</span><span>從首頁「存款」按鈕進入（非遊戲頁跳出）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>上次成功存款距今超過 12 小時</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">設計邏輯（研究依據）</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>預填最常用金額，不需要玩家動腦筋決定</span></li>
+                <li><span class="pi pi-tip">→</span><span>顯示 AI 推薦金額標籤，讓玩家知道這是根據他的習慣</span></li>
+                <li><span class="pi pi-tip">→</span><span>如有優惠且接近門檻（差距 ≤20%），顯示門檻提示</span></li>
+                <li><span class="pi pi-tip">→</span><span>不加冷靜提示、不加確認彈窗 — 這個狀態不需要保護，只需要流暢</span></li>
+              </ul>
+            </div>
+            <div class="callout green">
+              <span>研究數據：個人化金額建議使存款確認率提升，個人化優惠使存款頻率提升 <strong>19%</strong>（IGT Analytics 2024）</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 說明：狀態2 -->
+      <div class="p1-info" id="p1-s2-info" style="display:none;">
+        <div class="card" style="border-color:var(--amber-border);">
+          <div class="card-header amber-bg">
+            <div class="cname">狀態 2 — 遊戲中餘額不足（Low Balance）</div>
+            <div class="csub">玩家在遊戲頁被打斷，跳出來補充餘額，情緒急迫，不想等。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">AI 判斷依據</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>從遊戲頁面直接跳轉到存款頁（referrer = game page）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>目前餘額低於玩家平均單局投注金額</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">設計邏輯（研究依據）</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span><strong>極簡模式：</strong>只顯示最常用的 2 個金額 + 確認按鈕，3 步完成</span></li>
+                <li><span class="pi pi-tip">→</span><span>移除所有優惠提示和橫幅 — 這個情境下玩家只想快點存完回去玩</span></li>
+                <li><span class="pi pi-tip">→</span><span>顯示「存款後自動回到遊戲」提示，讓玩家有預期</span></li>
+                <li><span class="pi pi-tip">→</span><span>不顯示支付方式選擇 — 直接用上次的方式</span></li>
+              </ul>
+            </div>
+            <div class="callout amber">
+              <span>研究依據：玩家從遊戲頁跳來存款時情緒最急迫。任何多餘步驟都會流失這批玩家。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 說明：狀態3 -->
+      <div class="p1-info" id="p1-s3-info" style="display:none;">
+        <div class="card" style="border-color:var(--red-border);">
+          <div class="card-header red-bg">
+            <div class="cname">狀態 3 — AI 偵測到連輸追損（Loss Chasing）</div>
+            <div class="csub">玩家在過去 30 分鐘內連輸，現在進來存款，AI 判斷追損風險高。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">AI 判斷依據</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>過去 30 分鐘內淨虧損超過平均存款金額的 80%</span></li>
+                <li><span class="pi pi-ok">✓</span><span>本次存款距上次存款不到 30 分鐘</span></li>
+                <li><span class="pi pi-ok">✓</span><span>今日存款次數已達警戒值</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">設計邏輯（研究依據）</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span><strong>加入冷靜提示（非阻擋）：</strong>顯示「你今天已存了 X 次」，讓玩家知道但不強制阻止</span></li>
+                <li><span class="pi pi-tip">→</span><span>移除一鍵快速存款 — 讓流程保留必要的摩擦</span></li>
+                <li><span class="pi pi-tip">→</span><span>預填金額改為較低的選項，不推高金額</span></li>
+                <li><span class="pi pi-tip">→</span><span>顯示「設定今日存款上限」的入口，尊重玩家選擇</span></li>
+              </ul>
+            </div>
+            <div class="callout red">
+              <span>研究依據：33-40% 定期賭客承認追損。個人化介入訊息讓 <strong>65%</strong> 的玩家當天降低賭博活動（7,134人研究）。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 說明：狀態4 -->
+      <div class="p1-info" id="p1-s4-info" style="display:none;">
+        <div class="card" style="border-color:var(--purple-border);">
+          <div class="card-header" style="background:var(--purple-bg);border-color:var(--purple-border);">
+            <div class="cname">狀態 4 — 快升 VIP（Tier Upgrade）</div>
+            <div class="csub">玩家距離下一個 VIP 等級的存款門檻非常接近，是觸發升等提示的最佳時機。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">AI 判斷依據</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>距離 VIP 升等門檻差距 ≤ 15%（需先確認 VIP 計算指標）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>玩家過去曾在升等後增加遊戲頻率（行為紀錄支持）</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">設計邏輯（研究依據）</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>在存款頁上方顯示 VIP 進度條，清楚說明「再存 ৳XXX 升 Gold」</span></li>
+                <li><span class="pi pi-tip">→</span><span>預填金額自動設為「剛好升等」的金額</span></li>
+                <li><span class="pi pi-tip">→</span><span>說明升等後的具體好處（不只說「升級」，要說「每次存款手續費 0%」）</span></li>
+              </ul>
+            </div>
+            <div class="callout blue" style="background:var(--purple-bg);border-color:var(--purple-border);color:#5b21b6;">
+              <span><strong>前提：</strong>此功能需要先確認 VIP 計算指標（存款金額 or 投注流水），否則數字會算錯。這是 Round 2 提案的 Blocker #2。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PHONE P1 -->
+    <div class="phone-wrap">
+      <div class="phone-label" id="p1-phone-label">狀態 1 — 正常開局</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+
+          <!-- STATE 1: Normal -->
+          <div class="pstate active" id="p1-s1">
+            <div class="app-bar">
+              <div class="app-bar-back">←</div>
+              <div class="app-bar-title">存款</div>
+              <div class="app-bar-sub"><span class="ai-chip">✦ AI 個人化</span></div>
+            </div>
+            <div class="scroll">
+              <div class="amt-box">
+                <div class="amt-label">存款金額</div>
+                <div class="amt-val"><span class="amt-currency">৳</span> 1,000</div>
+                <div class="amt-hint">最低 ৳100</div>
+              </div>
+              <div class="alert green"><strong>🎁 優惠門檻提示</strong>再存 ৳200 即可解鎖 10% 存款紅利（最高 ৳500）</div>
+              <div class="sep">你常存的金額</div>
+              <div class="qgrid">
+                <div class="qbtn ai"><div class="qbtn-n">৳1,000</div><div class="qbtn-s">✦ 最常存</div></div>
+                <div class="qbtn ai"><div class="qbtn-n">৳500</div><div class="qbtn-s">✦ 上次存款</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳2,000</div><div class="qbtn-s">曾存過</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳300</div><div class="qbtn-s">曾存過</div></div>
+              </div>
+              <div class="sep">付款方式</div>
+              <div class="method-row sel">
+                <div class="mico bk">bK</div>
+                <div class="minfo"><div class="mname">bKash</div><div class="msub">✦ 你最常用</div></div>
+                <span class="mbadge ok">推薦</span>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn primary">確認存款 ৳1,000</button>
+            </div>
+          </div>
+
+          <!-- STATE 2: Low Balance -->
+          <div class="pstate" id="p1-s2">
+            <div class="app-bar">
+              <div class="app-bar-back" style="opacity:0.4;">←</div>
+              <div class="app-bar-title">快速存款</div>
+            </div>
+            <div class="scroll">
+              <div class="alert amber"><strong>⚡ 快速模式</strong>存款後自動返回遊戲，繼續 Teen Patti</div>
+              <div class="amt-box">
+                <div class="amt-label">選擇金額</div>
+                <div class="amt-val"><span class="amt-currency">৳</span> 1,000</div>
+              </div>
+              <div class="qgrid">
+                <div class="qbtn ai" style="padding:14px 6px;"><div class="qbtn-n" style="font-size:16px;">৳1,000</div><div class="qbtn-s">✦ 最常存</div></div>
+                <div class="qbtn used" style="padding:14px 6px;"><div class="qbtn-n" style="font-size:16px;">৳500</div><div class="qbtn-s">上次存款</div></div>
+              </div>
+              <div style="font-size:11px;color:#bbb;text-align:center;">使用上次付款方式：bKash</div>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn primary">存款 ৳1,000 → 返回遊戲</button>
+            </div>
+          </div>
+
+          <!-- STATE 3: Loss Chasing -->
+          <div class="pstate" id="p1-s3">
+            <div class="app-bar">
+              <div class="app-bar-back">←</div>
+              <div class="app-bar-title">存款</div>
+            </div>
+            <div class="scroll">
+              <div class="alert amber">
+                <strong>今天已存款 3 次</strong>
+                你今日存款共 ৳3,000。繼續存款前，請確認這在你的預算範圍內。
+              </div>
+              <div class="amt-box">
+                <div class="amt-label">存款金額</div>
+                <div class="amt-val"><span class="amt-currency">৳</span> 500</div>
+                <div class="amt-hint">建議從小金額開始</div>
+              </div>
+              <div class="qgrid">
+                <div class="qbtn used"><div class="qbtn-n">৳300</div><div class="qbtn-s">建議金額</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳500</div><div class="qbtn-s">建議金額</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳1,000</div><div class="qbtn-s">自訂</div></div>
+                <div class="qbtn used"><div class="qbtn-n">其他</div><div class="qbtn-s">自行輸入</div></div>
+              </div>
+              <div class="method-row sel">
+                <div class="mico bk">bK</div>
+                <div class="minfo"><div class="mname">bKash</div><div class="msub">上次使用</div></div>
+                <span class="mbadge ok">推薦</span>
+              </div>
+              <button class="big-btn outline" style="border-color:#e8e8e8;font-size:12px;height:38px;color:#888;">設定今日存款上限</button>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn primary">確認存款 ৳500</button>
+            </div>
+          </div>
+
+          <!-- STATE 4: VIP -->
+          <div class="pstate" id="p1-s4">
+            <div class="app-bar">
+              <div class="app-bar-back">←</div>
+              <div class="app-bar-title">存款</div>
+              <div class="app-bar-sub"><span class="ai-chip" style="background:var(--purple-bg);color:var(--purple);border-color:var(--purple-border);">✦ VIP 提示</span></div>
+            </div>
+            <div class="scroll">
+              <div class="vip-bar">
+                <div class="vip-top">
+                  <div class="vip-label">Silver → Gold 進度</div>
+                  <div class="vip-val">再 ৳300 升等</div>
+                </div>
+                <div class="vip-track"><div class="vip-fill"></div></div>
+                <div class="vip-sub">升 Gold 後：每次存款手續費 0%・專屬客服・每週返水 1.5%</div>
+              </div>
+              <div class="amt-box">
+                <div class="amt-label">存款金額</div>
+                <div class="amt-val"><span class="amt-currency">৳</span> 1,300</div>
+                <div class="amt-hint">✦ 含升等所需金額</div>
+              </div>
+              <div class="qgrid">
+                <div class="qbtn ai"><div class="qbtn-n">৳1,300</div><div class="qbtn-s">✦ 剛好升 Gold</div></div>
+                <div class="qbtn ai"><div class="qbtn-n">৳1,000</div><div class="qbtn-s">✦ 最常存</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳500</div><div class="qbtn-s">自訂</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳2,000</div><div class="qbtn-s">自訂</div></div>
+              </div>
+              <div class="method-row sel">
+                <div class="mico bk">bK</div>
+                <div class="minfo"><div class="mname">bKash</div><div class="msub">✦ 你最常用</div></div>
+                <span class="mbadge ok">推薦</span>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;">存款 ৳1,300 · 升 Gold VIP</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     原型 2：智慧失敗處理
+═══════════════════════════════════════ -->
+<div id="p2" class="proto">
+  <div class="proto-head">
+    <div class="proto-num">原型 2</div>
+    <div class="proto-title">智慧失敗處理</div>
+    <p class="proto-desc">存款失敗後，40% 的玩家不會再嘗試。關鍵在於：不同原因的失敗，要給不同的引導，不是只說「失敗，請重試」。</p>
+  </div>
+
+  <div class="state-switcher">
+    <button class="state-btn s-amber active" onclick="switchState('p2','s1',this)">狀態 1 · 網路逾時（可重試）</button>
+    <button class="state-btn s-red" onclick="switchState('p2','s2',this)">狀態 2 · 支付被拒（換方式）</button>
+    <button class="state-btn s-amber" onclick="switchState('p2','s3',this)">狀態 3 · 金額不符</button>
+    <button class="state-btn" onclick="switchState('p2','s4',this)">狀態 4 · 處理中（弱網路）</button>
+  </div>
+
+  <div class="layout">
+    <div class="info">
+
+      <div class="p2-info" id="p2-s1-info">
+        <div class="card" style="border-color:var(--amber-border);">
+          <div class="card-header amber-bg">
+            <div class="cname">逾時失敗 — 銀行沒有在時限內回應</div>
+            <div class="csub">這種失敗不代表錢真的沒扣，可能只是等待中。要先確認狀態，不能直接說「失敗」。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>先說「正在確認你的交易狀態」，不急著宣告失敗</span></li>
+              <li><span class="pi pi-ok">✓</span><span>確認後若真的沒扣款 → 提供一鍵重試</span></li>
+              <li><span class="pi pi-ok">✓</span><span>若錢已扣但沒到帳 → 轉人工客服，不讓玩家重複扣款</span></li>
+              <li><span class="pi pi-tip">→</span><span>對孟加拉市場特別重要：網路不穩是常見原因，不是平台問題</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s2-info" style="display:none;">
+        <div class="card" style="border-color:var(--red-border);">
+          <div class="card-header red-bg">
+            <div class="cname">支付被拒 — 銀行拒絕這筆交易</div>
+            <div class="csub">在孟加拉，這可能是因為 MFS 平台標記了賭博相關交易。不能只說「失敗」，要引導換方式。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>立刻顯示其他可用的付款方式，讓玩家不用重新開始</span></li>
+              <li><span class="pi pi-ok">✓</span><span>成功率根據我們自己的歷史數據顯示，給玩家參考</span></li>
+              <li><span class="pi pi-warn">!</span><span>不要說「你的銀行拒絕了」— 這在孟加拉情境下可能引起更多焦慮</span></li>
+              <li><span class="pi pi-tip">→</span><span>說「這個方式目前無法處理，試試其他選項」更中性</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s3-info" style="display:none;">
+        <div class="card" style="border-color:var(--amber-border);">
+          <div class="card-header amber-bg">
+            <div class="cname">金額不符 — 低於最低存款或超過上限</div>
+            <div class="csub">最可避免的失敗類型。玩家通常不知道最低金額是多少，失敗後不知道要改多少。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>直接說「最低存款是 ৳100」，並提供一鍵修改為最低金額</span></li>
+              <li><span class="pi pi-ok">✓</span><span>不要只說「金額不符」—— 玩家看到這個完全不知道要怎麼辦</span></li>
+              <li><span class="pi pi-tip">→</span><span>理想做法是在輸入金額時就即時驗證，根本不讓這個失敗發生</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s4-info" style="display:none;">
+        <div class="card" style="border-color:var(--blue-border);">
+          <div class="card-header blue-bg">
+            <div class="cname">弱網路等待 — 孟加拉特有場景</div>
+            <div class="csub">玩家在網路不穩的環境存款，頁面卡住。他不知道是成功了還是失敗了，只能乾等。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>偵測到網路不穩 → 顯示橫幅「目前網路較慢，你的存款仍在處理中」</span></li>
+              <li><span class="pi pi-ok">✓</span><span>關掉頁面不影響交易 → 告知玩家可以安心關掉，到帳後通知</span></li>
+              <li><span class="pi pi-ok">✓</span><span>重新連線後自動查詢交易狀態，顯示最新結果</span></li>
+              <li><span class="pi pi-tip">→</span><span>研究：孟加拉農村地區網路不穩是存款放棄的常見原因之一</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PHONE P2 -->
+    <div class="phone-wrap">
+      <div class="phone-label" id="p2-phone-label">狀態 1 — 網路逾時</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+
+          <!-- FAIL 1: timeout -->
+          <div class="pstate active" id="p2-s1">
+            <div class="app-bar">
+              <div class="app-bar-back" style="opacity:0.3;">←</div>
+              <div class="app-bar-title">確認交易狀態</div>
+            </div>
+            <div class="scroll">
+              <div style="text-align:center;padding:20px 0 10px;">
+                <div style="width:56px;height:56px;background:#fffbeb;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;">⏳</div>
+                <div style="font-size:15px;font-weight:700;color:#111;">正在確認存款狀態</div>
+                <div style="font-size:12px;color:#aaa;margin-top:4px;">銀行回應較慢，請稍等</div>
+              </div>
+              <div class="alert amber">
+                <strong>你的錢安全嗎？</strong>
+                我們正在向銀行確認這筆 ৳1,000 的交易。請不要重複送出，避免重複扣款。
+              </div>
+              <div class="prog-wrap">
+                <div class="prog-row"><div class="pdot done">✓</div><div class="pinfo"><div class="pname">存款請求已送出</div><div class="ptime">14:32:05</div></div></div>
+                <div class="prog-row"><div class="pdot now">?</div><div class="pinfo"><div class="pname">等待銀行確認</div><div class="ptime blue">確認中...</div></div></div>
+                <div class="prog-row"><div class="pdot wait">3</div><div class="pinfo"><div class="pname dim">到帳</div><div class="ptime">等待確認</div></div></div>
+              </div>
+            </div>
+            <div class="bottom-bar" style="display:flex;gap:8px;">
+              <button class="big-btn outline" style="flex:1;font-size:12px;">聯絡客服</button>
+              <button class="big-btn primary" style="flex:2;">繼續等待</button>
+            </div>
+          </div>
+
+          <!-- FAIL 2: declined -->
+          <div class="pstate" id="p2-s2">
+            <div class="app-bar">
+              <div class="app-bar-back">←</div>
+              <div class="app-bar-title">存款</div>
+            </div>
+            <div class="scroll">
+              <div class="alert red">
+                <strong>這個方式目前無法處理</strong>
+                bKash 無法完成這筆交易，請選擇其他付款方式。
+              </div>
+              <div class="sep">改用其他方式</div>
+              <div class="method-row">
+                <div class="mico na">Na</div>
+                <div class="minfo"><div class="mname">Nagad</div><div class="msub">成功率 94%</div></div>
+                <span class="mbadge ok">推薦</span>
+              </div>
+              <div class="method-row">
+                <div class="mico ro">Ro</div>
+                <div class="minfo"><div class="mname">Rocket</div><div class="msub">成功率 92%</div></div>
+                <span class="mbadge ok">可用</span>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn primary">用 Nagad 存款 ৳1,000</button>
+            </div>
+          </div>
+
+          <!-- FAIL 3: amount -->
+          <div class="pstate" id="p2-s3">
+            <div class="app-bar">
+              <div class="app-bar-back">←</div>
+              <div class="app-bar-title">存款</div>
+            </div>
+            <div class="scroll">
+              <div class="alert amber">
+                <strong>金額低於最低存款</strong>
+                最低存款金額為 ৳100。你輸入的 ৳50 無法處理。
+              </div>
+              <div class="amt-box" style="border-color:#fde68a;background:#fffbeb;">
+                <div class="amt-label">建議修改為</div>
+                <div class="amt-val" style="color:#d97706;"><span class="amt-currency">৳</span> 100</div>
+                <div class="amt-hint">最低存款金額</div>
+              </div>
+              <div class="sep">或選擇其他金額</div>
+              <div class="qgrid">
+                <div class="qbtn ai"><div class="qbtn-n">৳100</div><div class="qbtn-s">最低金額</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳300</div><div class="qbtn-s">常見金額</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳500</div><div class="qbtn-s">常見金額</div></div>
+                <div class="qbtn used"><div class="qbtn-n">৳1,000</div><div class="qbtn-s">常見金額</div></div>
+              </div>
+            </div>
+            <div class="bottom-bar">
+              <button class="big-btn primary">改為 ৳100 存款</button>
+            </div>
+          </div>
+
+          <!-- FAIL 4: weak network -->
+          <div class="pstate" id="p2-s4">
+            <div class="app-bar">
+              <div class="app-bar-back" style="opacity:0.3;">←</div>
+              <div class="app-bar-title">存款處理中</div>
+            </div>
+            <div class="scroll">
+              <div class="net-banner">
+                <div class="net-dot"></div>
+                <div>目前網路較慢，交易仍在後台處理</div>
+              </div>
+              <div style="text-align:center;padding:16px 0 8px;">
+                <div style="width:56px;height:56px;background:#eff6ff;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;animation:pulse 2s infinite;">📡</div>
+                <div style="font-size:14px;font-weight:700;color:#111;">等待銀行回應中</div>
+                <div style="font-size:11px;color:#aaa;margin-top:3px;">৳1,000 透過 bKash</div>
+              </div>
+              <div class="alert blue">
+                <strong>可以安心關掉這個頁面</strong>
+                你的存款請求已送出，關掉頁面不會影響交易。到帳後我們會通知你。
+              </div>
+              <div class="alert amber">
+                <strong>網路恢復後...</strong>
+                我們會自動查詢最新交易狀態。如果長時間未到帳，請聯絡客服。
+              </div>
+            </div>
+            <div class="bottom-bar" style="display:flex;gap:8px;">
+              <button class="big-btn outline" style="flex:1;font-size:12px;">聯絡客服</button>
+              <button class="big-btn primary" style="flex:2;">關閉頁面</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     原型 3：存款後 AI 引導
+═══════════════════════════════════════ -->
+<div id="p3" class="proto">
+  <div class="proto-head">
+    <div class="proto-num">原型 3</div>
+    <div class="proto-title">存款成功後 AI 引導</div>
+    <p class="proto-desc">存款成功頁不是終點，是玩家留在平台最關鍵的 30 秒。AI 根據玩家歷史，預測他下一步想做什麼，主動引導，減少流失。</p>
+  </div>
+
+  <div class="state-switcher">
+    <button class="state-btn s-green active" onclick="switchState('p3','s1',this)">狀態 1 · 有遊戲紀錄</button>
+    <button class="state-btn s-blue" onclick="switchState('p3','s2',this)">狀態 2 · 首次存款（FTD）</button>
+    <button class="state-btn s-green" onclick="switchState('p3','s3',this)">狀態 3 · 解鎖優惠</button>
+    <button class="state-btn s-purple" onclick="switchState('p3','s4',this)">狀態 4 · 升 VIP 成功</button>
+  </div>
+
+  <div class="layout">
+    <div class="info">
+
+      <div class="p3-info" id="p3-s1-info">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">有遊戲紀錄 — 引導回去繼續玩</div>
+            <div class="csub">玩家有明確的上次遊戲紀錄，AI 預測他最想做的事是繼續玩同一個遊戲。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>顯示上次玩的遊戲卡片，一鍵跳回</span></li>
+              <li><span class="pi pi-ok">✓</span><span>如果有優惠剛好達到門檻，在成功頁一起顯示</span></li>
+              <li><span class="pi pi-tip">→</span><span>研究：個人化遊戲推薦讓遊戲時長平均增加 27%</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p3-info" id="p3-s2-info" style="display:none;">
+        <div class="card" style="border-color:var(--blue-border);">
+          <div class="card-header blue-bg">
+            <div class="cname">首次存款（FTD）— 最重要的 7 天</div>
+            <div class="csub">首存玩家沒有遊戲紀錄，需要引導，否則他存完錢不知道要去哪，直接關掉。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>顯示「新手推薦遊戲」— 不是所有遊戲，是 3 個最容易上手的</span></li>
+              <li><span class="pi pi-ok">✓</span><span>說明新手禮包：首存 bonus 如何使用</span></li>
+              <li><span class="pi pi-warn">!</span><span>研究：FTD 後 7 天是留存關鍵期。這個頁面設計好不好，決定他會不會有第 2 次存款</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p3-info" id="p3-s3-info" style="display:none;">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">解鎖優惠門檻 — 趁熱出擊</div>
+            <div class="csub">玩家這次存款剛好達到優惠門檻，這是讓他立刻去用的最好時機。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>優先顯示「你已解鎖 ৳100 紅利」，讓玩家感受到即時回饋</span></li>
+              <li><span class="pi pi-ok">✓</span><span>說明紅利使用條件（投注流水要求），不要讓玩家後來才發現有條件</span></li>
+              <li><span class="pi pi-ok">✓</span><span>一鍵帶入可以使用紅利的遊戲</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="p3-info" id="p3-s4-info" style="display:none;">
+        <div class="card" style="border-color:var(--purple-border);">
+          <div class="card-header" style="background:var(--purple-bg);border-color:var(--purple-border);">
+            <div class="cname">升 VIP 成功 — 給玩家儀式感</div>
+            <div class="csub">這是玩家最有成就感的時刻，設計好的升等體驗會大幅提升長期留存。</div>
+          </div>
+          <div class="card-body">
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>用動畫和視覺效果強化升等的儀式感（不只是文字說「升級了」）</span></li>
+              <li><span class="pi pi-ok">✓</span><span>立刻說明新等級的具體好處，讓玩家馬上感受到差異</span></li>
+              <li><span class="pi pi-tip">→</span><span>研究：玩家升等後的 24 小時是遊戲頻率最高的時間窗口</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PHONE P3 -->
+    <div class="phone-wrap">
+      <div class="phone-label" id="p3-phone-label">狀態 1 — 有遊戲紀錄</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+
+          <!-- SUCCESS 1: has game history -->
+          <div class="pstate active" id="p3-s1">
+            <div class="scroll" style="padding-top:24px;">
+              <div class="success-hero">
+                <div class="s-icon-wrap">✓</div>
+                <div class="s-title">存款成功！</div>
+                <div class="s-amount">৳ 1,000</div>
+                <div class="s-sub">透過 bKash · 已到帳</div>
+              </div>
+              <div class="sep">繼續你的遊戲</div>
+              <div class="game-card">
+                <div class="game-thumb">🃏</div>
+                <div class="game-info">
+                  <div class="game-name">Teen Patti Gold</div>
+                  <div class="game-sub">上次遊玩 · 2 小時前</div>
+                </div>
+                <button class="game-btn">繼續</button>
+              </div>
+              <div class="sep">你可能也喜歡</div>
+              <div class="game-card" style="background:linear-gradient(135deg,#1e3a5f,#1e4d8c);">
+                <div class="game-thumb" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">🎲</div>
+                <div class="game-info">
+                  <div class="game-name">Andar Bahar</div>
+                  <div class="game-sub">✦ AI 推薦 · 適合你的風格</div>
+                </div>
+                <button class="game-btn">試試</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUCCESS 2: FTD -->
+          <div class="pstate" id="p3-s2">
+            <div class="scroll" style="padding-top:20px;">
+              <div class="success-hero">
+                <div class="s-icon-wrap">🎉</div>
+                <div class="s-title">歡迎！首次存款成功</div>
+                <div class="s-amount">৳ 500</div>
+                <div class="s-sub">新手禮包已啟用</div>
+              </div>
+              <div class="alert green" style="margin-top:2px;">
+                <strong>🎁 你的首存紅利：৳50</strong>
+                可用於所有遊戲。在 7 天內完成 ৳500 投注即可提領。
+              </div>
+              <div class="sep">推薦新手遊戲</div>
+              <div class="game-card">
+                <div class="game-thumb">🎰</div>
+                <div class="game-info">
+                  <div class="game-name">水果老虎機</div>
+                  <div class="game-sub">最容易上手 · 最低 ৳1 起投</div>
+                </div>
+                <button class="game-btn">開始</button>
+              </div>
+              <div class="game-card" style="background:linear-gradient(135deg,#064e3b,#065f46);">
+                <div class="game-thumb" style="background:linear-gradient(135deg,#10b981,#059669);">🎯</div>
+                <div class="game-info">
+                  <div class="game-name">Color Prediction</div>
+                  <div class="game-sub">新手最愛 · 規則超簡單</div>
+                </div>
+                <button class="game-btn">開始</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUCCESS 3: bonus unlocked -->
+          <div class="pstate" id="p3-s3">
+            <div class="scroll" style="padding-top:20px;">
+              <div class="success-hero">
+                <div class="s-icon-wrap">✓</div>
+                <div class="s-title">存款成功！</div>
+                <div class="s-amount">৳ 1,200</div>
+                <div class="s-sub">透過 bKash · 已到帳</div>
+              </div>
+              <div class="alert green">
+                <strong>🎁 恭喜！解鎖存款紅利</strong>
+                你已達到 ৳1,000 門檻，獲得 <strong>৳120 紅利</strong>（10%）。<br>完成 ৳3,600 投注後可提領。
+              </div>
+              <div class="sep">用紅利去玩</div>
+              <div class="game-card">
+                <div class="game-thumb">🃏</div>
+                <div class="game-info">
+                  <div class="game-name">Teen Patti Gold</div>
+                  <div class="game-sub">紅利可用 · 上次遊玩</div>
+                </div>
+                <button class="game-btn">開始</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUCCESS 4: VIP upgrade -->
+          <div class="pstate" id="p3-s4">
+            <div class="scroll" style="padding-top:20px;">
+              <div style="background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:16px;padding:20px 14px;text-align:center;margin-bottom:0;">
+                <div style="font-size:32px;margin-bottom:8px;">👑</div>
+                <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;">恭喜升級 Gold VIP！</div>
+                <div style="font-size:26px;font-weight:700;color:#fde68a;letter-spacing:-0.03em;margin:8px 0 3px;">৳ 1,300</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6);">存款成功 · 已升至 Gold 等級</div>
+              </div>
+              <div class="alert blue" style="background:var(--purple-bg);border-color:var(--purple-border);color:#5b21b6;">
+                <strong>Gold VIP 專屬好處，立即生效</strong>
+                ✓ 每次存款手續費 0%<br>
+                ✓ 每週返水 1.5%<br>
+                ✓ 專屬 VIP 客服通道
+              </div>
+              <div class="sep">開始享受 VIP 待遇</div>
+              <div class="game-card" style="background:linear-gradient(135deg,#4c1d95,#5b21b6);">
+                <div class="game-thumb" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">🏆</div>
+                <div class="game-info">
+                  <div class="game-name">VIP 專屬桌</div>
+                  <div class="game-sub">Gold 限定 · 更高倍率</div>
+                </div>
+                <button class="game-btn">進入</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div class="footer">
+  <div class="footer-inner">
+    <span class="footer-text">Payment UX Prototypes v2 · 研究應用版 · 2026.05.18</span>
+    <span class="footer-text">整合：行為研究 + 孟加拉市場 + AI 預測 + 失敗處理</span>
+  </div>
+</div>
+
+<script>
+  function switchProto(id, el) {
+    document.querySelectorAll('.proto').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function switchState(proto, stateId, btn) {
+    const prefix = proto + '-';
+    // switch phone states
+    document.querySelectorAll('[id^="' + prefix + 's"]').forEach(el => {
+      if (el.classList.contains('pstate') || el.classList.contains('p1-info') ||
+          el.classList.contains('p2-info') || el.classList.contains('p3-info')) {
+        el.style.display = 'none';
+        el.classList.remove('active');
+      }
+    });
+    // show phone
+    const phone = document.getElementById(prefix + stateId);
+    if (phone) { phone.style.display = 'flex'; phone.classList.add('active'); }
+    // show info
+    const info = document.getElementById(prefix + stateId + '-info');
+    if (info) info.style.display = 'block';
+    // update label
+    const label = document.getElementById(proto + '-phone-label');
+    if (label) label.textContent = btn.textContent.trim();
+    // update buttons
+    btn.closest('.state-switcher').querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // init all pstates properly
+  document.querySelectorAll('.pstate').forEach(el => {
+    if (!el.classList.contains('active')) el.style.display = 'none';
+    else el.style.display = 'flex';
+  });
+  document.querySelectorAll('.p1-info, .p2-info, .p3-info').forEach(el => {
+    if (el.style.display !== 'none') el.style.display = 'block';
+  });
+</script>
+</body>
+</html>

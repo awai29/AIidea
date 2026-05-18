@@ -171,6 +171,9 @@
     <a href="#passive" class="fb">被動存款</a>
     <a href="#data" class="fb">關鍵數據</a>
     <a href="#implications" class="fb">對我們的意義</a>
+    <a href="#bangladesh" class="fb">孟加拉市場</a>
+    <a href="#ai" class="fb">AI 預測玩家</a>
+    <a href="#future" class="fb">未來 UX 技術</a>
     <a href="#sources" class="fb">資料來源</a>
   </div>
 </div>
@@ -582,6 +585,438 @@
     </div>
   </div>
 
+  <!-- 孟加拉市場特殊性 -->
+  <div id="bangladesh" class="section">
+    <div class="sec-label">孟加拉市場特殊性 · 不能用一般市場邏輯套用</div>
+
+    <div class="card" style="border-color:var(--red-border);">
+      <div class="card-header red-bg">
+        <div class="ctop">
+          <div class="cname">⚠ 關鍵背景：孟加拉賭博屬於違法</div>
+        </div>
+        <div class="csub">這是孟加拉市場與其他市場最根本的差異，直接影響玩家的存款心理與行為。</div>
+      </div>
+      <div class="card-body">
+        <div class="panel">
+          <div class="panel-title">法律現況</div>
+          <ul class="pl">
+            <li><span class="pi pi-warn">!</span><span>孟加拉自 1867 年《公共賭博法》起，絕大多數賭博形式屬於違法（賽馬和政府彩票除外）</span></li>
+            <li><span class="pi pi-warn">!</span><span><strong>2025 年《網路安全條例》第 20 條：</strong>經營或推廣線上賭博平台，最高處 2 年有期徒刑 + 最高 1 千萬塔卡罰款</span></li>
+            <li><span class="pi pi-warn">!</span><span>2025 年 5 月，孟加拉刑事調查局（CID）識別出 1,000 多個與非法賭博交易相關的行動金融服務代理商</span></li>
+            <li><span class="pi pi-tip">→</span><span>儘管如此，2024 年 6 月估計仍有 <strong>500 萬人</strong>活躍在各賭博網站上，主要是年輕族群</span></li>
+          </ul>
+        </div>
+        <div class="callout red">
+          <span class="callout-icon">!</span>
+          <span><strong>這對存款 UX 的直接影響：</strong>玩家在使用 bKash / Nagad 存款時，心裡清楚這是違法行為。這不只是「流程麻煩」，而是玩家面對的是「會不會被追查」的焦慮。存款失敗時，他不知道是技術問題，還是交易被銀行標記了。這種模糊感是孟加拉市場獨有的放棄原因。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="cname">孟加拉行動支付市場數據</div>
+        <div class="csub">MFS（行動金融服務）是玩家存款的主要管道，但實際活躍使用率遠低於帳戶數</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">指標</th>
+              <th style="padding-top:18px;">數值</th>
+              <th style="padding-top:18px;">說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MFS 帳戶總數（2025年1月）</td>
+              <td><span class="num amber">2.39 億</span></td>
+              <td>一年內增加 2,000 萬個帳戶，但活躍率只有 37.6%</td>
+            </tr>
+            <tr>
+              <td>bKash 市佔率</td>
+              <td><span class="num">39.9%</span></td>
+              <td>最大行動支付平台，2024 年獲利年增 67%</td>
+            </tr>
+            <tr>
+              <td>Nagad 市佔率</td>
+              <td><span class="num">18.1%</span></td>
+              <td>第二大平台，成長快速</td>
+            </tr>
+            <tr>
+              <td>每日交易總額年增率</td>
+              <td><span class="num green">+34%</span></td>
+              <td>日均交易額 4.39 億美元，主要用於帳單、薪資、家庭匯款</td>
+            </tr>
+            <tr>
+              <td>網路普及率（2024年）</td>
+              <td><span class="num amber">44.5%</span></td>
+              <td>7,736 萬網路用戶，但農村地區數據費用高、網速慢</td>
+            </tr>
+            <tr>
+              <td>智慧型手機擁有率</td>
+              <td><span class="num">31%</span></td>
+              <td>近 1.89 億行動連線，但智慧機普及率仍低，許多人用功能型手機</td>
+            </tr>
+            <tr>
+              <td>年輕人智慧型手機成癮率</td>
+              <td><span class="num">61.4%</span></td>
+              <td>25 歲以下男性比例最高，與博弈平台目標用戶高度重疊</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--amber-border);">
+      <div class="card-header amber-bg">
+        <div class="cname">孟加拉市場的 3 個存款特殊障礙</div>
+        <div class="csub">這些是一般 iGaming 研究沒有考慮到的，孟加拉玩家獨有的存款阻力</div>
+      </div>
+      <div class="card-body">
+        <div class="panel">
+          <div class="panel-title">障礙 1：交易被 MFS 平台標記的恐懼</div>
+          <ul class="pl">
+            <li><span class="pi pi-warn">!</span><span>CID 已識別大量 bKash / Nagad 代理商參與賭博交易，代表 MFS 平台對賭博交易有一定程度的監控</span></li>
+            <li><span class="pi pi-warn">!</span><span>玩家擔心存款交易被標記 → 即使技術上可以成功，心理摩擦也更大</span></li>
+            <li><span class="pi pi-tip">→</span><span>存款失敗時，玩家不知道是技術失敗還是被攔截，這種模糊感比「確定失敗」更讓人焦慮</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">障礙 2：網路品質不穩定</div>
+          <ul class="pl">
+            <li><span class="pi pi-warn">!</span><span>孟加拉農村地區數據費用高、網速慢，存款過程中斷線很常見</span></li>
+            <li><span class="pi pi-warn">!</span><span>玩家不知道「等待中」是網路斷了還是正在處理 — 情境 C 的問題在孟加拉尤其嚴重</span></li>
+            <li><span class="pi pi-tip">→</span><span>等待頁面必須能在弱網路環境下工作，且斷線重連後要能顯示正確狀態</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">障礙 3：節慶時段交易量爆增造成系統不穩</div>
+          <ul class="pl">
+            <li><span class="pi pi-warn">!</span><span>孟加拉 MFS 在節慶（齋戒月 Eid、潑水節）期間交易量急劇上升，bKash 曾出現系統中斷</span></li>
+            <li><span class="pi pi-warn">!</span><span>賽事期間（IPL、世界盃）賭博交易量也同步激增，支付系統更容易出錯</span></li>
+            <li><span class="pi pi-tip">→</span><span>最需要優化「等待狀態頁」的時間點，恰好是系統最不穩定的時候</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--blue-border);">
+      <div class="card-header blue-bg">
+        <div class="cname">對提案的直接影響</div>
+      </div>
+      <div class="card-body">
+        <div class="impls">
+          <div class="implication" style="background:var(--bg);border-radius:10px;">
+            <div class="impl-icon red">!</div>
+            <div class="impl-body">
+              <div class="impl-title">存款失敗的原因比一般市場更複雜</div>
+              <div class="impl-desc">一般市場：技術失敗 or 用戶輸入錯誤。孟加拉市場多了第三種：<strong>交易被攔截</strong>。失敗訊息必須區分這三種情況，給出不同的下一步建議。</div>
+            </div>
+          </div>
+          <div class="implication" style="background:var(--bg);border-radius:10px;">
+            <div class="impl-icon amber">📶</div>
+            <div class="impl-body">
+              <div class="impl-title">存款頁必須考慮弱網路環境</div>
+              <div class="impl-desc">等待頁面要能判斷「是網路斷了，還是交易還在處理」，避免玩家因為頁面沒反應就誤以為失敗。</div>
+            </div>
+          </div>
+          <div class="implication" style="background:var(--bg);border-radius:10px;">
+            <div class="impl-icon purple">⚖</div>
+            <div class="impl-body">
+              <div class="impl-title">所有功能上線前必須確認法律合規性</div>
+              <div class="impl-desc">主動引導存款、一鍵重複存款、深夜存款推播 — 在孟加拉法律框架下，這些功能的設計需要法務確認邊界在哪裡。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 預測玩家下一步 -->
+  <div id="ai" class="section">
+    <div class="sec-label">AI 預測玩家下一步 · 業界實際應用與數據</div>
+
+    <div class="card" style="border-color:var(--blue-border);">
+      <div class="card-header blue-bg">
+        <div class="cname">AI 能預測什麼？</div>
+        <div class="csub">現在業界領先的 iGaming 平台，已不是「玩家做了什麼才反應」，而是「提前知道玩家下一步想做什麼」。</div>
+      </div>
+      <div class="card-body">
+        <div class="panel">
+          <div class="panel-title">6 件 AI 現在就能預測的事</div>
+          <div class="scenario-grid">
+            <div class="s-card" style="border-left:3px solid var(--blue);">
+              <div class="s-title">玩家快要離開了</div>
+              <div class="s-desc">偵測到長時間閒置、下注頻率降低、bet 金額縮小 → 在他關掉之前，送出個人化留存誘因</div>
+              <div class="s-data">介入後：<strong>65%</strong> 的玩家當天降低賭博活動（研究追蹤 7,134 名玩家）</div>
+            </div>
+            <div class="s-card" style="border-left:3px solid var(--green);">
+              <div class="s-title">最佳的推播時機</div>
+              <div class="s-desc">每個玩家有自己的最佳接收時段（有人早上、有人深夜）→ AI 根據歷史行為判斷，不是統一定時發送</div>
+              <div class="s-data">即時觸發 vs 批量推播：<strong>轉換率顯著更高</strong>（業界一致認可）</div>
+            </div>
+            <div class="s-card" style="border-left:3px solid var(--amber);">
+              <div class="s-title">玩家下次要存多少</div>
+              <div class="s-desc">根據過去存款金額、週期、當前餘額，預測玩家下次最可能的存款金額 → 存款頁直接預填建議金額</div>
+              <div class="s-data">個人化金額建議 → 存款頁停留時間縮短，確認率提升</div>
+            </div>
+            <div class="s-card" style="border-left:3px solid var(--purple);">
+              <div class="s-title">玩家想玩什麼遊戲</div>
+              <div class="s-desc">存款成功後，根據玩家習慣預測他想去哪個遊戲 → 成功頁直接顯示「繼續玩 [遊戲名]」捷徑</div>
+              <div class="s-data">個人化遊戲推薦 → 平均延長遊戲時間 <strong>27%</strong>（IGT Analytics 2024 調查）</div>
+            </div>
+            <div class="s-card" style="border-left:3px solid var(--red);">
+              <div class="s-title">玩家是否有問題賭博傾向</div>
+              <div class="s-desc">追蹤：深夜存款、輸後立即存款、存款金額突然增大 → 提前識別高風險玩家，啟動保護機制</div>
+              <div class="s-data">XGBoost 模型：只需 <strong>30 天數據</strong>，識別準確率 <strong>97%</strong>（瑞典研究，2025）</div>
+            </div>
+            <div class="s-card" style="border-left:3px solid var(--green);">
+              <div class="s-title">哪個優惠最有效</div>
+              <div class="s-desc">不同玩家對不同誘因的反應不同（有人要 free spin、有人要 match bonus）→ AI 選擇對這個玩家 ROI 最高的優惠</div>
+              <div class="s-data">個人化優惠 → 存款頻率提升 <strong>19%</strong>，同時節省 bonus 支出 <strong>27%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="cname">AI 應用於存款頁的具體場景</div>
+        <div class="csub">不是未來，是現在業界已在做的事</div>
+      </div>
+      <div class="card-body">
+        <div class="panel">
+          <div class="panel-title">場景 1：動態存款頁 — 根據玩家狀態顯示不同內容</div>
+          <ul class="pl">
+            <li><span class="pi pi-ok">✓</span><span><strong>玩家剛輸完進來（追損情境）：</strong>不主動顯示「一鍵存更多」，改為顯示冷靜提示；如果確認要存，流程正常但加入確認步驟</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>玩家是今天第一次進來（session start）：</strong>直接預填最常用金額，最快完成存款，不加干擾</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>玩家餘額快見底（遊戲中跳來）：</strong>極簡模式，只顯示最常用金額 + 確認按鈕，兩步完成</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>玩家接近 VIP 門檻：</strong>顯示升等提示，帶入恰好可以升等的金額建議</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">場景 2：存款成功後，AI 預測下一步</div>
+          <ul class="pl">
+            <li><span class="pi pi-ok">✓</span><span>有遊戲紀錄 → 「繼續玩 [上次遊戲]」捷徑，一鍵跳回去</span></li>
+            <li><span class="pi pi-ok">✓</span><span>剛達到優惠門檻 → 顯示「你已解鎖 XX 紅利，現在去用」提示</span></li>
+            <li><span class="pi pi-ok">✓</span><span>沒有遊戲紀錄（首存）→ 「探索遊戲」引導，而不是空白頁面</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-title">場景 3：存款失敗後，AI 判斷原因給不同引導</div>
+          <ul class="pl">
+            <li><span class="pi pi-ok">✓</span><span><strong>逾時（銀行沒回應）：</strong>「可能只是網路慢，幫你保留金額，要重試嗎？」</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>帳號問題（KYC / 限額）：</strong>「需要聯絡客服解鎖，點這裡馬上聯絡」</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>金額不符（低於最低存款）：</strong>直接顯示最低金額，問要不要改成這個金額</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--red-border);">
+      <div class="card-header red-bg">
+        <div class="cname">⚠ AI 的倫理雙刃劍</div>
+        <div class="csub">同樣的技術，可以保護玩家，也可以操控玩家。我們要選哪條路？</div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:12px;padding:16px;">
+            <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">負責任的用法</div>
+            <ul class="pl">
+              <li><span class="pi pi-ok">✓</span><span>偵測到高頻存款 → 顯示冷靜提示</span></li>
+              <li><span class="pi pi-ok">✓</span><span>深夜存款 → 加入確認步驟</span></li>
+              <li><span class="pi pi-ok">✓</span><span>識別高風險玩家 → 主動提供存款限額設定</span></li>
+              <li><span class="pi pi-ok">✓</span><span>存款成功後推薦遊戲（而非再次存款）</span></li>
+            </ul>
+          </div>
+          <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:12px;padding:16px;">
+            <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">操控性用法（應避免）</div>
+            <ul class="pl">
+              <li><span class="pi pi-warn">!</span><span>玩家輸了 → 馬上彈出「再充一次」誘惑</span></li>
+              <li><span class="pi pi-warn">!</span><span>深夜決策能力差 → 送出最強力的存款推播</span></li>
+              <li><span class="pi pi-warn">!</span><span>玩家快要冷靜了 → 推送限時優惠製造緊迫感</span></li>
+              <li><span class="pi pi-warn">!</span><span>追損玩家 → 移除所有存款摩擦</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout amber" style="margin-top:12px;">
+          <span class="callout-icon">★</span>
+          <span>研究指出：AI 可以精確判斷玩家快要登出的時機，並送出個人化誘因讓他留下來繼續玩。<strong>這項技術本身是中性的，但使用意圖決定它是保護工具還是傷害工具。</strong>建議在提案中明確說明我們的 AI 應用原則。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--green-border);">
+      <div class="card-header green-bg">
+        <div class="cname">AI 實際帶來的數據成果</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">應用</th>
+              <th style="padding-top:18px;">數據成果</th>
+              <th style="padding-top:18px;">來源</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>即時 AI 個人化</td>
+              <td><span class="num green">玩家終身價值 +22%</span></td>
+              <td style="color:var(--muted);font-size:12px;">Red Apple Tech 案例研究</td>
+            </tr>
+            <tr>
+              <td>個人化遊戲推薦</td>
+              <td><span class="num green">遊戲時長 +27%</span></td>
+              <td style="color:var(--muted);font-size:12px;">IGT Analytics 2024 調查</td>
+            </tr>
+            <tr>
+              <td>個人化優惠投遞</td>
+              <td><span class="num green">存款頻率 +19%，bonus 支出 -27%</span></td>
+              <td style="color:var(--muted);font-size:12px;">IGT Analytics 2024 調查</td>
+            </tr>
+            <tr>
+              <td>AI 留存干預（D30）</td>
+              <td><span class="num green">30 天留存率 +38%，重複存款 +41%</span></td>
+              <td style="color:var(--muted);font-size:12px;">iGaming AI 案例研究</td>
+            </tr>
+            <tr>
+              <td>AI 識別問題賭客</td>
+              <td><span class="num green">比人工快 5 倍，準確率 85%+</span></td>
+              <td style="color:var(--muted);font-size:12px;">AI 負責任賭博研究, 2025</td>
+            </tr>
+            <tr>
+              <td>XGBoost 問題賭客預測</td>
+              <td><span class="num green">30 天數據準確率 97%</span></td>
+              <td style="color:var(--muted);font-size:12px;">瑞典研究, Springer Nature, 2025</td>
+            </tr>
+            <tr>
+              <td>個人化訊息介入後行為改變</td>
+              <td><span class="num green">65% 當天降低賭博活動，60% 七天後仍維持</span></td>
+              <td style="color:var(--muted);font-size:12px;">7,134 名玩家追蹤研究</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 未來 UX 技術趨勢 -->
+  <div id="future" class="section">
+    <div class="sec-label">未來存款 UX 技術趨勢 · 業界正在發生的改變</div>
+
+    <div class="scenario-grid">
+
+      <div class="s-card" style="border-left:3px solid var(--blue);">
+        <span class="s-tag active">現在可做</span>
+        <div class="s-title">生物辨識支付 — Face ID / 指紋</div>
+        <div class="s-desc">存款不需要輸入任何數字，直接用臉部或指紋認證完成。業界已廣泛使用（Google Pay、Apple Pay 的博弈整合）。</div>
+        <div class="s-data">效果：從「輸入金額 → 填資料 → 確認」縮減為「選金額 → 臉部掃描 → 完成」。存款時間縮短至 <strong>數秒</strong>。</div>
+      </div>
+
+      <div class="s-card" style="border-left:3px solid var(--green);">
+        <span class="s-tag active">現在可做</span>
+        <div class="s-title">智慧路由 — 自動選最佳支付通道</div>
+        <div class="s-desc">後端根據玩家的支付方式、金額、地區、時段，自動選擇成功率最高的支付路徑，玩家完全感覺不到。</div>
+        <div class="s-data">效果：同樣的支付方式，好的路由讓核准率從 <strong>75% 提升到 95%</strong>，等於減少 20% 的存款失敗。</div>
+      </div>
+
+      <div class="s-card" style="border-left:3px solid var(--purple);">
+        <span class="s-tag passive">需要評估</span>
+        <div class="s-title">Token 化 — 存款資料不再重複輸入</div>
+        <div class="s-desc">玩家第一次存款後，支付資料被替換為一次性 token 儲存。下次存款只需選金額，不用再填任何支付資料。</div>
+        <div class="s-data">安全性：即使平台被駭，黑客拿到的只是無效的 token，不是真實的支付資料。</div>
+      </div>
+
+      <div class="s-card" style="border-left:3px solid var(--amber);">
+        <span class="s-tag passive">需要評估</span>
+        <div class="s-title">背景驗證（3DS 2.2）</div>
+        <div class="s-desc">存款驗證在背景自動完成，不需要跳出頁面輸入 OTP，玩家體驗是無縫的。目前在歐洲已廣泛部署。</div>
+        <div class="s-data">Baymard 研究：改善 checkout UX 平均可提升轉換率 <strong>35%</strong>，手機端尤其顯著。</div>
+      </div>
+
+      <div class="s-card" style="border-left:3px solid var(--blue);">
+        <span class="s-tag active">概念可參考</span>
+        <div class="s-title">情境感知 checkout（Uber 模式）</div>
+        <div class="s-desc">不同情境的玩家，看到不同的存款步驟。從遊戲跳來的玩家只看到 2 步；從主頁進來的玩家看到完整流程。不是一套流程對所有人。</div>
+        <div class="s-data">Uber「Checkout Actions」框架：根據交易情境動態插入或移除步驟，同一服務兩個用戶可能看到完全不同的流程。</div>
+      </div>
+
+      <div class="s-card" style="border-left:3px solid var(--green);">
+        <span class="s-tag active">現在可做</span>
+        <div class="s-title">弱網路偵測 + 離線容錯</div>
+        <div class="s-desc">存款送出後如果偵測到網路中斷，不立即顯示失敗，而是切換到「等待重連」模式，重連後繼續確認交易狀態。</div>
+        <div class="s-data">對孟加拉市場特別重要：農村地區網路不穩定，玩家因斷線誤以為失敗而放棄的情況很常見。</div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:4px;">
+      <div class="card-header">
+        <div class="cname">這些技術的實施優先順序</div>
+        <div class="csub">哪些現在就能做，哪些需要更多前提</div>
+      </div>
+      <div class="card-body" style="padding-top:0;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="padding-top:18px;">技術</th>
+              <th style="padding-top:18px;">難度</th>
+              <th style="padding-top:18px;">依賴的前提</th>
+              <th style="padding-top:18px;">預期效果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>情境感知存款頁（不同入口不同流程）</td>
+              <td><span style="color:var(--green);font-weight:600;">低</span></td>
+              <td>前端判斷入口來源即可</td>
+              <td>減少不必要摩擦，急迫玩家更快完成</td>
+            </tr>
+            <tr>
+              <td>弱網路偵測 + 等待重連</td>
+              <td><span style="color:var(--green);font-weight:600;">低</span></td>
+              <td>前端偵測 navigator.onLine 狀態</td>
+              <td>減少因斷線誤判失敗的放棄</td>
+            </tr>
+            <tr>
+              <td>AI 預填存款金額建議</td>
+              <td><span style="color:var(--amber);font-weight:600;">中</span></td>
+              <td>需要後端歷史存款 API + 簡單預測模型</td>
+              <td>縮短存款頁停留時間，提高確認率</td>
+            </tr>
+            <tr>
+              <td>智慧支付路由</td>
+              <td><span style="color:var(--amber);font-weight:600;">中</span></td>
+              <td>需要多個支付 PSP + 路由邏輯</td>
+              <td>核准率提升 8–20%，減少存款失敗</td>
+            </tr>
+            <tr>
+              <td>存款成功後 AI 推薦遊戲</td>
+              <td><span style="color:var(--amber);font-weight:600;">中</span></td>
+              <td>需要遊戲歷史紀錄 + 推薦模型</td>
+              <td>存款後直接留在平台，減少流失</td>
+            </tr>
+            <tr>
+              <td>AI 即時行為監控（問題賭博保護）</td>
+              <td><span style="color:var(--red);font-weight:600;">高</span></td>
+              <td>需要完整行為追蹤 + ML 模型 + 介入邏輯</td>
+              <td>保護玩家，降低長期流失風險</td>
+            </tr>
+            <tr>
+              <td>生物辨識支付（Face ID）</td>
+              <td><span style="color:var(--red);font-weight:600;">高</span></td>
+              <td>需要支付 SDK 整合 + 裝置支援判斷</td>
+              <td>存款時間縮短到數秒，提升高價值玩家體驗</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- 資料來源 -->
   <div id="sources" class="section">
     <div class="sec-label">資料來源 · Sources</div>
@@ -652,6 +1087,82 @@
           <div class="source-item">
             <div class="source-dot"></div>
             <div>How Times of Day Shape Online Gambling Patterns · <a href="https://time.now/blog/how-times-of-day-shape-online-gambling-patterns" target="_blank">Time.now</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Payments Are the Lifeblood: How Friction in Deposits and Withdrawals Destroys Loyalty · <a href="https://gr8.tech/blog/payments-are-the-lifeblood-how-friction-in-deposits-and-withdrawals-destroys-loyalty/" target="_blank">GR8 Tech</a></div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:16px 0 12px;">孟加拉市場研究</div>
+        <div class="sources">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Gambling Regulation in Bangladesh · <a href="https://www.igamingtoday.com/gambling-regulation-in-bangladesh/" target="_blank">iGamingToday</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Bangladesh declares zero-tolerance policy on online gambling · <a href="https://sigma.world/news/bangladesh-zero-tolerance-online-gambling-cyber-security-act-2025/" target="_blank">Sigma World, 2025</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>The State of Mobile Financial Services (MFS) Industry in Bangladesh at the Beginning of 2025 · <a href="https://futurestartup.com/2025/05/06/the-state-of-mobile-financial-services-mfs-industry-in-bangladesh/" target="_blank">Future Startup</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Bangladesh MFS accounts surge by 20 million in a year, transactions up 32% · <a href="https://thefinancialexpress.com.bd/trade/bangladesh-mfs-accounts-surge-by-20-million-in-a-year-transactions-up-32pc" target="_blank">The Financial Express Bangladesh</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Digital 2024: Bangladesh · <a href="https://datareportal.com/reports/digital-2024-bangladesh" target="_blank">DataReportal</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>BBS: 39% of Bangladeshis use internet, 31% own smartphone · <a href="https://www.dhakatribune.com/bangladesh/301591/bbs-39%25-of-bangladeshis-use-internet-31%25-own" target="_blank">Dhaka Tribune</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Prevalence of Smartphone Addiction among Young Adults of Bangladesh · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9778917/" target="_blank">PMC</a></div>
+          </div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:16px 0 12px;">AI 與未來技術</div>
+        <div class="sources">
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>22% Higher iGaming Player Value Through Real-Time AI Personalization · <a href="https://www.redappletech.com/case-studies/higher-igaming-player-value-through-real-time-ai-personalization" target="_blank">Red Apple Tech</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Predictive Analytics In Online Casino: Using AI To Forecast High-Value Player Behavior · <a href="https://www.scaleo.io/blog/predictive-analytics-in-online-casino-using-ai-to-forecast-high-value-player-behavior/" target="_blank">Scaleo</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Using Machine-Learning Algorithms to Predict Self-Reported Problem Gambling · <a href="https://link.springer.com/article/10.1007/s11469-025-01602-2" target="_blank">Springer Nature, 2025</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>AI Personalization and Its Influence on Online Gamblers' Behavior · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12189489/" target="_blank">PMC</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Predictive Churn Analytics: AI-Driven Player Retention · <a href="https://www.smartico.ai/blog-post/predictive-churn-analytics-ai-driven-player-retention" target="_blank">Smartico.ai</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>AI in iGaming: Use Cases to Watch in 2026 · <a href="https://gr8.tech/blog/ai-in-igaming-a-look-into-machine-learning-and-personalized-gaming-experiences/" target="_blank">GR8 Tech</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Mobile Wallets Are Reshaping Payments and Logins Across Digital Gaming Platforms · <a href="https://nerdbot.com/2026/04/07/mobile-wallets-are-reshaping-payments-and-logins-across-digital-gaming-platforms/" target="_blank">Nerdbot, 2026</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>Checkout UX Best Practices 2025 · <a href="https://baymard.com/blog/current-state-of-checkout-ux" target="_blank">Baymard Institute</a></div>
+          </div>
+          <div class="source-item">
+            <div class="source-dot"></div>
+            <div>iGaming Deposit Solutions in 2025: Challenges, Strategies, and Opportunities · <a href="https://catalystpay.com/resources/blog/igaming-deposit-solutions-2025-challenges-strategies-opportuniti" target="_blank">CatalystPay</a></div>
           </div>
         </div>
       </div>
