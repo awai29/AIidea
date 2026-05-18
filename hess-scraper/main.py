@@ -84,6 +84,42 @@ def _decrypt(text: str) -> str:
         return text   # 舊版明文，直接回傳
 
 
+# ── Dropbox 設定加解密 ──
+
+DROPBOX_CONFIG_FILE = BASE_DIR / "dropbox_config.json"
+
+
+def load_dropbox_config() -> dict:
+    """
+    讀取 Dropbox 設定檔。
+    支援兩種格式：
+      - 新版（加密）：檔案內容為 Fernet 加密字串
+      - 舊版（明文）：標準 JSON，首次讀取後自動升級為加密版
+    """
+    if not DROPBOX_CONFIG_FILE.exists():
+        return {}
+    raw = DROPBOX_CONFIG_FILE.read_text(encoding="utf-8").strip()
+    try:
+        # 嘗試解密（新版加密格式）
+        decrypted = _get_fernet().decrypt(raw.encode()).decode()
+        return json.loads(decrypted)
+    except (InvalidToken, Exception):
+        pass
+    # 舊版明文 JSON：讀出後立即加密存回（自動升級）
+    try:
+        cfg = json.loads(raw)
+        save_dropbox_config(cfg)   # 升級為加密版
+        return cfg
+    except Exception:
+        return {}
+
+
+def save_dropbox_config(cfg: dict):
+    """將 Dropbox 設定以 Fernet 加密後寫入檔案"""
+    encrypted = _encrypt(json.dumps(cfg))
+    DROPBOX_CONFIG_FILE.write_text(encrypted, encoding="utf-8")
+
+
 # ── 安全工具 ──
 
 def validate_username(username: str) -> bool:
@@ -283,13 +319,12 @@ async def get_dropbox_link(path: str = Query(...)):
     if ".." in path:
         raise HTTPException(status_code=400, detail="路徑不合法")
 
-    config_file = BASE_DIR / "dropbox_config.json"
-    if not config_file.exists():
+    if not DROPBOX_CONFIG_FILE.exists():
         raise HTTPException(status_code=503, detail="Dropbox 尚未設定")
 
     try:
         import dropbox as dbx_mod
-        cfg = json.loads(config_file.read_text())
+        cfg = load_dropbox_config()
         dbx = dbx_mod.Dropbox(
             oauth2_refresh_token=cfg["refresh_token"],
             app_key=cfg["app_key"],
@@ -493,12 +528,11 @@ def run_backup(username: str, selected_keys: list):
     import re as _re
 
     state = backup_states[username]
-    config_file = BASE_DIR / "dropbox_config.json"
-    if not config_file.exists():
+    if not DROPBOX_CONFIG_FILE.exists():
         state.update({"running": False, "done": True, "error": "找不到 Dropbox 設定，請重新授權"})
         return
 
-    cfg = json.loads(config_file.read_text())
+    cfg = load_dropbox_config()
 
     def safe(s):
         """移除不合法的檔名字元"""
