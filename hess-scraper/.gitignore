@@ -1,7 +1,10 @@
 # ── 敏感資料（絕對不能上傳）──────────────────────────
-dropbox_config.json        # Dropbox App Key / Secret / Refresh Token
-data/accounts.json         # 帳號密碼
-data/.secret_key           # Fernet 加密金鑰（遺失後所有加密資料無法解密）
+# Dropbox App Key / Secret / Refresh Token
+dropbox_config.json
+# 帳號密碼（Fernet 加密）
+data/accounts.json
+# Fernet 加密金鑰（遺失後所有加密資料無法解密）
+data/.secret_key
 
 # ── 下載的音檔（檔案太大，不適合放 git）────────────────
 data/downloads/
