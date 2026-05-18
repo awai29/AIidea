@@ -304,25 +304,26 @@
           <div class="panel-title">Round 1 的邏輯鏈（有問題）</div>
           <div class="compare">
             <div class="compare-box old">
-              <h4>我們假設的</h4>
+              <h4>Round 1 的假設（已更正）</h4>
               <ul class="pl">
+                <li><span class="pi pi-warn">✗</span><span>轉換率 62%（捏造）</span></li>
                 <li><span class="pi pi-warn">✗</span><span>38% 放棄 = 因為流程太麻煩</span></li>
-                <li><span class="pi pi-warn">✗</span><span>解法 = 減少輸入步驟</span></li>
-                <li><span class="pi pi-warn">✗</span><span>結果 = 轉換率大幅提升</span></li>
+                <li><span class="pi pi-warn">✗</span><span>優惠提示是提升存款的關鍵</span></li>
               </ul>
             </div>
             <div class="compare-box new">
-              <h4>可能的真實情況</h4>
+              <h4>真實數據（2026-05-18）</h4>
               <ul class="pl">
-                <li><span class="pi pi-q">?</span><span>放棄原因：支付出錯、改變主意、網路斷線、帳號問題...</span></li>
-                <li><span class="pi pi-q">?</span><span>真正的解法可能完全不同</span></li>
-                <li><span class="pi pi-q">?</span><span>如果原因猜錯，做再多功能也沒用</span></li>
+                <li><span class="pi pi-ok">✓</span><span>完成率 85.5%，放棄率 14.2%（70,671 次）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>閒置逾時 0.01%，網路問題幾乎不存在</span></li>
+                <li><span class="pi pi-ok">✓</span><span>73% 玩家跳過優惠選擇步驟</span></li>
+                <li><span class="pi pi-q">?</span><span>那 14.2% 在哪一步放棄——仍不知道</span></li>
               </ul>
             </div>
           </div>
-          <div class="callout amber" style="margin-top:12px;">
-            <span class="callout-icon">★</span>
-            <span><strong>在拿到真實 Funnel 數據之前，所有的功能優先順序都只是猜測。</strong>要提這份提案最有說服力的方式，是先帶著一個問題去找 Tonya：「玩家在存款流程的哪一個步驟流失最多？」</span>
+          <div class="callout blue" style="margin-top:12px;">
+            <span class="callout-icon">→</span>
+            <span><strong>現在有了總放棄率，下一步是找到放棄在哪一步發生。</strong>這個答案決定要優先改哪個環節，也是讓功能優先順序從猜測變成有根據的關鍵。</span>
           </div>
         </div>
       </div>
@@ -392,13 +393,14 @@
             <span class="badge badge-amber">需先確認財務計畫</span>
           </div>
         </div>
-        <div class="csub">可能在不知情的情況下讓 Promotion 成本翻倍。</div>
+        <div class="csub">可能在不知情的情況下讓 Promotion 成本翻倍。真實數據更強化了這個疑慮。</div>
       </div>
       <div class="card-body">
         <ul class="pl">
           <li><span class="pi pi-warn">!</span><span><strong>隱藏的成本風險：</strong>CFO 設計 Promotion 時預期只有 30% 玩家觸發門檻。我們主動提示後，觸發率可能升至 60%，Promotion 成本直接翻倍，但這不在原本的財務計畫內。</span></li>
+          <li><span class="pi pi-warn">!</span><span><strong>真實數據（2026-05-18）新發現：</strong>目前只有 26.7%（63,244 / 237,059）的玩家走過優惠選擇步驟，73% 直接跳過。這代表優惠本身的吸引力有問題，或玩家根本看不見，在成本結構未釐清前不應主動推廣。</span></li>
           <li><span class="pi pi-warn">!</span><span><strong>必要前提：</strong>上線前需與營運確認「Promotion 觸發率提升是否在計畫內」。這不是技術問題，是財務問題。</span></li>
-          <li><span class="pi pi-tip">→</span><span><strong>解法：</strong>可以設「本月 Promotion 觸發上限」，達到上限後橫幅自動隱藏，保護成本結構。</span></li>
+          <li><span class="pi pi-tip">→</span><span><strong>可能更好的方向：</strong>與其「主動展示優惠」，不如先搞清楚為什麼 73% 的玩家不選優惠——是不知道有，還是覺得麻煩，還是覺得條件太難達到？</span></li>
         </ul>
       </div>
     </div>
@@ -440,19 +442,19 @@
 
   <!-- 流失漏斗 -->
   <div id="funnel" class="section">
-    <div class="sec-label">向 Tonya 請求的資料 · 具體清單</div>
+    <div class="sec-label">仍需追問 Tonya 的問題 · 數據部分到位</div>
 
     <div class="card" style="border-color:var(--blue-border);">
       <div class="card-header blue-bg">
         <div class="ctop">
-          <div class="cname">為什麼要先拿數據？</div>
+          <div class="cname">已知總放棄率，但還不知道放棄在哪一步</div>
         </div>
         <div class="csub">真實數據：每 100 次存款流程，85 次完成、14 次中途放棄、1 次閒置逾時。那 14 次放棄發生在哪一步？我們還不知道。<br>就像你知道一個杯子漏水，但不知道洞在哪裡 — 不找到洞，補了也沒用。</div>
       </div>
       <div class="card-body">
         <div class="panel">
           <div class="panel-title">存款流程的 5 個步驟（哪一步流失最多？）</div>
-          <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">玩家存款要經過以下步驟。目前我們完全不知道每步各有多少人離開，需要請 Tonya 提供每一步的完成人數（或百分比）。</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">我們已知整體放棄率（14.2%，70,671 次），但還不知道這些人是在哪一步離開的。需要請 Tonya 提供分步的事件數據，才能確定改哪裡最有效。</div>
           <div class="funnel">
             <div class="funnel-step">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px;"></div>
@@ -766,12 +768,15 @@
 
           <div class="step">
             <div class="step-left">
-              <div class="step-num green">1</div>
+              <div class="step-num" style="background:var(--amber);color:#fff;">1</div>
               <div class="step-line"></div>
             </div>
             <div class="step-content">
-              <div class="step-title">向 Tonya 取得完整 Funnel 數據</div>
-              <div class="step-desc">存款頁各步驟的流失率、放棄原因分佈、新玩家 vs 回流玩家分開的轉換率。<strong>這是整份提案的地基，沒有這個就沒有後面的一切。</strong></div>
+              <div class="step-title">向 Tonya 取得分步 Funnel 數據 <span style="font-size:11px;font-weight:400;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:9999px;margin-left:6px;">部分完成</span></div>
+              <div class="step-desc">
+                <strong style="color:var(--green);">已取得：</strong>整體完成率 85.5%、放棄率 14.2%（70,671 次）、閒置率 0.01%、優惠選擇漏斗數據<br>
+                <strong style="color:var(--amber);">仍需取得：</strong>那 70,671 次放棄是發生在哪一步？（選付款方式時？填金額時？送出後等待時？）這個答案決定接下來改哪裡。
+              </div>
             </div>
           </div>
 
@@ -814,8 +819,13 @@
               <div class="step-line"></div>
             </div>
             <div class="step-content">
-              <div class="step-title">拿到數據後，重新排 Round 2 優先順序</div>
-              <div class="step-desc">根據 Funnel 數據找到最大流失點 → 優先解決那個點 → 再來做個人化和引導功能。有了真實數據，才能給老闆看有說服力的 ROI 估算。</div>
+              <div class="step-title">根據分步數據，確認最終優先順序</div>
+              <div class="step-desc">
+                現在已知總放棄率 14.2%，功能優先順序的初步方向：<br>
+                · <strong>優先做：</strong>個人化金額按鈕（成本低、風險低，幫有意存款的玩家更快完成）<br>
+                · <strong>先暫緩：</strong>優惠橫幅、門檻提示（73% 玩家跳過優惠，財務風險未釐清）<br>
+                · <strong>等分步數據：</strong>確認最大流失點後，再決定「失敗處理」或「等待頁面」哪個更值得改
+              </div>
             </div>
           </div>
 
@@ -840,8 +850,8 @@
 
 <div class="footer">
   <div class="footer-inner">
-    <span class="footer-text">Payment UX · Round 2 · 2025.05.14 · 內部文件</span>
-    <span class="footer-text">基於 Round 1 深度審視後的修正版本</span>
+    <span class="footer-text">Payment UX · Round 2 · 2026.05.18 更新 · 內部文件</span>
+    <span class="footer-text">基於真實埋點數據驗證並修正的版本</span>
   </div>
 </div>
 
