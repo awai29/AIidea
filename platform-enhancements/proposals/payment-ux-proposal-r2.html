@@ -208,6 +208,87 @@
 
 <div class="main">
 
+  <!-- 真實數據驗證（2026-05-18 更新）-->
+  <div class="section" style="padding-bottom:0;">
+    <div class="sec-label">真實數據已到位 · 2026-05-18 更新</div>
+    <div class="card" style="border-color:var(--green-border);">
+      <div class="card-header green-bg">
+        <div class="ctop">
+          <div class="cname">Tonya 提供的數據 — 現在可以驗證提案了</div>
+        </div>
+        <div class="csub">以下數字來自真實系統埋點（BJ 站，最近 30 天）。用這批數據對照 Round 1 和 Round 2 的假設，找出哪些說對了、哪些說錯了。</div>
+      </div>
+      <div class="card-body">
+
+        <div class="panel">
+          <div class="panel-title">存款流程事件追蹤（deposit_flow_timing）· BJ 站</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:12px;padding:14px;text-align:center;">
+              <div style="font-size:11px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">完成率</div>
+              <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:-0.04em;">85.5%</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">424,007 / 496,101 次</div>
+            </div>
+            <div style="background:var(--red-bg);border:1px solid var(--red-border);border-radius:12px;padding:14px;text-align:center;">
+              <div style="font-size:11px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">中途放棄率</div>
+              <div style="font-size:28px;font-weight:700;color:var(--red);letter-spacing:-0.04em;">14.2%</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">70,671 / 496,101 次</div>
+            </div>
+            <div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:12px;padding:14px;text-align:center;">
+              <div style="font-size:11px;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">閒置逾時率</div>
+              <div style="font-size:28px;font-weight:700;color:var(--blue);letter-spacing:-0.04em;">0.01%</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">63 / 496,101 次</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">優惠選擇漏斗（存款入口 → 選優惠 → 填資料 → 完成）</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">注意：此漏斗追蹤的是「有走到優惠選擇步驟」的玩家，不是全體存款者。</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8f8f8;border-radius:9px;">
+              <div style="width:34px;height:34px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">1</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;">存款入口（含所有進入存款頁的玩家）</div><div style="font-size:11px;color:var(--muted);">包含不走優惠流程、直接存款的玩家</div></div>
+              <div style="font-size:16px;font-weight:700;color:var(--green);">237,059</div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--red);font-weight:600;">↓ 只有 26.7% 進入優惠選擇 — 73.3% 跳過</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff8f0;border:1px solid #fde68a;border-radius:9px;">
+              <div style="width:34px;height:34px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--amber);flex-shrink:0;">2</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;">先選優惠</div></div>
+              <div style="font-size:16px;font-weight:700;color:var(--amber);">63,244</div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);">↓ 99.6% 繼續（幾乎沒有人在這步放棄）</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8f8f8;border-radius:9px;">
+              <div style="width:34px;height:34px;background:#f5f5f5;border:1px solid #e8e8e8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#555;flex-shrink:0;">3</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;">填選優惠事項</div></div>
+              <div style="font-size:16px;font-weight:700;color:#555;">62,958</div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);">↓</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f0fdf4;border:1px solid var(--green-border);border-radius:9px;">
+              <div style="width:34px;height:34px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;">4</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:500;">填選完成</div></div>
+              <div style="font-size:16px;font-weight:700;color:var(--green);">66,432</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">數據驗證結論</div>
+          <ul class="pl">
+            <li><span class="pi pi-warn">!</span><span><strong>Round 1 的「62%」是捏造的</strong> — 真實完成率是 85.5%。目標不是「從 62% 升到 66%」，而是「把 14.2% 的中途放棄降低」。</span></li>
+            <li><span class="pi pi-warn">!</span><span><strong>73% 的玩家跳過優惠選擇步驟</strong> — 我們之前在存款頁大量強調優惠提示，但大多數玩家根本不走優惠路徑。優惠提示的設計需要重新評估。</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>弱網路問題不是主因</strong> — 閒置逾時只有 0.01%（63次），幾乎可以忽略。原型 2 的「弱網路狀態」優先度可以降低。</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>14.2% 放棄率是真實問題</strong> — 70,671 次放棄值得深入分析。但我們仍不知道是在哪個步驟放棄的，需要追問 Tonya。</span></li>
+          </ul>
+          <div class="callout amber" style="margin-top:12px;">
+            <span class="callout-icon">?</span>
+            <span><strong>仍未解答的問題：</strong>那 70,671 次放棄是發生在哪一步？是填金額時離開、還是送出後等待時離開？這個答案決定了接下來要優先改哪裡。</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- 核心問題 -->
   <div id="problem" class="section">
     <div class="sec-label">核心問題 · The Real Problem</div>
@@ -216,7 +297,7 @@
         <div class="ctop">
           <div class="cname">Round 1 最大的盲點</div>
         </div>
-        <div class="csub">我們在優化 62% 成功存款者的體驗，卻對造成 38% 流失的真正原因完全沒有數據。</div>
+        <div class="csub">Round 1 假設轉換率 62%（已更正：真實完成率 85.5%），更大的盲點是：我們不知道那 14.2% 放棄的人在哪一步離開、為什麼離開。</div>
       </div>
       <div class="card-body">
         <div class="panel">
@@ -366,7 +447,7 @@
         <div class="ctop">
           <div class="cname">為什麼要先拿數據？</div>
         </div>
-        <div class="csub">我們現在只知道「100 個進來存款的玩家，最後只有 62 個成功」。但不知道那 38 個人是在哪一步放棄的、為什麼放棄。<br>就像你知道一個杯子漏水，但不知道洞在哪裡 — 不找到洞，補了也沒用。</div>
+        <div class="csub">真實數據：每 100 次存款流程，85 次完成、14 次中途放棄、1 次閒置逾時。那 14 次放棄發生在哪一步？我們還不知道。<br>就像你知道一個杯子漏水，但不知道洞在哪裡 — 不找到洞，補了也沒用。</div>
       </div>
       <div class="card-body">
         <div class="panel">
@@ -375,47 +456,47 @@
           <div class="funnel">
             <div class="funnel-step">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">第 1 步：進入存款頁面</div>
-              <div class="funnel-pct green">100%（起點）</div>
+              <div class="funnel-label">第 1 步：進入存款頁面（開始 deposit_flow）</div>
+              <div class="funnel-pct green">496,101 次（100%）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
               <div class="funnel-label">第 2 步：選好付款方式（如：bKash、Nagad、銀行轉帳）</div>
-              <div class="funnel-pct">? %（待填）</div>
+              <div class="funnel-pct">? %（仍待詳細分步數據）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">第 3 步：輸入存款金額、填完所有欄位</div>
-              <div class="funnel-pct">? %（待填）</div>
+              <div class="funnel-label">第 3 步：輸入存款金額、完成匯款資訊</div>
+              <div class="funnel-pct">? %（仍待詳細分步數據）</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step unknown">
               <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">第 4 步：按下「確認存款」按鈕</div>
-              <div class="funnel-pct">? %（待填）</div>
+              <div class="funnel-label">第 4 步：按下「確認存款」送出</div>
+              <div class="funnel-pct">? %（仍待詳細分步數據）</div>
             </div>
             <div class="funnel-arrow">↓</div>
-            <div class="funnel-step unknown">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">第 5 步：等待到帳（系統在處理，玩家在等）</div>
-              <div class="funnel-pct">? %（待填）</div>
+            <div class="funnel-step" style="background:#fff8f0;border:1px solid var(--amber-border);">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:2px;"></div>
+              <div class="funnel-label">中途放棄（leave 事件）</div>
+              <div class="funnel-pct" style="color:var(--amber);">70,671 次（14.2%）— 在哪一步放棄，仍未知</div>
             </div>
             <div class="funnel-arrow">↓</div>
             <div class="funnel-step">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:2px;"></div>
-              <div class="funnel-label">錢成功進帳戶</div>
-              <div class="funnel-pct red">62%（目前唯一已知的數字）</div>
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px;"></div>
+              <div class="funnel-label">存款流程完成（completed 事件）</div>
+              <div class="funnel-pct green">424,007 次（85.5%）— 真實完成率，非 62%</div>
             </div>
           </div>
-          <div class="callout blue" style="margin-top:16px;">
-            <span class="callout-icon">→</span>
+          <div class="callout amber" style="margin-top:16px;">
+            <span class="callout-icon">!</span>
             <div>
-              <strong>數據出來後，我們就知道該改哪裡：</strong><br>
-              流失最多在「第 2 步：選付款方式」→ 代表支付選項有問題，或某個方式常出錯<br>
-              流失最多在「第 5 步：等待到帳」→ 代表玩家以為出錯了就關掉，要改等待頁面設計<br>
-              流失最多在「第 3 步：填金額」→ Round 1 的個人化按鈕才真的有用
+              <strong>現在知道總放棄率（14.2%），但還不知道放棄在哪一步 — 這是下一個要追問 Tonya 的問題：</strong><br>
+              若放棄在「選付款方式」→ 代表支付選項有問題，某個方式常出錯<br>
+              若放棄在「等待到帳」→ 代表玩家以為出錯了就關掉，要改等待頁面設計<br>
+              若放棄在「填金額」→ Round 1 的個人化按鈕才真的有用
             </div>
           </div>
         </div>
