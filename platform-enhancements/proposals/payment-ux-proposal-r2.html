@@ -275,13 +275,44 @@
           <div class="panel-title">數據驗證結論</div>
           <ul class="pl">
             <li><span class="pi pi-warn">!</span><span><strong>Round 1 的「62%」是捏造的</strong> — 真實完成率是 85.5%。目標不是「從 62% 升到 66%」，而是「把 14.2% 的中途放棄降低」。</span></li>
-            <li><span class="pi pi-warn">!</span><span><strong>73% 的玩家跳過優惠選擇步驟</strong> — 我們之前在存款頁大量強調優惠提示，但大多數玩家根本不走優惠路徑。優惠提示的設計需要重新評估。</span></li>
-            <li><span class="pi pi-ok">✓</span><span><strong>弱網路問題不是主因</strong> — 閒置逾時只有 0.01%（63次），幾乎可以忽略。原型 2 的「弱網路狀態」優先度可以降低。</span></li>
-            <li><span class="pi pi-ok">✓</span><span><strong>14.2% 放棄率是真實問題</strong> — 70,671 次放棄值得深入分析。但我們仍不知道是在哪個步驟放棄的，需要追問 Tonya。</span></li>
+            <li><span class="pi pi-warn">!</span><span><strong>「73% 跳過優惠」的解讀是錯的</strong> — 更正：那 73% 的人是在 Step 2（方式選擇畫面）就離開了，根本沒有走到優惠選擇。問題不在優惠，在方式選擇本身。</span></li>
+            <li><span class="pi pi-warn">!</span><span><strong>最大流失點已確認：Step 2 和 Step 3</strong> — Step 2（方式選擇）和 Step 3（到達表單頁）是流失最多的兩個步驟。詳見下方分析。</span></li>
+            <li><span class="pi pi-ok">✓</span><span><strong>弱網路問題不是主因</strong> — 閒置逾時只有 0.01%（63次），幾乎可以忽略。</span></li>
           </ul>
-          <div class="callout amber" style="margin-top:12px;">
-            <span class="callout-icon">?</span>
-            <span><strong>仍未解答的問題：</strong>那 70,671 次放棄是發生在哪一步？是填金額時離開、還是送出後等待時離開？這個答案決定了接下來要優先改哪裡。</span>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">最大流失點分析 — Step 2 和 Step 3</div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+
+            <div style="background:#fff8f0;border:1px solid var(--amber-border);border-radius:12px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Step 2 · 方式選擇（In Types 畫面）</div>
+              <div style="font-size:13px;color:#3f3f46;line-height:1.65;">
+                玩家點入存款後，看到 <strong>Quick In、Local bank、E-wallet、Crypto</strong> 四個選項。大量玩家在這裡沒有選擇就直接離開。<br><br>
+                <strong>可能原因：</strong>
+                <ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px;">
+                  <li>不知道每種方式有什麼差別（沒有說明）</li>
+                  <li>想用的方式在維護（Maintenance），但不知道</li>
+                  <li>每個選項都需要玩家主動選，沒有任何引導或推薦</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="background:#fff8f0;border:1px solid var(--amber-border);border-radius:12px;padding:14px 16px;">
+              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">Step 3 · 到達表單頁（E-wallet 為例）</div>
+              <div style="font-size:13px;color:#3f3f46;line-height:1.65;">
+                選了 E-wallet 後，進入的表單有 <strong>4 層決策</strong>，才能到「填金額」：<br><br>
+                <ol style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px;">
+                  <li>選優惠（Promotion）</li>
+                  <li>選付款渠道（bKash / Rocket / OKwallet / Upay / Nagad / SureCash / Bank card — 7 個選項）</li>
+                  <li>選 type（Payment Gateway / Bank Transfer）</li>
+                  <li>選 channel（AB 01 下拉選單）</li>
+                </ol>
+                <br>這麼多決定在按 Continue 之前就要全部做完，太複雜，導致放棄。
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -316,8 +347,8 @@
               <ul class="pl">
                 <li><span class="pi pi-ok">✓</span><span>完成率 85.5%，放棄率 14.2%（70,671 次）</span></li>
                 <li><span class="pi pi-ok">✓</span><span>閒置逾時 0.01%，網路問題幾乎不存在</span></li>
-                <li><span class="pi pi-ok">✓</span><span>73% 玩家跳過優惠選擇步驟</span></li>
-                <li><span class="pi pi-q">?</span><span>那 14.2% 在哪一步放棄——仍不知道</span></li>
+                <li><span class="pi pi-ok">✓</span><span>最大流失點：Step 2（方式選擇）和 Step 3（表單頁）</span></li>
+                <li><span class="pi pi-q">?</span><span>各步驟的精確流失數字仍待確認</span></li>
               </ul>
             </div>
           </div>
@@ -398,9 +429,9 @@
       <div class="card-body">
         <ul class="pl">
           <li><span class="pi pi-warn">!</span><span><strong>隱藏的成本風險：</strong>CFO 設計 Promotion 時預期只有 30% 玩家觸發門檻。我們主動提示後，觸發率可能升至 60%，Promotion 成本直接翻倍，但這不在原本的財務計畫內。</span></li>
-          <li><span class="pi pi-warn">!</span><span><strong>真實數據（2026-05-18）新發現：</strong>目前只有 26.7%（63,244 / 237,059）的玩家走過優惠選擇步驟，73% 直接跳過。這代表優惠本身的吸引力有問題，或玩家根本看不見，在成本結構未釐清前不應主動推廣。</span></li>
-          <li><span class="pi pi-warn">!</span><span><strong>必要前提：</strong>上線前需與營運確認「Promotion 觸發率提升是否在計畫內」。這不是技術問題，是財務問題。</span></li>
-          <li><span class="pi pi-tip">→</span><span><strong>可能更好的方向：</strong>與其「主動展示優惠」，不如先搞清楚為什麼 73% 的玩家不選優惠——是不知道有，還是覺得麻煩，還是覺得條件太難達到？</span></li>
+          <li><span class="pi pi-warn">!</span><span><strong>真實數據（2026-05-18）更正：</strong>之前說「73% 跳過優惠」是解讀錯誤。實際上那 73% 的人是在 Step 2（方式選擇畫面）就已經離開了，根本沒有走到優惠那一頁，與優惠設計無關。</span></li>
+          <li><span class="pi pi-warn">!</span><span><strong>必要前提仍然成立：</strong>上線前需與營運確認「Promotion 觸發率提升是否在計畫內」。這不是技術問題，是財務問題。</span></li>
+          <li><span class="pi pi-tip">→</span><span><strong>優先改的是 Step 2 和 Step 3：</strong>即使優惠橫幅做得再好，玩家在 Step 2 就離開了根本看不見。先解決方式選擇和表單複雜度，再來優化優惠體驗。</span></li>
         </ul>
       </div>
     </div>
@@ -685,10 +716,41 @@
   <div id="revised" class="section">
     <div class="sec-label">修正後的功能方案</div>
 
+    <div class="card" style="border-color:var(--red-border);">
+      <div class="card-header red-bg">
+        <div class="ctop">
+          <div class="cname">數據驅動的新優先順序 — 先解決 Step 2 和 Step 3</div>
+          <span class="badge badge-red">最高優先</span>
+        </div>
+        <div class="csub">現在知道流失最多在 Step 2（方式選擇）和 Step 3（表單頁），改善重心要調整。Round 1 的功能都是針對 Step 3 之後的環節，對最大流失點沒有直接幫助。</div>
+      </div>
+      <div class="card-body">
+        <table class="tbl">
+          <thead><tr><th style="width:30%">問題點</th><th>現況</th><th>建議改法</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Step 2 — 方式選擇沒有引導</strong></td>
+              <td>4 個選項平等排列，沒有說明差異，不知道哪個最快、哪個有問題</td>
+              <td>預設選中玩家上次用的方式；維護中的方式提前顯示「暫時不可用」而非進去才發現；顯示各方式的特點（「最快到帳」「有優惠」）</td>
+            </tr>
+            <tr>
+              <td><strong>Step 3 — 表單決策層次太多</strong></td>
+              <td>選優惠 → 選付款渠道（7選1）→ 選 type → 選 channel，4 層才能填金額</td>
+              <td>根據玩家歷史預選付款渠道；Payment Gateway / Bank Transfer 可以根據選的渠道自動判斷；Channel 如只有一個選項就自動填；優惠改為下一步再選或自動套用最優</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout blue" style="margin-top:14px;">
+          <span class="callout-icon">→</span>
+          <span><strong>這兩個改善不需要新功能，只需要調整現有畫面的設計邏輯。</strong>成本比 Round 1 的所有功能都低，但對流失率的影響可能更直接。</span>
+        </div>
+      </div>
+    </div>
+
     <div class="card" style="border-color:var(--green-border);">
       <div class="card-header green-bg">
         <div class="ctop">
-          <div class="cname">保留並優化的功能</div>
+          <div class="cname">保留並優化的功能（Step 3 之後的環節）</div>
           <span class="badge badge-green">方向正確</span>
         </div>
       </div>
@@ -821,10 +883,11 @@
             <div class="step-content">
               <div class="step-title">根據分步數據，確認最終優先順序</div>
               <div class="step-desc">
-                現在已知總放棄率 14.2%，功能優先順序的初步方向：<br>
-                · <strong>優先做：</strong>個人化金額按鈕（成本低、風險低，幫有意存款的玩家更快完成）<br>
-                · <strong>先暫緩：</strong>優惠橫幅、門檻提示（73% 玩家跳過優惠，財務風險未釐清）<br>
-                · <strong>等分步數據：</strong>確認最大流失點後，再決定「失敗處理」或「等待頁面」哪個更值得改
+                現在已知最大流失點在 Step 2 和 Step 3，功能優先順序：<br>
+                · <strong>最優先：</strong>Step 2 方式選擇加入引導（預選上次方式、提前顯示維護狀態）<br>
+                · <strong>最優先：</strong>Step 3 表單精簡（預選渠道、自動判斷 type、優惠改為選填）<br>
+                · <strong>次優先：</strong>個人化金額按鈕（成本低，幫走到填金額的玩家更快完成）<br>
+                · <strong>暫緩：</strong>優惠橫幅、門檻提示（Step 2 問題不解決，玩家根本看不到）
               </div>
             </div>
           </div>
