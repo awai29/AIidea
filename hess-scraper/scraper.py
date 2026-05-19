@@ -185,10 +185,15 @@ async def scrape(username: str, password: str, state: dict):
                 wp = await page_queue.get()
                 captured = []
 
+                MEDIA_EXTS = {"mp3", "mp4"}
+
                 def capture(req):
                     url = req.url
-                    if "hippoeschooladmin" in url:
-                        ext = url.split("?")[0].rsplit(".", 1)[-1].lower()
+                    # 攔截所有 hess 網域的 mp3/mp4，以及舊版 hippoeschooladmin 的任何媒體
+                    ext = url.split("?")[0].rsplit(".", 1)[-1].lower()
+                    if ext in MEDIA_EXTS:
+                        captured.append({"url": url, "type": ext})
+                    elif "hippoeschooladmin" in url:
                         captured.append({"url": url, "type": ext})
 
                 wp.on("request", capture)
@@ -199,6 +204,29 @@ async def scrape(username: str, password: str, state: dict):
                             captured.clear()
                             await wp.goto(item["url"], wait_until="networkidle", timeout=15000)
                             await wp.wait_for_timeout(800)
+                            # 補充：掃描頁面中 <audio>/<video>/<source> 的 src 屬性
+                            # 有些頁面不透過網路請求載入媒體，而是直接嵌在 HTML 裡
+                            try:
+                                av_srcs = await wp.evaluate("""
+                                    () => {
+                                        const res = [];
+                                        document.querySelectorAll('audio[src],video[src],source[src]').forEach(el => {
+                                            const s = el.getAttribute('src');
+                                            if (s) {
+                                                const abs = s.startsWith('http') ? s : location.origin + (s.startsWith('/') ? s : '/' + s);
+                                                const ext = abs.split('?')[0].split('.').pop().toLowerCase();
+                                                res.push({url: abs, type: ext});
+                                            }
+                                        });
+                                        return res;
+                                    }
+                                """)
+                                seen = {c["url"] for c in captured}
+                                for av in av_srcs:
+                                    if av["url"] not in seen:
+                                        captured.append(av)
+                            except Exception:
+                                pass
                             item["media"] = list(captured)
                             break   # 成功就跳出重試迴圈
                         except Exception as e:
