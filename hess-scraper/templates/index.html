@@ -59,6 +59,11 @@ input{font-family:inherit;}
   #layout{flex-direction:column;}
   #main{padding-bottom:calc(var(--player-h) + 60px);}
 }
+#mobile-lesson-list{display:none;flex-direction:column;padding:4px 12px 12px;}
+@media(max-width:768px){#mobile-lesson-list{display:flex;}}
+#mobile-back-btn{display:none;align-items:center;gap:6px;padding:4px 0 12px;font-size:12px;color:var(--text-3);transition:color .15s;}
+#mobile-back-btn:hover{color:var(--text-1);}
+@media(max-width:768px){#mobile-back-btn{display:flex;}}
 
 /* SIDEBAR CONTENT */
 #sidebar-content{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
@@ -433,13 +438,20 @@ input{font-family:inherit;}
         </svg>
       </div>
       <h1 class="welcome-title">選擇課次，開始聆聽</h1>
-      <p class="welcome-sub">從左側選擇課次 · 已備份的點擊即可播放</p>
+      <p class="welcome-sub" id="welcome-sub-text">從左側選擇課次 · 已備份的點擊即可播放</p>
       <button class="welcome-cta" onclick="openWizard()">首次使用？點此新增帳號並備份</button>
     </div>
+
+    <!-- 手機版課次列表（sidebar 隱藏時用） -->
+    <div id="mobile-lesson-list"></div>
 
     <div id="content-header">
       <div class="content-gradient"></div>
       <div class="content-header-inner">
+        <button id="mobile-back-btn" onclick="mobileLessonBack()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          返回課次列表
+        </button>
         <h2 id="cv-title"></h2>
         <div id="cv-meta"></div>
       </div>
@@ -895,7 +907,16 @@ function selectCourse(id) {
   document.querySelectorAll('.mobile-ctab').forEach(b => {
     b.classList.toggle('active', b.textContent === (currentData.courses.find(c => c.id === id)?.name || ''));
   });
-  renderLessons(); showWelcome();
+  renderLessons();
+  if (window.innerWidth <= 768) {
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('mobile-lesson-list').style.display = 'flex';
+    document.getElementById('content-header').style.display = 'none';
+    document.getElementById('tracks-section').style.display = 'none';
+    document.getElementById('links-section').style.display = 'none';
+  } else {
+    showWelcome();
+  }
 }
 
 function renderLessons() {
@@ -922,8 +943,9 @@ function renderLessons() {
         </div>`;
     }
   }
-  document.getElementById('lesson-list').innerHTML = html ||
-    `<div style="text-align:center;padding:24px;font-size:12px;color:var(--text-3)">無結果</div>`;
+  const noResult = `<div style="text-align:center;padding:24px;font-size:12px;color:var(--text-3)">無結果</div>`;
+  document.getElementById('lesson-list').innerHTML = html || noResult;
+  document.getElementById('mobile-lesson-list').innerHTML = html || noResult;
 }
 
 function filterLessons() { renderLessons(); }
@@ -936,6 +958,7 @@ function selectLesson(lesson) {
   currentLesson = lesson;
   renderLessons();
 
+  document.getElementById('mobile-lesson-list').style.display = 'none';
   document.getElementById('welcome').style.display = 'none';
   document.getElementById('content-header').style.display = 'block';
 
@@ -1033,10 +1056,20 @@ function selectLesson(lesson) {
 }
 
 function showWelcome() {
+  document.getElementById('mobile-lesson-list').style.display = 'none';
   document.getElementById('welcome').style.display = 'flex';
   document.getElementById('content-header').style.display = 'none';
   document.getElementById('tracks-section').style.display = 'none';
   document.getElementById('links-section').style.display = 'none';
+}
+
+function mobileLessonBack() {
+  document.getElementById('content-header').style.display = 'none';
+  document.getElementById('tracks-section').style.display = 'none';
+  document.getElementById('links-section').style.display = 'none';
+  document.getElementById('mobile-lesson-list').style.display = 'flex';
+  currentLesson = null;
+  renderLessons();
 }
 
 /* ═══════════════════════════════════════
