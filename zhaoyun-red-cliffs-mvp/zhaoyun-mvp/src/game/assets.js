@@ -20,7 +20,7 @@
 const _cache = {};
 
 // 精靈圖版本號：每次重新生成 sprite sheet 後更新此版本，強制瀏覽器清除快取
-const SPRITE_VERSION = '20260514-v3';
+const SPRITE_VERSION = '20260519-v6';
 
 /**
  * 非同步載入某角色的 spritesheet + atlas.json。

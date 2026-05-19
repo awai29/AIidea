@@ -1,8 +1,8 @@
 # Codex 交接文件：已知問題與待修清單
 
-- 日期：2026-05-12（最後更新：2026-05-12）
-- 來源：Code Review 結果 + Sprite 盤點 + 效能 Review
-- 狀態：Issues 1/2/3/4 已修，Issues 5/6 **仍待處理**
+- 日期：2026-05-12（最後更新：2026-05-19）
+- 來源：Code Review 結果 + Sprite 盤點 + 效能 Review + 動畫預覽頁面目測（2026-05-19）
+- 狀態：Issues 1/2/3/4 已修，Issues 5/6 待處理，Issues 9/10 新增
 
 ## 待辦摘要（最新狀態）
 
@@ -16,6 +16,8 @@
 | 6 | player.js 冗餘狀態檢查 | **⚠️ 待處理** |
 | 7 | Sprite 去背不乾淨（白邊鋸齒） | **⚠️ 需重做 sprite 資產** |
 | 8 | Sprite 各幀腳底基準線不一致（動作切換跳動）| **⚠️ 需重做 sprite 資產** |
+| 9 | 趙雲 idle / death poseboard 每格有兩個角色 | **🔴 最優先：需重出 poseboard** |
+| 10 | hurt poseboard 尺寸不一致（1402×1122 橫向）導致幀分割錯誤 | **🔴 需重出 poseboard** |
 
 ---
 
@@ -434,6 +436,81 @@ const SPRITE_VERSION = '20260514-v4';  // 改成新版本
 - 尺寸規格
 - 視覺描述
 - AI 生成 prompt
+
+---
+
+---
+
+## 🔴 Issue 9：趙雲 idle / death poseboard 每格有兩個角色（2026-05-19 目測）
+
+### 問題描述
+
+在 `sprite-viewer.html` 動畫預覽頁面目測，趙雲的以下動作每格 poseboard 同時畫了**兩個角色**：
+
+- `idle`：上方是正常站立的趙雲，下方有另一個角色（角度/姿勢不同）
+- `death`：一個站立角色 + 一個倒地角色疊在同一格裡
+
+pipeline 的 `recover.py` 以格子為單位裁切，會把整格（包含兩個角色）都帶進去，導致動畫播放時每幀都有兩個人。
+
+### 需要做的事
+
+重新產生以下 poseboard，**每格只畫一個角色、一個姿勢**：
+
+- `pipeline/input/zhaoyun/idle-poseboard-v3.png`（3 cols × 4 rows，共 12 格）
+- `pipeline/input/zhaoyun/death-poseboard-v3.png`（3 cols × 4 rows，共 12 格）
+
+產完後對兩個新 poseboard 跑 pipeline：
+
+```bash
+cd zhaoyun-red-cliffs-mvp
+python3 pipeline/run.py all \
+  --poseboard pipeline/input/zhaoyun/idle-poseboard-v3.png \
+  --character zhaoyun --action idle --rows 4 --cols 3
+
+python3 pipeline/run.py all \
+  --poseboard pipeline/input/zhaoyun/death-poseboard-v3.png \
+  --character zhaoyun --action death --rows 4 --cols 3
+```
+
+⚠️ **注意**：`run.py all` 的 `align` 步驟用每格角落偵測背景色，對某些 poseboard 會失敗（偵測到角色色而非背景色）。若產出幀仍有粉紅背景，改用更可靠的全圖眾數偵測法（見本文件背景色問題記錄）。
+
+產完後更新 `assets.js` 的版本號：
+```js
+const SPRITE_VERSION = '20260519-v8';  // 遞增
+```
+
+---
+
+## 🔴 Issue 10：hurt / death poseboard 尺寸不一致（1402×1122 橫向格式）
+
+### 問題描述
+
+pipeline 跑出的 aligned 幀顯示 hurt 動作高度只有 280px（467×280），遠低於其他動作的 362px。原因是 hurt poseboard 的尺寸是 **1402×1122**（橫向），而不是其他動作的 1086×1448（直向）。
+
+以 rows=4, cols=3 切割 1402×1122：
+- 每格：1402/3 ≈ 467px 寬 × 1122/4 = 280px 高
+- 這樣的角色幀非常「矮胖」，pack 到 48×64 後比例嚴重失真
+
+### 受影響的 poseboard
+
+| 角色 | 動作 | 目前尺寸 | 正確尺寸 |
+|------|------|----------|----------|
+| zhaoyun | hurt | 1402×1122 | 1086×1448 |
+| wei-swordsman | hurt | 1402×1122 | 1086×1448 |
+| wei-swordsman | death | 1402×1122 | 1086×1448 |
+
+（wei-spearman attack/hurt/death 是 1448×1086，rows/cols 對調，也有問題）
+
+### 需要做的事
+
+重新產生以下 poseboard，尺寸統一為 **1086×1448**（直向，3 cols × 4 rows）：
+
+- `pipeline/input/zhaoyun/hurt-poseboard-v3.png`
+- `pipeline/input/wei-swordsman/hurt-poseboard-v3.png`
+- `pipeline/input/wei-swordsman/death-poseboard-v3.png`
+- `pipeline/input/wei-spearman/attack-poseboard-v3.png`
+- `pipeline/input/wei-spearman/hurt-poseboard-v3.png`
+- `pipeline/input/wei-spearman/death-poseboard-v3.png`
 
 ---
 

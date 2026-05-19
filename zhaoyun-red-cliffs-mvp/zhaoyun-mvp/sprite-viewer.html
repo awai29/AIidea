@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sprite 動畫預覽</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #f5d060;
+      font-size: 22px;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      margin-bottom: 32px;
+    }
+
+    /* ── 每個角色區塊 ── */
+    .character-section {
+      margin-bottom: 40px;
+    }
+    .character-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5d060;
+      border-left: 3px solid #f5d060;
+      padding-left: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* ── 動作列 ── */
+    .actions-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .action-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 140px;
+    }
+    .action-card.highlighted {
+      border-color: rgba(255, 80, 80, 0.7);
+      background: rgba(255, 80, 80, 0.08);
+    }
+
+    .action-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* canvas 背景：棋盤格（顯示透明區域） */
+    canvas {
+      image-rendering: pixelated;
+      background-color: #2d3250;
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.04) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.04) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.04) 75%);
+      background-size: 12px 12px;
+      background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+      border-radius: 4px;
+    }
+
+    .frame-info {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* 問題標籤 */
+    .issue-badge {
+      font-size: 10px;
+      background: rgba(255, 80, 80, 0.25);
+      color: #ff8080;
+      border: 1px solid rgba(255,80,80,0.4);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 32px 0;
+    }
+
+    #global-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #e0e0e0;
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { background: rgba(255,255,255,0.15); }
+    button.active {
+      background: rgba(245, 208, 96, 0.2);
+      border-color: #f5d060;
+      color: #f5d060;
+    }
+    label { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+    input[type=range] { width: 100px; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Sprite 動畫預覽</h1>
+  <p class="subtitle">所有角色 × 所有動作，逐幀播放確認效果</p>
+
+  <div id="global-controls">
+    <button id="btn-pause-all">⏸ 全部暫停</button>
+    <label>速度：<input type="range" id="speed-slider" min="0.1" max="3" step="0.1" value="1"> <span id="speed-label">1×</span></label>
+    <label><input type="checkbox" id="show-grid" checked> 顯示格線</label>
+    <label><input type="checkbox" id="highlight-issues" checked> 標記問題幀</label>
+  </div>
+
+  <div id="viewer-root"></div>
+
+  <script>
+    // ── 已知問題幀（character → action → frame indices）
+    const KNOWN_ISSUES = {};
+    const ASSET_VERSION = '20260519-v7';
+
+    const CHARACTERS = [
+      { key: 'zhaoyun',      label: '趙雲' },
+      { key: 'wei-swordsman', label: '魏軍刀兵' },
+      { key: 'wei-spearman',  label: '魏軍槍兵' },
+    ];
+
+    const ACTION_LABELS = {
+      idle:   '待機 Idle',
+      walk:   '走路 Walk',
+      attack: '攻擊 Attack',
+      hurt:   '受傷 Hurt',
+      death:  '死亡 Death',
+    };
+
+    // ── 全域狀態
+    let globalPaused = false;
+    let speedMultiplier = 1;
+    let showGrid = true;
+    let highlightIssues = true;
+    const allAnimators = [];   // { canvas, ctx, img, anim, charKey, actionKey, frameCount, lastTs }
+
+    // ── UI 控制
+    document.getElementById('btn-pause-all').addEventListener('click', () => {
+      globalPaused = !globalPaused;
+      document.getElementById('btn-pause-all').textContent = globalPaused ? '▶ 全部繼續' : '⏸ 全部暫停';
+    });
+    document.getElementById('speed-slider').addEventListener('input', e => {
+      speedMultiplier = parseFloat(e.target.value);
+      document.getElementById('speed-label').textContent = speedMultiplier.toFixed(1) + '×';
+    });
+    document.getElementById('show-grid').addEventListener('change', e => {
+      showGrid = e.target.checked;
+    });
+    document.getElementById('highlight-issues').addEventListener('change', e => {
+      highlightIssues = e.target.checked;
+    });
+
+    // ── 讀取資源並建立 UI
+    async function init() {
+      const root = document.getElementById('viewer-root');
+
+      for (const char of CHARACTERS) {
+        const base = `assets/sprites/${char.key}/runtime`;
+        let img, atlas;
+        try {
+          [img, atlas] = await Promise.all([
+            loadImage(`${base}/sheet.png?v=${ASSET_VERSION}`),
+            fetch(`${base}/atlas.json?v=${ASSET_VERSION}`).then(r => r.json()),
+          ]);
+        } catch (e) {
+          root.insertAdjacentHTML('beforeend',
+            `<div class="character-section"><div class="character-title">${char.label} ⚠️ 載入失敗</div></div>`);
+          continue;
+        }
+
+        const section = document.createElement('div');
+        section.className = 'character-section';
+        section.innerHTML = `<div class="character-title">${char.label}（${char.key}）</div>`;
+        const row = document.createElement('div');
+        row.className = 'actions-row';
+
+        for (const [actionKey, anim] of Object.entries(atlas.animations)) {
+          const issue = KNOWN_ISSUES[char.key]?.[actionKey];
+          const card = document.createElement('div');
+          card.className = 'action-card' + (issue ? ' highlighted' : '');
+
+          const labelEl = document.createElement('div');
+          labelEl.className = 'action-label';
+          labelEl.textContent = ACTION_LABELS[actionKey] || actionKey;
+          card.appendChild(labelEl);
+
+          // canvas 內直接畫 4× 大小，避免 CSS 縮放模糊
+          const SCALE = 4;
+          const fw = anim.frames[0].w;
+          const fh = anim.frames[0].h;
+          const canvas = document.createElement('canvas');
+          canvas.width  = fw * SCALE;
+          canvas.height = fh * SCALE;
+          canvas.style.width  = fw * SCALE + 'px';
+          canvas.style.height = fh * SCALE + 'px';
+          card.appendChild(canvas);
+
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = false;
+
+          // 幀號 + fps 資訊
+          const frameInfo = document.createElement('div');
+          frameInfo.className = 'frame-info';
+          frameInfo.textContent = `幀 0/${anim.frames.length}  fps ${anim.fps}`;
+          card.appendChild(frameInfo);
+
+          // 問題標籤
+          if (issue) {
+            const badge = document.createElement('div');
+            badge.className = 'issue-badge';
+            badge.textContent = `⚠️ ${issue.note}`;
+            badge.style.maxWidth = (fw * SCALE) + 'px';
+            badge.style.textAlign = 'center';
+            card.appendChild(badge);
+          }
+
+          row.appendChild(card);
+
+          // 動畫器
+          const animator = {
+            canvas, ctx, img, anim, charKey: char.key, actionKey,
+            frameIndex: 0,
+            accumMs: 0,
+            frameInfo,
+            issue,
+          };
+          allAnimators.push(animator);
+        }
+
+        section.appendChild(row);
+        root.appendChild(section);
+
+        if (CHARACTERS.indexOf(char) < CHARACTERS.length - 1) {
+          root.insertAdjacentHTML('beforeend', '<hr>');
+        }
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    // ── 主循環
+    let lastTs = 0;
+    function loop(ts) {
+      const dtMs = Math.min(ts - lastTs, 100) * speedMultiplier;
+      lastTs = ts;
+
+      for (const a of allAnimators) {
+        if (!globalPaused) {
+          a.accumMs += dtMs;
+          const mspf = 1000 / a.anim.fps;
+          while (a.accumMs >= mspf) {
+            a.accumMs -= mspf;
+            a.frameIndex = (a.frameIndex + 1) % a.anim.frames.length;
+          }
+        }
+
+        const frame = a.anim.frames[a.frameIndex];
+        const S = 4; // 與建立 canvas 時相同的 SCALE
+        const cW = frame.w * S;
+        const cH = frame.h * S;
+        a.ctx.clearRect(0, 0, cW, cH);
+        a.ctx.imageSmoothingEnabled = false;
+        // 在 canvas 內直接畫大，4× nearest-neighbor
+        a.ctx.drawImage(a.img, frame.x, frame.y, frame.w, frame.h, 0, 0, cW, cH);
+
+        // 格線（標記 canvas 邊緣）
+        if (showGrid) {
+          a.ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+          a.ctx.lineWidth = 1;
+          a.ctx.strokeRect(0.5, 0.5, cW - 1, cH - 1);
+          // 底線（腳底基準線，綠色）
+          a.ctx.strokeStyle = 'rgba(80,255,160,0.65)';
+          a.ctx.lineWidth = 2;
+          a.ctx.beginPath();
+          a.ctx.moveTo(0, cH - 1);
+          a.ctx.lineTo(cW, cH - 1);
+          a.ctx.stroke();
+        }
+
+        // 問題幀高亮
+        if (highlightIssues && a.issue && a.issue.frames.includes(a.frameIndex)) {
+          a.ctx.fillStyle = 'rgba(255, 60, 60, 0.18)';
+          a.ctx.fillRect(0, 0, cW, cH);
+          a.ctx.strokeStyle = 'rgba(255, 60, 60, 0.9)';
+          a.ctx.lineWidth = 3;
+          a.ctx.strokeRect(1.5, 1.5, cW - 3, cH - 3);
+        }
+
+        a.frameInfo.textContent = `幀 ${a.frameIndex + 1}/${a.anim.frames.length}  fps ${a.anim.fps}`;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Failed: ' + src));
+        img.src = src;
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
