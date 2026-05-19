@@ -263,6 +263,9 @@ async def scrape(username: str, password: str, state: dict):
                 await page.select_option("#c1", course_id)
                 await page.click("#btnLogin")
                 await page.wait_for_load_state("networkidle", timeout=30000)
+                # Worker pages 也各自導到課程首頁，確保它們的 session 也在正確課程
+                for wp in worker_pages:
+                    await wp.goto(f"{BASE_URL}/index", wait_until="networkidle", timeout=15000)
 
                 await asyncio.gather(*[fetch_item(item) for item in course_items])
 
