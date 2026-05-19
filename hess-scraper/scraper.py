@@ -159,10 +159,17 @@ async def scrape(username: str, password: str, state: dict):
             log(f"\n✅ 探索完成，共 {total_items} 個內容項目")
 
             # ── 階段 2：並發抓取每個項目的媒體 URL ──────────────
-            # 同時開 3 個分頁，速度約提升 2-3 倍
-            # 分頁共用同一個 browser context，所以 session/cookie 自動共享，不需要重新登入
+            # Hess 的 learn_1/learn_2 頁面需要先在 Login2 選課才能正確通過權限檢查（GetRight）。
+            # 所以按課程分組：每批先用主頁面到 Login2 選課（設定伺服器端 session），
+            # 再讓所有 worker 分頁並發抓取同一課程的項目。
             CONCURRENCY = 3
             log(f"\n🎵 階段 2：並發抓取媒體連結（共 {total_items} 項，{CONCURRENCY} 個分頁）...")
+
+            # 按 course_id 分組，保留原始順序
+            from collections import OrderedDict
+            items_by_course: dict[str, list] = OrderedDict()
+            for cid, uid, lurl, item in all_items_flat:
+                items_by_course.setdefault(cid, []).append(item)
 
             # 建立工作分頁（共用同一個 context，cookie 自動繼承）
             worker_pages = []
@@ -245,11 +252,19 @@ async def scrape(username: str, password: str, state: dict):
                 set_progress("media", n, total_items,
                              f"{item['name']} ({item.get('type') or item.get('group', '')})")
 
-            # 全部項目同時丟進去，asyncio 會控制最多 CONCURRENCY 個同時跑
-            await asyncio.gather(*[
-                fetch_item(item)
-                for _, _, _, item in all_items_flat
-            ])
+            # 按課程分批執行：每批先選課（設定伺服器端 session），再並發抓項目
+            for course_id, course_items in items_by_course.items():
+                course_name = next(
+                    (o["name"] for o in options if o["id"] == course_id), course_id
+                )
+                log(f"\n  📖 切換課程：{course_name}（{len(course_items)} 項）")
+                # 主頁面到 Login2 選課，確保 server session 正確
+                await page.goto(f"{BASE_URL}/Login2", wait_until="networkidle", timeout=30000)
+                await page.select_option("#c1", course_id)
+                await page.click("#btnLogin")
+                await page.wait_for_load_state("networkidle", timeout=30000)
+
+                await asyncio.gather(*[fetch_item(item) for item in course_items])
 
             # 關閉工作分頁
             for wp in worker_pages:
