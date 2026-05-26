@@ -343,7 +343,6 @@
 <div class="proto-tabs">
   <div class="proto-tabs-inner">
     <button class="ptab active" onclick="switchProto('p2',this)">原型 2 — Step 3 最大流失點</button>
-    <button class="ptab" onclick="switchProto('p3',this)">原型 3 — 存款後 AI 引導</button>
     <button class="ptab" onclick="switchProto('p4',this)">原型 4 — 轉換挽救設計</button>
     <button class="ptab" onclick="switchProto('p6',this)">原型 6 — 被動存款觸發</button>
     <button class="ptab" onclick="switchProto('p7',this)">原型 7 — 存款過程體驗</button>
@@ -1089,7 +1088,7 @@
 <!-- ═══════════════════════════════════════
      原型 3：存款後 AI 引導
 ═══════════════════════════════════════ -->
-<div id="p3" class="proto">
+<div id="p3" class="proto" style="display:none">
   <div class="proto-head">
     <div class="proto-num">原型 3</div>
     <div class="proto-title">存款成功後 AI 引導</div>
@@ -1717,8 +1716,7 @@
     <p class="proto-desc">被動存款的關鍵是「時機」。三種觸發設計：新玩家首頁引導倒數、老玩家一鍵重複、遊戲中低餘額即時提示。對應研究中情境 A、B、04。</p>
   </div>
   <div class="state-switcher">
-    <button class="state-btn s-amber active" onclick="switchState('p6','s1',this)">狀態 1 · 首頁 FTD Banner + 倒數</button>
-    <button class="state-btn s-green" onclick="switchState('p6','s2',this)">狀態 2 · 一鍵重複存款</button>
+    <button class="state-btn s-green active" onclick="switchState('p6','s2',this)">狀態 1 · 一鍵重複存款</button>
   </div>
   <div class="layout">
     <div class="info">
@@ -1800,7 +1798,7 @@
         <div class="phone-notch"></div>
         <div class="phone-screen">
           <!-- P6 S1: FTD homepage banner -->
-          <div class="pstate active" id="p6-s1">
+          <div class="pstate" id="p6-s1">
             <div class="app-bar">
               <div style="font-size:13px;font-weight:700;color:#fff;">首頁</div>
               <div class="app-bar-sub">BJ Platform</div>
@@ -1838,7 +1836,7 @@
             </div>
           </div>
           <!-- P6 S2: one-tap repeat deposit -->
-          <div class="pstate" id="p6-s2">
+          <div class="pstate active" id="p6-s2">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
               <div class="app-bar-title">存款</div>
