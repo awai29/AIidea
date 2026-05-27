@@ -342,10 +342,10 @@
 
 <div class="proto-tabs">
   <div class="proto-tabs-inner">
-    <button class="ptab active" onclick="switchProto('p2',this)">原型 2 — Step 3 最大流失點</button>
-    <button class="ptab" onclick="switchProto('p4',this)">原型 4 — 轉換挽救設計</button>
-    <button class="ptab" onclick="switchProto('p6',this)">原型 6 — 被動存款觸發</button>
-    <button class="ptab" onclick="switchProto('p7',this)">原型 7 — 存款過程體驗</button>
+    <button class="ptab active" onclick="switchProto('p2',this)">快速存款</button>
+    <button class="ptab" onclick="switchProto('p4',this)">流失後問卷</button>
+    <button class="ptab" onclick="switchProto('p6',this)">一鍵重複存款</button>
+    <button class="ptab" onclick="switchProto('p7',this)">存款後等待</button>
     <span style="width:1px;height:18px;background:var(--border);display:inline-block;margin:0 4px;flex-shrink:0;align-self:center;"></span>
     <button class="ptab" id="archive-tab" onclick="switchProto('archive',this)" style="opacity:0.55;">歸檔</button>
   </div>
@@ -909,6 +909,18 @@
               </div>
             </div>
 
+            <!-- 上次存款時間 -->
+            <div style="padding:10px 14px 0;flex-shrink:0;">
+              <div style="font-size:10px;color:#576775;margin-bottom:6px;">上次存款</div>
+              <div style="background:#222424;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;background:#e2136e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:600;color:#E2E6E9;">bKash · ৳1,000</div>
+                  <div style="font-size:11px;color:#657381;margin-top:2px;">2小時前 · 成功到帳</div>
+                </div>
+              </div>
+            </div>
+
             <!-- 金額輸入框 -->
             <div style="padding:12px 18px 8px;flex-shrink:0;">
               <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">花費</div>
@@ -991,33 +1003,35 @@
                 <div onclick="p2SelectPayment('bKash','#e2136e','bK','Personal · 017xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #27b488;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#e2136e;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">bKash</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent · Merchant</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(39,180,136,0.15);color:#27b488;flex-shrink:0;">即時</div>
                 </div>
                 <div onclick="p2SelectPayment('Nagad','#e8621a','Na','Personal · 018xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#e8621a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">Na</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Nagad</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(39,180,136,0.15);color:#27b488;flex-shrink:0;">即時</div>
                 </div>
                 <div onclick="p2SelectPayment('Rocket','#8b2fc9','Ro','Personal · 019xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#8b2fc9;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">Ro</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Rocket</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(39,180,136,0.15);color:#27b488;flex-shrink:0;">即時</div>
                 </div>
-                <div onclick="p2SelectPayment('OK Wallet','#1a56db','OK','Personal · 016xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;">
+                <div onclick="p2SelectPayment('OK Wallet','#1a56db','OK','Personal · 016xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#1a56db;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">OK</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">OK Wallet</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(39,180,136,0.15);color:#27b488;flex-shrink:0;">即時</div>
+                </div>
+                <div onclick="p2SelectPayment('Bangkok Pay','#0066cc','BP','Agent · 015xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
+                  <div style="width:26px;height:26px;background:#0066cc;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">BP</div>
+                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Bangkok Pay</div><div style="font-size:9px;color:#555;margin-top:1px;">Agent · 015xxxxxxxx</div></div>
+                </div>
+                <div onclick="p2SelectPayment('Baji','#ff6b00','BJ','Personal · 013xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;">
+                  <div style="width:26px;height:26px;background:#ff6b00;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">BJ</div>
+                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Baji</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · 013xxxxxxxx</div></div>
                 </div>
                 <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;padding:0 2px;">Local Bank</div>
                 <div onclick="p2SelectPayment('Dutch Bangla','#e83030','DB','DB · 016xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#e83030;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">DB</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Dutch Bangla</div><div style="font-size:9px;color:#555;margin-top:1px;">NPSB · BEFTN</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(217,119,6,0.15);color:#d97706;flex-shrink:0;">1-3 min</div>
                 </div>
                 <div onclick="p2SelectPayment('City Bank','#0a5fb4','CB','CB · 017xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;">
                   <div style="width:26px;height:26px;background:#0a5fb4;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">CB</div>
                   <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">City Bank</div><div style="font-size:9px;color:#555;margin-top:1px;">NPSB · BEFTN</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(217,119,6,0.15);color:#d97706;flex-shrink:0;">1-3 min</div>
                 </div>
               </div>
               <div style="padding:8px 10px 12px;flex-shrink:0;">
@@ -1026,39 +1040,67 @@
             </div>
 
             <!-- PROMOTION SHEET -->
-            <div id="p2-promo-sheet" style="position:absolute;bottom:0;left:0;right:0;height:70%;background:#1e1e1e;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
-              <div style="padding:8px 0 4px;flex-shrink:0;text-align:center;">
-                <div style="width:32px;height:3px;background:#444;border-radius:9999px;display:inline-block;"></div>
-              </div>
-              <div style="padding:4px 14px 8px;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">選擇優惠</div>
-              <div style="flex:1;overflow-y:auto;padding:0 10px;">
-                <div onclick="p2SelectPromo('不使用優惠','');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:10px 11px;display:flex;align-items:center;gap:9px;margin-bottom:5px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#2a2a2a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#555;flex-shrink:0;">—</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#888;">不使用優惠</div></div>
-                </div>
-                <div onclick="p2SelectPromo('首存紅利 30%','最高獎勵 ৳3,000');p2CloseAll();" style="background:#242424;border:1.5px solid #27b488;border-radius:9px;padding:10px 11px;display:flex;align-items:center;gap:9px;margin-bottom:5px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:rgba(39,180,136,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">首存紅利 30%</div><div style="font-size:9px;color:#27b488;margin-top:2px;">最高 ৳3,000 · 流水 x8</div></div>
-                  <div style="font-size:11px;color:#27b488;">✓</div>
-                </div>
-                <div onclick="p2SelectPromo('再存紅利 10%','每次存款最高 ৳1,000');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:10px 11px;display:flex;align-items:center;gap:9px;margin-bottom:5px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:rgba(37,99,235,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                  </div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">再存紅利 10%</div><div style="font-size:9px;color:#60a5fa;margin-top:2px;">每次最高 ৳1,000 · 流水 x6</div></div>
-                </div>
-                <div onclick="p2SelectPromo('VIP 返水','每週自動結算');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:10px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:rgba(124,58,237,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  </div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">VIP 返水</div><div style="font-size:9px;color:#a78bfa;margin-top:2px;">每週結算 · 依等級計算</div></div>
-                  <div style="font-size:8px;font-weight:700;padding:2px 6px;border-radius:9999px;background:rgba(124,58,237,0.15);color:#a78bfa;flex-shrink:0;">VIP</div>
+            <div id="p2-promo-sheet" style="position:absolute;bottom:0;left:0;right:0;height:90%;background:#141515;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
+              <!-- Header -->
+              <div style="padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                <div style="font-size:16px;font-weight:600;color:#E2E6E9;">Select promotion</div>
+                <div onclick="p2CloseAll()" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;background:rgba(255,255,255,0.08);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </div>
               </div>
-              <div style="padding:8px 10px 12px;flex-shrink:0;">
-                <button onclick="p2CloseAll()" class="big-btn outline" style="height:38px;font-size:12px;border-radius:10px;">取消</button>
+              <!-- Tabs -->
+              <div style="display:flex;padding:0 16px;margin-top:14px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+                <div style="padding:8px 0;margin-right:24px;font-size:14px;font-weight:600;color:#27B488;border-bottom:2px solid #27B488;margin-bottom:-1px;">Valid (3)</div>
+                <div style="padding:8px 0;font-size:14px;color:#657381;">Invalid (2)</div>
+              </div>
+              <!-- Card list -->
+              <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+                <!-- Card 1 - selected -->
+                <div onclick="p2SelectPromo('100% bonus on all games','Get an extra 7% INR');p2CloseAll();" style="background:#222424;border:1.5px solid #14805e;border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                  <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#0d5c42,#1db87c);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;letter-spacing:-1px;">%</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;line-height:1.3;">100% bonus on all games</div>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div style="font-size:13px;color:#8D9AA5;margin-bottom:4px;">Welcome offer</div>
+                    <div style="font-size:11px;color:#657381;">01/05/2025 – 31/05/2025</div>
+                  </div>
+                  <div style="width:20px;height:20px;border-radius:50%;border:2px solid #14805e;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#14805e;"></div>
+                  </div>
+                </div>
+                <!-- Card 2 -->
+                <div onclick="p2SelectPromo('Extra 1.5% deposit bonus','');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                  <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#1a3a5c,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">1.5%</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;line-height:1.3;">Extra 1.5% deposit bonus</div>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div style="font-size:13px;color:#8D9AA5;margin-bottom:4px;">Daily offer</div>
+                    <div style="font-size:11px;color:#657381;">01/05/2025 – 31/05/2025</div>
+                  </div>
+                  <div style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;flex-shrink:0;margin-top:2px;"></div>
+                </div>
+                <!-- Card 3 -->
+                <div onclick="p2SelectPromo('50% sports refund bonus','');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                  <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#4c1d95,#7c3aed);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">50%</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;line-height:1.3;">50% sports refund bonus</div>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div style="font-size:13px;color:#8D9AA5;margin-bottom:4px;">Daily offer</div>
+                    <div style="font-size:11px;color:#657381;">01/05/2025 – 31/05/2025</div>
+                  </div>
+                  <div style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;flex-shrink:0;margin-top:2px;"></div>
+                </div>
+              </div>
+              <!-- Bottom bar -->
+              <div style="padding:12px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom,16px));border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;background:#141515;">
+                <div style="font-size:12px;color:#8D9AA5;margin-bottom:10px;">Get an extra <span style="font-weight:700;color:#E2E6E9;">7% INR</span></div>
+                <button onclick="p2SelectPromo('100% bonus on all games','Get an extra 7% INR');p2CloseAll();" class="big-btn primary" style="height:44px;font-size:14px;border-radius:10px;">Confirm</button>
               </div>
             </div>
           </div>
