@@ -300,6 +300,28 @@ main {
 .db ul { padding-left: 1.1rem; }
 .db li { margin-bottom: 3px; }
 
+/* ── DEMO LINK ── */
+.demo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 18px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-color, var(--teal));
+  background: transparent;
+  color: var(--accent-color, var(--teal));
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.demo-link:hover {
+  background: var(--accent-color, var(--teal));
+  color: #fff;
+}
+
 /* ── DETAIL (expandable) ── */
 .detail {
   display: none !important;
@@ -925,7 +947,8 @@ await sharp('input.png')
   .webp({ quality: 80 })
   .toFile('output.webp');`,
    predict:'用戶無感知，但頁面圖片載入速度明顯加快，尤其對行動裝置用戶；搭配 Blur-Up 效果更佳。',
-   api:'若用 CDN：URL 參數即可（f_auto）；若自建：POST /api/images/convert → { webpUrl, jpgUrl }'},
+   api:'若用 CDN：URL 參數即可（f_auto）；若自建：POST /api/images/convert → { webpUrl, jpgUrl }',
+   demoUrl:'platform-enhancements/proposals/image-optimization-demo.html'},
 
   // ── RISK ──
   {id:'r4',cat:'existing',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
@@ -1017,7 +1040,9 @@ const PUSH_SCENARIOS = {
    api:`POST /api/push/send → { scenario, userId, payload }
 GET  /api/push/preferences → UserPushSettings
 PUT  /api/push/preferences → 更新訂閱偏好
-後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff / leaderboard.ending / odds.shifted / campaign.published`},
+後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff / leaderboard.ending / odds.shifted / campaign.published`,
+   demoUrl:'platform-enhancements/proposals/push-notification-design.html',
+   demoLabel:'查看推播設計提案 →'},
 
   {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['be','ai','ux'],diff:'hard',
@@ -1085,6 +1110,7 @@ function cardHTML(d){
     <div class="dsec dsec-main"><div class="dl">問題</div><div class="db">${d.problem}</div></div>
     <div class="dsec dsec-main"><div class="dl">為什麼做</div><div class="db">${d.why}</div></div>
     <div class="dsec dsec-main"><div class="dl">解決方法</div><div class="cdesc">${d.desc}</div></div>
+    ${d.demoUrl ? `<a class="demo-link" href="${d.demoUrl}" target="_blank">${d.demoLabel ?? '查看比較分析 →'}</a>` : ''}
     <div class="detail" id="det-${d.id}">
       <div class="dsec angular-wrap collapsed" id="angular-${d.id}" onclick="event.stopPropagation();togAngular('${d.id}')">
         <div class="angular-header">

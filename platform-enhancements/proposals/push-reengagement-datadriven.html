@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推播回流策略 — 數據驅動版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:8px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6}
+code{font-family:var(--mono);font-size:.9em}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(239,239,239,.87);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.hdr-in{max-width:1140px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{font-size:14px;font-weight:600}
+.nav{display:flex;gap:4px}
+.nl{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;
+  padding:4px 9px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nl:hover,.nl.active{background:var(--card);color:var(--fg)}
+
+/* layout */
+main{max-width:1140px;margin:0 auto;padding:36px 24px 80px;display:flex;flex-direction:column;gap:52px}
+section{scroll-margin-top:70px}
+.sec-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.sec-num{width:34px;height:34px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:2px}
+.sec-title{font-size:clamp(16px,2.2vw,20px);font-weight:700;line-height:1.3}
+.sec-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh)}
+.cp{padding:20px}
+
+/* badges */
+.bdg{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:9999px;border:1px solid}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.br{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.bp{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+.notice{background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);
+  padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px}
+.warn-box{padding:11px 13px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);
+  font-size:11px;color:var(--amber);margin:12px 0;line-height:1.6}
+
+/* stats bar */
+.stats{display:flex;gap:20px;padding:12px 0 0;border-top:1px solid var(--border);margin-top:12px;flex-wrap:wrap}
+.si{display:flex;flex-direction:column;gap:1px}
+.sl{font-size:10px;color:var(--muted)}
+.sv{font-family:var(--mono);font-size:15px;font-weight:500}
+
+/* S1 – player chart */
+.chart-outer{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.seg-list{display:flex;flex-direction:column;gap:6px;padding:4px 0}
+.seg-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.seg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.seg-name{width:56px;flex-shrink:0}
+.seg-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.seg-fill{height:100%;border-radius:3px}
+.seg-num{font-family:var(--mono);font-size:11px;font-weight:500;width:100px;text-align:right;flex-shrink:0}
+.ggr-note{margin-top:12px;padding:10px 12px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);font-size:11px;color:var(--amber)}
+
+/* brand grid */
+.brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.brand-card{background:var(--bg);border-radius:var(--rsm);padding:14px;text-align:center;border:1px solid var(--border)}
+.brand-card.warn{border-color:var(--rbdr);background:var(--rbg)}
+.brand-name{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.brand-val{font-size:22px;font-weight:800}
+.brand-sub{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* funnel */
+.funnel{display:flex;flex-direction:column;gap:0}
+.f-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);border-radius:var(--rsm);border:1px solid var(--border);margin-bottom:2px}
+.f-lbl{font-size:12px;font-weight:600;width:160px;flex-shrink:0}
+.f-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.f-fill{height:100%;border-radius:4px}
+.f-num{font-family:var(--mono);font-size:12px;font-weight:500;width:80px;text-align:right;flex-shrink:0}
+.f-pct{font-family:var(--mono);font-size:11px;color:var(--muted);width:44px;text-align:right;flex-shrink:0}
+.f-gap{text-align:center;padding:3px 0;font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px}
+.f-drop{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:9999px;border:1px solid}
+
+/* S2 – data request table */
+.req-block{margin-bottom:20px}
+.req-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.req-head-title{font-size:13px;font-weight:600}
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+table.rtbl th{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:500}
+table.rtbl td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table.rtbl tr:last-child td{border-bottom:none}
+table.rtbl tr:hover td{background:rgba(0,0,0,.015)}
+.m-name{font-weight:600;margin-bottom:2px}
+.m-note{font-size:11px;color:var(--muted)}
+
+/* S3 – scenarios */
+.scenario{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.sc-hd{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px}
+.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg);border:1px solid var(--border)}
+.sc-meta{flex:1}
+.sc-title{font-size:15px;font-weight:700;margin-bottom:3px}
+.sc-desc{font-size:12px;color:var(--muted)}
+.sc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.sc-body{padding:18px 20px;display:grid;grid-template-columns:1fr 240px;gap:24px;align-items:start}
+.d-row{display:flex;gap:8px;margin-bottom:10px;font-size:12px}
+.d-lbl{color:var(--muted);width:72px;flex-shrink:0;padding-top:1px}
+.d-val{line-height:1.5}
+.ab-hd{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;margin-top:4px}
+.ab-item{padding:10px 12px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg);margin-bottom:6px}
+.ab-item.a{border-left:3px solid var(--blue)}
+.ab-item.b{border-left:3px solid var(--green)}
+.ab-item.c{border-left:3px solid var(--amber)}
+.ab-tag{font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:500}
+.ab-title-t{font-size:12px;font-weight:600;margin-bottom:2px}
+.ab-body-t{font-size:11px;color:var(--muted)}
+
+/* phone mockup */
+.phone{width:220px;background:#1c1c1e;border-radius:30px;padding:10px;border:2px solid #3a3a3c;box-shadow:0 12px 40px rgba(0,0,0,.2);flex-shrink:0}
+.p-screen{background:#000;border-radius:22px;overflow:hidden;padding:8px}
+.p-status{display:flex;justify-content:space-between;padding:3px 8px 4px;font-size:11px}
+.p-time{font-weight:700;color:#fff}
+.p-icons{color:#fff;font-size:10px;display:flex;gap:3px}
+.notif{background:rgba(44,44,46,.96);backdrop-filter:blur(16px);border-radius:13px;padding:10px 12px;margin-bottom:6px}
+.n-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.n-app{width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px}
+.n-name{font-size:10px;color:rgba(255,255,255,.45);flex:1}
+.n-time{font-size:10px;color:rgba(255,255,255,.35)}
+.n-inner{display:flex;gap:8px;align-items:flex-start}
+.n-body{flex:1}
+.n-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
+.n-text{font-size:11px;color:rgba(255,255,255,.55);line-height:1.35}
+.n-thumb{width:38px;height:38px;border-radius:9px;background:#2c2c2e;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* S4 freq */
+.freq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.freq-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px}
+.freq-title{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.freq-rule{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--border)}
+.freq-rule:last-child{border-bottom:none}
+.freq-rule strong{color:var(--fg)}
+
+/* S5 steps */
+.step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:12px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.step-content h4{font-size:14px;font-weight:700;margin-bottom:5px}
+.step-content p{font-size:12px;color:var(--muted);margin-bottom:8px}
+.step-list{list-style:none}
+.step-list li{font-size:12px;color:var(--muted);padding:3px 0 3px 14px;position:relative}
+.step-list li::before{content:'›';position:absolute;left:0;color:var(--blue)}
+.step-list li strong{color:var(--fg)}
+
+@media(max-width:768px){
+  .chart-outer,.sc-body,.freq-grid{grid-template-columns:1fr}
+  .brand-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── S-DESIGN: notification redesign ── */
+.notif-compare{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.nc-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.nc-label{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center}
+.phone-sm{width:240px;background:#1c1c1e;border-radius:32px;padding:10px;border:2px solid #3a3a3c;box-shadow:0 14px 44px rgba(0,0,0,.25)}
+.ps-screen{background:#000;border-radius:23px;overflow:hidden;padding:10px 8px}
+.ps-status{display:flex;justify-content:space-between;padding:4px 8px 6px;font-size:11px}
+.ps-time{font-weight:700;color:#fff}
+.ps-icons{color:#fff;font-size:10px;display:flex;gap:3px}
+/* old plain notification */
+.notif-old{background:rgba(44,44,46,.96);border-radius:13px;padding:12px}
+.no-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.no-appicon{width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px}
+.no-name{font-size:10px;color:rgba(255,255,255,.4);flex:1}
+.no-time{font-size:10px;color:rgba(255,255,255,.28)}
+.no-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px}
+.no-body{font-size:11px;color:rgba(255,255,255,.5);line-height:1.35}
+/* new rich notification */
+.notif-new{background:rgba(36,36,38,.97);border-radius:16px;overflow:hidden}
+.rn-top{display:flex;align-items:center;gap:7px;padding:9px 12px 5px}
+.rn-appicon{width:18px;height:18px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
+.rn-appname{font-size:10px;color:rgba(255,255,255,.4);flex:1}
+.rn-apptime{font-size:10px;color:rgba(255,255,255,.27)}
+.rn-banner{height:68px;display:flex;align-items:center;padding:0 14px;position:relative;overflow:hidden;gap:10px}
+.rn-banner-emo{font-size:32px}
+.rn-banner-info{flex:1}
+.rn-banner-sub{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.04em}
+.rn-banner-amt{font-size:20px;font-weight:800;line-height:1.1}
+.rn-content{padding:8px 12px 7px}
+.rn-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px}
+.rn-body{font-size:10px;color:rgba(255,255,255,.5);line-height:1.4}
+.rn-actions{display:flex;border-top:1px solid rgba(255,255,255,.08)}
+.rn-act{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;border-right:1px solid rgba(255,255,255,.08)}
+.rn-act:last-child{border-right:none;color:rgba(255,255,255,.28)}
+.rn-act.primary{color:#60a5fa}
+
+/* design principles */
+.principle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.pr-card{padding:14px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg)}
+.pr-num{font-family:var(--mono);font-size:22px;font-weight:800;line-height:1;margin-bottom:8px}
+.pr-title{font-size:12px;font-weight:700;margin-bottom:5px}
+.pr-body{font-size:11px;color:var(--muted);line-height:1.6}
+
+/* fcm code blocks */
+.fcm-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.fcm-blk{border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
+.fcm-hd{padding:8px 12px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:600}
+.fcm-code{font-family:var(--mono);font-size:10px;background:#09090b;color:#d4d4d8;padding:12px;line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+
+/* platform compat */
+.compat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.compat-card{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.compat-hd{padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700}
+.compat-body{padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+.compat-row{font-size:11px;display:flex;align-items:flex-start;gap:6px;line-height:1.5;color:var(--muted)}
+.compat-ok{color:var(--green);font-weight:700;flex-shrink:0}
+.compat-no{color:var(--red);font-weight:700;flex-shrink:0}
+.compat-warn{color:var(--amber);font-weight:700;flex-shrink:0}
+
+/* ── S-TECH: PWA / tech ── */
+.pwa-answer{display:flex;align-items:flex-start;gap:16px;padding:16px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);margin-bottom:16px}
+.pwa-badge{font-size:28px;flex-shrink:0}
+.pwa-answer-title{font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pwa-answer-body{font-size:12px;color:var(--fg);line-height:1.6}
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.req-card{padding:13px 14px;border-radius:var(--rsm);border:1px solid}
+.req-card.must{border-color:var(--gbdr);background:var(--gbg)}
+.req-card.skip{border-color:var(--border);background:var(--bg)}
+.req-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+.req-item{display:flex;align-items:flex-start;gap:7px;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05);line-height:1.5}
+.req-item:last-child{border-bottom:none}
+.req-icon{flex-shrink:0;font-weight:700;font-size:12px}
+.ios-note{padding:13px 15px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);font-size:11px;color:var(--amber);line-height:1.7;margin-bottom:16px}
+.sw-blk{border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
+.sw-hd{padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;font-weight:600}
+
+@media(max-width:768px){
+  .notif-compare,.fcm-compare,.principle-grid,.compat-grid,.req-grid,.compat-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <span class="hdr-title">推播回流策略 — 數據驅動版</span>
+    <nav class="nav">
+      <a href="#s-design" class="nl active">01 推播時機</a>
+      <a href="#s-tech" class="nl">02 技術架構</a>
+      <a href="#s4" class="nl">03 頻率控制</a>
+      <a href="#s5" class="nl">04 下一步</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ─────────────────────────────────────── S1 數據基礎 ── -->
+<!-- ─────────────────────────────────────── S-DESIGN 推播時機矩陣 ── -->
+<section id="s-design">
+  <div class="sec-hd">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">推播時機矩陣 — 基於千人千面分群規劃</div>
+      <div class="sec-desc">根據玩家生命週期 8 階段、投注節奏型態、輸後行為分群，定義各時機點的推播觸發條件與文案方向</div>
+    </div>
+  </div>
+
+
+  <!-- 分析來源說明 -->
+  <div class="notice" style="margin-bottom:20px">
+    分析來源：千人千面規劃.xlsx — 玩家生命週期 8 階段 × 投注節奏型態（ABCD）× 輸後行為（ABCD）× DBCR 個性判斷
+  </div>
+
+  <!-- 板塊一：即時行為觸發 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">⚡ 即時行為觸發（事件驅動，分鐘級）</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">玩家完成特定行為後即時觸發，時效性最強，轉化率最高</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:180px">時機點</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th><th style="width:70px">延遲</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">存款表單放棄</div><div class="m-note">Step 3→4 流失點</div></td>
+          <td>進入存款表單頁，<strong>20 分鐘內未完成</strong></td>
+          <td><span class="bdg br">全體 ~14,506/日</span></td>
+          <td>中性提醒 or 利益驅動（BH 品牌完成率 58.4%，需加利益點）</td>
+          <td><span class="bdg ba">15 min</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 D 止損退出型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數≤1 且 下注大幅下降/中斷</td>
+          <td><span class="bdg bp">D 止損退出型</span></td>
+          <td>安撫 / 翻盤感 —「今天的結果不代表明天」，<strong>禁止推促銷</strong></td>
+          <td><span class="bdg ba">2–4 hr 後</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 C 補錢冷靜型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數&gt;1 且 無加碼下注</td>
+          <td><span class="bdg bb">C 補錢冷靜型</span></td>
+          <td>小額回饋 / 任務導留 — 肯定穩健行為，提供低風險誘因繼續玩</td>
+          <td><span class="bdg ba">1 hr</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 B 用餘額追輸型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數≤1 且 加碼下注（用餘額追）</td>
+          <td><span class="bdg bg">B 用餘額追輸型</span></td>
+          <td>入金回饋誘因 — 玩家有意願繼續但缺資金，低門檻入金 offer 最有效</td>
+          <td><span class="bdg bg">即時</span></td>
+        </tr>
+        <tr style="background:var(--rbg)">
+          <td><div class="m-name" style="color:var(--red)">🚫 大輸後 A 立即追輸型</div><div class="m-note">風控優先</div></td>
+          <td>BigLossDay = true，入金次數&gt;1 且 加碼下注（連續入金追輸）</td>
+          <td><span class="bdg br">A 立即追輸型</span></td>
+          <td><strong>禁止推任何促銷</strong>，改推冷卻提醒 / 限額通知 / Cashback 補償任務</td>
+          <td><span class="bdg br">立即</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">C 補血型入金節奏斷掉</div><div class="m-note">入金型態</div></td>
+          <td>IsDepositCountHigh=1 且 IsDepositSmallEach=1<br>本次入金間隔 &gt; 個人月均間隔 × 1.5</td>
+          <td><span class="bdg bg">C 補血型</span></td>
+          <td>小額入金加碼券 / 低門檻任務 — 補血節奏斷掉時精準觸發</td>
+          <td><span class="bdg ba">30 min</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 板塊二：生命週期 D+N 觸發 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">📅 生命週期觸發（D+N，依流失時間點）</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">根據 L1–L8 階段定義，在玩家流失曲線的黃金時間點介入</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:150px">時機點</th><th>生命週期階段</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">首存後 24 hr</div><div class="m-note">新客教育</div></td>
+          <td><span class="bdg bg">L1 G3 新客</span></td>
+          <td>完成首存後滿 24 小時，Quick Deposit 使用率僅 6.3%</td>
+          <td>所有首存新客</td>
+          <td>「下次存款可以快 3 倍」— 教育 Quick Deposit，降低下次存款摩擦</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+1 未回流</div><div class="m-note">活躍留存</div></td>
+          <td><span class="bdg bb">L2–L3 活躍</span></td>
+          <td>昨日有遊玩，今日至傍晚未登入（依 GameType 分群推不同文案）</td>
+          <td>Slot 671k / Crash 288k / Sport 236k</td>
+          <td>遊戲型：熱榜引流 / 翻盤感；Sport 型：賽事倒數（不計額度）</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+3 活躍下降</div><div class="m-note">L4→L5 預警</div></td>
+          <td><span class="bdg ba">L4→L5</span></td>
+          <td>近 7 天投注額下降 &gt;30% 且連 3 日無登入（active_days 下降信號）</td>
+          <td>高活躍轉下降（G5 流失預警）</td>
+          <td>挽回 — 個人化訊息，強調「你常玩的遊戲」，避免通用促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+7 流失預警</div><div class="m-note">L5</div></td>
+          <td><span class="bdg ba">L5 流失預警</span></td>
+          <td>近 7 日無下注（bet_count_d7 = 0），歷史高 GGR 者優先</td>
+          <td>高單人 GGR：Sport &gt; Casino</td>
+          <td>Sport 型：「你關注的聯賽還在」；Casino 型：個人化回饋 offer</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+14 休眠</div><div class="m-note">L6</div></td>
+          <td><span class="bdg br">L6 休眠</span></td>
+          <td>login_inactive_days ≥ 14，bet_count_d14 = 0</td>
+          <td>休眠玩家（包含沉睡 VIP）</td>
+          <td>回流 Reload：歷史 LTV 前 5% → 首筆 6% 尊榮回饋；一般 → 「好久不見」情感訴求</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+30 流失召回</div><div class="m-note">L7</div></td>
+          <td><span class="bdg br">L7 流失</span></td>
+          <td>login_inactive_days ≥ 30</td>
+          <td>流失玩家</td>
+          <td>強利益點（沉睡 VIP：首筆 6% + 尊榮感），一般流失：簡單回饋 + 情感喚醒</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">L8 回流後 nurture</div><div class="m-note">回流穩定</div></td>
+          <td><span class="bdg bg">L8 回流</span></td>
+          <td>prev_segment ∈ {L6, L7} 且 login_today = true</td>
+          <td>回流玩家</td>
+          <td>歡迎回來 + 連續 3 天留存獎勵，把 L8 穩定轉為 L3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 板塊三：投注節奏人格對照 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🎯 投注節奏人格 × 推播時機對照</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">基於 DBCR × 投注節奏 × 入金型態的千人千面分群，不同人格最佳觸發時機不同</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:130px">人格類型</th><th>定義特徵</th><th>最佳推播時機</th><th>訊息策略</th><th style="width:70px">禁忌</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">A 耐玩型</div><div class="m-note">DBCR ≫ 1，小注長玩</div></td>
+          <td>IsHighDurability=1 且 IsBetCountHigh=1，節奏穩定、黏著度高</td>
+          <td>連續登入任務斷掉當天晚間<br>週期任務到期前 2 小時</td>
+          <td>成就感 / 任務連續性 —「連續登入快斷了」「距離下一等級差 3 天」</td>
+          <td>高壓促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">B 速燃型</div><div class="m-note">DBCR &lt; 1，衝動爆發</div></td>
+          <td>IsLowDurability=1 且 IsAvgBetHigh=1，單注高、快速燃燒</td>
+          <td>大輸冷卻 6 小時後<br>下次登入時觸發活動</td>
+          <td>冷靜後再推 — 先冷卻期，再用限額任務 / 分段目標重新引導</td>
+          <td>大輸後即時促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">C 補血型</div><div class="m-note">頻繁小額入金</div></td>
+          <td>IsDepositCountHigh=1 且 IsDepositSmallEach=1，對小回饋敏感</td>
+          <td>入金間隔超過個人月均 × 1.5 時<br>小額返利活動到期前 1 小時</td>
+          <td>低門檻誘因 —「入金 100 立拿 10%」，短週期小回饋推進補血節奏</td>
+          <td>高打碼要求</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D 一次大充型</div><div class="m-note">計畫型重投入</div></td>
+          <td>IsDepositOnce=1 且 IsDepositAmtBig=1，習慣一次打滿</td>
+          <td>體育大賽前 72 小時<br>VIP 節點 / 個人 LTV 里程碑</td>
+          <td>尊榮感 + 高額獎勵 —「大客專屬：存款 50,000 享 25%」，透過專屬管道</td>
+          <td>通用小額促銷</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 板塊四：外部事件觸發 -->
+  <div class="card cp">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🌐 外部事件 / 週期固定推播</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">不依賴玩家行為，由平台事件或時間週期驅動</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:160px">時機點</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th><th style="width:80px">備註</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">Sport 賽事前 90 min</div></td>
+          <td>玩家有 Sport 投注記錄 + 關注賽事開賽前 90 分鐘</td>
+          <td><span class="bdg ba">Sport 236k</span></td>
+          <td>「你關注的賽事還有 1.5 小時，賠率現在最佳」</td>
+          <td>不佔每日額度</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">週末 Fri–Sun 晚間</div></td>
+          <td>週五至週日，玩家活躍時段 ± 30 分鐘</td>
+          <td>週末娛樂派對客</td>
+          <td>「週末快閃：今晚 20–24 點存款享 30%」時間感 + 限定感</td>
+          <td>高打碼防套利</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">個人活躍時段推播</div></td>
+          <td>根據歷史行為，在玩家最活躍時段 ± 30 min 發送（需時段數據驗證）</td>
+          <td>所有回流推播對象</td>
+          <td>時間點依玩家個人最佳時段，文案依場景設計</td>
+          <td>需時段數據</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">Reload 活動到期前</div></td>
+          <td>玩家有資格領 Reload 活動，距到期剩 2 小時</td>
+          <td>高頻小額穩定客 / 新客首週</td>
+          <td>「你的入金加碼今晚 12 點截止」— 損失厭惡，催化行動</td>
+          <td>不計每日額度</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="warn-box" style="margin-top:14px;margin-bottom:0">
+      ⚡ <strong>優先順序：</strong>存款放棄 &gt; 大輸後行為分類 &gt; D+1 生命週期 &gt; Sport 賽事 &gt; Reload 到期 &gt; 週末活動 &gt; 週期性召回<br>
+      🔒 <strong>A 立即追輸型</strong>：所有促銷推播暫停，改走風控流程（冷卻通知 / Cashback 任務），避免加劇問題行為。
+    </div>
+  </div>
+
+</section>
+
+</section>
+
+<!-- ─────────────────────────────────────── S-TECH 技術架構 ── -->
+<section id="s-tech">
+  <div class="sec-hd">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">技術架構 — 網頁推播不需要完整 PWA</div>
+      <div class="sec-desc">釐清 PWA vs Web Push 的關係，以及現有 Firebase FCM 架構的定位</div>
+    </div>
+  </div>
+
+  <div class="card cp">
+    <!-- 核心答案 -->
+    <div class="pwa-answer">
+      <div class="pwa-badge">✅</div>
+      <div>
+        <div class="pwa-answer-title">不需要完整 PWA，但需要 Service Worker</div>
+        <div class="pwa-answer-body">
+          推播通知的技術依賴是 <strong>Service Worker + HTTPS + 用戶授權</strong>，跟「是否為 PWA」無關。<br>
+          你們已在用 Firebase FCM，FCM SDK 會自動注冊一個 Service Worker（<code>firebase-messaging-sw.js</code>）。<br>
+          App Manifest、離線功能、可安裝性 — 這些 PWA 特性對推播 <strong>沒有影響</strong>，不需要實作。
+        </div>
+      </div>
+    </div>
+
+    <!-- 需要 vs 不需要 -->
+    <div class="req-grid">
+      <div class="req-card must">
+        <div class="req-card-title" style="color:var(--green)">✅ 推播必要條件（你們已有）</div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>HTTPS</strong> — 所有推播 API 只在 HTTPS 下運作</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>Service Worker</strong> — Firebase SDK 自動注冊 firebase-messaging-sw.js</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>Firebase FCM</strong> — Server-side 推送訊息的基礎設施</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>用戶授權</strong> — Notification.requestPermission() 彈窗</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>FCM Token</strong> — 每裝置唯一識別符，存在後端 DB</div></div>
+      </div>
+      <div class="req-card skip">
+        <div class="req-card-title" style="color:var(--muted)">❌ 推播不需要的 PWA 特性</div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>Web App Manifest</strong>（manifest.json）— 只影響安裝行為</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>離線快取</strong>（Cache API）— 與推播無關</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>可安裝性</strong>（A2HS / Install Prompt）— 非必要</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>App Shell 架構</strong> — PWA 設計模式，不影響推播</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>背景同步</strong>（Background Sync）— 不同 API</div></div>
+      </div>
+    </div>
+
+    <!-- iOS 特殊說明 -->
+    <div class="ios-note">
+      <strong>⚠️ iOS 例外情況：</strong><br>
+      Safari 16.4（2023/3）才支援 Web Push，且有一個關鍵限制：<strong>用戶必須先「加入主畫面」（A2HS）才能授權推播</strong>。<br>
+      這意味著 iOS Safari 上的推播觸及率會遠低於 Android。<br>
+      <br>
+      若用戶群中 iOS 比例高，建議評估：① 引導 A2HS 流程 ② 開發 iOS App（FCM + APNs，完整支援 Rich Notification）<br>
+      目前 <strong>Android 用戶（FCM WebPush）可立即享受完整 image + action button</strong>，不受限制。
+    </div>
+
+    <!-- 現有架構圖 -->
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">現有 FCM 推播流程</div>
+    <div class="sw-blk">
+      <div class="sw-hd">推播發送流程（現有 → 優化方向）</div>
+      <pre class="fcm-code" style="border-radius:0">後端 CRM 觸發事件
+  （存款放棄 / D+1 未回流 / 賽事開賽）
+    │
+    ▼
+Firebase Admin SDK (Node.js / Python)
+  send({ token, notification, webpush, apns })
+    │
+    ▼
+FCM Server ──────────────────────────────────┐
+    │                                        │
+    ▼ Android / Web                          ▼ iOS
+Chrome Service Worker                   APNs → iOS App
+firebase-messaging-sw.js                Notification Service Extension (NSE)
+  showNotification({                      動態替換 image / 修改文案
+    image, actions,                       UNNotificationAction（按鈕）
+    requireInteraction, tag
+  })
+    │
+    ▼
+用戶點擊 notificationclick
+  → 判斷 event.action
+  → clients.openWindow(deepLink + utm_params)
+  → 後端記錄 push_click 事件 + 計算 CTR</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── S4 頻率控制 ── -->
+<section id="s4">
+  <div class="sec-hd">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">頻率控制與疲勞防護</div>
+      <div class="sec-desc">防止過度推播導致玩家退訂，保護長期觸及率</div>
+    </div>
+  </div>
+
+  <div class="freq-grid">
+    <div class="freq-card">
+      <div class="freq-title">全域上限</div>
+      <div class="freq-rule">每日最多 <strong>2 則</strong>（任何類型）</div>
+      <div class="freq-rule">回流序列每週最多 <strong>3 則</strong></div>
+      <div class="freq-rule">手動關閉通知 → 靜默 <strong>14 天</strong></div>
+      <div class="freq-rule">存款放棄 cooldown：<strong>24 小時</strong></div>
+    </div>
+    <div class="freq-card">
+      <div class="freq-title">Fatigue Guard</div>
+      <div class="freq-rule"><strong>Level 1：</strong>連 3 天無點擊 → 每週 1 則</div>
+      <div class="freq-rule"><strong>Level 2：</strong>連 7 天無點擊 → 暫停推播，改 email/SMS</div>
+      <div class="freq-rule"><strong>Level 3：</strong>連 14 天無點擊 → 移出名單，進 re-permission</div>
+    </div>
+    <div class="freq-card">
+      <div class="freq-title">豁免項目（不佔用額度）</div>
+      <div class="freq-rule">Sport 賽事提醒 — <strong>視為服務通知</strong></div>
+      <div class="freq-rule">Quick Deposit 教育 — <strong>一次性</strong></div>
+      <div class="freq-rule">存款成功確認 — <strong>永遠發送</strong></div>
+      <div class="freq-rule">帳戶安全通知 — <strong>永遠發送</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────── S5 下一步 ── -->
+<section id="s5">
+  <div class="sec-hd">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">下一步行動</div>
+      <div class="sec-desc">拿到數據前後的分工，場景 1 可以立即啟動不需等待</div>
+    </div>
+  </div>
+
+  <div class="card cp">
+    <div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>與數據團隊 Meeting — 優先確認三個數字</h4>
+          <p>這三個數字決定推播場景的優先上線順序，沒有它們所有時機點都是假設值。</p>
+          <ul class="step-list">
+            <li><strong>D+1 回流率現況基線</strong>（整體 + by GameType）</li>
+            <li><strong>存款放棄的 14,506 人中推播授權比例</strong></li>
+            <li><strong>玩家最活躍時段分布</strong>（驗證晚 8 點假設）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>場景 1 優先上線（不需等數據）</h4>
+          <p>存款放棄推播的觸發條件已確定，可以立即開發。</p>
+          <ul class="step-list">
+            <li>後端：定義 CRM 觸發邏輯 + Deep Link 規格</li>
+            <li>前端：SW <code>notificationclick</code> 補 deepLink 導航</li>
+            <li><strong>BH 優先</strong>：加入利益點文案，重點改善 58.4% 完成率</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>拿到數據後 — 排場景 2、3、4 優先序</h4>
+          <p>依 D+1 回流率最低的遊戲類型優先推，高流失 = 高改善空間。</p>
+          <ul class="step-list">
+            <li>確認輸贏是否為主因 → 決定場景 2/3 的訴求方向</li>
+            <li>Sport 場景需後端串賽程 API + 投注歷史</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>A/B 測試啟動 — 以場景 1 做第一輪</h4>
+          <p>用「中性提醒 vs 利益驅動」建立 A/B 框架，其他場景之後復用。</p>
+          <ul class="step-list">
+            <li>最少跑 <strong>7 天</strong>，每組 ≥ 500 次曝光</li>
+            <li>指標：24h <strong>存款完成率</strong>（非點擊率）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.nl');
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nl[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

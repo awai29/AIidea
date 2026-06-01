@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圖片載入優化 — 比較分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:8px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6}
+code{font-family:var(--mono);font-size:.9em}
+
+/* ── header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(239,239,239,.87);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.hdr-in{max-width:1140px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{font-size:14px;font-weight:600}
+.nav{display:flex;gap:4px}
+.nl{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;
+  padding:4px 9px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nl:hover{background:var(--card);color:var(--fg)}
+.notice{background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);
+  padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:20px}
+.notice code{background:rgba(37,99,235,.08);padding:1px 5px;border-radius:3px}
+
+/* ── layout ── */
+main{max-width:1140px;margin:0 auto;padding:36px 24px 80px;display:flex;flex-direction:column;gap:52px}
+section{scroll-margin-top:70px}
+.sec-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.sec-num{width:34px;height:34px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:2px}
+.sec-title{font-size:clamp(16px,2.2vw,20px);font-weight:700;line-height:1.3}
+.sec-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh)}
+.cp{padding:18px}
+
+/* ── badges ── */
+.bdg{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:9999px;border:1px solid}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.br{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.bp{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+
+/* ── shared image grid ── */
+.ig{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.ic{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:#e4e4e7}
+.ic img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .35s}
+.ic img.ok{opacity:1}
+.sk{position:absolute;inset:0;background:linear-gradient(90deg,#e4e4e7 25%,#f4f4f5 50%,#e4e4e7 75%);
+  background-size:800px 100%;animation:shim 1.4s infinite;transition:opacity .25s}
+.sk.gone{opacity:0;pointer-events:none}
+.ct{position:absolute;bottom:4px;right:5px;font-family:var(--mono);font-size:9px;color:#fff;
+  background:rgba(0,0,0,.65);padding:1px 5px;border-radius:3px;opacity:0;transition:opacity .2s}
+.ct.show{opacity:1}
+@keyframes shim{0%{background-position:-400px 0}100%{background-position:400px 0}}
+
+/* ── stat bar under each grid ── */
+.stats{display:flex;gap:20px;padding:12px 0 0;border-top:1px solid var(--border);margin-top:12px;flex-wrap:wrap}
+.si{display:flex;flex-direction:column;gap:1px}
+.sl{font-size:10px;color:var(--muted)}
+.sv{font-family:var(--mono);font-size:15px;font-weight:500}
+
+/* ── S1 two-col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.col-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cnt{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+/* ── S2 resolution tabs ── */
+.res-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.rtab{padding:6px 14px;border-radius:var(--rsm);border:1px solid var(--border);
+  background:var(--card);font-family:var(--mono);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.rtab:hover{background:var(--bg)}
+.rtab.active{border-color:var(--bbdr);background:var(--bbg);color:var(--blue)}
+.dpr-badge{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 10px;
+  border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg)}
+
+/* ── S3 format columns ── */
+.fmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fmt-col{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.fmt-img{aspect-ratio:3/2;background:#e4e4e7;background-size:cover;background-position:center}
+.fmt-body{padding:12px}
+.fmt-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}
+.fmt-lbl{color:var(--muted)}
+.fmt-val{font-family:var(--mono);font-weight:500}
+.fmt-bar-wrap{margin-top:8px;height:5px;background:#e4e4e7;border-radius:3px;overflow:hidden}
+.fmt-bar{height:100%;border-radius:3px;transition:width .9s ease;width:0}
+.prog-txt{text-align:center;padding:36px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* ── S3 methods ── */
+.mwrap{margin-top:22px}
+.mwrap-title{font-size:13px;font-weight:600;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.warn-box{padding:11px 13px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);
+  font-size:11px;color:var(--amber);margin-bottom:12px;line-height:1.6}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mc{padding:13px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg);position:relative}
+.mc.best{border-color:var(--gbdr);background:var(--gbg)}
+.best-tag{position:absolute;top:11px;right:11px;font-family:var(--mono);font-size:9px;font-weight:700;
+  color:var(--green);background:#fff;border:1px solid var(--gbdr);padding:1px 6px;border-radius:9999px}
+.mc-name{font-size:12px;font-weight:600;margin-bottom:5px}
+.mc-tags{display:flex;gap:4px;margin-bottom:7px;flex-wrap:wrap}
+.mc-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;background:var(--border);color:var(--muted)}
+.mc-cmd{font-family:var(--mono);font-size:9px;background:var(--fg);color:#e4e4e7;
+  padding:7px 9px;border-radius:5px;line-height:1.7;white-space:pre;overflow-x:auto;margin-bottom:7px}
+.mc-note{font-size:10px;color:var(--muted);line-height:1.6}
+
+/* ── S4 net layout ── */
+.net-top{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.sim-btn{padding:5px 11px;border-radius:var(--rsm);border:1px solid var(--border);
+  background:var(--card);font-family:var(--mono);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.sim-btn:hover{background:var(--bg)}
+.sim-btn.active{border-color:var(--bbdr);background:var(--bbg);color:var(--blue)}
+.net-info-row{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
+.ni{display:flex;flex-direction:column;gap:1px}
+.ni-l{font-size:10px;color:var(--muted)}
+.ni-v{font-family:var(--mono);font-size:12px;font-weight:500}
+
+/* ── S4 approach comparison ── */
+.awrap{margin-top:22px}
+.awrap-title{font-size:13px;font-weight:600;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.acard{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;display:flex;flex-direction:column}
+.ahead{padding:13px 14px;border-bottom:1px solid var(--border)}
+.a-icon{font-size:18px;margin-bottom:4px}
+.a-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.a-sub{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.abody{padding:13px 14px;flex:1;display:flex;flex-direction:column;gap:10px}
+.pl-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.pt{color:var(--green)}.ct2{color:var(--red)}
+.pl{list-style:none;display:flex;flex-direction:column;gap:3px}
+.pl li{font-size:10px;line-height:1.5;display:flex;gap:5px;align-items:flex-start}
+.pl li::before{flex-shrink:0;margin-top:2px;font-size:9px}
+.pros li::before{content:"✓";color:var(--green);font-weight:700}
+.cons li::before{content:"✗";color:var(--red)}
+.afoot{padding:10px 14px;border-top:1px solid var(--border);background:var(--bg)}
+.asc-l{font-size:9px;color:var(--muted);margin-bottom:2px}
+.asc{font-size:11px;font-weight:500}
+.arec{display:inline-flex;font-family:var(--mono);font-size:9px;padding:2px 6px;
+  border-radius:9999px;border:1px solid;margin-top:5px}
+.rh{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.rm{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.rl{color:var(--muted);background:var(--bg);border-color:var(--border)}
+.cf-code-wrap{margin-top:14px;padding:13px;background:var(--bg);border-radius:var(--rsm);border:1px solid var(--border)}
+.cf-code-t{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.cf-code{font-family:var(--mono);font-size:10px;background:var(--fg);color:#e4e4e7;
+  padding:10px 11px;border-radius:6px;line-height:1.7;white-space:pre;overflow-x:auto}
+
+/* ── Summary bar chart ── */
+.sum-chart{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:180px 1fr 90px;align-items:center;gap:10px}
+.bar-lbl{font-family:var(--mono);font-size:10px;text-align:right;color:var(--fg)}
+.bar-track{height:20px;background:#e4e4e7;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .9s ease;width:0;min-width:2px}
+.bar-val{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.sum-note{margin-top:14px;padding:13px 15px;background:var(--gbg);border:1px solid var(--gbdr);
+  border-radius:var(--rsm);font-size:12px;color:var(--green)}
+.sum-pending{font-family:var(--mono);font-size:11px;color:var(--muted);padding:20px;text-align:center}
+.sum-group-lbl{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted);margin:10px 0 4px;padding-left:0}
+
+.unsup{padding:12px 14px;background:var(--abg);border:1px solid var(--abdr);
+  border-radius:var(--rsm);font-size:12px;color:var(--amber);margin-bottom:14px;display:none}
+
+@media(max-width:680px){
+  .ig{grid-template-columns:repeat(3,1fr)}
+  .two-col,.fmt-grid,.agrid,.mgrid{grid-template-columns:1fr}
+  .nav{display:none}
+  .bar-row{grid-template-columns:130px 1fr 70px}
+  .bar-lbl{font-size:9px}
+}
+
+/* ── S3 color diff ── */
+.diff-section{margin-top:28px;border-top:1px solid var(--border);padding-top:20px}
+.diff-sec-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.diff-sec-desc{font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.diff-pair{margin-bottom:22px}
+.diff-pair-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.diff-6grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.diff-cell{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:#0a0a0a}
+.diff-cell canvas{width:100%;height:100%;display:block}
+.diff-tag{position:absolute;bottom:4px;right:5px;font-family:var(--mono);font-size:9px;color:#fff;
+  background:rgba(0,0,0,.75);padding:1px 5px;border-radius:3px}
+.diff-scale{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px}
+.diff-scale-bar{flex:1;height:6px;border-radius:3px;background:linear-gradient(to right,#1d4ed8,#16a34a,#f59e0b,#dc2626)}
+@media(max-width:680px){.diff-6grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <span class="hdr-title">圖片載入優化 — 比較分析</span>
+    <nav class="nav">
+      <a class="nl" href="#s1">01 Lazy</a>
+      <a class="nl" href="#s2">02 Responsive</a>
+      <a class="nl" href="#s3">03 格式</a>
+      <a class="nl" href="#s4">04 組合比較</a>
+      <a class="nl" href="#s5">05 自適應</a>
+      <a class="nl" href="#summary">⭐ 總結</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ════════════════════════════════
+     S1: Lazy vs Eager
+════════════════════════════════ -->
+<section id="s1">
+  <div class="sec-hd">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">Lazy Load vs Eager Load</div>
+      <div class="sec-desc">同樣 6 張圖，左欄開頁即全部載入；右欄等進入視窗才用 <code>fetch</code> 下載，流量用 <code>blob.size</code> 實測。向下捲動觀察右欄從 0 累積。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div class="notice">6 張遊戲封面 PNG（348×462）— 進入視窗才觸發下載，初始流量 <code>0 KB</code>。向下捲動觀察流量累積。</div>
+    <div class="col-hd" style="margin-bottom:10px"><span class="bdg bg">Lazy Load</span><span class="cnt" id="lc">0 / 6</span></div>
+    <div class="ig" id="lazy-grid"></div>
+    <div class="stats">
+      <div class="si"><span class="sl">初始流量</span><span class="sv" style="color:var(--green)">0 KB</span></div>
+      <div class="si"><span class="sl">已下載合計</span><span class="sv" id="lb" style="color:var(--green)">0 KB</span></div>
+      <div class="si"><span class="sl">平均 / 張</span><span class="sv" id="la">—</span></div>
+      <div class="si"><span class="sl">捲動進度</span><span class="sv" style="font-size:12px" id="lp">等待進入視窗…</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     S2: Responsive
+════════════════════════════════ -->
+<section id="s2">
+  <div class="sec-hd">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">Responsive Images — 1x / 2x / 3x</div>
+      <div class="sec-desc">同樣 6 張圖，切換解析度版本，觀察 6 張合計流量差距。Tab 預設為你的螢幕 DPR 對應版本。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="res-tabs" id="res-tabs">
+        <button class="rtab" data-tier="1x" data-w="100"  data-h="133">1x — 100×133</button>
+        <button class="rtab" data-tier="2x" data-w="200"  data-h="266">2x — 200×266</button>
+        <button class="rtab" data-tier="3x" data-w="9999" data-h="462">3x — 348×462</button>
+      </div>
+      <span class="dpr-badge">你的 DPR: <span id="dpr-val">…</span> → 建議: <span id="dpr-rec">…</span></span>
+    </div>
+    <div class="ig" id="res-grid"></div>
+    <div class="stats">
+      <div class="si"><span class="sl">6張實際下載</span><span class="sv" id="res-total">—</span></div>
+      <div class="si"><span class="sl">平均 / 張</span><span class="sv" id="res-avg">—</span></div>
+      <div class="si"><span class="sl">vs 1x 基準</span><span class="sv" id="res-vs" style="font-size:12px">—</span></div>
+    </div>
+
+    <!-- Angular 實作 -->
+    <div class="mwrap">
+      <div class="mwrap-title">Angular 實作方向 — BO 繼續上傳 3x，前端自動依 DPR 選圖</div>
+      <div class="warn-box" style="background:var(--gbg);border-color:var(--gbdr);color:var(--green)">
+        ✅ BO 上傳流程不需要改，繼續上傳原始 3x 圖。前端或 CDN 自動產生 1x / 2x 縮圖，裝置只下載需要的尺寸。
+      </div>
+      <div class="mgrid">
+
+        <div class="mc">
+          <div class="mc-name">方式一 — <code>srcset</code> 屬性（純 HTML）</div>
+          <div class="mc-tags"><span class="mc-tag">零 JS</span><span class="mc-tag">需 CDN resize</span></div>
+          <div class="mc-cmd">&lt;!-- 搭配 Cloudflare Image Resizing --&gt;
+&lt;img
+  srcset="
+    /cdn-cgi/image/w=116/game.png 1x,
+    /cdn-cgi/image/w=232/game.png 2x,
+    /cdn-cgi/image/w=348/game.png 3x
+  "
+  src="/cdn-cgi/image/w=232/game.png"
+  loading="lazy"
+  alt="game cover"
+/&gt;</div>
+          <div class="mc-note">瀏覽器依 DPR 自動選：1x → 116px / 2x → 232px / 3x → 348px（原圖）。</div>
+        </div>
+
+        <div class="mc best">
+          <div class="best-tag">推薦</div>
+          <div class="mc-name">方式二 — Angular <code>CdnService</code></div>
+          <div class="mc-tags"><span class="mc-tag">全站生效</span><span class="mc-tag">只改 Service</span><span class="mc-tag">Cloudflare</span></div>
+          <div class="mc-cmd">// cdn.service.ts
+@Injectable({ providedIn: 'root' })
+export class CdnService {
+  private readonly DPR_MAP: Record&lt;string,number&gt; = {
+    '1x': 116, '2x': 232, '3x': 9999,
+  };
+
+  getImageUrl(src: string): string {
+    const dpr = window.devicePixelRatio ?? 1;
+    const tier = dpr &gt;= 2.5 ? '3x' : dpr &gt;= 1.5 ? '2x' : '1x';
+    const w = this.DPR_MAP[tier];
+    // Cloudflare: /cdn-cgi/image/w={w}/original-path
+    return w === 9999
+      ? src
+      : src.replace('/images/', `/cdn-cgi/image/w=${w}/images/`);
+  }
+}</div>
+          <div class="mc-note">只改 CdnService，全站圖片自動受益。不需逐一修改元件。</div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-name">方式三 — Angular <code>ImagePipe</code></div>
+          <div class="mc-tags"><span class="mc-tag">Template 乾淨</span><span class="mc-tag">搭配方式二</span></div>
+          <div class="mc-cmd">// image.pipe.ts
+@Pipe({ name: 'cdnImg', standalone: true })
+export class CdnImagePipe implements PipeTransform {
+  constructor(private cdn: CdnService) {}
+  transform(src: string) {
+    return this.cdn.getImageUrl(src);
+  }
+}
+
+// 元件 template 用法
+&lt;img [src]="game.thumbnail | cdnImg"
+     loading="lazy"
+     [alt]="game.name" /&gt;</div>
+          <div class="mc-note">Pipe 包一層，template 不需要直接呼叫 service，便於測試與替換。</div>
+        </div>
+
+        <div class="mc" style="background:var(--pbg);border-color:var(--pbdr)">
+          <div class="mc-name" style="color:var(--purple)">DPR 對應規則</div>
+          <div class="mc-tags"><span class="mc-tag" style="color:var(--purple);background:var(--pbg)">東南亞裝置參考</span></div>
+          <div class="mc-cmd">devicePixelRatio  裝置類型          寬度
+─────────────────────────────────────
+&lt; 1.5            低密度桌機/舊機   → 1x (116px)
+1.5 – 2.4        Android 主流       → 2x (232px)
+≥ 2.5            iPhone / 高階 DPR → 3x (348px)</div>
+          <div class="mc-note" style="color:var(--purple)">東南亞市場大多數 Android 裝置落在 2x，套用 2x 可省下約 34% 流量，且肉眼無法察覺差異。</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     S3: Format Comparison
+════════════════════════════════ -->
+<section id="s3">
+  <div class="sec-hd">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">格式轉換 — PNG → 設計師批轉 JPG (q70) / WebP</div>
+      <div class="sec-desc">載入設計師實際轉換的 6 張圖（PNG 原始 / JPG quality 70 / WebP），實測合計檔案大小與壓縮率。下方附色差熱力圖，逐像素比對顏色偏移量。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div id="fmt-prog" class="prog-txt">正在載入 6 張圖片…</div>
+    <div id="fmt-result" style="display:none">
+      <div id="fmt-rows"></div>
+      <div id="fmt-diff" class="diff-section" style="display:none">
+        <div class="diff-sec-title">顏色差異分析 — PNG 原始 vs 設計師轉換版</div>
+        <div class="diff-sec-desc">差異以熱力圖呈現（×5 放大）：<span style="color:#1d4ed8;font-weight:600">藍</span>=與原圖相同、<span style="color:#16a34a;font-weight:600">綠</span>=輕微差異、<span style="color:#dc2626;font-weight:600">紅</span>=明顯差異。ΔE 越小代表顏色越接近原始 PNG。</div>
+        <!-- diff pairs injected by JS -->
+      </div>
+      <div class="mwrap">
+        <div class="mwrap-title">批次轉換 1000 張 PNG 的方法比較</div>
+        <div class="warn-box">⚠️ JPG 為有損格式，PNG→JPG 技術上一定有損失。真正無損只有 <strong>WebP lossless</strong>（<code>quality=100 + lossless:true</code>）。若接受視覺無損（quality ≥ 95），轉 JPG 可行。PNG 支援透明背景，JPG 不支援——有透明度的圖轉 JPG 會填白底。</div>
+        <div class="mgrid">
+          <div class="mc best">
+            <div class="best-tag">最佳解</div>
+            <div class="mc-name">Sharp (Node.js)</div>
+            <div class="mc-tags"><span class="mc-tag">Script</span><span class="mc-tag">Mac/Win/Linux</span><span class="mc-tag">最快 4–8×</span></div>
+            <div class="mc-cmd">npm install sharp
+node -e "
+const sharp=require('sharp'),fs=require('fs');
+fs.readdirSync('./png')
+  .filter(f=>f.endsWith('.png'))
+  .forEach(f=>sharp('./png/'+f)
+    .jpeg({quality:95,mozjpeg:true})
+    .toFile('./jpg/'+f.replace('.png','.jpg')));
+"</div>
+            <div class="mc-note">libvips 底層，比 ImageMagick 快 4–8×。<code>mozjpeg:true</code> 同品質再小 10–15%。<br>WebP lossless: <code>.webp({lossless:true})</code></div>
+          </div>
+          <div class="mc">
+            <div class="mc-name">ImageMagick mogrify</div>
+            <div class="mc-tags"><span class="mc-tag">CLI</span><span class="mc-tag">Mac/Win/Linux</span><span class="mc-tag">最廣泛</span></div>
+            <div class="mc-cmd">brew install imagemagick
+mkdir jpg
+mogrify -format jpg -quality 95 \
+  -path ./jpg ./png/*.png</div>
+            <div class="mc-note">一行指令，1000 張約 30–90 秒。WebP lossless: 加 <code>-define webp:lossless=true -format webp</code></div>
+          </div>
+          <div class="mc">
+            <div class="mc-name">Squoosh CLI (Google)</div>
+            <div class="mc-tags"><span class="mc-tag">CLI</span><span class="mc-tag">同時輸出 JPG+WebP</span></div>
+            <div class="mc-cmd">npm i -g @squoosh/cli
+squoosh-cli \
+  --mozjpeg '{"quality":95}' \
+  --webp '{"quality":85}' \
+  --output-dir ./out ./png/*.png</div>
+            <div class="mc-note">一次輸出 JPG 和 WebP 兩個版本，方便搭配 <code>&lt;picture&gt;</code> fallback。</div>
+          </div>
+          <div class="mc" style="background:var(--pbg);border-color:var(--pbdr)">
+            <div class="mc-name" style="color:var(--purple)">WebP 破圖的正確解法</div>
+            <div class="mc-tags"><span class="mc-tag" style="color:var(--purple);background:var(--pbg)">HTML only</span><span class="mc-tag" style="color:var(--purple);background:var(--pbg)">零 JS</span></div>
+            <div class="mc-cmd">&lt;picture&gt;
+  &lt;source srcset="photo.webp"
+          type="image/webp"&gt;
+  &lt;img src="photo.jpg" alt="..."&gt;
+&lt;/picture&gt;</div>
+            <div class="mc-note" style="color:var(--purple)">支援 WebP → 用 WebP；不支援 → 自動 fallback JPG。<strong>完全零風險</strong>，不需 JS 偵測。Safari 14 以前完整覆蓋。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     S4: Responsive × Format Combo
+════════════════════════════════ -->
+<section id="s4">
+  <div class="sec-hd">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">Responsive × 格式 — 組合比較</div>
+      <div class="sec-desc">同時套用解析度縮圖（1x/2x/3x）× 格式轉換（PNG/JPG/WebP），實測 6 張合計下載量。找出「最省」組合，與原始 3x PNG 比較節省比例。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div id="combo-prog" class="prog-txt">正在分析 3 種尺寸 × 3 種格式（共 54 張），請稍候…</div>
+    <div id="combo-result" style="display:none">
+      <div id="combo-chart" class="sum-chart"></div>
+      <div id="combo-winner" class="sum-note" style="display:none;margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     S5: Network Adaptive
+════════════════════════════════ -->
+<section id="s5">
+  <div class="sec-hd">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">網路自適應載入</div>
+      <div class="sec-desc">同樣 6 張圖，依網路品質切換解析度。點擊模擬器觀察圖片與流量變化，並對照下方三種實作方式的優劣。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div class="unsup" id="net-warn">⚠️ 此瀏覽器不支援 Network Information API。請用 Chrome，或點擊下方模擬器。</div>
+    <div class="net-top">
+      <span style="font-size:12px;font-weight:600">網路模擬：</span>
+      <button class="sim-btn" data-net="slow-2g" onclick="simNet('slow-2g')">slow-2g</button>
+      <button class="sim-btn" data-net="2g"      onclick="simNet('2g')">2G</button>
+      <button class="sim-btn" data-net="3g"      onclick="simNet('3g')">3G</button>
+      <button class="sim-btn" data-net="4g"      onclick="simNet('4g')">4G</button>
+      <button onclick="simNet(null)" style="padding:5px 10px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:10px;cursor:pointer;color:var(--muted)">↺ 偵測值</button>
+    </div>
+    <div class="ig" id="net-grid"></div>
+    <div class="stats">
+      <div class="si"><span class="sl">6張實際下載</span><span class="sv" id="net-total">—</span></div>
+      <div class="si"><span class="sl">平均 / 張</span><span class="sv" id="net-avg">—</span></div>
+      <div class="si"><span class="sl">當前品質</span><span class="sv" style="font-size:12px" id="net-quality">—</span></div>
+    </div>
+    <div class="net-info-row" style="margin-top:12px">
+      <div class="ni"><span class="ni-l">effectiveType</span><span class="ni-v" id="ni-type">—</span></div>
+      <div class="ni"><span class="ni-l">downlink</span><span class="ni-v" id="ni-dl">—</span></div>
+      <div class="ni"><span class="ni-l">rtt</span><span class="ni-v" id="ni-rtt">—</span></div>
+      <div class="ni"><span class="ni-l">saveData</span><span class="ni-v" id="ni-sd">—</span></div>
+    </div>
+
+    <!-- Approach comparison -->
+    <div class="awrap">
+      <div class="awrap-title">三種網路偵測方式比較</div>
+      <div class="agrid">
+        <div class="acard">
+          <div class="ahead"><div class="a-icon">💻</div><div class="a-name">前端偵測</div><div class="a-sub">navigator.connection</div></div>
+          <div class="abody">
+            <div><div class="pl-title pt">優點</div><ul class="pl pros"><li>免費，零後端成本</li><li>即時偵測，無需 round-trip</li><li>可監聽 change 事件動態切換</li><li>靜態網站也能用（本 Demo 即此方式）</li></ul></div>
+            <div><div class="pl-title ct2">缺點</div><ul class="pl cons"><li>僅 Chrome / Android 支援，Safari / Firefox 不支援</li><li>effectiveType 是估算值，非真實頻寬</li><li>VPN / 代理可能造成誤判</li></ul></div>
+          </div>
+          <div class="afoot"><div class="asc-l">適合場景</div><div class="asc">靜態網站、原型、APP WebView</div><span class="arec rm">推薦度：中</span></div>
+        </div>
+        <div class="acard">
+          <div class="ahead"><div class="a-icon">🖥</div><div class="a-name">後端偵測</div><div class="a-sub">HTTP Client Hints</div></div>
+          <div class="abody">
+            <div><div class="pl-title pt">做法</div><ul class="pl pros"><li>Server 回 <code>Accept-CH: ECT, Downlink, Save-Data</code></li><li>瀏覽器後續請求自動帶 hint headers</li><li>Server 依 header 回傳對應尺寸</li></ul></div>
+            <div><div class="pl-title pt">優點</div><ul class="pl pros"><li>無需前端 JS，可搭配 SSR 首屏直出正確尺寸</li><li>Save-Data 明確表達使用者節流意願</li></ul></div>
+            <div><div class="pl-title ct2">缺點</div><ul class="pl cons"><li>第一次請求不帶 hint（需 Critical-CH）</li><li>底層仍依賴 navigator.connection 數據</li><li>需後端邏輯，增加維護複雜度</li></ul></div>
+          </div>
+          <div class="afoot"><div class="asc-l">適合場景</div><div class="asc">有 SSR 的 Web App（Next.js / Nuxt）</div><span class="arec rm">推薦度：中</span></div>
+        </div>
+        <div class="acard" style="border-color:var(--gbdr)">
+          <div class="ahead" style="background:var(--gbg);border-color:var(--gbdr)"><div class="a-icon">🌐</div><div class="a-name">CDN 邊緣偵測</div><div class="a-sub">Cloudflare Image Resizing</div></div>
+          <div class="abody">
+            <div><div class="pl-title pt">優點</div><ul class="pl pros"><li>原始只需一張高解析度圖，無需預生成多版本</li><li><code>format=auto</code> 自動 WebP fallback，完全解決破圖</li><li>全球 CDN 邊緣加速，延遲最低</li><li>Polish 功能自動進一步壓縮</li></ul></div>
+            <div><div class="pl-title ct2">缺點</div><ul class="pl cons"><li>Image Resizing 需 Pro 方案（$20/月起）</li><li>綁定 Cloudflare 供應商</li><li>網路速度仍需前端或 Client Hints 配合</li></ul></div>
+          </div>
+          <div class="afoot" style="background:var(--gbg);border-color:var(--gbdr)"><div class="asc-l">適合場景</div><div class="asc">生產環境、大流量、需自動 WebP fallback</div><span class="arec rh">推薦度：高（生產首選）</span></div>
+        </div>
+      </div>
+      <div class="cf-code-wrap">
+        <div class="cf-code-t">Cloudflare Image Resizing — 前端整合（結合 navigator.connection）</div>
+        <div class="cf-code">const CF = 'https://example.com/cdn-cgi/image';
+const cfg = {
+  'slow-2g': 'width=100,quality=40,format=auto',
+  '2g':      'width=100,quality=50,format=auto',
+  '3g':      'width=400,quality=70,format=auto',
+  '4g':      'width=1200,quality=85,format=auto',
+};
+const type = navigator.connection?.effectiveType ?? '4g';
+img.src = `${CF}/${cfg[type]}/images/hero.jpg`;
+// format=auto: 支援 WebP → 給 .webp；不支援 → 自動給 .jpg</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     Summary
+════════════════════════════════ -->
+<section id="summary">
+  <div class="sec-hd">
+    <div class="sec-num">★</div>
+    <div>
+      <div class="sec-title">同系列 6 張圖 — 各方法實際下載量比較</div>
+      <div class="sec-desc">各 Section 完成載入後自動更新。越短 = 越省流量。</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div id="sum-chart"><div class="sum-pending">等待各 Section 載入完成…</div></div>
+    <div class="sum-note" id="sum-note" style="display:none"></div>
+  </div>
+</section>
+
+</main>
+<script>
+// ─────────────────────────────────────────────
+// Shared constants
+// ─────────────────────────────────────────────
+const IMG_IDS = [
+  'exclusive-aviator',
+  'exclusive-aztec-gems',
+  'exclusive-baji-of-olympus-1000',
+  'exclusive-bj-fortune-gems',
+  'exclusive-bj-super-ace-plus',
+  'exclusive-boxing-king'
+];
+// w <= 100 → 100px thumbnail | w <= 400 → 200px medium | w > 400 → original 348px
+const PICSUM = (id, w=9999) => {
+  if (w <= 100) return `images/100/${id}.png`;
+  if (w <= 400) return `images/200/${id}.png`;
+  return `images/${id}.png`;
+};
+
+// Global metrics → summary chart
+// key: { bytes, label, color, group, note }
+const M = {};
+
+function record(key, bytes, label, color, group, note='') {
+  M[key] = { bytes, label, color, group, note };
+  renderSummary();
+}
+
+function renderSummary() {
+  const el = document.getElementById('sum-chart');
+  if (!el) return;
+  if (Object.keys(M).length === 0) return;
+
+  const groups = ['timing','resolution','format','combo','adaptive'];
+  const gLabel = { timing:'載入時機', resolution:'解析度', format:'圖片格式', combo:'Responsive × 格式 組合', adaptive:'網路自適應' };
+  const entries = Object.entries(M).sort((a,b) => a[1].bytes - b[1].bytes);
+  const maxB = Math.max(...entries.map(([,v])=>v.bytes));
+
+  el.innerHTML = '';
+  groups.forEach(g => {
+    const rows = entries.filter(([,v])=>v.group===g);
+    if (!rows.length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'sum-group-lbl';
+    lbl.textContent = gLabel[g];
+    el.appendChild(lbl);
+    rows.forEach(([key,v]) => {
+      const pct = maxB > 0 ? Math.max(1, Math.round(v.bytes/maxB*100)) : 0;
+      const kb  = (v.bytes/1024).toFixed(0);
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `<span class="bar-lbl">${v.label}</span>
+        <div class="bar-track"><div class="bar-fill" id="bf-${key}" style="background:${v.color}"></div></div>
+        <span class="bar-val">${kb} KB${v.note?' · '+v.note:''}</span>`;
+      el.appendChild(row);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const b=document.getElementById('bf-'+key);
+        if(b) b.style.width=pct+'%';
+      }));
+    });
+  });
+
+  // Show verdict when we have data from all groups
+  const haveAll = groups.every(g => entries.some(([,v])=>v.group===g));
+  if (haveAll) {
+    const best = entries[0];
+    const note = document.getElementById('sum-note');
+    note.textContent = `最省流量：${best[1].label}（${(best[1].bytes/1024).toFixed(0)} KB）。最佳策略 = WebP 格式 + 網路自適應，可比 Eager PNG 節省 90%+ 流量。`;
+    note.style.display = 'block';
+  }
+}
+
+// ─────────────────────────────────────────────
+// Shared cell builder + fetch loader
+// ─────────────────────────────────────────────
+function makeCell() {
+  const cell=document.createElement('div'); cell.className='ic';
+  const sk=document.createElement('div');   sk.className='sk';
+  const img=document.createElement('img');  img.alt='';
+  const tag=document.createElement('span'); tag.className='ct';
+  cell.append(sk,img,tag);
+  return {cell,img,sk,tag};
+}
+
+async function fetchLoad(id, w, h, img, sk, tag) {
+  const url = PICSUM(id, w, h);
+  const t0  = performance.now();
+  try {
+    const resp = await fetch(url);
+    const blob = await resp.blob();
+    const ms   = (performance.now()-t0).toFixed(0);
+    const kb   = (blob.size/1024).toFixed(0);
+    const bu   = URL.createObjectURL(blob);
+    img.onload = () => {
+      img.classList.add('ok'); sk.classList.add('gone');
+      tag.textContent = `${ms}ms·${kb}KB`; tag.classList.add('show');
+    };
+    img.src = bu;
+    return blob.size;
+  } catch(e) {
+    img.src = url;
+    return 0;
+  }
+}
+
+// ─────────────────────────────────────────────
+// S1: Lazy Load only
+// ─────────────────────────────────────────────
+function initS1() {
+  let lB=0, lN=0;
+
+  const onL = bytes => {
+    lB+=bytes; lN++;
+    document.getElementById('lc').textContent=lN+'/6';
+    document.getElementById('lb').textContent=(lB/1024).toFixed(0)+' KB';
+    if(lN>0) document.getElementById('la').textContent=(lB/lN/1024).toFixed(0)+' KB';
+    document.getElementById('lp').textContent=lN+' 張已進入視窗';
+    if(lN===6) record('lazy', lB, 'Lazy Load（全部捲過）', '#22c55e', 'timing', '初始 0 KB');
+  };
+
+  const lg = document.getElementById('lazy-grid');
+  const cellMap = new WeakMap();
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      const refs = cellMap.get(e.target);
+      if(!refs) return;
+      cellMap.delete(e.target);
+      fetchLoad(refs.id,600,400,refs.img,refs.sk,refs.tag).then(onL);
+      obs.unobserve(e.target);
+    });
+  },{threshold:0.1});
+
+  IMG_IDS.forEach(id=>{
+    const {cell,img,sk,tag}=makeCell();
+    cellMap.set(cell,{id,img,sk,tag});
+    lg.appendChild(cell);
+    obs.observe(cell);
+  });
+}
+
+// ─────────────────────────────────────────────
+// S2: Responsive tabs
+// ─────────────────────────────────────────────
+let res1xBytes = 0; // store 1x baseline for comparison
+
+function initS2() {
+  const dpr = window.devicePixelRatio||1;
+  const rec = dpr>=2.5?'3x':dpr>=1.5?'2x':'1x';
+  document.getElementById('dpr-val').textContent = dpr.toFixed(2);
+  document.getElementById('dpr-rec').textContent = rec;
+
+  document.querySelectorAll('.rtab').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.tier===rec);
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      loadRes(btn.dataset.tier, +btn.dataset.w, +btn.dataset.h);
+    });
+  });
+
+  const dims={'1x':[100,133],'2x':[200,266],'3x':[9999,462]};
+  loadRes(rec, ...dims[rec]);
+}
+
+function loadRes(tier, w, h) {
+  const grid=document.getElementById('res-grid');
+  grid.innerHTML='';
+  document.getElementById('res-total').textContent='…';
+  document.getElementById('res-avg').textContent='…';
+  document.getElementById('res-vs').textContent='…';
+
+  let tot=0, n=0;
+  const colors={'1x':'#60a5fa','2x':'#3b82f6','3x':'#1d4ed8'};
+
+  IMG_IDS.forEach(id=>{
+    const {cell,img,sk,tag}=makeCell();
+    grid.appendChild(cell);
+    fetchLoad(id,w,h,img,sk,tag).then(bytes=>{
+      tot+=bytes; n++;
+      document.getElementById('res-total').textContent=(tot/1024).toFixed(0)+' KB';
+      document.getElementById('res-avg').textContent=(tot/n/1024).toFixed(0)+' KB';
+      if(n===IMG_IDS.length){
+        if(tier==='1x') res1xBytes=tot;
+        const vs = res1xBytes>0 ? (tot===res1xBytes ? 'baseline' : (tot>res1xBytes?'+':'')+Math.round((tot/res1xBytes-1)*100)+'%') : '—';
+        document.getElementById('res-vs').textContent = vs;
+        record('res_'+tier, tot, `Responsive ${tier} (${w}×${h})`, colors[tier], 'resolution');
+      }
+    });
+  });
+}
+
+// ─────────────────────────────────────────────
+// S3: Format comparison — real designer files
+// ─────────────────────────────────────────────
+const FMT_PATH = {
+  png:  id => `images/${id}.png`,
+  jpg:  id => `images/jpg/${id}.jpg`,
+  webp: id => `images/webp/${id}.webp`,
+};
+
+async function initS3() {
+  const prog = document.getElementById('fmt-prog');
+  const res  = document.getElementById('fmt-result');
+
+  const fmtDefs = [
+    { key:'png',  label:'PNG',  desc:'原始（設計師提供）',         cls:'bb', color:'#3b82f6' },
+    { key:'jpg',  label:'JPG',  desc:'設計師批轉 — quality 70',   cls:'ba', color:'#f59e0b' },
+    { key:'webp', label:'WebP', desc:'設計師批轉 — WebP lossless', cls:'bg', color:'#16a34a' },
+  ];
+
+  const allImgs = { png:[], jpg:[], webp:[] };
+  const totals  = { png:0,  jpg:0,  webp:0  };
+  let loaded = 0;
+  const totalCount = IMG_IDS.length * fmtDefs.length;
+
+  for (const { key } of fmtDefs) {
+    for (const id of IMG_IDS) {
+      prog.textContent = `正在載入 ${++loaded} / ${totalCount}…`;
+      try {
+        const resp = await fetch(FMT_PATH[key](id));
+        const blob = await resp.blob();
+        totals[key] += blob.size;
+        allImgs[key].push({ id, blob, objUrl: URL.createObjectURL(blob) });
+      } catch(e) {
+        allImgs[key].push({ id, blob: null, objUrl: null });
+      }
+    }
+  }
+
+  prog.style.display = 'none';
+  res.style.display  = 'block';
+
+  const container = document.getElementById('fmt-rows');
+  container.innerHTML = '';
+
+  fmtDefs.forEach(f => {
+    const total  = totals[f.key];
+    const avg    = (total / IMG_IDS.length / 1024).toFixed(0);
+    const saving = f.key !== 'png' && totals.png > 0
+                 ? Math.round((1 - total/totals.png)*100) : null;
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'margin-bottom:20px';
+
+    const hd = document.createElement('div');
+    hd.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap';
+    hd.innerHTML = `
+      <span class="bdg ${f.cls}">${f.label}</span>
+      <span style="font-size:11px;color:var(--muted)">${f.desc}</span>
+      <span style="font-family:var(--mono);font-size:11px;margin-left:auto;white-space:nowrap">
+        合計 <strong>${(total/1024).toFixed(0)} KB</strong>
+        &nbsp;平均 <strong>${avg} KB</strong>
+        ${saving !== null ? `&nbsp;<span style="color:var(--green)">▼ ${saving}% vs PNG</span>` : ''}
+      </span>`;
+    wrap.appendChild(hd);
+
+    const grid = document.createElement('div');
+    grid.className = 'ig';
+    allImgs[f.key].forEach(({ blob, objUrl }) => {
+      const { cell, img, sk, tag } = makeCell();
+      if (objUrl) {
+        const kb = (blob.size/1024).toFixed(0);
+        img.onload = () => { img.classList.add('ok'); sk.classList.add('gone'); tag.textContent=`${kb} KB`; tag.classList.add('show'); };
+        img.src = objUrl;
+      } else {
+        sk.classList.add('gone'); tag.textContent='載入失敗'; tag.classList.add('show');
+        tag.style.background = 'rgba(220,38,38,.75)';
+      }
+      grid.appendChild(cell);
+    });
+    wrap.appendChild(grid);
+    container.appendChild(wrap);
+
+    if (total > 0) record('fmt_'+f.key, total, `${f.label} 格式（6張）`, f.color, 'format');
+  });
+
+  await renderColorDiff(allImgs);
+}
+
+async function renderColorDiff(allImgs) {
+  const diffEl = document.getElementById('fmt-diff');
+  if (!diffEl) return;
+  diffEl.style.display = 'block';
+
+  const pairs = [
+    { key:'jpg',  label:'JPG q70 vs PNG', color:'#f59e0b' },
+    { key:'webp', label:'WebP vs PNG',    color:'#16a34a' },
+  ];
+
+  for (const pair of pairs) {
+    const pairDiv = document.createElement('div');
+    pairDiv.className = 'diff-pair';
+
+    const statsSpan = document.createElement('span');
+    statsSpan.style.cssText = 'font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto';
+
+    const hd = document.createElement('div');
+    hd.className = 'diff-pair-hd';
+    hd.innerHTML = `
+      <span class="bdg" style="color:${pair.color};background:${pair.color}18;border-color:${pair.color}50">${pair.label} 色差熱力圖</span>
+      <span style="font-size:11px;color:var(--muted)">差異 ×5 放大 — 藍=無差異 / 紅=差距大</span>`;
+    hd.appendChild(statsSpan);
+    pairDiv.appendChild(hd);
+
+    const grid = document.createElement('div');
+    grid.className = 'diff-6grid';
+
+    let totalDelta = 0, count = 0;
+
+    for (let i = 0; i < IMG_IDS.length; i++) {
+      const pngEntry = allImgs.png[i];
+      const cmpEntry = allImgs[pair.key][i];
+      const cell = document.createElement('div');
+      cell.className = 'diff-cell';
+      const canvas = document.createElement('canvas');
+      cell.appendChild(canvas);
+      const tag = document.createElement('span');
+      tag.className = 'diff-tag';
+      cell.appendChild(tag);
+      grid.appendChild(cell);
+
+      if (pngEntry?.objUrl && cmpEntry?.objUrl) {
+        try {
+          const delta = await drawDiff(canvas, pngEntry.objUrl, cmpEntry.objUrl);
+          tag.textContent = `ΔE ${delta.toFixed(1)}`;
+          totalDelta += delta; count++;
+          statsSpan.textContent = `平均 ΔE: ${(totalDelta/count).toFixed(1)}`;
+        } catch(e) { tag.textContent = '計算失敗'; }
+      } else {
+        tag.textContent = '—';
+      }
+    }
+
+    pairDiv.appendChild(grid);
+
+    const scale = document.createElement('div');
+    scale.className = 'diff-scale';
+    scale.innerHTML = `<span>無差異</span><div class="diff-scale-bar"></div><span>差異最大</span>`;
+    pairDiv.appendChild(scale);
+
+    diffEl.appendChild(pairDiv);
+  }
+}
+
+async function drawDiff(canvas, urlA, urlB) {
+  const [imgA, imgB] = await Promise.all([s3LoadImg(urlA), s3LoadImg(urlB)]);
+  const W = imgA.naturalWidth, H = imgA.naturalHeight;
+  canvas.width = W; canvas.height = H;
+
+  const cvA = Object.assign(document.createElement('canvas'), { width:W, height:H });
+  const cvB = Object.assign(document.createElement('canvas'), { width:W, height:H });
+  cvA.getContext('2d').drawImage(imgA, 0, 0);
+  cvB.getContext('2d').drawImage(imgB, 0, 0, W, H);
+  const dA = cvA.getContext('2d').getImageData(0, 0, W, H).data;
+  const dB = cvB.getContext('2d').getImageData(0, 0, W, H).data;
+
+  const ctx = canvas.getContext('2d');
+  const out = ctx.createImageData(W, H);
+  let sum = 0;
+  const n = W * H;
+
+  for (let p = 0; p < n; p++) {
+    const i = p * 4;
+    const dr = dA[i]   - dB[i];
+    const dg = dA[i+1] - dB[i+1];
+    const db = dA[i+2] - dB[i+2];
+    const delta = Math.sqrt(dr*dr + dg*dg + db*db) / Math.sqrt(3) / 255 * 100;
+    sum += delta;
+    const t = Math.min(delta * 5, 100) / 100;
+    out.data[i]   = t < .5 ? 0                       : Math.round((t - .5) * 2 * 220);
+    out.data[i+1] = t < .5 ? Math.round(t * 2 * 160) : Math.round((1 - t) * 2 * 160);
+    out.data[i+2] = t < .5 ? Math.round((1-t*2)*220) : 0;
+    out.data[i+3] = 255;
+  }
+  ctx.putImageData(out, 0, 0);
+  return sum / n;
+}
+
+function s3LoadImg(url) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = url;
+  });
+}
+
+// ─────────────────────────────────────────────
+// S4: Responsive × Format Combo
+// ─────────────────────────────────────────────
+async function initS4combo() {
+  const sizes = [
+    { tier:'1x', w:100,  label:'1x 縮圖 100px' },
+    { tier:'2x', w:200,  label:'2x 縮圖 200px' },
+    { tier:'3x', w:9999, label:'3x 原始 348px'  },
+  ];
+  const fmts = [
+    { key:'png',  mime:'image/png',  q:1,    label:'PNG',  color:'#3b82f6' },
+    { key:'jpg',  mime:'image/jpeg', q:0.85, label:'JPG',  color:'#f59e0b' },
+    { key:'webp', mime:'image/webp', q:0.85, label:'WebP', color:'#16a34a' },
+  ];
+
+  const totals = {}; // totals[tier][fmt] = bytes
+  sizes.forEach(sz => { totals[sz.tier]={}; fmts.forEach(ft=>{ totals[sz.tier][ft.key]=0; }); });
+
+  let done = 0;
+  const total = IMG_IDS.length * sizes.length;
+  const prog = document.getElementById('combo-prog');
+
+  for (const sz of sizes) {
+    for (const id of IMG_IDS) {
+      try {
+        const si = new Image();
+        const url = PICSUM(id, sz.w);
+        await new Promise((res,rej)=>{ si.onload=res; si.onerror=rej; si.src=url; });
+        const cv = document.createElement('canvas');
+        cv.width = si.naturalWidth; cv.height = si.naturalHeight;
+        cv.getContext('2d').drawImage(si,0,0);
+        for (const ft of fmts) {
+          const blob = await new Promise(r => cv.toBlob(r, ft.mime, ft.q));
+          if (blob && (ft.key!=='webp' || blob.type==='image/webp')) {
+            totals[sz.tier][ft.key] += blob.size;
+          }
+        }
+      } catch(e) {}
+      done++;
+      prog.textContent = `正在分析 ${done} / ${total}…`;
+    }
+  }
+
+  prog.style.display = 'none';
+  document.getElementById('combo-result').style.display = 'block';
+
+  const chartEl = document.getElementById('combo-chart');
+  chartEl.innerHTML = '';
+
+  // Find max bytes (for bar widths) and 3x-PNG baseline (for savings)
+  const allBytes = [];
+  sizes.forEach(sz => fmts.forEach(ft => { if(totals[sz.tier][ft.key]>0) allBytes.push(totals[sz.tier][ft.key]); }));
+  const maxB = Math.max(...allBytes);
+  const pngOriginal = totals['3x'].png; // 3x PNG = baseline reference
+
+  const sizeLabels = { '1x':'1x 縮圖 (100px)', '2x':'2x 縮圖 (200px)', '3x':'3x 原始 (348px)' };
+  let winner = null;
+
+  sizes.forEach(sz => {
+    const grpDiv = document.createElement('div');
+    grpDiv.className = 'sum-group-lbl';
+    grpDiv.textContent = sizeLabels[sz.tier];
+    chartEl.appendChild(grpDiv);
+
+    fmts.forEach(ft => {
+      const bytes = totals[sz.tier][ft.key];
+      if (!bytes) return;
+      if (!winner || bytes < winner.bytes) winner = { bytes, tier:sz.tier, fmtLabel:ft.label };
+
+      const pngBase = totals[sz.tier].png;
+      const vsPNG   = ft.key!=='png' && pngBase>0 ? `▼ ${Math.round((1-bytes/pngBase)*100)}% vs PNG` : 'PNG baseline';
+      const vsOrig  = pngOriginal>0 ? `/ ▼ ${Math.round((1-bytes/pngOriginal)*100)}% vs 3x PNG` : '';
+      const pct     = Math.max(1, Math.round(bytes/maxB*100));
+      const kb      = (bytes/1024).toFixed(0);
+      const uid     = `cbf-${sz.tier}-${ft.key}`;
+
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.style.gridTemplateColumns = '160px 1fr 160px';
+      row.innerHTML = `<span class="bar-lbl">${sz.tier} × ${ft.label}</span>
+        <div class="bar-track"><div class="bar-fill" id="${uid}" style="background:${ft.color}"></div></div>
+        <span class="bar-val">${kb} KB　${vsPNG} ${ft.key!=='png'?vsOrig:''}</span>`;
+      chartEl.appendChild(row);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ const b=document.getElementById(uid); if(b) b.style.width=pct+'%'; }));
+
+      record(`combo_${sz.tier}_${ft.key}`, bytes, `${sz.tier} × ${ft.label}`, ft.color, 'combo');
+    });
+  });
+
+  // Winner callout
+  if (winner && pngOriginal) {
+    const saving = Math.round((1-winner.bytes/pngOriginal)*100);
+    const el = document.getElementById('combo-winner');
+    el.textContent = `最佳組合：${sizeLabels[winner.tier]} × ${winner.fmtLabel}（${(winner.bytes/1024).toFixed(0)} KB）— 比 3x PNG 節省 ${saving}%`;
+    el.style.display = 'block';
+  }
+}
+
+// ─────────────────────────────────────────────
+// S5: Network Adaptive
+// ─────────────────────────────────────────────
+const NET={
+  'slow-2g':{w:100,h:67, label:'slow-2g 100px',blur:8,color:'#dc2626'},
+  '2g':     {w:100,h:67, label:'2G 100px',      blur:5,color:'#ef4444'},
+  '3g':     {w:400,h:267,label:'3G 400px',       blur:0,color:'#d97706'},
+  '4g':     {w:1200,h:800,label:'4G 1200px',     blur:0,color:'#16a34a'},
+};
+let simOverride=null;
+
+function getNet(){
+  if(simOverride) return simOverride;
+  const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  if(!c) return '4g';
+  if(c.saveData) return '2g';
+  if(c.effectiveType) return c.effectiveType;
+  return (c.downlink||0)<1?'2g':(c.downlink||0)<5?'3g':'4g';
+}
+
+function loadNetGrid(tier){
+  const cfg=NET[tier]||NET['4g'];
+  const grid=document.getElementById('net-grid');
+  grid.innerHTML='';
+  document.getElementById('net-total').textContent='…';
+  document.getElementById('net-avg').textContent='…';
+  document.getElementById('net-quality').textContent=cfg.label;
+  document.getElementById('net-quality').style.color=cfg.color;
+  document.querySelectorAll('.sim-btn').forEach(b=>b.classList.toggle('active',b.dataset.net===tier));
+
+  let tot=0,n=0;
+  IMG_IDS.forEach(id=>{
+    const {cell,img,sk,tag}=makeCell();
+    img.style.filter=`blur(${cfg.blur}px)`;
+    grid.appendChild(cell);
+    fetchLoad(id,cfg.w,cfg.h,img,sk,tag).then(bytes=>{
+      tot+=bytes; n++;
+      document.getElementById('net-total').textContent=(tot/1024).toFixed(0)+' KB';
+      document.getElementById('net-avg').textContent=(tot/n/1024).toFixed(0)+' KB';
+      if(n===IMG_IDS.length) record('net_'+tier, tot, `自適應 ${tier}（${cfg.w}px）`, cfg.color, 'adaptive');
+    });
+  });
+}
+
+function simNet(type){
+  simOverride=type;
+  loadNetGrid(type||getNet());
+}
+
+function initS5(){
+  const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  if(!c){
+    document.getElementById('net-warn').style.display='block';
+    ['ni-type','ni-dl','ni-rtt','ni-sd'].forEach(id=>document.getElementById(id).textContent='不支援');
+  }else{
+    const upd=()=>{
+      document.getElementById('ni-type').textContent=c.effectiveType||'—';
+      document.getElementById('ni-dl').textContent=c.downlink!=null?c.downlink+' Mbps':'—';
+      document.getElementById('ni-rtt').textContent=c.rtt!=null?c.rtt+' ms':'—';
+      document.getElementById('ni-sd').textContent=c.saveData?'是':'否';
+    };
+    upd(); c.addEventListener('change',()=>{upd();if(!simOverride)loadNetGrid(getNet());});
+  }
+  loadNetGrid(getNet());
+}
+
+// ─────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  initS1();
+  initS2();
+  initS3();
+  initS4combo();
+  initS5();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多情境智慧推播 — 回流刺激規劃</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:8px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --orange:#ea580c;--obg:#fff7ed;--obdr:#fed7aa;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6}
+code{font-family:var(--mono);font-size:.88em;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(239,239,239,.87);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.hdr-in{max-width:1140px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{font-size:14px;font-weight:600}
+.nav{display:flex;gap:4px}
+.nl{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;
+  padding:4px 9px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nl:hover{background:var(--card);color:var(--fg)}
+
+/* layout */
+main{max-width:1140px;margin:0 auto;padding:36px 24px 80px;display:flex;flex-direction:column;gap:52px}
+section{scroll-margin-top:70px}
+.sec-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.sec-num{width:34px;height:34px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:2px}
+.sec-title{font-size:clamp(16px,2.2vw,20px);font-weight:700;line-height:1.3}
+.sec-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh)}
+.cp{padding:20px}
+
+/* badges */
+.bdg{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:9999px;border:1px solid;white-space:nowrap}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.br{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.bp{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+.bo{color:var(--orange);background:var(--obg);border-color:var(--obdr)}
+
+/* hero stat strip */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-box{background:var(--card);border-radius:var(--rsm);padding:16px 18px;box-shadow:var(--sh)}
+.stat-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.stat-sub{font-family:var(--mono);font-size:10px;margin-top:6px}
+
+/* churn timeline */
+.timeline{display:flex;gap:0;margin:20px 0}
+.tstep{flex:1;position:relative}
+.tstep:not(:last-child)::after{content:'';position:absolute;top:18px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.tstep-inner{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;z-index:1}
+.tdot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;border:2px solid}
+.tlbl{font-size:10px;font-weight:600;text-align:center}
+.tval{font-family:var(--mono);font-size:12px;font-weight:700}
+.tsub{font-size:9px;color:var(--muted);text-align:center}
+
+/* scenario cards */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.sc{border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column}
+.sc-head{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+.sc-day{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.sc-name{font-size:13px;font-weight:600;margin-top:2px}
+.sc-trigger{font-size:10px;color:var(--muted);margin-top:3px}
+.sc-body{padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:10px}
+.sc-msg{background:var(--bg);border-radius:6px;padding:10px 12px}
+.sc-msg-title{font-size:11px;font-weight:600;margin-bottom:3px}
+.sc-msg-body{font-size:10px;color:var(--muted);line-height:1.6}
+.sc-row{display:flex;justify-content:space-between;align-items:center;font-size:10px}
+.sc-rl{color:var(--muted)}
+.sc-rv{font-family:var(--mono);font-weight:500;font-size:11px}
+.sc-foot{padding:10px 16px;border-top:1px solid var(--border);background:var(--bg);
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* persona matrix */
+.persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.persona-card{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.persona-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center}
+.persona-icon{font-size:24px}
+.persona-name{font-size:14px;font-weight:700}
+.persona-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.persona-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.p-row{font-size:10px;line-height:1.5}
+.p-lbl{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;font-weight:600}
+.p-msg{background:var(--bg);border-radius:5px;padding:8px 10px;font-size:10px;line-height:1.6;border-left:3px solid}
+
+/* frequency rules */
+.freq-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.freq-card{border:1px solid var(--border);border-radius:var(--rsm);padding:14px 16px}
+.freq-title{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.rule-list li{font-size:11px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.rule-list li::before{content:'→';font-family:var(--mono);color:var(--muted);flex-shrink:0;margin-top:1px}
+.cooldown-bar{margin-top:12px}
+.cb-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cb-lbl{font-size:10px;color:var(--muted);width:80px;flex-shrink:0;text-align:right}
+.cb-track{flex:1;height:12px;background:#e4e4e7;border-radius:6px;overflow:hidden}
+.cb-fill{height:100%;border-radius:6px}
+.cb-val{font-family:var(--mono);font-size:10px;color:var(--muted);width:40px}
+
+/* AB test */
+.ab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ab-card{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.ab-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;display:flex;gap:8px;align-items:center}
+.ab-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:10px}
+.ab-var{background:var(--bg);border-radius:5px;padding:8px 10px;line-height:1.6}
+.ab-var-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px}
+.ab-metric{display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border);margin-top:6px}
+.ab-ml{font-size:10px;color:var(--muted)}
+.ab-mv{font-family:var(--mono);font-size:11px;font-weight:500}
+
+/* KPI bars */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.kpi-group-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px}
+.kpi-row{display:grid;grid-template-columns:160px 1fr 80px;align-items:center;gap:10px;margin-bottom:8px}
+.kpi-lbl{font-size:11px;text-align:right}
+.kpi-track{height:18px;background:#e4e4e7;border-radius:4px;overflow:hidden}
+.kpi-fill{height:100%;border-radius:4px;transition:width 1s ease;width:0}
+.kpi-val{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.kpi-note{margin-top:14px;padding:12px 14px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);font-size:11px;color:var(--green);line-height:1.7}
+
+/* tech arch */
+.arch-flow{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.af-row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:flex-start}
+.af-lbl{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;padding-top:9px}
+.af-boxes{display:flex;gap:6px;flex-wrap:wrap}
+.af-box{padding:7px 12px;border-radius:6px;font-size:10px;font-weight:500;border:1px solid}
+.af-arrow{text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);padding:2px 0}
+.code-block{font-family:var(--mono);font-size:10px;background:var(--fg);color:#e4e4e7;
+  padding:14px 16px;border-radius:8px;line-height:1.8;white-space:pre;overflow-x:auto;margin-top:14px}
+
+/* info box */
+.info-box{padding:11px 14px;border-radius:var(--rsm);font-size:11px;line-height:1.7;margin-bottom:16px}
+.info-blue{background:var(--bbg);border:1px solid var(--bbdr);color:var(--blue)}
+.info-amber{background:var(--abg);border:1px solid var(--abdr);color:var(--amber)}
+
+@media(max-width:768px){
+  .scenario-grid,.persona-grid,.ab-grid{grid-template-columns:1fr}
+  .stat-strip{grid-template-columns:repeat(2,1fr)}
+  .freq-grid,.kpi-grid{grid-template-columns:1fr}
+  .nav{display:none}
+  .kpi-row{grid-template-columns:120px 1fr 60px}
+  .kpi-lbl{font-size:10px}
+  .af-row{grid-template-columns:80px 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <span class="hdr-title">多情境智慧推播 — 回流刺激規劃</span>
+    <nav class="nav">
+      <a class="nl" href="#s1">01 問題</a>
+      <a class="nl" href="#s2">02 情境</a>
+      <a class="nl" href="#s3">03 受眾</a>
+      <a class="nl" href="#s4">04 頻率</a>
+      <a class="nl" href="#s5">05 A/B</a>
+      <a class="nl" href="#s6">06 KPI</a>
+      <a class="nl" href="#s7">07 技術</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════
+     S1: 問題診斷
+════════════════════════════════════ -->
+<section id="s1">
+  <div class="sec-hd">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">問題診斷 — 用戶為什麼不回來</div>
+      <div class="sec-desc">回流推播的前提是理解流失節點。數據顯示用戶沉默後 72 小時是召回黃金窗口，超過 14 天後召回成本倍增。</div>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--red)">68%</div>
+      <div class="stat-lbl">用戶 7 天內不再回訪</div>
+      <div class="stat-sub" style="color:var(--muted)">首次存款後 D+7 留存率</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--amber)">72h</div>
+      <div class="stat-lbl">召回黃金窗口</div>
+      <div class="stat-sub" style="color:var(--green)">此窗口內 CTR 高 3.2×</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--blue)">23%</div>
+      <div class="stat-lbl">推播開啟率（業界均值）</div>
+      <div class="stat-sub" style="color:var(--muted)">個人化後可達 38–45%</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:var(--purple)">4.1×</div>
+      <div class="stat-lbl">個人化推播轉換倍數</div>
+      <div class="stat-sub" style="color:var(--green)">vs 廣播式群發</div>
+    </div>
+  </div>
+
+  <div class="card cp">
+    <div class="info-box info-blue">沉默定義：距上次登入超過 <code>N</code> 天且未完成任何投注行為。不同 N 值對應不同推播強度與優惠成本。</div>
+    <div style="font-size:12px;font-weight:600;margin-bottom:16px">用戶沉默後的流失風險曲線</div>
+    <div class="timeline">
+      <div class="tstep">
+        <div class="tstep-inner">
+          <div class="tdot" style="color:var(--green);border-color:var(--gbdr);background:var(--gbg)">D+1</div>
+          <div class="tlbl" style="color:var(--green)">冷卻期</div>
+          <div class="tval" style="color:var(--green)">低風險</div>
+          <div class="tsub">正常休息<br>輕提醒即可</div>
+        </div>
+      </div>
+      <div class="tstep">
+        <div class="tstep-inner">
+          <div class="tdot" style="color:var(--blue);border-color:var(--bbdr);background:var(--bbg)">D+3</div>
+          <div class="tlbl" style="color:var(--blue)">關注期</div>
+          <div class="tval" style="color:var(--blue)">中風險</div>
+          <div class="tsub">可能在比較<br>其他平台</div>
+        </div>
+      </div>
+      <div class="tstep">
+        <div class="tstep-inner">
+          <div class="tdot" style="color:var(--amber);border-color:var(--abdr);background:var(--abg)">D+7</div>
+          <div class="tlbl" style="color:var(--amber)">危險期</div>
+          <div class="tval" style="color:var(--amber)">高風險</div>
+          <div class="tsub">習慣已斷裂<br>需強力誘因</div>
+        </div>
+      </div>
+      <div class="tstep">
+        <div class="tstep-inner">
+          <div class="tdot" style="color:var(--orange);border-color:var(--obdr);background:var(--obg)">D+14</div>
+          <div class="tlbl" style="color:var(--orange)">流失臨界</div>
+          <div class="tval" style="color:var(--orange)">極高風險</div>
+          <div class="tsub">召回成本<br>大幅上升</div>
+        </div>
+      </div>
+      <div class="tstep">
+        <div class="tstep-inner">
+          <div class="tdot" style="color:var(--red);border-color:var(--rbdr);background:var(--rbg)">D+30</div>
+          <div class="tlbl" style="color:var(--red)">流失確認</div>
+          <div class="tval" style="color:var(--red)">流失</div>
+          <div class="tsub">最後一次<br>挽回機會</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S2: 情境分類
+════════════════════════════════════ -->
+<section id="s2">
+  <div class="sec-hd">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">6 大推播情境 × 觸發條件</div>
+      <div class="sec-desc">依沉默時長與用戶行為分 6 個觸發節點，每個情境對應不同的訊息強度、優惠力度與預期 CTR。</div>
+    </div>
+  </div>
+
+  <div class="scenario-grid">
+
+    <!-- D+1 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--gbg);border-color:var(--gbdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--green)">D+1</div>
+            <div class="sc-name">輕度喚醒</div>
+            <div class="sc-trigger">觸發：距上次登入滿 24 小時</div>
+          </div>
+          <span class="bdg bg">低成本</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例</div>
+          <div class="sc-msg-body">「{name}，你的幸運今天還沒開始 🎰<br>好友 {friend} 剛在 Aviator 贏了一把，來試試？」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">上次登入時間 ±1h</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">無（純情感喚醒）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--green)">35–42%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg bg">社交觸發</span>
+        <span class="bdg bb">遊戲偏好</span>
+        <span class="bdg" style="color:var(--muted);border-color:var(--border);background:var(--bg)">每用戶/天 max 1</span>
+      </div>
+    </div>
+
+    <!-- D+3 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--bbg);border-color:var(--bbdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--blue)">D+3</div>
+            <div class="sc-name">遊戲偏好召回</div>
+            <div class="sc-trigger">觸發：沉默 3 天 + 有歷史投注紀錄</div>
+          </div>
+          <span class="bdg bb">個人化</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例（Sports 偏好）</div>
+          <div class="sc-msg-body">「今晚 {team_A} vs {team_B} 開打 ⚽<br>根據你的投注習慣，賠率 {odds} 正在更新中」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">賽前 2–3h / 晚間 8–10pm</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">小額回饋券（選配）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--blue)">28–35%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg bb">賽事觸發</span>
+        <span class="bdg bp">偏好比對</span>
+      </div>
+    </div>
+
+    <!-- D+7 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--abg);border-color:var(--abdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--amber)">D+7</div>
+            <div class="sc-name">高價值誘因</div>
+            <div class="sc-trigger">觸發：沉默 7 天 + 歷史存款 &gt; 門檻</div>
+          </div>
+          <span class="bdg ba">優惠</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例</div>
+          <div class="sc-msg-body">「{name}，你的專屬回饋 <strong>NT$200 免費籌碼</strong> 等你領 🎁<br>限今日 23:59 前，不回來就消失了」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">每日 18:00–20:00</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">中（依等級調整）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--amber)">22–30%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg ba">限時優惠</span>
+        <span class="bdg br">緊迫感</span>
+      </div>
+    </div>
+
+    <!-- D+14 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--obg);border-color:var(--obdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--orange)">D+14</div>
+            <div class="sc-name">流失警報召回</div>
+            <div class="sc-trigger">觸發：沉默 14 天，最後強力召回</div>
+          </div>
+          <span class="bdg bo">強力</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例</div>
+          <div class="sc-msg-body">「好久不見 {name} 👋<br>我們替你保留了 <strong>存款 100% 加碼</strong>，這是你的專屬回來禮，48h 後失效」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">週五晚間（高活躍）</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">高（依 LTV 分層）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--orange)">15–22%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg bo">高價值優惠</span>
+        <span class="bdg ba">LTV 分層</span>
+      </div>
+    </div>
+
+    <!-- 存款未下注 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--pbg);border-color:var(--pbdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--purple);font-size:16px;padding-top:4px">存款<br>未投注</div>
+            <div class="sc-name">轉換催化</div>
+            <div class="sc-trigger">觸發：存款後 2h 未完成任何投注</div>
+          </div>
+          <span class="bdg bp">高優先</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例</div>
+          <div class="sc-msg-body">「{name}，你的 NT${amount} 還沒動 💰<br>推薦你從 {game}（勝率 {rtp}%）開始，新手首注享 1.5× 加成」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">存款後 2h / 6h / 24h</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">首注加成（低成本）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--purple)">45–55%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg bp">最高 CTR</span>
+        <span class="bdg bb">即時觸發</span>
+      </div>
+    </div>
+
+    <!-- D+30 -->
+    <div class="sc">
+      <div class="sc-head" style="background:var(--rbg);border-color:var(--rbdr)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="sc-day" style="color:var(--red)">D+30</div>
+            <div class="sc-name">最後挽回</div>
+            <div class="sc-trigger">觸發：沉默 30 天，高 LTV 用戶</div>
+          </div>
+          <span class="bdg br">最終</span>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-msg">
+          <div class="sc-msg-title">推播示例</div>
+          <div class="sc-msg-body">「{name}，平台有了大更新 ✨<br>全新遊戲 {new_game} 上線，老玩家前 100 名享 VIP 體驗資格」</div>
+        </div>
+        <div class="sc-row"><span class="sc-rl">發送時機</span><span class="sc-rv">新遊戲 / 大活動節點</span></div>
+        <div class="sc-row"><span class="sc-rl">優惠強度</span><span class="sc-rv">最高（僅限高 LTV）</span></div>
+        <div class="sc-row"><span class="sc-rl">目標 CTR</span><span class="sc-rv" style="color:var(--red)">10–18%</span></div>
+      </div>
+      <div class="sc-foot">
+        <span class="bdg br">新內容觸發</span>
+        <span class="bdg ba">高 LTV 限定</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S3: 受眾分層 × 個人化內容
+════════════════════════════════════ -->
+<section id="s3">
+  <div class="sec-hd">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">受眾分層 × 個人化內容矩陣</div>
+      <div class="sec-desc">依用戶歷史行為分 3 種 Persona，每種 Persona 的推播文案、優惠類型與最佳時機均不同。</div>
+    </div>
+  </div>
+
+  <div class="persona-grid">
+
+    <div class="persona-card">
+      <div class="persona-head" style="background:var(--gbg);border-color:var(--gbdr)">
+        <div class="persona-icon">⚽</div>
+        <div>
+          <div class="persona-name">Sports 玩家</div>
+          <div class="persona-sub">主要投注體育賽事，對賠率敏感</div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div>
+          <div class="p-lbl">觸發條件</div>
+          <div class="p-row">體育投注佔比 &gt; 60%、關注特定聯賽</div>
+        </div>
+        <div>
+          <div class="p-lbl">最佳推播時間</div>
+          <div class="p-row">賽前 1–3h、週末下午 2–5pm</div>
+        </div>
+        <div>
+          <div class="p-lbl">推播文案方向</div>
+          <div class="p-msg" style="border-color:var(--green)">「{team} 今晚出戰，你追蹤的比賽開賽前 2 小時，亞盤讓分有變化 📊 — 搶早盤好賠率」</div>
+        </div>
+        <div>
+          <div class="p-lbl">優惠偏好</div>
+          <div class="p-row">串關加賠、退水加成、賠率保險</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="background:var(--bbg);border-color:var(--bbdr)">
+        <div class="persona-icon">🃏</div>
+        <div>
+          <div class="persona-name">Casino 玩家</div>
+          <div class="persona-sub">偏好桌遊、百家樂、真人荷官</div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div>
+          <div class="p-lbl">觸發條件</div>
+          <div class="p-row">Casino 投注佔比 &gt; 60%、深夜活躍</div>
+        </div>
+        <div>
+          <div class="p-lbl">最佳推播時間</div>
+          <div class="p-row">晚間 9pm–12am（深夜型）</div>
+        </div>
+        <div>
+          <div class="p-lbl">推播文案方向</div>
+          <div class="p-msg" style="border-color:var(--blue)">「夜深了，VIP 包廂剛開放 🎴 — {name} 你的專屬荷官桌等你，今晚入場享點數加倍」</div>
+        </div>
+        <div>
+          <div class="p-lbl">優惠偏好</div>
+          <div class="p-row">現金回水、VIP 升等、免費籌碼</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="persona-card">
+      <div class="persona-head" style="background:var(--pbg);border-color:var(--pbdr)">
+        <div class="persona-icon">🎰</div>
+        <div>
+          <div class="persona-name">Slot 玩家</div>
+          <div class="persona-sub">偏好電子老虎機、JP 累積獎池</div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div>
+          <div class="p-lbl">觸發條件</div>
+          <div class="p-row">Slot 投注佔比 &gt; 60%、偏好特定主題</div>
+        </div>
+        <div>
+          <div class="p-lbl">最佳推播時間</div>
+          <div class="p-row">午休 12–2pm、晚間 7–9pm</div>
+        </div>
+        <div>
+          <div class="p-lbl">推播文案方向</div>
+          <div class="p-msg" style="border-color:var(--purple)">「{game} 累積獎池剛突破 NT$2,000,000 🔥 — 你上次差一點點，現在賠率更高，回來試試？」</div>
+        </div>
+        <div>
+          <div class="p-lbl">優惠偏好</div>
+          <div class="p-row">免費旋轉、JP 加成、買功能折扣</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S4: 頻率控制 & 冷卻機制
+════════════════════════════════════ -->
+<section id="s4">
+  <div class="sec-hd">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">頻率控制 & 冷卻機制</div>
+      <div class="sec-desc">過度推播是流失的直接原因之一。需設置全局上限、情境冷卻、轉換後靜默三層保護。</div>
+    </div>
+  </div>
+
+  <div class="freq-grid">
+    <div class="freq-card card">
+      <div class="freq-title">🔒 全局頻率上限</div>
+      <ul class="rule-list">
+        <li>每位用戶每日最多 <strong>2 則</strong>推播（不含即時觸發類）</li>
+        <li>每週最多 <strong>8 則</strong>，超過自動排隊至下週</li>
+        <li>用戶連續 3 次未開啟 → 自動降級至每週 2 則</li>
+        <li>用戶手動關閉任一則 → 同類情境冷卻 <strong>72h</strong></li>
+      </ul>
+      <div class="cooldown-bar" style="margin-top:16px">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:8px">每日推播上限佔比（示意）</div>
+        <div class="cb-row">
+          <div class="cb-lbl">即時觸發</div>
+          <div class="cb-track"><div class="cb-fill" style="width:100%;background:var(--purple)"></div></div>
+          <div class="cb-val">不計入</div>
+        </div>
+        <div class="cb-row">
+          <div class="cb-lbl">回流召回</div>
+          <div class="cb-track"><div class="cb-fill" style="width:60%;background:var(--blue)"></div></div>
+          <div class="cb-val">max 1/天</div>
+        </div>
+        <div class="cb-row">
+          <div class="cb-lbl">活動行銷</div>
+          <div class="cb-track"><div class="cb-fill" style="width:40%;background:var(--amber)"></div></div>
+          <div class="cb-val">max 1/天</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="freq-card card">
+      <div class="freq-title">⏱ 情境冷卻時間</div>
+      <ul class="rule-list">
+        <li><strong>D+1 輕度喚醒</strong>：觸發後冷卻 <code>24h</code>，下次跳至 D+3</li>
+        <li><strong>D+3 偏好召回</strong>：觸發後冷卻 <code>48h</code></li>
+        <li><strong>D+7 高價值</strong>：觸發後冷卻 <code>72h</code>，優惠不重疊</li>
+        <li><strong>存款未投注</strong>：2h → 6h → 24h 三梯次，投注即停止</li>
+        <li><strong>用戶登入後</strong>：所有回流類推播靜默 <code>48h</code></li>
+        <li><strong>用戶完成投注</strong>：所有召回類靜默 <code>72h</code></li>
+      </ul>
+    </div>
+
+    <div class="freq-card card" style="grid-column:1/-1">
+      <div class="freq-title">🛡 過度推播保護（Fatigue Guard）</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px">
+        <div style="background:var(--bg);border-radius:6px;padding:12px">
+          <div style="font-size:11px;font-weight:600;margin-bottom:6px;color:var(--blue)">Level 1 — 警告</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7">7天內推播 &gt; 10則<br>→ 系統標記，下週限制發送頻率</div>
+        </div>
+        <div style="background:var(--bg);border-radius:6px;padding:12px">
+          <div style="font-size:11px;font-weight:600;margin-bottom:6px;color:var(--amber)">Level 2 — 降頻</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7">連續 5 則未開啟<br>→ 自動切換為每週 1–2 則低頻模式</div>
+        </div>
+        <div style="background:var(--rbg);border-radius:6px;padding:12px;border:1px solid var(--rbdr)">
+          <div style="font-size:11px;font-weight:600;margin-bottom:6px;color:var(--red)">Level 3 — 停播</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.7">用戶主動取消訂閱<br>→ 停止所有推播，僅保留交易通知</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S5: A/B 測試框架
+════════════════════════════════════ -->
+<section id="s5">
+  <div class="sec-hd">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">A/B 測試框架</div>
+      <div class="sec-desc">推播上線前須經過 A/B 測試驗證效益，每次測試專注單一變數，避免多變數污染結果。</div>
+    </div>
+  </div>
+
+  <div class="card cp">
+    <div class="info-box info-amber">⚠️ 每次只測試一個變數。同時改文案 + 時間 + 優惠會讓你無法判斷哪個因素有效。</div>
+    <div class="ab-grid">
+
+      <div class="ab-card">
+        <div class="ab-head" style="background:var(--bbg)">
+          <span class="bdg bb">Test 01</span> 文案風格
+        </div>
+        <div class="ab-body">
+          <div class="ab-var">
+            <div class="ab-var-lbl">A 組（理性訴求）</div>
+            「你的帳戶有 NT$500 等待使用，存款回饋截止日 12/31」
+          </div>
+          <div class="ab-var">
+            <div class="ab-var-lbl">B 組（情感訴求）</div>
+            「{name}，好久不見 👋 大家都在等你回來，今晚來一局？」
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">衡量指標</span>
+            <span class="ab-mv">CTR、登入轉換率</span>
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">測試週期</span>
+            <span class="ab-mv">7 天 / 每組 min 1000</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-head" style="background:var(--abg)">
+          <span class="bdg ba">Test 02</span> 發送時機
+        </div>
+        <div class="ab-body">
+          <div class="ab-var">
+            <div class="ab-var-lbl">A 組（歷史活躍時間）</div>
+            依用戶上次登入時間 ±1h 發送（個人化時間）
+          </div>
+          <div class="ab-var">
+            <div class="ab-var-lbl">B 組（平台最佳時間）</div>
+            固定晚間 8:00–9:00 PM 批次發送
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">衡量指標</span>
+            <span class="ab-mv">開啟率、開啟到投注率</span>
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">測試週期</span>
+            <span class="ab-mv">14 天（涵蓋週末）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-card">
+        <div class="ab-head" style="background:var(--gbg)">
+          <span class="bdg bg">Test 03</span> 優惠類型
+        </div>
+        <div class="ab-body">
+          <div class="ab-var">
+            <div class="ab-var-lbl">A 組（固定金額）</div>
+            「回來送 NT$100 免費籌碼，無流水限制」
+          </div>
+          <div class="ab-var">
+            <div class="ab-var-lbl">B 組（比例加碼）</div>
+            「存款 NT$500 以上，加碼 30%，最高 NT$300」
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">衡量指標</span>
+            <span class="ab-mv">存款轉換率、ARPU</span>
+          </div>
+          <div class="ab-metric">
+            <span class="ab-ml">測試週期</span>
+            <span class="ab-mv">14 天 / 需達統計顯著</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S6: KPI & 預期效益
+════════════════════════════════════ -->
+<section id="s6">
+  <div class="sec-hd">
+    <div class="sec-num">06</div>
+    <div>
+      <div class="sec-title">KPI 目標 & 預期效益</div>
+      <div class="sec-desc">以導入智慧推播後 90 天為觀測週期，對比無推播基準值。</div>
+    </div>
+  </div>
+
+  <div class="card cp">
+    <div class="kpi-grid">
+      <div>
+        <div class="kpi-group-title">推播效能指標</div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">推播開啟率</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf1" style="background:var(--blue)"></div></div>
+          <div class="kpi-val">目標 38%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">點擊到登入率</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf2" style="background:var(--blue)"></div></div>
+          <div class="kpi-val">目標 72%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">登入到投注率</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf3" style="background:var(--blue)"></div></div>
+          <div class="kpi-val">目標 55%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">退訂率（&lt;目標）</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf4" style="background:var(--red)"></div></div>
+          <div class="kpi-val">控制 &lt;3%</div>
+        </div>
+      </div>
+      <div>
+        <div class="kpi-group-title">業務效益指標</div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">D+7 回流率提升</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf5" style="background:var(--green)"></div></div>
+          <div class="kpi-val">+25%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">D+30 留存率提升</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf6" style="background:var(--green)"></div></div>
+          <div class="kpi-val">+18%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">ARPU 提升</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf7" style="background:var(--green)"></div></div>
+          <div class="kpi-val">+12%</div>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-lbl">召回存款轉換率</div>
+          <div class="kpi-track"><div class="kpi-fill" id="kf8" style="background:var(--green)"></div></div>
+          <div class="kpi-val">目標 22%</div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-note" id="kpi-note" style="display:none">
+      預估：若月活 10 萬用戶中有 30% 進入沉默，智慧推播可每月額外召回約 8,400 人回平台，以平均 ARPU NT$450 計，月增營收約 <strong>NT$378 萬</strong>。
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     S7: 技術架構 + FCM Icon 痛點
+════════════════════════════════════ -->
+<section id="s7">
+  <div class="sec-hd">
+    <div class="sec-num">07</div>
+    <div>
+      <div class="sec-title">技術架構 — FCM Payload 與站臺 Logo 控制痛點</div>
+      <div class="sec-desc">目前以 FCM payload 控制各平台通知 icon，Web 端與 Android 端的實作機制根本不同，存在無法用同一套邏輯解決的結構性差異。</div>
+    </div>
+  </div>
+
+  <!-- FCM Payload 結構 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">FCM Payload 結構（現行做法）</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px">Web Push</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">{
+  "message": {
+    "topic": "reengagement",
+    "webpush": {
+      "notification": {
+        "title": "回來試試手氣 🎰",
+        "body":  "{name}，你的專屬優惠等你",
+        "icon":  "https://cdn.example.com/logo-site-a.png",
+        // ✅ 接受 URL，直接顯示站臺 logo
+        // ⚠️ 需 HTTPS + CORS
+        // ⚠️ 建議尺寸 192×192 px
+        "badge": "https://cdn.example.com/badge.png"
+      }
+    }
+  }
+}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px">Android（FCM）</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">{
+  "message": {
+    "topic": "reengagement",
+    "android": {
+      "notification": {
+        "title": "回來試試手氣 🎰",
+        "body":  "{name}，你的專屬優惠等你",
+        "icon":  "ic_stat_site_a",
+        // ❌ 只接受 drawable resource name
+        // ❌ 無法傳 URL，傳了會被忽略
+        // ❌ 必須預先編譯進 APK
+        "color": "#FF6B00"
+      }
+    }
+  }
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 痛點分析 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">技術痛點分析</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+
+      <!-- 痛點 1 -->
+      <div style="border:1px solid var(--rbdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--rbg);padding:12px 14px;border-bottom:1px solid var(--rbdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--red)">❌ Android icon 不支援 URL</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">最核心的結構問題</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          <code>android.notification.icon</code> 欄位只接受 APK 內已編譯的 drawable resource name（如 <code>ic_stat_logo</code>），<strong>無法傳入 URL</strong>。傳 URL 字串不會報錯，但 FCM 找不到對應 resource 時直接改用 App 預設 icon，站臺 logo 完全無法顯示。
+        </div>
+      </div>
+
+      <!-- 痛點 2 -->
+      <div style="border:1px solid var(--rbdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--rbg);padding:12px 14px;border-bottom:1px solid var(--rbdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--red)">❌ Android icon 必須是單色</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Android 5.0+ 系統強制規定</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          Android 5.0（API 21）起，通知欄 small icon 只允許白色透明背景（monochrome alpha-only）。若 drawable 有彩色，系統會自動渲染成純色剪影，站臺 logo 顏色全部消失，只剩輪廓。<strong>彩色 logo 直接用會顯示錯誤。</strong>
+        </div>
+      </div>
+
+      <!-- 痛點 3 -->
+      <div style="border:1px solid var(--abdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--abg);padding:12px 14px;border-bottom:1px solid var(--abdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--amber)">⚠️ 白牌多站臺 APK 問題</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">每個站臺需獨立打包</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          若平台有多個白牌站臺（site-a、site-b…），每個站臺的 Android APK 都需要各自編譯對應的 <code>ic_stat_sitename</code> drawable。無法透過 FCM payload 動態切換，站臺新增或 logo 更版都需要重新打包 + 上架 Google Play。
+        </div>
+      </div>
+
+      <!-- 痛點 4 -->
+      <div style="border:1px solid var(--abdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--abg);padding:12px 14px;border-bottom:1px solid var(--abdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--amber)">⚠️ Web icon URL 快取問題</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Logo 更新後用戶看到舊圖</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          Chrome 會積極快取通知 icon URL。若站臺更換 logo 但沿用相同 URL，已訂閱用戶可能數天內仍看到舊 logo。需使用版本化 URL（如 <code>logo-v2.png</code> 或帶 hash 的 CDN 路徑）並同步更新推播模板。
+        </div>
+      </div>
+
+      <!-- 痛點 5 -->
+      <div style="border:1px solid var(--abdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--abg);padding:12px 14px;border-bottom:1px solid var(--abdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--amber)">⚠️ iOS 無法換 small icon</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">但可用 NSE 顯示 logo 縮圖</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          APNs payload 沒有 icon 欄位，狀態列小 icon 永遠是 App icon 無法動態替換。但可透過 <strong>Notification Service Extension（NSE）</strong> 攔截推播，將 logo 以附件縮圖形式呈現在 banner 右側，視覺效果比 small icon 更顯眼。
+        </div>
+      </div>
+
+      <!-- 痛點 6 -->
+      <div style="border:1px solid var(--gbdr);border-radius:var(--rsm);overflow:hidden">
+        <div style="background:var(--gbg);padding:12px 14px;border-bottom:1px solid var(--gbdr)">
+          <div style="font-size:11px;font-weight:700;color:var(--green)">✅ Web Push 相對可行</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">唯一支援 URL 的平台</div>
+        </div>
+        <div style="padding:12px 14px;font-size:10px;line-height:1.8;color:var(--fg)">
+          Web Push 的 <code>webpush.notification.icon</code> 完整支援 HTTPS URL，可直接帶入各站臺 logo CDN 路徑，不需改動 App。需確保：① CDN 回應 CORS header、② icon 為正方形 192px+、③ URL 使用版本化命名。
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- iOS NSE 解法 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">iOS 解法 — Notification Service Extension（NSE）</div>
+    <div class="info-box info-blue" style="margin-bottom:14px">
+      NSE 是 iOS 原生機制，可在通知送達用戶裝置後、顯示前攔截並修改內容。只需在 APNs payload 加 <code>"mutable-content": 1</code>，App 端的 NSE target 就會被喚醒，可下載 logo URL 並以 <strong>UNNotificationAttachment</strong> 附加到通知，出現在 banner 右側縮圖及展開後的大圖位置。
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px">後端：APNs payload（透過 FCM apns block）</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">{
+  "message": {
+    "token": "apns_device_token",
+    "apns": {
+      "payload": {
+        "aps": {
+          "alert": {
+            "title": "回來試試手氣 🎰",
+            "body":  "你的專屬優惠等你"
+          },
+          "mutable-content": 1,  // ← 必填，啟用 NSE
+          "sound": "default"
+        },
+        // 自訂欄位，NSE 可讀取
+        "logo_url": "https://cdn.example.com/logo-site-a.png",
+        "deep_link": "app://promo/reengagement"
+      }
+    }
+  }
+}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px">iOS App：NotificationService.swift（NSE target）</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">// Swift — Notification Service Extension
+class NotificationService: UNNotificationServiceExtension {
+
+  override func didReceive(
+    _ request: UNNotificationRequest,
+    withContentHandler handler: @escaping (UNNotificationContent) -> Void
+  ) {
+    let content = request.content.mutableCopy()
+      as! UNMutableNotificationContent
+
+    guard
+      let urlStr = request.content.userInfo["logo_url"] as? String,
+      let url    = URL(string: urlStr)
+    else { handler(content); return }
+
+    // 下載 logo 並建立附件
+    URLSession.shared.downloadTask(with: url) { tmp, _, _ in
+      if let tmp,
+         let att = try? UNNotificationAttachment(
+           identifier: "logo", url: tmp,
+           options: [UNNotificationAttachmentOptionsTypeHintKey: "public.png"]
+         ) {
+        content.attachments = [att]   // ← 顯示在 banner 右側縮圖
+      }
+      handler(content)
+    }.resume()
+  }
+
+  // NSE 超時 fallback（iOS 強制 ~30s 限制）
+  override func serviceExtensionTimeWillExpire() {
+    handler?(bestAttemptContent ?? request.content)
+  }
+}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="padding:12px 14px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);font-size:10px;line-height:1.8;color:var(--green)">
+        <strong>✅ NSE 的優點</strong><br>
+        • 不需重新打包 App，新站臺只要改 <code>logo_url</code><br>
+        • 彩色 logo 完整顯示，無單色限制<br>
+        • 展開通知後 logo 放大，品牌感更強<br>
+        • iOS 10+ 全版本支援
+      </div>
+      <div style="padding:12px 14px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);font-size:10px;line-height:1.8;color:var(--amber)">
+        <strong>⚠️ NSE 的限制</strong><br>
+        • Small icon（狀態列左上角）仍固定為 App icon，無法改<br>
+        • NSE 執行時間上限約 30 秒，超時 fallback 無附件<br>
+        • 需在 Xcode 額外建立 NSE target 並上架新版本（一次性）<br>
+        • App 在背景被系統殺掉時 NSE 可能無法執行
+      </div>
+    </div>
+  </div>
+
+  <!-- 解決方案 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Android 動態 Logo 的繞過方案</div>
+    <div class="info-box info-amber" style="margin-bottom:14px">FCM 原生 <code>notification</code> 訊息無法做到 Android 動態 icon。需改用 <strong>Data Message + 自訂 FirebaseMessagingService</strong>，在 App 端攔截並自行建構通知。</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:6px">後端：改發 Data Message（不帶 notification block）</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">{
+  "message": {
+    "token": "device_fcm_token",
+    "data": {
+      "title":    "回來試試手氣 🎰",
+      "body":     "你的專屬優惠等你",
+      "logo_url": "https://cdn.example.com/logo-site-a.png",
+      "deep_link": "app://promo/reengagement"
+    }
+    // ✅ 不加 "android.notification" block
+    // → FCM 不自動顯示通知
+    // → App 端的 onMessageReceived() 才會被呼叫
+  }
+}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px">Android App：FirebaseMessagingService 自訂通知</div>
+        <div class="code-block" style="margin-top:0;font-size:10px">// Kotlin
+class PushService : FirebaseMessagingService() {
+  override fun onMessageReceived(msg: RemoteMessage) {
+    val data     = msg.data
+    val logoUrl  = data["logo_url"] ?: return
+    val title    = data["title"] ?: ""
+    val body     = data["body"]  ?: ""
+
+    // 用 Glide 下載 logo（需先 cache）
+    val bitmap = Glide.with(this)
+      .asBitmap().load(logoUrl)
+      .submit(192, 192).get()
+
+    val notif = NotificationCompat.Builder(this, CHANNEL_ID)
+      .setSmallIcon(R.drawable.ic_stat_default) // monochrome fallback
+      .setLargeIcon(bitmap)   // ← 彩色 logo 放這裡
+      .setContentTitle(title)
+      .setContentText(body)
+      .build()
+
+    NotificationManagerCompat.from(this)
+      .notify(NOTIF_ID, notif)
+  }
+}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px 14px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);font-size:11px;color:var(--green);line-height:1.8">
+      <strong>重點：</strong>彩色站臺 logo 放 <code>setLargeIcon()</code>（右側大圖），<code>setSmallIcon()</code> 繼續用 APK 內的單色 drawable。這樣 Android 5.0+ 顯示正確，又能動態顯示站臺品牌色彩，不需重新打包 APK。
+    </div>
+  </div>
+
+  <!-- 平台支援對照表 -->
+  <div class="card cp">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">各平台 Icon 控制能力對照</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="background:var(--bg)">
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">平台</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">FCM 欄位</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">接受 URL？</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">彩色 Logo？</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">動態切換？</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);font-weight:600">建議做法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:10px 14px;font-weight:600">Web Push</td>
+            <td style="padding:10px 14px"><code>webpush.notification.icon</code></td>
+            <td style="padding:10px 14px;color:var(--green)">✅ 支援</td>
+            <td style="padding:10px 14px;color:var(--green)">✅ 支援</td>
+            <td style="padding:10px 14px;color:var(--green)">✅ 直接改 URL</td>
+            <td style="padding:10px 14px;color:var(--muted)">版本化 CDN URL</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:10px 14px;font-weight:600">Android</td>
+            <td style="padding:10px 14px"><code>android.notification.icon</code></td>
+            <td style="padding:10px 14px;color:var(--red)">❌ 僅 resource name</td>
+            <td style="padding:10px 14px;color:var(--red)">❌ 系統強制單色</td>
+            <td style="padding:10px 14px;color:var(--amber)">⚠️ 需自訂 Service</td>
+            <td style="padding:10px 14px;color:var(--muted)">Data msg + <code>setLargeIcon()</code></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;font-weight:600">iOS</td>
+            <td style="padding:10px 14px"><code>apns.payload.logo_url</code>（自訂）</td>
+            <td style="padding:10px 14px;color:var(--amber)">⚠️ 需 NSE 攔截</td>
+            <td style="padding:10px 14px;color:var(--green)">✅ 附件縮圖彩色</td>
+            <td style="padding:10px 14px;color:var(--amber)">⚠️ 改 URL 即生效</td>
+            <td style="padding:10px 14px;color:var(--muted)">NSE + <code>UNNotificationAttachment</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// Animate KPI bars on scroll
+const kpiData = [
+  { id:'kf1', pct:76  },   // 38% / 50% max → 76%
+  { id:'kf2', pct:72  },
+  { id:'kf3', pct:55  },
+  { id:'kf4', pct:30  },   // 3% bad → show as narrow red bar
+  { id:'kf5', pct:83  },   // +25% of 30% ceiling
+  { id:'kf6', pct:60  },
+  { id:'kf7', pct:40  },
+  { id:'kf8', pct:73  },
+];
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    kpiData.forEach(k => {
+      const el = document.getElementById(k.id);
+      if (el) requestAnimationFrame(() => requestAnimationFrame(() => { el.style.width = k.pct + '%'; }));
+    });
+    document.getElementById('kpi-note').style.display = 'block';
+    obs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+
+const kpiSection = document.getElementById('s6');
+if (kpiSection) obs.observe(kpiSection);
+</script>
+</body>
+</html>

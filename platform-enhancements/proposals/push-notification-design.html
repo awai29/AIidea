@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推播通知設計提案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:8px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6}
+code{font-family:var(--mono);font-size:.9em}
+
+/* ── Header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(239,239,239,.87);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.hdr-in{max-width:1200px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{font-size:14px;font-weight:600}
+.nav{display:flex;gap:4px}
+.nl{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;
+  padding:4px 9px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nl:hover,.nl.active{background:var(--card);color:var(--fg)}
+
+/* ── Hero (section 0) ── */
+.hero{max-width:1200px;margin:0 auto;padding:56px 24px 64px;display:grid;
+  grid-template-columns:1fr 420px;gap:56px;align-items:center}
+.eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--purple);margin-bottom:14px}
+.heading{font-size:clamp(26px,3vw,40px);font-weight:700;line-height:1.2;
+  letter-spacing:-.03em;margin-bottom:14px}
+.hero-desc{font-size:14px;color:var(--muted);line-height:1.75;max-width:460px;margin-bottom:32px}
+
+.features{border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--card);box-shadow:var(--sh);overflow:hidden;margin-bottom:28px}
+.feature{display:flex;gap:14px;align-items:flex-start;padding:15px 18px;
+  border-bottom:1px solid var(--border)}
+.feature:last-child{border-bottom:none}
+.feat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:14px;flex-shrink:0}
+.feat-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.ctr-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctr-card{padding:16px 18px;border-radius:var(--radius);border:1px solid var(--border);
+  background:var(--card);box-shadow:var(--sh)}
+.ctr-card.good{border-color:var(--gbdr);background:var(--gbg)}
+.ctr-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ctr-card.good .ctr-label{color:var(--green)}
+.ctr-stat{font-size:30px;font-weight:700;letter-spacing:-.02em;margin-bottom:3px}
+.ctr-card.good .ctr-stat{color:var(--green)}
+.ctr-note{font-size:11px;color:var(--muted)}
+
+/* ── Sections ── */
+main{max-width:1200px;margin:0 auto;padding:0 24px 80px;display:flex;flex-direction:column;gap:52px}
+section{scroll-margin-top:70px}
+.sec-hd{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.sec-num{width:34px;height:34px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:2px}
+.sec-title{font-size:clamp(16px,2.2vw,20px);font-weight:700;line-height:1.3}
+.sec-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh)}
+.cp{padding:20px}
+
+/* badges */
+.bdg{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:2px 7px;border-radius:9999px;border:1px solid}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.br{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.bp{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+.notice{background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);
+  padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:16px}
+.warn-box{padding:11px 13px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);
+  font-size:11px;color:var(--amber);margin:12px 0;line-height:1.6}
+
+/* tables */
+table.rtbl{width:100%;border-collapse:collapse;font-size:12px}
+table.rtbl th{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.05em;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:500}
+table.rtbl td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table.rtbl tr:last-child td{border-bottom:none}
+table.rtbl tr:hover td{background:rgba(0,0,0,.015)}
+.m-name{font-weight:600;margin-bottom:2px}
+.m-note{font-size:11px;color:var(--muted)}
+
+/* freq */
+.freq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.freq-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px}
+.freq-title{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.freq-rule{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--border)}
+.freq-rule:last-child{border-bottom:none}
+.freq-rule strong{color:var(--fg)}
+
+/* steps */
+.step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--fg);color:#fff;
+  font-family:var(--mono);font-size:12px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.step-content h4{font-size:14px;font-weight:700;margin-bottom:5px}
+.step-content p{font-size:12px;color:var(--muted);margin-bottom:8px}
+.step-list{list-style:none}
+.step-list li{font-size:12px;color:var(--muted);padding:3px 0 3px 14px;position:relative}
+.step-list li::before{content:'›';position:absolute;left:0;color:var(--blue)}
+.step-list li strong{color:var(--fg)}
+
+/* tech / pwa */
+.pwa-answer{display:flex;align-items:flex-start;gap:16px;padding:16px;background:var(--gbg);
+  border:1px solid var(--gbdr);border-radius:var(--rsm);margin-bottom:16px}
+.pwa-badge{font-size:28px;flex-shrink:0}
+.pwa-answer-title{font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pwa-answer-body{font-size:12px;color:var(--fg);line-height:1.6}
+.req-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.req-card{padding:13px 14px;border-radius:var(--rsm);border:1px solid}
+.req-card.must{border-color:var(--gbdr);background:var(--gbg)}
+.req-card.skip{border-color:var(--border);background:var(--bg)}
+.req-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px}
+.req-item{display:flex;align-items:flex-start;gap:7px;font-size:11px;padding:4px 0;
+  border-bottom:1px solid rgba(0,0,0,.05);line-height:1.5}
+.req-item:last-child{border-bottom:none}
+.req-icon{flex-shrink:0;font-weight:700;font-size:12px}
+.ios-note{padding:13px 15px;background:var(--abg);border:1px solid var(--abdr);
+  border-radius:var(--rsm);font-size:11px;color:var(--amber);line-height:1.7;margin-bottom:16px}
+.sw-blk{border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
+.sw-hd{padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;font-weight:600}
+.fcm-code{font-family:var(--mono);font-size:10px;background:#09090b;color:#d4d4d8;
+  padding:12px;line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr;padding:36px 20px 48px}
+  .phone-wrap{display:none}
+  .freq-grid{grid-template-columns:1fr}
+  .req-grid{grid-template-columns:1fr}
+}
+
+/* ── iPhone 17 mockup (6.3", 149.6×71.5mm ratio) ── */
+.phone-wrap{display:flex;justify-content:center;align-items:flex-start}
+.iphone{width:310px;background:#1a1a1c;border-radius:52px;padding:10px;position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08) inset}
+/* Dynamic Island */
+.iphone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:118px;height:34px;background:#1a1a1c;border-radius:20px;z-index:10}
+/* side button */
+.iphone::after{content:'';position:absolute;right:-3px;top:110px;
+  width:3px;height:72px;background:#2c2c2e;border-radius:0 3px 3px 0}
+.iscreen{background:#000;border-radius:43px;overflow:hidden}
+.iwallpaper{background:linear-gradient(170deg,#0c1628 0%,#0f2240 35%,#091525 70%,#060e1a 100%);
+  display:flex;flex-direction:column;height:629px;position:relative}
+.iwallpaper::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 25%,rgba(56,120,220,.1) 0%,transparent 55%);pointer-events:none}
+/* status bar */
+.isb{display:flex;justify-content:space-between;align-items:center;
+  padding:18px 22px 2px;position:relative;z-index:2}
+.isb-l{font-size:13px;font-weight:600;color:#fff;letter-spacing:-.2px}
+.isb-r{display:flex;align-items:center;gap:5px}
+/* clock */
+.iclk{padding:8px 0 10px;text-align:center;position:relative;z-index:2}
+.iclk-date{font-size:13px;color:rgba(255,255,255,.62);margin-bottom:3px;font-weight:400;letter-spacing:.01em}
+.iclk-time{font-size:86px;font-weight:200;color:#fff;letter-spacing:-4px;line-height:1}
+/* notification area */
+.inarea{flex:1;padding:0 10px 10px;display:flex;flex-direction:column;
+  justify-content:flex-end;gap:5px;position:relative;z-index:2}
+/* iOS notification card */
+.inotif{background:rgba(28,28,34,.86);backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px);border-radius:16px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08)}
+.intop{display:flex;align-items:center;gap:6px;padding:10px 12px 5px}
+.in-ico{width:16px;height:16px;border-radius:4px;overflow:hidden;flex-shrink:0;background:#14805e;
+  display:flex;align-items:center;justify-content:center}
+.in-name{font-size:11px;color:rgba(255,255,255,.42);flex:1;font-weight:500;white-space:nowrap}
+.in-time{font-size:11px;color:rgba(255,255,255,.28)}
+.inbody{display:flex;gap:9px;padding:0 12px 0;align-items:center}
+.in-brand{width:36px;height:36px;border-radius:9px;background:#14805e;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.incnt{flex:1;min-width:0;padding-bottom:9px}
+.intitle{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.inbodytxt{font-size:11.5px;color:rgba(255,255,255,.55);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+/* banner */
+.in-banner{line-height:0}
+.in-banner img{width:100%;display:block;object-fit:cover;max-height:72px}
+/* actions */
+.inacts{display:flex;border-top:1px solid rgba(255,255,255,.07)}
+.inact{flex:1;padding:9px 4px;text-align:center;font-size:11.5px;font-weight:500;
+  color:rgba(255,255,255,.32);border-right:1px solid rgba(255,255,255,.07)}
+.inact.cta{color:#5e9eff;font-weight:600;border-right:none}
+/* dock */
+.idock{padding:5px 20px 3px;display:flex;justify-content:space-around;position:relative;z-index:2}
+.idbtn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-size:14px}
+.idmid{font-size:9px;color:rgba(255,255,255,.28);display:flex;align-items:center}
+.ihomebar{width:100px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:5px auto 7px}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="hdr">
+  <div class="hdr-in">
+    <span class="hdr-title">推播通知設計提案</span>
+    <nav class="nav">
+      <a href="#hero" class="nl active">00 提案總覽</a>
+      <a href="#s2" class="nl">01 技術架構</a>
+      <a href="#s5" class="nl">02 Payload 升級</a>
+      <a href="#s1" class="nl">後期 推播時機</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero" id="hero">
+  <div>
+    <div class="eyebrow">通知視覺優化提案</div>
+    <h1 class="heading">讓通知值得點擊<br>不只是提醒</h1>
+    <p class="hero-desc">現有通知為純文字兩行，無圖片、無按鈕、無具體利益點。參考 LINE 購物通知結構，加入品牌視覺、即時數字與一鍵行動，讓每一則推播都帶來轉化機會。</p>
+    <div class="features">
+      <div class="feature">
+        <div class="feat-icon" style="background:var(--abg)">🎁</div>
+        <div>
+          <div class="feat-title">具體利益點，不說模糊優惠</div>
+          <div class="feat-desc">「+50% 回饋 · BDT 250」比「享有回饋」點擊意願高 2.3×。數字讓玩家秒決策。</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feat-icon" style="background:var(--pbg)">⏱</div>
+        <div>
+          <div class="feat-title">倒數時限，創造不行動的代價</div>
+          <div class="feat-desc">環形倒數計時器顯示「剩 28 分鐘」，從「待會再看」變成「現在點進去」。</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feat-icon" style="background:var(--gbg)">👆</div>
+        <div>
+          <div class="feat-title">一鍵 CTA，直跳目標頁面</div>
+          <div class="feat-desc">Action Button 帶 Deep Link，省去「開 App → 找存款頁」的摩擦，完成率直接提升。</div>
+        </div>
+      </div>
+    </div>
+    <div class="ctr-compare">
+      <div class="ctr-card">
+        <div class="ctr-label">現有通知 CTR</div>
+        <div class="ctr-stat">3–5%</div>
+        <div class="ctr-note">純文字，業界平均</div>
+      </div>
+      <div class="ctr-card good">
+        <div class="ctr-label">優化目標 CTR</div>
+        <div class="ctr-stat">10–18%</div>
+        <div class="ctr-note">icon + image + actions 補齊後預估（Android Chrome）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- iPhone 17 mockup -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iscreen">
+        <div class="iwallpaper">
+
+          <!-- status bar -->
+          <div class="isb">
+            <span class="isb-l">21:35</span>
+            <div class="isb-r">
+              <svg width="14" height="10" viewBox="0 0 14 10"><rect x="0" y="4" width="2" height="6" rx="1" fill="rgba(255,255,255,.9)"/><rect x="3" y="3" width="2" height="7" rx="1" fill="rgba(255,255,255,.9)"/><rect x="6" y="1.5" width="2" height="8.5" rx="1" fill="rgba(255,255,255,.9)"/><rect x="9" y="0" width="2" height="10" rx="1" fill="rgba(255,255,255,.9)"/></svg>
+              <svg width="13" height="10" viewBox="0 0 13 10"><path d="M6.5 2.5C4.5 2.5 2.7 3.3 1.4 4.6L0 3.1C1.7 1.2 4 0 6.5 0s4.8 1.2 6.5 3.1L11.6 4.6C10.3 3.3 8.5 2.5 6.5 2.5z" fill="rgba(255,255,255,.9)"/><path d="M6.5 5.5C5.3 5.5 4.2 6 3.4 6.8L2 5.4C3.2 4.2 4.8 3.5 6.5 3.5s3.3.7 4.5 1.9L9.6 6.8C8.8 6 7.7 5.5 6.5 5.5z" fill="rgba(255,255,255,.9)"/><circle cx="6.5" cy="9" r="1.5" fill="rgba(255,255,255,.9)"/></svg>
+              <svg width="22" height="10" viewBox="0 0 22 10"><rect x="0" y="1" width="18" height="8" rx="2" stroke="rgba(255,255,255,.65)" stroke-width="1.2" fill="none"/><rect x="1.5" y="2.5" width="13" height="5" rx="1" fill="rgba(255,255,255,.9)"/><rect x="19" y="3" width="2" height="4" rx="1" fill="rgba(255,255,255,.4)"/></svg>
+            </div>
+          </div>
+
+          <!-- clock -->
+          <div class="iclk">
+            <div class="iclk-date">Thursday, May 28</div>
+            <div class="iclk-time">21:35</div>
+          </div>
+
+          <!-- notification area -->
+          <div class="inarea">
+            <div class="inotif">
+              <!-- header -->
+              <div class="intop">
+                <div class="in-ico" style="background:transparent">
+                  <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+                </div>
+                <span class="in-name">Chrome · feuatcb.bkw168 · now</span>
+                <div style="width:20px;height:20px;border-radius:50%;background:#666;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-right:4px">F</div>
+                <span class="in-time" style="font-size:13px;color:rgba(255,255,255,.3)">∧</span>
+              </div>
+              <!-- body -->
+              <div class="inbody">
+                <div class="in-brand">
+                  <img src="images/bj-logo.png" style="width:26px;height:26px;object-fit:contain" alt="BJ">
+                </div>
+                <div class="incnt">
+                  <div class="intitle">Complete Your First Deposit</div>
+                  <div class="inbodytxt">Deposit ৳500 to unlock +50% bonus</div>
+                </div>
+              </div>
+              <!-- banner image -->
+              <div class="in-banner">
+                <img src="images/notif-banner.jpg" alt="banner">
+              </div>
+              <!-- actions -->
+              <div class="inacts">
+                <div class="inact">Dismiss</div>
+                <div class="inact cta">Deposit Now</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- dock -->
+          <div class="idock">
+            <div class="idbtn">🔦</div>
+            <div class="idmid">🌙 Do Not Disturb</div>
+            <div class="idbtn">📷</div>
+          </div>
+          <div class="ihomebar"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+
+<!-- S2 技術架構 -->
+<section id="s2">
+  <div class="sec-hd">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">技術架構 — 網頁推播不需要完整 PWA</div>
+      <div class="sec-desc">釐清 PWA vs Web Push 的關係，以及現有 Firebase FCM 架構的定位</div>
+    </div>
+  </div>
+  <div class="card cp">
+    <div class="pwa-answer">
+      <div class="pwa-badge">✅</div>
+      <div>
+        <div class="pwa-answer-title">不需要完整 PWA，但需要 Service Worker</div>
+        <div class="pwa-answer-body">
+          推播通知的技術依賴是 <strong>Service Worker + HTTPS + 用戶授權</strong>，跟「是否為 PWA」無關。<br>
+          你們已在用 Firebase FCM，FCM SDK 會自動注冊一個 Service Worker（<code>firebase-messaging-sw.js</code>）。<br>
+          App Manifest、離線功能、可安裝性 — 這些 PWA 特性對推播 <strong>沒有影響</strong>，不需要實作。
+        </div>
+      </div>
+    </div>
+    <div class="req-grid">
+      <div class="req-card must">
+        <div class="req-card-title" style="color:var(--green)">✅ 推播必要條件（你們已有）</div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>HTTPS</strong> — 所有推播 API 只在 HTTPS 下運作</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>Service Worker</strong> — Firebase SDK 自動注冊 firebase-messaging-sw.js</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>Firebase FCM</strong> — Server-side 推送訊息的基礎設施</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>用戶授權</strong> — Notification.requestPermission() 彈窗</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--green)">✓</span><div><strong>FCM Token</strong> — 每裝置唯一識別符，存在後端 DB</div></div>
+      </div>
+      <div class="req-card skip">
+        <div class="req-card-title" style="color:var(--muted)">❌ 推播不需要的 PWA 特性</div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>Web App Manifest</strong>（manifest.json）— 只影響安裝行為</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>離線快取</strong>（Cache API）— 與推播無關</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>可安裝性</strong>（A2HS / Install Prompt）— 非必要</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>App Shell 架構</strong> — PWA 設計模式，不影響推播</div></div>
+        <div class="req-item"><span class="req-icon" style="color:var(--red)">✗</span><div><strong>背景同步</strong>（Background Sync）— 不同 API</div></div>
+      </div>
+    </div>
+    <div class="ios-note">
+      <strong>⚠️ iOS 例外情況：</strong><br>
+      Safari 16.4（2023/3）才支援 Web Push，且有一個關鍵限制：<strong>用戶必須先「加入主畫面」（A2HS）才能授權推播</strong>。<br>
+      這意味著 iOS Safari 上的推播觸及率會遠低於 Android。<br><br>
+      若用戶群中 iOS 比例高，建議評估：① 引導 A2HS 流程 ② 開發 iOS App（FCM + APNs，完整支援 Rich Notification）<br>
+      目前 <strong>Android 用戶（FCM WebPush）可立即享受完整 image + action button</strong>，不受限制。
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">現有 FCM 推播流程</div>
+    <div class="sw-blk">
+      <div class="sw-hd">推播發送流程（現有 → 優化方向）</div>
+      <pre class="fcm-code">後端 CRM 觸發事件
+  （存款放棄 / D+1 未回流 / 賽事開賽）
+    │
+    ▼
+Firebase Admin SDK (Node.js / Python)
+  send({ token, notification, webpush, apns })
+    │
+    ▼
+FCM Server ──────────────────────────────────┐
+    │                                        │
+    ▼ Android / Web                          ▼ iOS
+Chrome Service Worker                   APNs → iOS App
+firebase-messaging-sw.js                Notification Service Extension (NSE)
+  showNotification({                      動態替換 image / 修改文案
+    image, actions,                       UNNotificationAction（按鈕）
+    requireInteraction, tag
+  })
+    │
+    ▼
+用戶點擊 notificationclick
+  → 判斷 event.action
+  → clients.openWindow(deepLink + utm_params)
+  → 後端記錄 push_click 事件 + 計算 CTR</pre>
+    </div>
+  </div>
+</section>
+
+<!-- S5 Payload 升級可行性 -->
+<section id="s5">
+  <div class="sec-hd">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">Payload 升級可行性評估</div>
+      <div class="sec-desc">從現有三個參數到 Rich Notification，差距分析與分階段實作路徑</div>
+    </div>
+  </div>
+
+  <!-- 現有 payload + 現況問題 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">📦 現有 Payload 結構</div>
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;margin-bottom:16px;align-items:start">
+      <div style="background:var(--bg);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:7px 12px;border-bottom:1px solid var(--border);background:var(--card)">存款通知 · en (BD)</div>
+        <pre style="font-family:var(--mono);font-size:10.5px;padding:14px;margin:0;line-height:1.75;overflow:auto;color:var(--fg)">{
+  "websiteId": "77",
+  "data": "{\"notificationType\":1}",
+  "tokenCount": 1,
+  "title": "Approved Deposit",
+  "message": "You have a ৳4,002.44
+    deposit has been traded
+    successfully",
+  "userId": "testtonyabdt"
+}</pre>
+      </div>
+      <!-- 現況問題標注 -->
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--muted)">實際通知欄樣子（Android Chrome）</div>
+
+        <!-- Android 通知欄 mockup -->
+        <div style="background:#e8e8e8;border-radius:16px;overflow:hidden;font-family:'Roboto',sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.15);margin-bottom:14px">
+
+          <!-- 展開的第一則 -->
+          <div style="background:#f5f5f5;margin:8px 8px 4px;border-radius:12px;overflow:hidden;position:relative">
+            <!-- 問題標注貼紙 -->
+            <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:2">
+              <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px">①②</span>
+            </div>
+            <div style="padding:12px 14px 0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+                <!-- Chrome icon -->
+                <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+                <span style="font-size:11px;color:#555;font-weight:500">Chrome</span>
+                <span style="font-size:11px;color:#999">·</span>
+                <span style="font-size:11px;color:#999">feuatcb.bkw168...</span>
+                <span style="font-size:11px;color:#999">·</span>
+                <span style="font-size:11px;color:#999">4 分鐘</span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                  <!-- F 頭像 -->
+                  <div style="position:relative">
+                    <div style="width:26px;height:26px;border-radius:50%;background:#757575;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff">F</div>
+                    <span style="position:absolute;top:-14px;right:-2px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:4px">③</span>
+                  </div>
+                  <!-- 展開箭頭 -->
+                  <span style="font-size:14px;color:#666">∧</span>
+                </div>
+              </div>
+              <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:3px">Approved Deposit</div>
+              <div style="font-size:13px;color:#444;line-height:1.45;margin-bottom:10px">You have a ৳20.32 deposit has been traded successfully</div>
+            </div>
+            <!-- 取消訂閱 row -->
+            <div style="border-top:1px solid #ddd;padding:8px 14px;display:flex;align-items:center;gap:4px;position:relative">
+              <span style="font-size:12px;color:#555">取消訂閱</span>
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px">④</span>
+            </div>
+          </div>
+
+          <!-- 疊加的 4 則（collapsed） -->
+          <div style="display:flex;flex-direction:column;gap:4px;padding:0 8px 8px;position:relative">
+            <span style="position:absolute;top:6px;right:20px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;z-index:3">⑤</span>
+
+            <!-- row 共用樣式 -->
+            <div style="background:#f5f5f5;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#111">Approved… · feuatcb.bk… · 4 分鐘</div>
+                <div style="font-size:11px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">You have a ৳20.32 deposit ha…</div>
+              </div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#757575;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">F</div>
+              <span style="font-size:14px;color:#888">∨</span>
+            </div>
+
+            <div style="background:#f5f5f5;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#111">Approved… · feuatcb.bk… · 4 分鐘</div>
+                <div style="font-size:11px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">You have a ৳100.43 deposit h…</div>
+              </div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#757575;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">F</div>
+              <span style="font-size:14px;color:#888">∨</span>
+            </div>
+
+            <div style="background:#f5f5f5;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#111">Approved… · feuatcb.bk… · 3 天</div>
+                <div style="font-size:11px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">You have a ৳21.04 deposit ha…</div>
+              </div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#757575;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">F</div>
+              <span style="font-size:14px;color:#888">∨</span>
+            </div>
+
+            <div style="background:#f5f5f5;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#ddd" stroke-width="1"/><circle cx="12" cy="12" r="4.5" fill="#4285f4"/><path d="M12 7.5h8.66A10 10 0 0 0 3.34 7.5z" fill="#ea4335"/><path d="M3.34 7.5A10 10 0 0 0 7.5 20.66L12 12z" fill="#fbbc05"/><path d="M7.5 20.66A10 10 0 0 0 20.66 7.5L12 12z" fill="#34a853"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:600;color:#111">Approved… · feuatcb.bk… · 3 天</div>
+                <div style="font-size:11px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">You have a ৳88.00 deposit ha…</div>
+              </div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#757575;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0">F</div>
+              <span style="font-size:14px;color:#888">∨</span>
+            </div>
+          </div>
+        </div><!-- end Android shade -->
+
+        <!-- 問題清單 -->
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:flex-start;gap:7px;font-size:11px">
+            <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;margin-top:1px">①②</span>
+            <span><strong>顯示「Chrome」+ Chrome icon</strong> — OS 固定顯示 Browser 名，icon 也是 Chrome 預設，玩家認不出品牌</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:7px;font-size:11px">
+            <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;margin-top:1px">③</span>
+            <span><strong>右上角「F」頭像</strong> — 瀏覽器帳號圖，前端無法干預</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:7px;font-size:11px">
+            <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;margin-top:1px">④</span>
+            <span><strong>只有「取消訂閱」</strong> — 沒有 CTA 按鈕，無法一鍵跳存款頁</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:7px;font-size:11px">
+            <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;margin-top:1px">⑤</span>
+            <span><strong>同類通知重複疊加</strong> — 無 <code>tag</code>，每筆存款都推一則，塞滿通知欄</span>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:7px;font-size:11px">
+            <span style="background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;flex-shrink:0;margin-top:1px">⑥</span>
+            <span><strong>純文字，無圖 / 無品牌感</strong> — 和其他 App 通知無任何視覺區別</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 診斷 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div style="padding:12px 14px;border-radius:var(--rsm);background:var(--rbg);border:1px solid var(--rbdr)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--red);font-weight:600;margin-bottom:5px">❌ 無圖片</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">無 <code>image</code> / <code>icon</code>，通知顯示為純文字，無視覺辨識度</div>
+      </div>
+      <div style="padding:12px 14px;border-radius:var(--rsm);background:var(--rbg);border:1px solid var(--rbdr)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--red);font-weight:600;margin-bottom:5px">❌ 無 Action</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">無 <code>actions</code> 陣列，玩家只能點開通知無法直跳目標頁</div>
+      </div>
+      <div style="padding:12px 14px;border-radius:var(--rsm);background:var(--rbg);border:1px solid var(--rbdr)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--red);font-weight:600;margin-bottom:5px">❌ 無 Deep Link</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">data 僅有 <code>notificationType:1</code>，點擊後無法導向對應功能頁</div>
+      </div>
+      <div style="padding:12px 14px;border-radius:var(--rsm);background:var(--abg);border:1px solid var(--abdr)">
+        <div style="font-size:10px;font-family:var(--mono);color:var(--amber);font-weight:600;margin-bottom:5px">⚠ 訊息固定化</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">文案千篇一律，無玩家分群邏輯，ABCD 人格全拿到同一則通知</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 前端能做什麼 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🛠 前端（Service Worker）可以直接做的事</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">FCM 把 payload 送到 SW 的 <code>push</code> 事件後，由 SW 決定要顯示什麼樣的通知 — 這層完全在前端控制，<strong>不需要後端額外配合</strong>就能改善四個問題</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
+      <!-- 能做 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:5px">✅ 前端可以改（SW showNotification 選項）</div>
+        <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden">
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">icon</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">品牌 Logo URL → 取代 Chrome 預設圖，玩家一眼認出平台</div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">badge</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">小型單色 icon，顯示於 Android 狀態列 / 鎖定畫面角標</div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">image</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">通知展開後顯示大圖（Android Chrome）；存款成功可放金幣圖或品牌 banner</div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">tag</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">相同 tag 的通知只顯示一則 → 解決「重複疊加」問題，如 <code>"deposit-approved"</code></div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">actions[]</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">新增 CTA 按鈕，如「Deposit Now」「Play Now」；點擊觸發 notificationclick 事件</div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px;border-bottom:1px solid var(--border)">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">requireInteraction</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">通知不自動消失，玩家必須手動關閉或點擊，提高曝光時間</div>
+          </div>
+          <div style="display:grid;grid-template-columns:130px 1fr;font-size:11px">
+            <div style="padding:9px 12px;background:var(--bg);font-family:var(--mono);font-size:10px;font-weight:600;border-right:1px solid var(--border)">vibrate</div>
+            <div style="padding:9px 12px;color:var(--muted);line-height:1.5">自訂震動模式，如 <code>[200,100,200]</code>，讓存款通知有不同觸感</div>
+          </div>
+        </div>
+      </div>
+      <!-- 不能做 + SW 程式碼 -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:8px">❌ 前端改不了（OS / Browser 控制）</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:var(--rbg);border-radius:var(--rsm);border:1px solid var(--rbdr)">「<strong>Chrome</strong>」文字 → OS 顯示 Browser 名稱，不可自訂</div>
+            <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:var(--rbg);border-radius:var(--rsm);border:1px solid var(--rbdr)">域名「feuatcb.bkw168...」→ 顯示推播來源域，不可修改</div>
+            <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:var(--rbg);border-radius:var(--rsm);border:1px solid var(--rbdr)">右上角「F」頭像 → 瀏覽器登入帳號圖片，前端無法干預</div>
+            <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:var(--abg);border-radius:var(--rsm);border:1px solid var(--abdr)">iOS Safari：<code>actions</code> 按鈕不支援，需降級為純 body 文案</div>
+          </div>
+        </div>
+        <!-- SW 程式碼示意 -->
+        <div style="border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:7px 12px;border-bottom:1px solid var(--border);background:var(--card)">firebase-messaging-sw.js — 改這裡就夠了</div>
+          <pre style="font-family:var(--mono);font-size:10px;padding:12px;margin:0;line-height:1.7;background:#09090b;color:#d4d4d8;overflow:auto">messaging.onBackgroundMessage((payload) => {
+  const d = payload.data ?? {};
+  self.registration.showNotification(
+    payload.notification.title,
+    {
+      body:  payload.notification.body,
+<span style="color:#4ade80">      icon:  '/assets/icons/brand-192.png',</span>
+<span style="color:#4ade80">      badge: '/assets/icons/badge-72.png',</span>
+<span style="color:#4ade80">      image: '/assets/images/notif-deposit.png',</span>
+<span style="color:#4ade80">      tag:   `deposit-${d.notificationType}`,</span>
+<span style="color:#4ade80">      requireInteraction: true,</span>
+<span style="color:#4ade80">      vibrate: [200, 100, 200],</span>
+<span style="color:#4ade80">      actions: [</span>
+<span style="color:#4ade80">        { action:'deposit', title:'Deposit Now' },</span>
+<span style="color:#4ade80">        { action:'dismiss', title:'Later' }</span>
+<span style="color:#4ade80">      ],</span>
+<span style="color:#94a3b8">      // 等後端加欄位後才能用：</span>
+      data: { deepLink: d.deepLink ?? '/' }
+    }
+  );
+});</pre>
+        </div>
+      </div>
+    </div>
+    <div class="pwa-answer" style="margin-bottom:0">
+      <div class="pwa-badge">💡</div>
+      <div>
+        <div class="pwa-answer-title" style="font-size:13px">前端改完，效果能到哪裡？</div>
+        <div class="pwa-answer-body">只改 SW（icon + badge + tag + actions + requireInteraction）→ 通知立即有品牌感、不再重複疊加、有一鍵行動按鈕。<strong>這步不需要後端配合，今天就能上線。</strong> 要更個人化（bonus label、countdown、deep link）才需要後端加欄位。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gap 分析表 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">🔍 欄位差距分析</div>
+    <table class="rtbl">
+      <thead><tr>
+        <th style="width:160px">功能</th>
+        <th style="width:140px">需要的欄位</th>
+        <th>現況</th>
+        <th style="width:90px">後端工作量</th>
+        <th style="width:80px">實作難度</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">App icon 顯示</div><div class="m-note">通知左上角品牌圖</div></td>
+          <td><code>icon</code></td>
+          <td>❌ 缺失 — SW 可補靜態 URL，不需後端改</td>
+          <td><span class="bdg bg">零後端</span></td>
+          <td><span class="bdg bg">⭐ 簡單</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大圖 / Badge icon</div><div class="m-note">通知縮圖 + 狀態標示</div></td>
+          <td><code>image</code>、<code>badge</code></td>
+          <td>❌ 缺失 — 靜態圖 URL 即可，或由 notificationType 對應</td>
+          <td><span class="bdg bg">零後端</span></td>
+          <td><span class="bdg bg">⭐ 簡單</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">Tag / 去重</div><div class="m-note">同類通知合併，不刷屏</div></td>
+          <td><code>tag</code></td>
+          <td>❌ 缺失 — 可由 SW 組合 <code>notificationType + userId</code></td>
+          <td><span class="bdg bg">零後端</span></td>
+          <td><span class="bdg bg">⭐ 簡單</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">常駐通知</div><div class="m-note">不自動消失，需手動關閉</div></td>
+          <td><code>requireInteraction</code></td>
+          <td>❌ 缺失 — SW showNotification 補 flag 即可</td>
+          <td><span class="bdg bg">零後端</span></td>
+          <td><span class="bdg bg">⭐ 簡單</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">Action Button</div><div class="m-note">「立即存款」「查看詳情」按鈕</div></td>
+          <td><code>actions[]</code> + <code>data.deepLink</code></td>
+          <td>⚠ data 有 notificationType，但無目標 URL。<br>需後端加 <code>data.deepLink</code> 欄位，SW 監聽 notificationclick</td>
+          <td><span class="bdg ba">小改後端</span></td>
+          <td><span class="bdg ba">⭐⭐ 中等</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">結構化金額</div><div class="m-note">金額獨立欄位，利於文案模板</div></td>
+          <td><code>data.amount</code>、<code>data.currency</code></td>
+          <td>⚠ 金額藏在 message 字串裡（需 parse），後端拆欄可讓文案模板更彈性</td>
+          <td><span class="bdg ba">小改後端</span></td>
+          <td><span class="bdg ba">⭐⭐ 中等</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">通知子類型</div><div class="m-note">存款 / 促銷 / 回流 / 賽事</div></td>
+          <td><code>data.notificationSubtype</code></td>
+          <td>⚠ 現在只有 <code>notificationType:1</code>，所有場景共用同一模板</td>
+          <td><span class="bdg ba">小改後端</span></td>
+          <td><span class="bdg ba">⭐⭐ 中等</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">個人化 Bonus Label</div><div class="m-note">「+50% 回饋」動態 badge</div></td>
+          <td><code>data.bonusLabel</code>、<code>data.bonusPct</code></td>
+          <td>❌ 需 CRM 計算玩家專屬 bonus 並帶入 payload</td>
+          <td><span class="bdg br">需 CRM 串接</span></td>
+          <td><span class="bdg br">⭐⭐⭐ 複雜</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">倒數時間戳</div><div class="m-note">「剩 28 分」環形計時</div></td>
+          <td><code>data.expiresAt</code>（Unix ms）</td>
+          <td>❌ 需後端傳優惠到期時間，前端 SW 收到後帶入 JS 計算</td>
+          <td><span class="bdg br">需 CRM 串接</span></td>
+          <td><span class="bdg br">⭐⭐⭐ 複雜</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">玩家分群文案</div><div class="m-note">ABCD 人格 × 生命週期 L1–L8</div></td>
+          <td><code>data.segment</code>、<code>data.lifecycle</code></td>
+          <td>❌ 需數據平台輸出玩家標籤並傳給推播服務</td>
+          <td><span class="bdg br">需數據平台</span></td>
+          <td><span class="bdg br">⭐⭐⭐ 複雜</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 建議 payload 對照 -->
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">📝 建議 Payload — 分兩階段擴充</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Phase 1 後端只需加 3 個欄位，即可解鎖 Action Button + Deep Link + 去重</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:var(--bg);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:7px 12px;border-bottom:1px solid var(--border);background:var(--card);display:flex;justify-content:space-between;align-items:center">
+          <span>Phase 1 — 後端加 3 欄（立即可做）</span>
+          <span class="bdg bg">低工</span>
+        </div>
+        <pre style="font-family:var(--mono);font-size:10px;padding:14px;margin:0;line-height:1.7;overflow:auto;color:var(--fg)">{
+  "websiteId": "37",
+  "userId": "testctnhkd02",
+  "title": "存款已批准",
+  "message": "您的 $322 已到賬 🎉",
+  "data": {
+    "notificationType": 1,
+<span style="color:#22c55e">    "notificationSubtype": "deposit_approved",</span>
+<span style="color:#22c55e">    "deepLink": "/wallet/deposit",</span>
+<span style="color:#22c55e">    "amount": "322.00",</span>
+<span style="color:#22c55e">    "currency": "USD"</span>
+  }
+}
+
+<span style="color:#94a3b8">// SW 自動補（不需後端）：</span>
+<span style="color:#94a3b8">// icon, badge, tag, requireInteraction</span>
+<span style="color:#94a3b8">// actions: [{action:"deposit",title:"立即存款"}]</span></pre>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:7px 12px;border-bottom:1px solid var(--border);background:var(--card);display:flex;justify-content:space-between;align-items:center">
+          <span>Phase 2 — 接 CRM（個人化）</span>
+          <span class="bdg br">需數據平台</span>
+        </div>
+        <pre style="font-family:var(--mono);font-size:10px;padding:14px;margin:0;line-height:1.7;overflow:auto;color:var(--fg)">{
+  "websiteId": "37",
+  "userId": "testctnhkd02",
+  "title": "還差一步就能領首存回饋",
+  "message": "存款 $322，再存 $178 達標",
+  "data": {
+    "notificationType": 2,
+    "notificationSubtype": "deposit_abandon",
+    "deepLink": "/wallet/deposit?preselect=ewallet",
+    "amount": "322.00",
+    "currency": "USD",
+<span style="color:#f59e0b">    "bonusLabel": "+50% 回饋",</span>
+<span style="color:#f59e0b">    "bonusPct": 50,</span>
+<span style="color:#f59e0b">    "expiresAt": 1748524800000,</span>
+<span style="color:#f59e0b">    "segment": "C",</span>
+<span style="color:#f59e0b">    "lifecycle": "L1"</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 可行性總結 -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+    <div class="card cp" style="border-top:3px solid var(--green)">
+      <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">✅ Phase 1 — 立即可做</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--fg);display:block;margin-bottom:4px">後端加 3 欄 + SW 更新</strong>
+        icon / badge / tag / requireInteraction → <strong>SW 零成本補上</strong><br>
+        deepLink / subtype / amount → <strong>後端加欄，CRM 不需改</strong><br>
+        預計 CTR 提升：<strong>3–5% → 7–10%</strong>
+      </div>
+    </div>
+    <div class="card cp" style="border-top:3px solid var(--amber)">
+      <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:8px">⚡ Phase 2 — 需 CRM 配合</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--fg);display:block;margin-bottom:4px">bonusLabel / expiresAt / segment</strong>
+        需 CRM 根據玩家行為計算優惠 → 傳入 payload<br>
+        需數據平台輸出 ABCD / L1–L8 標籤<br>
+        預計 CTR 提升：<strong>10–18%</strong>（參考 LINE 購物）
+      </div>
+    </div>
+    <div class="card cp" style="border-top:3px solid var(--purple)">
+      <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">🚧 已知限制</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        <strong style="color:var(--fg);display:block;margin-bottom:4px">iOS Safari 限制</strong>
+        iOS 需 Add to Home Screen 才能收推播<br>
+        image 大圖在 iOS 顯示不穩定（需 NSE 測試）<br>
+        <code>actions</code> 按鈕 iOS 不支援（需降級處理）
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S1 推播時機矩陣（後期規劃）-->
+<section id="s1">
+  <div class="sec-hd">
+    <div class="sec-num" style="background:var(--muted)">後期</div>
+    <div>
+      <div class="sec-title">推播時機矩陣 — 基於千人千面分群規劃</div>
+      <div class="sec-desc">需數據平台支援，待前期推播基礎建好後推進。分析來源：千人千面規劃.xlsx</div>
+    </div>
+  </div>
+
+  <div class="notice">分析來源：千人千面規劃.xlsx — 玩家生命週期 8 階段 × 投注節奏型態（ABCD）× 輸後行為（ABCD）× DBCR 個性判斷</div>
+
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">⚡ 即時行為觸發（事件驅動，分鐘級）</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">玩家完成特定行為後即時觸發，時效性最強，轉化率最高</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:180px">時機點</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th><th style="width:70px">延遲</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">存款表單放棄</div><div class="m-note">Step 3→4 流失點</div></td>
+          <td>進入存款表單頁，<strong>20 分鐘內未完成</strong></td>
+          <td><span class="bdg br">全體 ~14,506/日</span></td>
+          <td>中性提醒 or 利益驅動（BH 品牌完成率 58.4%，需加利益點）</td>
+          <td><span class="bdg ba">15 min</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 D 止損退出型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數≤1 且 下注大幅下降/中斷</td>
+          <td><span class="bdg bp">D 止損退出型</span></td>
+          <td>安撫 / 翻盤感 —「今天的結果不代表明天」，<strong>禁止推促銷</strong></td>
+          <td><span class="bdg ba">2–4 hr 後</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 C 補錢冷靜型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數&gt;1 且 無加碼下注</td>
+          <td><span class="bdg bb">C 補錢冷靜型</span></td>
+          <td>小額回饋 / 任務導留 — 肯定穩健行為，提供低風險誘因繼續玩</td>
+          <td><span class="bdg ba">1 hr</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">大輸後 B 用餘額追輸型</div><div class="m-note">輸後行為分類</div></td>
+          <td>BigLossDay = true，入金次數≤1 且 加碼下注（用餘額追）</td>
+          <td><span class="bdg bg">B 用餘額追輸型</span></td>
+          <td>入金回饋誘因 — 玩家有意願繼續但缺資金，低門檻入金 offer 最有效</td>
+          <td><span class="bdg bg">即時</span></td>
+        </tr>
+        <tr style="background:var(--rbg)">
+          <td><div class="m-name" style="color:var(--red)">🚫 大輸後 A 立即追輸型</div><div class="m-note">風控優先</div></td>
+          <td>BigLossDay = true，入金次數&gt;1 且 加碼下注（連續入金追輸）</td>
+          <td><span class="bdg br">A 立即追輸型</span></td>
+          <td><strong>禁止推任何促銷</strong>，改推冷卻提醒 / 限額通知 / Cashback 補償任務</td>
+          <td><span class="bdg br">立即</span></td>
+        </tr>
+        <tr>
+          <td><div class="m-name">C 補血型入金節奏斷掉</div><div class="m-note">入金型態</div></td>
+          <td>IsDepositCountHigh=1 且 IsDepositSmallEach=1，本次入金間隔 &gt; 個人月均 × 1.5</td>
+          <td><span class="bdg bg">C 補血型</span></td>
+          <td>小額入金加碼券 / 低門檻任務 — 補血節奏斷掉時精準觸發</td>
+          <td><span class="bdg ba">30 min</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">📅 生命週期觸發（D+N，依流失時間點）</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">根據 L1–L8 階段定義，在玩家流失曲線的黃金時間點介入</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:150px">時機點</th><th>生命週期階段</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">首存後 24 hr</div><div class="m-note">新客教育</div></td>
+          <td><span class="bdg bg">L1 G3 新客</span></td>
+          <td>完成首存後滿 24 小時，Quick Deposit 使用率僅 6.3%</td>
+          <td>所有首存新客</td>
+          <td>「下次存款可以快 3 倍」— 教育 Quick Deposit，降低下次存款摩擦</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+1 未回流</div><div class="m-note">活躍留存</div></td>
+          <td><span class="bdg bb">L2–L3 活躍</span></td>
+          <td>昨日有遊玩，今日至傍晚未登入（依 GameType 分群推不同文案）</td>
+          <td>Slot 671k / Crash 288k / Sport 236k</td>
+          <td>遊戲型：熱榜引流 / 翻盤感；Sport 型：賽事倒數（不計額度）</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+3 活躍下降</div><div class="m-note">L4→L5 預警</div></td>
+          <td><span class="bdg ba">L4→L5</span></td>
+          <td>近 7 天投注額下降 &gt;30% 且連 3 日無登入（active_days 下降信號）</td>
+          <td>高活躍轉下降（G5 流失預警）</td>
+          <td>挽回 — 個人化訊息，強調「你常玩的遊戲」，避免通用促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+7 流失預警</div><div class="m-note">L5</div></td>
+          <td><span class="bdg ba">L5 流失預警</span></td>
+          <td>近 7 日無下注（bet_count_d7 = 0），歷史高 GGR 者優先</td>
+          <td>高單人 GGR：Sport &gt; Casino</td>
+          <td>Sport 型：「你關注的聯賽還在」；Casino 型：個人化回饋 offer</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+14 休眠</div><div class="m-note">L6</div></td>
+          <td><span class="bdg br">L6 休眠</span></td>
+          <td>login_inactive_days ≥ 14，bet_count_d14 = 0</td>
+          <td>休眠玩家（包含沉睡 VIP）</td>
+          <td>回流 Reload：歷史 LTV 前 5% → 首筆 6% 尊榮回饋；一般 → 「好久不見」情感訴求</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D+30 流失召回</div><div class="m-note">L7</div></td>
+          <td><span class="bdg br">L7 流失</span></td>
+          <td>login_inactive_days ≥ 30</td>
+          <td>流失玩家</td>
+          <td>強利益點（沉睡 VIP：首筆 6% + 尊榮感），一般流失：簡單回饋 + 情感喚醒</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">L8 回流後 nurture</div><div class="m-note">回流穩定</div></td>
+          <td><span class="bdg bg">L8 回流</span></td>
+          <td>prev_segment ∈ {L6, L7} 且 login_today = true</td>
+          <td>回流玩家</td>
+          <td>歡迎回來 + 連續 3 天留存獎勵，把 L8 穩定轉為 L3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card cp" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🎯 投注節奏人格 × 推播時機對照</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">基於 DBCR × 投注節奏 × 入金型態的千人千面分群，不同人格最佳觸發時機不同</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:130px">人格類型</th><th>定義特徵</th><th>最佳推播時機</th><th>訊息策略</th><th style="width:70px">禁忌</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">A 耐玩型</div><div class="m-note">DBCR ≫ 1，小注長玩</div></td>
+          <td>IsHighDurability=1 且 IsBetCountHigh=1，節奏穩定、黏著度高</td>
+          <td>連續登入任務斷掉當天晚間<br>週期任務到期前 2 小時</td>
+          <td>成就感 / 任務連續性 —「連續登入快斷了」「距離下一等級差 3 天」</td>
+          <td>高壓促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">B 速燃型</div><div class="m-note">DBCR &lt; 1，衝動爆發</div></td>
+          <td>IsLowDurability=1 且 IsAvgBetHigh=1，單注高、快速燃燒</td>
+          <td>大輸冷卻 6 小時後<br>下次登入時觸發活動</td>
+          <td>冷靜後再推 — 先冷卻期，再用限額任務 / 分段目標重新引導</td>
+          <td>大輸後即時促銷</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">C 補血型</div><div class="m-note">頻繁小額入金</div></td>
+          <td>IsDepositCountHigh=1 且 IsDepositSmallEach=1，對小回饋敏感</td>
+          <td>入金間隔超過個人月均 × 1.5 時<br>小額返利活動到期前 1 小時</td>
+          <td>低門檻誘因 —「入金 100 立拿 10%」，短週期小回饋推進補血節奏</td>
+          <td>高打碼要求</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">D 一次大充型</div><div class="m-note">計畫型重投入</div></td>
+          <td>IsDepositOnce=1 且 IsDepositAmtBig=1，習慣一次打滿</td>
+          <td>體育大賽前 72 小時<br>VIP 節點 / 個人 LTV 里程碑</td>
+          <td>尊榮感 + 高額獎勵 —「大客專屬：存款 50,000 享 25%」，透過專屬管道</td>
+          <td>通用小額促銷</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card cp">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🌐 外部事件 / 週期固定推播</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">不依賴玩家行為，由平台事件或時間週期驅動</div>
+    <table class="rtbl">
+      <thead><tr><th style="width:160px">時機點</th><th>觸發條件</th><th>目標群體</th><th>訊息方向</th><th style="width:80px">備註</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="m-name">Sport 賽事前 90 min</div></td>
+          <td>玩家有 Sport 投注記錄 + 關注賽事開賽前 90 分鐘</td>
+          <td><span class="bdg ba">Sport 236k</span></td>
+          <td>「你關注的賽事還有 1.5 小時，賠率現在最佳」</td>
+          <td>不佔每日額度</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">週末 Fri–Sun 晚間</div></td>
+          <td>週五至週日，玩家活躍時段 ± 30 分鐘</td>
+          <td>週末娛樂派對客</td>
+          <td>「週末快閃：今晚 20–24 點存款享 30%」時間感 + 限定感</td>
+          <td>高打碼防套利</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">個人活躍時段推播</div></td>
+          <td>根據歷史行為，在玩家最活躍時段 ± 30 min 發送（需時段數據驗證）</td>
+          <td>所有回流推播對象</td>
+          <td>時間點依玩家個人最佳時段，文案依場景設計</td>
+          <td>需時段數據</td>
+        </tr>
+        <tr>
+          <td><div class="m-name">Reload 活動到期前</div></td>
+          <td>玩家有資格領 Reload 活動，距到期剩 2 小時</td>
+          <td>高頻小額穩定客 / 新客首週</td>
+          <td>「你的入金加碼今晚 12 點截止」— 損失厭惡，催化行動</td>
+          <td>不計每日額度</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="warn-box" style="margin-top:14px;margin-bottom:0">
+      ⚡ <strong>優先順序：</strong>存款放棄 &gt; 大輸後行為分類 &gt; D+1 生命週期 &gt; Sport 賽事 &gt; Reload 到期 &gt; 週末活動 &gt; 週期性召回<br>
+      🔒 <strong>A 立即追輸型</strong>：所有促銷推播暫停，改走風控流程（冷卻通知 / Cashback 任務），避免加劇問題行為。
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('section[id], #hero');
+const links = document.querySelectorAll('.nl');
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.nl[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.2 });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
