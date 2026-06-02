@@ -842,8 +842,96 @@ firebase-messaging-sw.js                Notification Service Extension (NSE)
   <div class="sec-hd">
     <div class="sec-num" style="background:var(--muted)">後期</div>
     <div>
-      <div class="sec-title">推播時機矩陣 — 基於千人千面分群規劃</div>
+      <div class="sec-title">推播時機矩陣</div>
       <div class="sec-desc">需數據平台支援，待前期推播基礎建好後推進。分析來源：千人千面規劃.xlsx</div>
+    </div>
+  </div>
+
+  <!-- 實際數據 -->
+  <div class="card cp" style="margin-bottom:16px;border-left:3px solid var(--green)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700">📊 實際數據佐證 — 輸後流失分析</div>
+      <span class="bdg bg">data_2026-06-01.csv · N=10,000</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      撈近 7 天內有輸錢、且<strong>之後沒有再登入</strong>的玩家共 10,000 筆（site 11 / 18 / 73 為主）。<br>
+      結果：<strong style="color:var(--fg)">100% 輸後未回流</strong> — 這不是抽樣誤差，是明確的流失模式。
+    </div>
+    <!-- 分布長條 -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px">
+      <div style="text-align:center">
+        <div style="background:var(--green);border-radius:6px 6px 0 0;height:80px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:#fff">24.3%</span>
+        </div>
+        <div style="background:var(--gbg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--gbdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green)">&lt; 6h</div>
+          <div style="font-size:10px;color:var(--muted)">2,428 人</div>
+          <div style="font-size:9px;color:var(--green);margin-top:2px">⚡ 黃金</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="background:#22c55e;border-radius:6px 6px 0 0;height:116px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:#fff">34.8%</span>
+        </div>
+        <div style="background:var(--gbg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--gbdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green)">6–24h</div>
+          <div style="font-size:10px;color:var(--muted)">3,482 人</div>
+          <div style="font-size:9px;color:var(--green);margin-top:2px">🔥 次優</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="background:var(--amber);border-radius:6px 6px 0 0;height:50px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px">
+          <span style="font-size:11px;font-weight:700;color:#fff">15.1%</span>
+        </div>
+        <div style="background:var(--abg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--abdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber)">1–2d</div>
+          <div style="font-size:10px;color:var(--muted)">1,511 人</div>
+          <div style="font-size:9px;color:var(--amber);margin-top:2px">⚠ D+1</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="background:#f59e0b;border-radius:6px 6px 0 0;height:28px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
+          <span style="font-size:10px;font-weight:700;color:#fff">8.5%</span>
+        </div>
+        <div style="background:var(--abg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--abdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--amber)">2–3d</div>
+          <div style="font-size:10px;color:var(--muted)">847 人</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="background:var(--red);border-radius:6px 6px 0 0;height:38px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
+          <span style="font-size:10px;font-weight:700;color:#fff">11.8%</span>
+        </div>
+        <div style="background:var(--rbg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--rbdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red)">3–5d</div>
+          <div style="font-size:10px;color:var(--muted)">1,177 人</div>
+          <div style="font-size:9px;color:var(--red);margin-top:2px">📉 衰減</div>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div style="background:var(--red);border-radius:6px 6px 0 0;height:18px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px">
+          <span style="font-size:9px;font-weight:700;color:#fff">5.5%</span>
+        </div>
+        <div style="background:var(--rbg);border-radius:0 0 6px 6px;padding:6px 4px 4px;border:1px solid var(--rbdr);border-top:none">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--red)">5–7d</div>
+          <div style="font-size:10px;color:var(--muted)">555 人</div>
+          <div style="font-size:9px;color:var(--red);margin-top:2px">💤 休眠</div>
+        </div>
+      </div>
+    </div>
+    <!-- 關鍵結論 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="padding:11px 13px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm)">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">⚡ 前 24h 是黃金窗口</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">5,910 人（59.1%）的最後一筆輸錢在 24 小時內。推播在這個窗口送出，玩家記憶猶新、回來意願最高</div>
+      </div>
+      <div style="padding:11px 13px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm)">
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:4px">⚠ 還缺兩個關鍵欄位</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">
+          <strong style="color:var(--fg)">① 推播授權比例</strong>：這 10,000 人中有多少有 push token？<br>
+          <strong style="color:var(--fg)">② 輸錢金額</strong>：區分 D止損型 vs B/C 補錢型，文案策略完全不同
+        </div>
+      </div>
     </div>
   </div>
 
