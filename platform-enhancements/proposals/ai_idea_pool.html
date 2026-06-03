@@ -211,6 +211,19 @@ main {
   flex-shrink: 0;
   margin-top: 4px;
 }
+.round-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--blue);
+  border: 1px solid var(--blue-border, #bfdbfe);
+  background: var(--blue-bg, #eff6ff);
+  border-radius: 9999px;
+  padding: 3px 10px;
+  flex-shrink: 0;
+}
 
 /* ── CARD TITLE ── */
 .ctop {
@@ -385,20 +398,21 @@ main {
 .disc-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 12px;
-  font-weight: 500;
-  padding: 6px 12px;
+  font-weight: 600;
+  padding: 7px 14px;
   border-radius: 6px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted-foreground);
+  border: none;
+  background: var(--primary);
+  color: var(--primary-foreground);
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: 'Inter', sans-serif;
   transition: all .15s;
+  text-decoration: none;
 }
-.disc-btn:hover { background: var(--muted); color: var(--foreground); border-color: #d4d4d8; }
+.disc-btn:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -428,7 +442,9 @@ main {
 <div class="toolbar">
   <span class="filter-label">篩選</span>
   <div class="filters">
-    <button class="fb f-all on" onclick="fil('all',this)">全部</button>
+    <button class="fb f-all" onclick="fil('all',this)">全部</button>
+    <button class="fb f-round1" onclick="fil('round1',this)">ROUND 1</button>
+    <button class="fb f-round2 on" onclick="fil('round2',this)">ROUND 2</button>
     <button class="fb f-archive" onclick="fil('archive',this)">ARCHIVE</button>
   </div>
 </div>
@@ -444,8 +460,8 @@ main {
 
 <script>
 const CATS = [
-  { key:'acquisition', label:'新客獲取', accent:'var(--coral)' },
-  { key:'existing',    label:'既有用戶', accent:'var(--blue)' },
+  { key:'round2',      label:'ROUND 2',  accent:'var(--purple)' },
+  { key:'existing',    label:'ROUND 1', accent:'var(--blue)' },
   { key:'tech',        label:'技術優化', accent:'var(--teal)' },
   { key:'archive',     label:'ARCHIVE', accent:'#6b6b6b' },
 ];
@@ -492,7 +508,7 @@ fetchLayout() {
    predict:'最常去的頁面自然靠近拇指熱區，減少尋找時間。',
    api:'GET /api/user/nav-order → CategoryItem[]'},
 
-  {id:'p4',cat:'existing',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'p4',cat:'round2',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'mid',
    problem:'存款快捷按鈕金額固定，和玩家實際習慣落差大。',
    desc:'平時都存 500 的玩家，快捷按鈕就出現 450、475、500、525、550，不是死板的 100/500/1000，＋10% 那顆特別顯眼。',
@@ -518,7 +534,8 @@ ngOnInit() {
 // 去重 → 過濾平台 min/max → 組成 PresetOption[]
 // highlight = true 僅 +10% 選項`,
    predict:'玩家開存款面板時，5 個貼近習慣的金額已備好，+10% 視覺突出，自然引導往上存。',
-   api:'GET /api/user/deposit-presets → PresetOption[]（後端完成平均計算、去重、邊界過濾）'},
+   api:'GET /api/user/deposit-presets → PresetOption[]（後端完成平均計算、去重、邊界過濾）',
+   link:'payment-ux-prototypes-v2.html'},
 
   {id:'p5',cat:'archive',isNew:false,name:'Provider 雙維度動態排序',ico:'↑',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ui','fe','ai'],diff:'mid',
@@ -543,13 +560,23 @@ providerList = computed(() =>
    predict:'玩家進 Slot 頁，常玩的 Pragmatic 已在第一格；切到「平台熱度」，看的是全站流水最高的排法。不需搜尋，不需滾動。',
    api:'GET /api/providers/ranked?mode=global|personal → Provider[]（後端依 mode 排序後回傳）'},
 
-  {id:'p8',cat:'tech',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
-   types:['fe','ui','ux'],diff:'easy',
-   problem:'網路慢時頁面出現白框或破圖，影響第一印象。',
-   desc:'頁面先顯示極小縮圖並放大模糊（LQIP），真實圖片下載完成後以 CSS transition 清晰淡入。純 CSS + JS 實現，所有瀏覽器皆相容，無需任何新 API。',
-   why:'網路差的玩家看到白框或破圖，體驗差且跳出率高。Blur-Up 讓畫面立刻有內容，感知速度遠快於實際載入速度，不需等圖載完才有東西看。',
-   angular:['BlurUpDirective 掛在 <img>，接收 blurUp（原圖 URL）與 lqip（base64 縮圖 ~300B）兩個 Input','ngAfterViewInit 先把 lqip 放入 src，CSS filter:blur(12px) scale(1.05) 撐滿容器不留白邊','new Image() preload 原圖，onload 替換 src 並移除 blur，CSS transition 自動補間','純 CSS transition: filter .4s ease, transform .4s ease — IE11+ / iOS Safari / Android Chrome 全覆蓋'],
-   code:`// blur-up.directive.ts
+  {id:'p8',cat:'round2',isNew:true,name:'圖片最佳化（WebP 格式轉換 + Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+   types:['fe','be','ui','ux'],diff:'easy',
+   problem:'PNG 圖片體積大導致載入慢；網路差時頁面出現白框或破圖，兩者都影響第一印象。',
+   desc:'兩招合用，效果疊加：① PNG → WebP 格式轉換，檔案縮小 40–70%，載入速度大幅提升；② Blur-Up（LQIP），頁面先顯示極小模糊縮圖，原圖載入完成後 CSS transition 清晰淡入，網路再慢畫面都有內容。',
+   why:'WebP 比 PNG 小 25–34%，遊戲縮圖量大，每張少幾十 KB 累積顯著。Blur-Up 讓感知速度遠快於實際載入速度。兩者實作成本都低，是最容易拿到的效能與體驗提升。',
+   angular:['<picture> + <source type="image/webp"> 提供 WebP，<img> 作 JPG fallback，瀏覽器自動選擇','若有 CDN（如 Cloudinary）：URL 參數 f_auto,q_80 一行搞定格式轉換','BlurUpDirective 掛在 <img>，接收原圖 URL 與 lqip（base64 縮圖 ~300B）','ngAfterViewInit 先顯示模糊縮圖，原圖載完後 CSS transition 淡出模糊','ImagePipe 統一處理 URL 轉換，元件不需各自處理'],
+   code:`// ── Part 1：WebP 格式轉換 ──
+// 方式一：<picture> fallback（純前端）
+// <picture>
+//   <source srcset="game.webp" type="image/webp">
+//   <img src="game.jpg" alt="...">
+// </picture>
+
+// 方式二：CDN 自動轉換（推薦）
+// https://cdn.example.com/f_auto,q_80/images/game.png
+
+// ── Part 2：Blur-Up Directive ──
 @Directive({ selector: 'img[blurUp]', standalone: true })
 export class BlurUpDirective implements AfterViewInit {
   @Input() blurUp!: string;  // 原圖 URL
@@ -574,11 +601,10 @@ export class BlurUpDirective implements AfterViewInit {
     };
   }
 }
-
-// 使用方式
 // <img [blurUp]="game.imageUrl" [lqip]="game.lqip" alt="..." />`,
-   predict:'玩家進頁面立刻看到有內容的畫面，不是白框；網路恢復後自動清晰，全程無感。',
-   api:'後端 GET /api/images/:id?q=10 回傳極低品質縮圖（≤1KB）base64，前端 inline 寫入 lqip；或直接在資料預載時一併附上 lqipBase64 欄位'},
+   predict:'頁面圖片載入速度明顯加快（WebP），且網路再差畫面都有模糊縮圖先佔位（Blur-Up），兩者搭配讓玩家感知體驗大幅提升。',
+   api:'WebP：CDN URL 參數即可（f_auto）或 CI 批次轉換；Blur-Up：後端 GET /api/images/:id?q=10 回傳 base64 縮圖，或資料預載時附上 lqipBase64 欄位',
+   link:'image-optimization-demo.html'},
 
   {id:'p6',cat:'archive',isNew:false,name:'個人化活動配對',ico:'★',icoBg:'var(--pink-dim)',accentColor:'var(--pink)',
    types:['ux','be','ai'],diff:'hard',
@@ -675,7 +701,7 @@ ngOnInit() {
    api:'GET /api/lobby/config?segment=&providerSort=global|personal → LobbyConfig（後端統一決策）'},
 
   // ── ACQUISITION ──
-  {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'a1',cat:'existing',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['mkt','fe','be','ai'],diff:'mid',
    problem:'新玩家從廣告點進來，看到的是一個通用 LP，體育和 Slot 玩家看到一模一樣的內容，轉換動機不足。即使完成註冊，主站也不知道這個玩家偏好什麼，錯過了最佳個人化時機，Welcome Offer 和推薦遊戲與玩家完全無關。',
    why:'玩家的偏好在「點擊廣告的那一刻」就已暴露，但這個訊號目前完全浪費掉了。從渠道分流 → LP 個人化 → 快速註冊 → 個人化 Lobby → 符合分類的 Welcome Offer → 推薦第一款遊戲，整條新客漏斗每一步都與玩家偏好對齊，可顯著提升 FTD 轉換率。',
@@ -704,7 +730,7 @@ ngOnInit() {
    predict:'系統知道這個用戶從哪個廣告來，給他最短的註冊路徑。',
    api:'GET /api/register/config?intent=sports → FormConfig'},
 
-  {id:'a3',cat:'acquisition',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'a3',cat:'existing',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['mkt','ux','be','ai'],diff:'mid',
    problem:'所有新用戶看同一張歡迎優惠，配對錯誤直接影響首次存款率。',
    desc:'從體育相關渠道帶進來的新用戶，註冊完會看到體育首存 Bonus 並引導去體育投注；Slot 及 Casino 渠道也是相同的邏輯。不是同一張通用 Bonus Offer。',
@@ -908,34 +934,8 @@ this.roundCount$.pipe(
    predict:'系統在玩家快放棄前主動出手，Free Credit 是橋樑，存款 Bonus 是目的地。',
    api:'POST /api/offers/last-chance → { freeCredit, wagerRequired, bonusOnDeposit }'},
 
-  // ── TECH ──
-  {id:'t2',cat:'tech',isNew:true,name:'圖片格式轉換（PNG → WebP/JPG）',ico:'⟁',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
-   types:['fe','be'],diff:'easy',
-   problem:'PNG 圖片體積大，頁面載入速度慢，在行動裝置上尤其明顯。',
-   desc:'遊戲縮圖、Banner 等靜態圖片從 PNG 轉為 WebP（支援 WebP 的瀏覽器）或 JPG fallback，檔案大小縮減 40–70%，載入速度大幅提升。現代瀏覽器以 <picture> 元素自動選擇最佳格式，或透過 CDN URL 參數（如 Cloudinary f_auto）一行解決。',
-   why:'WebP 在相同畫質下比 PNG 小約 25–34%，比 JPG 小約 25–35%。瀏覽器覆蓋率 95%+，實作成本極低，是最容易拿到的效能提升之一。對 iGaming 平台而言，遊戲縮圖量大，每張少幾十 KB 累積起來效果顯著。',
-   angular:['<picture> 元素搭配 <source type="image/webp"> 提供 WebP，<img> 作為 JPG fallback，瀏覽器自動選擇','若有 CDN（如 Cloudinary）：URL 參數 f_auto,q_80 一行搞定，無需改前端程式碼','Asset pipeline 或 CI 加入批次轉換腳本（sharp / cwebp），上傳時自動產生 .webp 版本','ImagePipe 統一處理 URL 轉換邏輯，元件不需各自處理'],
-   code:`// 方式一：<picture> fallback（純前端，零後端成本）
-// <picture>
-//   <source srcset="game.webp" type="image/webp">
-//   <img src="game.jpg" alt="...">
-// </picture>
-
-// 方式二：CDN 自動轉換（推薦，Cloudinary 範例）
-// 原始 URL：https://cdn.example.com/images/game.png
-// 轉換 URL：https://cdn.example.com/f_auto,q_80/images/game.png
-// ↑ CDN 自動偵測瀏覽器，送 WebP 或 JPG
-
-// 方式三：Node.js 批次轉換（CI/CD pipeline）
-const sharp = require('sharp');
-await sharp('input.png')
-  .webp({ quality: 80 })
-  .toFile('output.webp');`,
-   predict:'用戶無感知，但頁面圖片載入速度明顯加快，尤其對行動裝置用戶；搭配 Blur-Up 效果更佳。',
-   api:'若用 CDN：URL 參數即可（f_auto）；若自建：POST /api/images/convert → { webpUrl, jpgUrl }'},
-
   // ── RISK ──
-  {id:'r4',cat:'existing',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'r4',cat:'round2',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['ux','be','ai','mkt'],diff:'mid',
    problem:'通用推播開啟率極低，等於在浪費每一次推播機會。',
    desc:'依玩家行為與平台事件，分 8 種情境精準觸發 Push Notification，每則推播都帶個人化內容與深連結，直接帶回對應頁面，不是一句通用文字。',
@@ -1018,7 +1018,8 @@ const PUSH_SCENARIOS = {
    api:`POST /api/push/send → { scenario, userId, payload }
 GET  /api/push/preferences → UserPushSettings
 PUT  /api/push/preferences → 更新訂閱偏好
-後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff`},
+後端 event bus 觸發：bet.settled / coupon.expiring / campaign.launched / jackpot.milestone / user.inactive / game.released / tier.threshold / match.kickoff`,
+   link:'push-notification-design.html'},
 
   {id:'r1',cat:'archive',isNew:false,name:'即時流失風險提示',ico:'⚠',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['be','ai','ux'],diff:'hard',
@@ -1079,6 +1080,7 @@ function cardHTML(d){
       <div class="ctop">
         <div class="cname">${d.name}</div>
         ${d.isNew ? '<div class="new-badge">New</div>' : ''}
+        ${d.cat === 'existing' ? '<div class="round-badge">Round 1</div>' : ''}
       </div>
       <div class="tags">${tags}</div>
     </div>
@@ -1109,23 +1111,23 @@ function cardHTML(d){
         <div class="db">${d.api}</div>
       </div>
     </div>
+    ${d.link ? `<div style="padding:0 0 4px"><a href="${d.link}" target="_blank" class="disc-btn">View</a></div>` : ''}
     </div>
   </div>`;
 }
 
 function render(f) {
   const main = document.getElementById('main');
-  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive') : f === 'archive' ? ALL.filter(d => d.cat === 'archive') : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
+  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive') : f === 'archive' ? ALL.filter(d => d.cat === 'archive') : f === 'round1' ? ALL.filter(d => d.cat === 'existing') : f === 'round2' ? ALL.filter(d => d.cat === 'round2') : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
   let html = '';
   let shown = 0;
   CATS.forEach(cat => {
     const items = filtered.filter(d => d.cat === cat.key);
     if (!items.length) return;
     shown += items.length;
+    const header = cat.key === 'existing' ? '' : `<div class="section-header"><div class="section-title">${cat.label}</div></div>`;
     html += `<section class="section">
-      <div class="section-header">
-        <div class="section-title">${cat.label}</div>
-      </div>
+      ${header}
       <div class="grid" id="sec-${cat.key}">${items.map(cardHTML).join('')}</div>
     </section>`;
   });
@@ -1179,7 +1181,7 @@ function tog(id) {
   if (!was) { det.classList.add('open'); card.classList.add('open'); }
 }
 
-render('all');
+render('round2');
 
 </script>
 </body>
