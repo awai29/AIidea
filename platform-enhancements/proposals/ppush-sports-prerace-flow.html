@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>賽前期 Sports Push 計畫</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  background: #f0f2f8;
+  color: #1a1d2e;
+  padding: 48px 32px 100px;
+}
+
+/* ── Page header ── */
+.page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.page-sub   { font-size: 14px; color: #888; margin-bottom: 36px; }
+
+/* ── Section labels ── */
+.sec-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.6px;
+  text-transform: uppercase; color: #aaa; margin-bottom: 16px; margin-top: 56px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:#dde0ea; }
+
+/* ── Exception bar ── */
+.exc-bar {
+  background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: 10px;
+  padding: 14px 18px; font-size: 13.5px; color: #92400e;
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 28px; line-height: 1.6;
+}
+
+/* ── B-layer explainer ── */
+.blayer-box {
+  background: #fff; border: 1px solid #e4e6ef; border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 0;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+}
+.blayer-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #bbb; margin-bottom: 10px; }
+.blayer-intro { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 14px; }
+.blayer-cards { display: flex; gap: 10px; flex-wrap: wrap; }
+.blayer-card  {
+  flex: 1; min-width: 150px; border-radius: 10px; padding: 12px 14px;
+}
+.blayer-card-title { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+.blayer-card-time  { font-size: 11px; font-weight: 700; border-radius: 20px; padding: 1px 8px; display: inline-block; margin-bottom: 7px; }
+.blayer-card-desc  { font-size: 12px; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════
+   SECTION B — 玩家旅程卡
+═══════════════════════════════════════════ */
+.journey-list { display: flex; flex-direction: column; gap: 12px; }
+
+.journey-card {
+  background: #fff; border-radius: 14px; border: 1px solid #e4e6ef;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05); overflow: hidden;
+  display: flex; align-items: stretch;
+}
+
+/* left label */
+.jc-label {
+  width: 154px; flex-shrink: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 20px 18px; border-right: 1px solid #eef0f6;
+}
+.jc-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+.jc-desc { font-size: 11.5px; color: #aaa; line-height: 1.45; }
+
+/* steps track */
+.jc-track {
+  flex: 1; display: flex; align-items: stretch;
+  position: relative;
+}
+
+/* connecting line between steps */
+.jc-track::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 2px;
+  background: #eef0f6;
+  z-index: 0;
+}
+
+.jc-step {
+  flex: 1; padding: 16px 14px;
+  display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: flex-start;
+  border-right: 1px solid #eef0f6;
+  position: relative; z-index: 1;
+  background: #fff;
+}
+.jc-step:last-child { border-right: none; }
+
+.jc-step-day {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: #bbb; margin-bottom: 8px;
+}
+
+/* push mini-card inside journey step */
+.jc-push {
+  background: #f5f6fb; border-radius: 8px;
+  padding: 9px 11px; width: 100%;
+}
+.jc-push-time  { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; margin-bottom: 5px; font-variant-numeric: tabular-nums; }
+.jc-push-b     { font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; display: inline-block; margin-bottom: 5px; }
+.jc-push-title { font-size: 11.5px; font-weight: 700; color: #1a1d2e; line-height: 1.4; margin-bottom: 4px; }
+.jc-push-body  { font-size: 11px; color: #777; line-height: 1.45; margin-bottom: 6px; }
+.jc-promo      { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 2px 7px; display: inline-block; }
+.promo-yes { background: #d1fae5; color: #065f46; }
+.promo-no  { background: #f1f5f9; color: #94a3b8; }
+
+/* multiple pushes in same day */
+.jc-push + .jc-push { margin-top: 6px; }
+
+/* empty step */
+.jc-empty {
+  flex: 1; padding: 16px 14px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+  border-right: 1px solid #eef0f6;
+  position: relative; z-index: 1;
+  background: #fafbff;
+}
+.jc-empty:last-child { border-right: none; }
+.jc-empty-day { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #ddd; margin-bottom: 8px; }
+.jc-empty-content { font-size: 11px; color: #ddd; }
+
+/* next badge for L05×SPORT */
+.jc-next {
+  background: #f0fdf4; border: 1px dashed #86efac; border-radius: 8px;
+  padding: 9px 11px; width: 100%;
+  font-size: 11px; color: #16a34a; line-height: 1.5;
+  font-weight: 600;
+}
+.jc-stop {
+  background: #fef2f2; border: 1px dashed #fca5a5; border-radius: 8px;
+  padding: 9px 11px; width: 100%;
+  font-size: 11px; color: #dc2626; line-height: 1.5;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION C — 發送時鐘
+═══════════════════════════════════════════ */
+.clock-wrap {
+  background: #fff; border: 1px solid #e4e6ef; border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  padding: 24px 24px 24px 0;
+  overflow-x: auto;
+}
+
+.clock-inner {
+  display: flex; gap: 0;
+  min-width: 640px;
+}
+
+/* time axis */
+.clock-axis {
+  width: 56px; flex-shrink: 0;
+  position: relative;
+}
+.clock-axis-inner {
+  position: relative;
+  height: 660px;
+  margin-left: 12px;
+}
+.axis-label {
+  position: absolute; left: 0;
+  font-size: 11px; font-weight: 600; color: #bbb;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+.axis-line {
+  position: absolute; left: 40px; right: -8px;
+  height: 1px; background: #f0f0f5;
+}
+/* highlight band lines */
+.axis-band {
+  position: absolute; left: 40px; right: 0;
+  background: rgba(99,102,241,.03);
+  border-top: 1px dashed #e0e7ff;
+}
+
+/* day columns */
+.clock-cols {
+  display: flex; flex: 1; gap: 0;
+}
+.clock-col {
+  flex: 1; position: relative;
+  border-left: 1px solid #f0f0f5;
+  padding: 0 8px;
+}
+
+.col-header {
+  padding: 0 8px 16px;
+  text-align: center;
+}
+.col-day   { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; display: block; }
+.col-sub   { font-size: 11px; color: #aaa; }
+
+.col-body {
+  position: relative;
+  height: 660px;
+}
+
+/* guide lines inside columns */
+.col-guide {
+  position: absolute; left: 0; right: 0;
+  height: 1px; background: #f4f5f9;
+  pointer-events: none;
+}
+
+/* push chip on clock */
+.clock-chip {
+  position: absolute; left: 0; right: 0;
+  margin: 0 4px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: default;
+  transition: transform .15s, box-shadow .15s;
+}
+.clock-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  z-index: 10;
+}
+.chip-time  { font-size: 13px; font-weight: 900; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.chip-seg   { font-size: 10px; font-weight: 700; margin-bottom: 3px; }
+.chip-title { font-size: 11px; font-weight: 600; line-height: 1.3; color: inherit; opacity: .85; }
+
+/* segment colour tokens */
+.c-sport  { background: #ecfdf5; border: 1.5px solid #6ee7b7; color: #065f46; }
+.c-slot   { background: #eff6ff; border: 1.5px solid #93c5fd; color: #1e40af; }
+.c-l03    { background: #faf5ff; border: 1.5px solid #c4b5fd; color: #5b21b6; }
+.c-l06    { background: #fffbeb; border: 1.5px solid #fcd34d; color: #92400e; }
+.c-l08    { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; }
+
+/* time band shading */
+.time-band {
+  position: absolute; left: 0; right: 0;
+  pointer-events: none;
+}
+
+/* ── Legend strip ── */
+.seg-legend {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  padding: 16px 24px 0;
+}
+.sl-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 600; color: #555;
+}
+.sl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Design rules ── */
+.rules-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+}
+@media (max-width: 700px) { .rules-grid { grid-template-columns: 1fr; } }
+.rule-card {
+  background: #fff; border: 1px solid #e4e6ef; border-radius: 12px;
+  padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.rule-icon  { font-size: 20px; margin-bottom: 8px; }
+.rule-title { font-size: 12px; font-weight: 800; color: #1a1d2e; margin-bottom: 6px; }
+.rule-body  { font-size: 12.5px; color: #666; line-height: 1.65; }
+.rule-body strong { color: #1a1d2e; }
+</style>
+</head>
+<body>
+
+<div class="page-title">發送時鐘</div>
+<div class="page-sub">推播在一天中的哪個時刻送出</div>
+
+
+<div id="journey-source" style="display:none"><div class="journey-list">
+
+  <!-- L05 × SPORT -->
+  <div class="journey-card">
+    <div class="jc-label" style="border-left: 4px solid #059669">
+      <div class="jc-name" style="color:#059669">L05 × SPORT</div>
+      <div class="jc-desc">活躍體育玩家<br>核心目標受眾</div>
+    </div>
+    <div class="jc-track">
+      <!-- D-3 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 3 天</div>
+        <div class="jc-push" style="background:#f0fdf8;border:1px solid #a7f3d0">
+          <div class="jc-push-time" style="color:#059669">10:30</div>
+          <div class="jc-push-b" style="background:#d1fae5;color:#065f46">白天型</div>
+          <div class="jc-push-title">🏆 World Cup 2026 倒數3天</div>
+          <div class="jc-push-body">孟加拉 vs 卡達 · 你支持誰？</div>
+          <span class="jc-promo promo-yes">✓ 賽事投注加成</span>
+        </div>
+        <div class="jc-push" style="background:#f0fdf8;border:1px solid #a7f3d0;margin-top:6px">
+          <div class="jc-push-time" style="color:#059669">20:30</div>
+          <div class="jc-push-b" style="background:#ede9fe;color:#6d28d9">晚間型</div>
+          <div class="jc-push-title">🔥 開賽前3天 · 早注贏更多</div>
+          <div class="jc-push-body">賽前賠率最佳 · 現在下注 ৳100 起</div>
+          <span class="jc-promo promo-yes">✓ 早注優惠</span>
+        </div>
+      </div>
+      <!-- D-2 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 2 天</div>
+        <div class="jc-push" style="background:#f8fafc;border:1px solid #e2e8f0">
+          <div class="jc-push-time" style="color:#475569">22:30</div>
+          <div class="jc-push-b" style="background:#f1f5f9;color:#64748b">深夜型</div>
+          <div class="jc-push-title">📊 賽前分析出爐</div>
+          <div class="jc-push-body">主場優勢 + 近況5戰4勝</div>
+          <span class="jc-promo promo-no">— 純資訊型</span>
+        </div>
+      </div>
+      <!-- D-1 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 1 天</div>
+        <div class="jc-next">
+          ➜ 賽前 2 小時<br>進入下一階段推播
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L05 × SLOT -->
+  <div class="journey-card">
+    <div class="jc-label" style="border-left: 4px solid #2563eb">
+      <div class="jc-name" style="color:#2563eb">L05 × SLOT</div>
+      <div class="jc-desc">活躍 Slot 玩家<br>跨品類吸引</div>
+    </div>
+    <div class="jc-track">
+      <!-- D-3 -->
+      <div class="jc-empty">
+        <div class="jc-empty-day">賽前 3 天</div>
+        <div class="jc-empty-content">不發送<br>避免過早打擾</div>
+      </div>
+      <!-- D-2 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 2 天</div>
+        <div class="jc-push" style="background:#eff6ff;border:1px solid #bfdbfe">
+          <div class="jc-push-time" style="color:#2563eb">14:00</div>
+          <div class="jc-push-b" style="background:#dbeafe;color:#1d4ed8">白天型</div>
+          <div class="jc-push-title">🎰 世界盃特別版 Slot 上線</div>
+          <div class="jc-push-body">孟加拉隊主題 · 今日限定免費試玩</div>
+          <span class="jc-promo promo-yes">✓ 免費試玩</span>
+        </div>
+      </div>
+      <!-- D-1 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 1 天</div>
+        <div class="jc-push" style="background:#eff6ff;border:1px solid #bfdbfe">
+          <div class="jc-push-time" style="color:#2563eb">20:00</div>
+          <div class="jc-push-b" style="background:#ede9fe;color:#6d28d9">晚間型</div>
+          <div class="jc-push-title">⚽ 不看球也能贏？</div>
+          <div class="jc-push-body">Lucky Slot 爆獎率 +20% · 限時</div>
+          <span class="jc-promo promo-yes">✓ Slot 加成 Promo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L03 -->
+  <div class="journey-card">
+    <div class="jc-label" style="border-left: 4px solid #7c3aed">
+      <div class="jc-name" style="color:#7c3aed">L03 新玩家</div>
+      <div class="jc-desc">首次接觸體育<br>需要教育引導</div>
+    </div>
+    <div class="jc-track">
+      <!-- D-3 -->
+      <div class="jc-empty">
+        <div class="jc-empty-day">賽前 3 天</div>
+        <div class="jc-empty-content">不發送<br>新玩家不宜過早</div>
+      </div>
+      <!-- D-2 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 2 天</div>
+        <div class="jc-push" style="background:#faf5ff;border:1px solid #ddd6fe">
+          <div class="jc-push-time" style="color:#7c3aed">11:00</div>
+          <div class="jc-push-b" style="background:#dbeafe;color:#1d4ed8">白天型</div>
+          <div class="jc-push-title">📖 看懂賠率，贏更多</div>
+          <div class="jc-push-body">1.5 是什麼意思？30秒看懂賠率</div>
+          <span class="jc-promo promo-no">— 教育型，不推銷</span>
+        </div>
+      </div>
+      <!-- D-1 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 1 天</div>
+        <div class="jc-push" style="background:#faf5ff;border:1px solid #ddd6fe">
+          <div class="jc-push-time" style="color:#7c3aed">21:00</div>
+          <div class="jc-push-b" style="background:#ede9fe;color:#6d28d9">晚間型</div>
+          <div class="jc-push-title">🌟 你的第一場世界盃</div>
+          <div class="jc-push-body">投注體育只需3步驟，最低 ৳10</div>
+          <span class="jc-promo promo-yes">✓ 新手首注加碼</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L06 -->
+  <div class="journey-card">
+    <div class="jc-label" style="border-left: 4px solid #d97706">
+      <div class="jc-name" style="color:#d97706">L06 流失玩家</div>
+      <div class="jc-desc">需強力誘因<br>情感觸點召回</div>
+    </div>
+    <div class="jc-track">
+      <!-- D-3 -->
+      <div class="jc-empty">
+        <div class="jc-empty-day">賽前 3 天</div>
+        <div class="jc-empty-content">不發送<br>禮包在 D-2 更有效</div>
+      </div>
+      <!-- D-2 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 2 天</div>
+        <div class="jc-push" style="background:#fffbeb;border:1px solid #fde68a">
+          <div class="jc-push-time" style="color:#d97706">20:00</div>
+          <div class="jc-push-b" style="background:#ede9fe;color:#6d28d9">晚間型</div>
+          <div class="jc-push-title">👋 你回來得正好</div>
+          <div class="jc-push-body">World Cup 回歸禮包 · 今明兩天 ৳200</div>
+          <span class="jc-promo promo-yes">✓ 回歸禮包</span>
+        </div>
+      </div>
+      <!-- D-1 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 1 天</div>
+        <div class="jc-push" style="background:#fffbeb;border:1px solid #fde68a">
+          <div class="jc-push-time" style="color:#d97706">23:00</div>
+          <div class="jc-push-b" style="background:#f1f5f9;color:#64748b">深夜型</div>
+          <div class="jc-push-title">⏰ 明天就開賽了</div>
+          <div class="jc-push-body">回歸禮包最後倒數 · 錯過要等4年</div>
+          <span class="jc-promo promo-yes">✓ 倒數強化緊迫</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L08 -->
+  <div class="journey-card">
+    <div class="jc-label" style="border-left: 4px solid #dc2626">
+      <div class="jc-name" style="color:#dc2626">L08 沉睡玩家</div>
+      <div class="jc-desc">反應最慢<br>需最早觸及</div>
+    </div>
+    <div class="jc-track">
+      <!-- D-3 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 3 天</div>
+        <div class="jc-push" style="background:#fef2f2;border:1px solid #fca5a5">
+          <div class="jc-push-time" style="color:#dc2626">20:00</div>
+          <div class="jc-push-b" style="background:#ede9fe;color:#6d28d9">晚間型</div>
+          <div class="jc-push-title">🏆 4年一次 · 錯過可惜</div>
+          <div class="jc-push-body">世界盃就在明後天 · 回來看看</div>
+          <span class="jc-promo promo-yes">✓ 重新激活禮包</span>
+        </div>
+      </div>
+      <!-- D-2 -->
+      <div class="jc-step">
+        <div class="jc-step-day">賽前 2 天</div>
+        <div class="jc-push" style="background:#fef2f2;border:1px solid #fca5a5">
+          <div class="jc-push-time" style="color:#dc2626">10:00</div>
+          <div class="jc-push-b" style="background:#dbeafe;color:#1d4ed8">白天型</div>
+          <div class="jc-push-title">🎁 老朋友，這是給你的</div>
+          <div class="jc-push-body">沉睡禮包 ৳500 · 世界盃任意投注</div>
+          <span class="jc-promo promo-yes">✓ 高額沉睡禮包</span>
+        </div>
+      </div>
+      <!-- D-1 -->
+      <div class="jc-empty">
+        <div class="jc-empty-day">賽前 1 天</div>
+        <div class="jc-stop">
+          已在 D-3/D-2<br>觸及，停止發送<br>避免過度打擾
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /journey-list --></div><!-- /journey-source -->
+
+
+<!-- ══════════════════════════════════
+     SECTION C · 發送時鐘
+══════════════════════════════════ -->
+<div class="sec-label">發送時鐘 &nbsp;— 推播在一天中的哪個時刻送出</div>
+
+<div class="clock-wrap">
+
+  <!-- legend -->
+  <div class="seg-legend" style="padding:0 24px 16px">
+    <div class="sl-item"><div class="sl-dot" style="background:#059669"></div>L05 × SPORT</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#2563eb"></div>L05 × SLOT</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#7c3aed"></div>L03 新玩家</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#d97706"></div>L06 流失玩家</div>
+    <div class="sl-item"><div class="sl-dot" style="background:#dc2626"></div>L08 沉睡玩家</div>
+  </div>
+
+  <div class="clock-inner">
+
+    <!-- time axis -->
+    <div class="clock-axis">
+      <div style="height:32px"></div><!-- col header offset -->
+      <div class="clock-axis-inner">
+        <!-- hour labels & lines, range 09:00–24:00, 44px/hr, 660px total -->
+        <span class="axis-label" style="top:0px">09:00</span>
+        <span class="axis-label" style="top:44px">10:00</span>
+        <span class="axis-label" style="top:88px">11:00</span>
+        <span class="axis-label" style="top:132px">12:00</span>
+        <span class="axis-label" style="top:176px">13:00</span>
+        <span class="axis-label" style="top:220px">14:00</span>
+        <span class="axis-label" style="top:264px">15:00</span>
+        <span class="axis-label" style="top:308px">16:00</span>
+        <span class="axis-label" style="top:352px">17:00</span>
+        <span class="axis-label" style="top:396px">18:00</span>
+        <span class="axis-label" style="top:440px">19:00</span>
+        <span class="axis-label" style="top:484px">20:00</span>
+        <span class="axis-label" style="top:528px">21:00</span>
+        <span class="axis-label" style="top:572px">22:00</span>
+        <span class="axis-label" style="top:616px">23:00</span>
+        <span class="axis-label" style="top:660px">24:00</span>
+      </div>
+    </div>
+
+    <!-- 3 day columns -->
+    <div class="clock-cols">
+
+      <!-- helper: time to px: (h + m/60 - 9) * 44 -->
+      <!-- 09:00=0  10:00=44  10:30=66  11:00=88  14:00=220  18:00=396  19:00=440  20:00=484  20:30=506  21:00=528  22:00=572  22:30=594  23:00=616 -->
+
+      <!-- D-3 -->
+      <div class="clock-col">
+        <div class="col-header">
+          <span class="col-day">D-3</span>
+          <span class="col-sub">賽前 3 天</span>
+        </div>
+        <div class="col-body">
+          <!-- guide lines -->
+          <div class="col-guide" style="top:0px"></div>
+          <div class="col-guide" style="top:44px"></div>
+          <div class="col-guide" style="top:88px"></div>
+          <div class="col-guide" style="top:132px"></div>
+          <div class="col-guide" style="top:176px"></div>
+          <div class="col-guide" style="top:220px"></div>
+          <div class="col-guide" style="top:264px"></div>
+          <div class="col-guide" style="top:308px"></div>
+          <div class="col-guide" style="top:352px"></div>
+          <div class="col-guide" style="top:396px"></div>
+          <div class="col-guide" style="top:440px"></div>
+          <div class="col-guide" style="top:484px"></div>
+          <div class="col-guide" style="top:528px"></div>
+          <div class="col-guide" style="top:572px"></div>
+          <div class="col-guide" style="top:616px"></div>
+          <!-- 10:30 L05×SPORT -->
+          <div class="clock-chip c-sport" style="top:66px">
+            <div class="chip-time">10:30</div>
+            <div class="chip-seg">L05 × SPORT</div>
+            <div class="chip-title">🏆 World Cup 2026 倒數3天</div>
+          </div>
+          <!-- 20:00 L08 -->
+          <div class="clock-chip c-l08" style="top:484px">
+            <div class="chip-time">20:00</div>
+            <div class="chip-seg">L08 沉睡玩家</div>
+            <div class="chip-title">🏆 4年一次 · 錯過可惜</div>
+          </div>
+          <!-- 20:30 L05×SPORT -->
+          <div class="clock-chip c-sport" style="top:528px">
+            <div class="chip-time">20:30</div>
+            <div class="chip-seg">L05 × SPORT</div>
+            <div class="chip-title">🔥 開賽前3天 · 早注贏更多</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D-2 -->
+      <div class="clock-col">
+        <div class="col-header">
+          <span class="col-day">D-2</span>
+          <span class="col-sub">賽前 2 天</span>
+        </div>
+        <div class="col-body">
+          <div class="col-guide" style="top:0px"></div>
+          <div class="col-guide" style="top:44px"></div>
+          <div class="col-guide" style="top:88px"></div>
+          <div class="col-guide" style="top:132px"></div>
+          <div class="col-guide" style="top:176px"></div>
+          <div class="col-guide" style="top:220px"></div>
+          <div class="col-guide" style="top:264px"></div>
+          <div class="col-guide" style="top:308px"></div>
+          <div class="col-guide" style="top:352px"></div>
+          <div class="col-guide" style="top:396px"></div>
+          <div class="col-guide" style="top:440px"></div>
+          <div class="col-guide" style="top:484px"></div>
+          <div class="col-guide" style="top:528px"></div>
+          <div class="col-guide" style="top:572px"></div>
+          <div class="col-guide" style="top:616px"></div>
+          <!-- 10:00 L08 -->
+          <div class="clock-chip c-l08" style="top:44px">
+            <div class="chip-time">10:00</div>
+            <div class="chip-seg">L08 沉睡玩家</div>
+            <div class="chip-title">🎁 老朋友，這是給你的</div>
+          </div>
+          <!-- 11:00 L03 -->
+          <div class="clock-chip c-l03" style="top:88px">
+            <div class="chip-time">11:00</div>
+            <div class="chip-seg">L03 新玩家</div>
+            <div class="chip-title">📖 看懂賠率，贏更多</div>
+          </div>
+          <!-- 14:00 L05×SLOT -->
+          <div class="clock-chip c-slot" style="top:220px">
+            <div class="chip-time">14:00</div>
+            <div class="chip-seg">L05 × SLOT</div>
+            <div class="chip-title">🎰 世界盃特別版 Slot 上線</div>
+          </div>
+          <!-- 20:00 L06 -->
+          <div class="clock-chip c-l06" style="top:484px">
+            <div class="chip-time">20:00</div>
+            <div class="chip-seg">L06 流失玩家</div>
+            <div class="chip-title">👋 你回來得正好</div>
+          </div>
+          <!-- 22:30 L05×SPORT -->
+          <div class="clock-chip c-sport" style="top:594px">
+            <div class="chip-time">22:30</div>
+            <div class="chip-seg">L05 × SPORT</div>
+            <div class="chip-title">📊 賽前分析出爐</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- D-1 -->
+      <div class="clock-col">
+        <div class="col-header">
+          <span class="col-day">D-1</span>
+          <span class="col-sub">賽前 1 天</span>
+        </div>
+        <div class="col-body">
+          <div class="col-guide" style="top:0px"></div>
+          <div class="col-guide" style="top:44px"></div>
+          <div class="col-guide" style="top:88px"></div>
+          <div class="col-guide" style="top:132px"></div>
+          <div class="col-guide" style="top:176px"></div>
+          <div class="col-guide" style="top:220px"></div>
+          <div class="col-guide" style="top:264px"></div>
+          <div class="col-guide" style="top:308px"></div>
+          <div class="col-guide" style="top:352px"></div>
+          <div class="col-guide" style="top:396px"></div>
+          <div class="col-guide" style="top:440px"></div>
+          <div class="col-guide" style="top:484px"></div>
+          <div class="col-guide" style="top:528px"></div>
+          <div class="col-guide" style="top:572px"></div>
+          <div class="col-guide" style="top:616px"></div>
+          <!-- 20:00 L05×SLOT -->
+          <div class="clock-chip c-slot" style="top:484px">
+            <div class="chip-time">20:00</div>
+            <div class="chip-seg">L05 × SLOT</div>
+            <div class="chip-title">⚽ 不看球也能贏？</div>
+          </div>
+          <!-- 21:00 L03 -->
+          <div class="clock-chip c-l03" style="top:528px">
+            <div class="chip-time">21:00</div>
+            <div class="chip-seg">L03 新玩家</div>
+            <div class="chip-title">🌟 你的第一場世界盃</div>
+          </div>
+          <!-- 23:00 L06 -->
+          <div class="clock-chip c-l06" style="top:616px">
+            <div class="chip-time">23:00</div>
+            <div class="chip-seg">L06 流失玩家</div>
+            <div class="chip-title">⏰ 明天就開賽了</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /clock-cols -->
+  </div><!-- /clock-inner -->
+</div><!-- /clock-wrap -->
+
+
+<!-- ── 完整推播計畫（收合於頁面底部） ── -->
+<details style="margin-top:56px;border-top:2px solid #dde0ea;padding-top:40px">
+  <summary style="font-size:13px;font-weight:700;color:#aaa;cursor:pointer;padding:8px 4px;list-style:none;display:flex;align-items:center;gap:8px;outline:none;user-select:none">
+    <span style="font-size:10px;transition:transform .2s">▶</span>
+    完整推播計畫（背景說明、玩家旅程卡、設計原則）
+  </summary>
+  <div style="margin-top:32px">
+
+    <div class="page-title" style="margin-bottom:4px">⚽ 賽前期 · Sports Push 推播計畫</div>
+    <div class="page-sub">適用時機：重大賽事開賽前 1–3 天 &nbsp;·&nbsp; 千人千面 × B 層時段分眾</div>
+
+    <div class="exc-bar">
+      <span style="font-size:18px;flex-shrink:0">⚠️</span>
+      <span><strong>例外規則：國家隊比賽</strong>（如孟加拉國家隊出賽）→ 忽略 B 層時段，<strong>全員一律 20:00 發送</strong>，視為全民事件。</span>
+    </div>
+
+    <div class="blayer-box">
+      <div class="blayer-title">什麼是 B 層時段？</div>
+      <div class="blayer-intro">
+        <strong>B 層（Behavior 行為層）</strong>是千人千面的維度之一。平台根據玩家<strong>過去登入、下注的時間紀錄</strong>將每個人分類，推播在玩家活躍的時間點發送，才不容易被忽略。
+      </div>
+      <div class="blayer-cards">
+        <div class="blayer-card" style="background:#eff6ff;border:1px solid #bfdbfe">
+          <div class="blayer-card-title" style="color:#1d4ed8">白天型</div>
+          <div class="blayer-card-time" style="background:#dbeafe;color:#1d4ed8">09:00 – 18:00</div>
+          <div class="blayer-card-desc" style="color:#3b82f6">白天看手機、午休活躍<br>習慣在工作時間滑手機</div>
+        </div>
+        <div class="blayer-card" style="background:#faf5ff;border:1px solid #ddd6fe">
+          <div class="blayer-card-title" style="color:#6d28d9">晚間型</div>
+          <div class="blayer-card-time" style="background:#ede9fe;color:#6d28d9">18:00 – 24:00</div>
+          <div class="blayer-card-desc" style="color:#7c3aed">下班後才有時間玩<br>平台最大的玩家群體</div>
+        </div>
+        <div class="blayer-card" style="background:#f8fafc;border:1px solid #e2e8f0">
+          <div class="blayer-card-title" style="color:#475569">深夜型</div>
+          <div class="blayer-card-time" style="background:#f1f5f9;color:#64748b">00:00 – 06:00</div>
+          <div class="blayer-card-desc" style="color:#64748b">夜貓子，習慣深夜上線<br>對研究型內容最感興趣</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label">玩家旅程卡 &nbsp;— 每個分群的 3 天推播路徑</div>
+    <div id="journey-target"></div>
+
+<!-- ── Design rules ── -->
+<div class="sec-label" style="margin-top:40px">設計原則</div>
+
+<div class="rules-grid">
+  <div class="rule-card">
+    <div class="rule-icon">🚫</div>
+    <div class="rule-title">不重複打擾</div>
+    <div class="rule-body">同一玩家同一天最多收 <strong>1 則</strong>推播。L05×SPORT 例外：可在不同天各收 1 則。</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-icon">📈</div>
+    <div class="rule-title">越近越緊迫</div>
+    <div class="rule-body"><strong>D-3</strong> 資訊型，建立期待<br><strong>D-2</strong> 主題型，提高興趣<br><strong>D-1</strong> 促銷型 + 倒數</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-icon">🔴</div>
+    <div class="rule-title">L08 越早越好</div>
+    <div class="rule-body">沉睡玩家反應最慢，<strong>必須 D-3 就觸及</strong>，是唯一需要在 D-3 發送的分群。</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-icon">🧑‍🎓</div>
+    <div class="rule-title">L03 兩步走</div>
+    <div class="rule-body">D-2 先教育（不推銷）→ D-1 再轉化（首注加碼）。不在第一則就推促銷。</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-icon">🛑</div>
+    <div class="rule-title">停送條件</div>
+    <div class="rule-body">若玩家連續 <strong>2 則</strong>未開啟，自動停止該系列推播，避免造成退訂。</div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-icon">🇧🇩</div>
+    <div class="rule-title">國家隊例外</div>
+    <div class="rule-body">孟加拉國家隊出賽 → <strong>全員 20:00</strong> 發送，B 層時段分類無效。</div>
+  </div>
+</div>
+
+  </div>
+</details><!-- /full-plan bottom -->
+
+<script>
+(function(){
+  var det = document.querySelector('details[style*="margin-top:56px"]');
+  var src = document.getElementById('journey-source');
+  var tgt = document.getElementById('journey-target');
+  if (!det || !src || !tgt) return;
+  det.addEventListener('toggle', function(){
+    if (det.open && tgt.childElementCount === 0) {
+      var clone = src.querySelector('.journey-list').cloneNode(true);
+      tgt.appendChild(clone);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
