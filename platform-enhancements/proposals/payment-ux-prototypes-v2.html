@@ -126,7 +126,7 @@
   /* PHONE */
   .phone-wrap { position: sticky; top: 72px; }
   .phone-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px; text-align: center; }
-  .phone { width: 320px; height: 640px; background: #fff; border-radius: 40px; border: 7px solid #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; overflow: hidden; margin: 0 auto; }
+  .phone { width: 375px; height: 812px; background: #fff; border-radius: 40px; border: 7px solid #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; overflow: hidden; margin: 0 auto; }
   .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #1a1a1a; border-radius: 0 0 14px 14px; z-index: 10; }
   .phone-screen { width: 100%; height: 100%; border-radius: 33px; overflow: hidden; position: relative; background: #1a1a1a; }
 
@@ -345,7 +345,6 @@
     <button class="ptab active" onclick="switchProto('p2',this)">快速存款</button>
     <button class="ptab" onclick="switchProto('p4',this)">流失後問卷</button>
     <button class="ptab" onclick="switchProto('p6',this)">一鍵重複存款</button>
-    <button class="ptab" onclick="switchProto('p7',this)">存款後等待</button>
     <span style="width:1px;height:18px;background:var(--border);display:inline-block;margin:0 4px;flex-shrink:0;align-self:center;"></span>
     <button class="ptab" id="archive-tab" onclick="switchProto('archive',this)" style="opacity:0.55;">歸檔</button>
   </div>
@@ -498,7 +497,7 @@
 
     <!-- PHONE P1 -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p1-phone-label">狀態 1 — 現況問題</div>
+      <div class="phone-label" id="p1-phone-label">State 1 — Current Issue</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -510,7 +509,7 @@
               <div class="app-bar-title">In Types</div>
             </div>
             <div class="scroll">
-              <div style="font-size:11px;color:#444;margin-bottom:4px;">選擇存款方式</div>
+              <div style="font-size:11px;color:#444;margin-bottom:4px;">Select deposit type</div>
               <div class="type-row">
                 <div class="type-ico" style="background:#1c3a28;color:#4ade80;font-size:11px;font-weight:700;">QI</div>
                 <div class="type-info">
@@ -540,7 +539,7 @@
                 <div class="type-arrow">›</div>
               </div>
               <div class="alert red" style="margin-top:6px;">
-                <strong>現況問題</strong>四個選項，沒有說明、沒有推薦、沒有個人化。玩家看完不知道選哪個。
+                <strong>Current issue</strong> 4 options, no description, no recommendation, no personalisation. Players don't know which to pick.
               </div>
             </div>
           </div>
@@ -552,12 +551,12 @@
               <div class="app-bar-title">In Types</div>
             </div>
             <div class="scroll">
-              <div style="font-size:11px;color:#444;margin-bottom:4px;">選擇存款方式</div>
+              <div style="font-size:11px;color:#444;margin-bottom:4px;">Select deposit type</div>
               <div class="type-row">
                 <div class="type-ico" style="background:#1c3a28;color:#4ade80;font-size:11px;font-weight:700;">QI</div>
                 <div class="type-info">
                   <div class="type-name">Quick In</div>
-                  <div class="type-sub">2-5 分鐘到帳</div>
+                  <div class="type-sub">2–5 min</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
@@ -565,7 +564,7 @@
                 <div class="type-ico" style="background:#1a2a40;color:#60a5fa;font-size:11px;font-weight:700;">LB</div>
                 <div class="type-info">
                   <div class="type-name">Local Bank</div>
-                  <div class="type-sub">銀行轉帳，約 1-2 小時</div>
+                  <div class="type-sub">Bank transfer, ~1–2 hrs</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
@@ -573,21 +572,21 @@
                 <div class="type-ico" style="background:#1c3a2e;color:#27b488;font-size:11px;font-weight:700;">EW</div>
                 <div class="type-info">
                   <div class="type-name">E-wallet</div>
-                  <div class="type-sub">bKash / Nagad，即時到帳</div>
+                  <div class="type-sub">bKash / Nagad, Instant</div>
                 </div>
-                <div class="type-tag green">上次使用</div>
+                <div class="type-tag green">Last used</div>
               </div>
               <div class="type-row">
                 <div class="type-ico" style="background:#3a2200;color:#fbbf24;font-size:11px;font-weight:700;">CR</div>
                 <div class="type-info">
                   <div class="type-name">Crypto</div>
-                  <div class="type-sub">USDT，鏈上確認</div>
+                  <div class="type-sub">USDT, on-chain</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">繼續用 E-wallet</button>
+              <button class="big-btn primary">Continue with E-wallet</button>
             </div>
           </div>
 
@@ -598,20 +597,20 @@
               <div class="app-bar-title">In Types</div>
             </div>
             <div class="scroll">
-              <div style="font-size:11px;color:#444;margin-bottom:4px;">選擇存款方式</div>
+              <div style="font-size:11px;color:#444;margin-bottom:4px;">Select deposit type</div>
               <div class="type-row dim">
                 <div class="type-ico" style="background:#2a2a2a;color:#555;font-size:11px;font-weight:700;">QI</div>
                 <div class="type-info">
                   <div class="type-name" style="color:#555;">Quick In</div>
-                  <div class="type-sub">預計 15:00 恢復</div>
+                  <div class="type-sub">Back at 15:00</div>
                 </div>
-                <div class="type-tag red">維護中</div>
+                <div class="type-tag red">Maintenance</div>
               </div>
               <div class="type-row">
                 <div class="type-ico" style="background:#1a2a40;color:#60a5fa;font-size:11px;font-weight:700;">LB</div>
                 <div class="type-info">
                   <div class="type-name">Local Bank</div>
-                  <div class="type-sub">銀行轉帳，約 1-2 小時</div>
+                  <div class="type-sub">Bank transfer, ~1–2 hrs</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
@@ -619,21 +618,21 @@
                 <div class="type-ico" style="background:#1c3a2e;color:#27b488;font-size:11px;font-weight:700;">EW</div>
                 <div class="type-info">
                   <div class="type-name">E-wallet</div>
-                  <div class="type-sub">bKash / Nagad，即時到帳</div>
+                  <div class="type-sub">bKash / Nagad, Instant</div>
                 </div>
-                <div class="type-tag green">推薦替代</div>
+                <div class="type-tag green">Alternative</div>
               </div>
               <div class="type-row">
                 <div class="type-ico" style="background:#3a2200;color:#fbbf24;font-size:11px;font-weight:700;">CR</div>
                 <div class="type-info">
                   <div class="type-name">Crypto</div>
-                  <div class="type-sub">USDT，鏈上確認</div>
+                  <div class="type-sub">USDT, on-chain</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">用 E-wallet 存款</button>
+              <button class="big-btn primary">Deposit via E-wallet</button>
             </div>
           </div>
 
@@ -645,13 +644,13 @@
             </div>
             <div class="scroll">
               <div class="alert blue" style="margin-bottom:4px;">
-                <strong>首次存款建議</strong>E-wallet 最快最方便，適合新玩家。
+                <strong>First deposit tip</strong> E-wallet is the fastest and easiest — great for new players.
               </div>
               <div class="type-row">
                 <div class="type-ico" style="background:#1c3a28;color:#4ade80;font-size:11px;font-weight:700;">QI</div>
                 <div class="type-info">
                   <div class="type-name">Quick In</div>
-                  <div class="type-sub">系統快速處理，2-5 分鐘到帳</div>
+                  <div class="type-sub">Fast processing, 2–5 min</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
@@ -659,7 +658,7 @@
                 <div class="type-ico" style="background:#1a2a40;color:#60a5fa;font-size:11px;font-weight:700;">LB</div>
                 <div class="type-info">
                   <div class="type-name">Local Bank</div>
-                  <div class="type-sub">銀行帳戶轉帳，限額較高</div>
+                  <div class="type-sub">Bank transfer, higher limit</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
@@ -667,21 +666,21 @@
                 <div class="type-ico" style="background:#1c3a2e;color:#27b488;font-size:11px;font-weight:700;">EW</div>
                 <div class="type-info">
                   <div class="type-name">E-wallet</div>
-                  <div class="type-sub">bKash / Nagad，即時到帳</div>
+                  <div class="type-sub">bKash / Nagad, Instant</div>
                 </div>
-                <div class="type-tag green">新手推薦</div>
+                <div class="type-tag green">Recommended</div>
               </div>
               <div class="type-row">
                 <div class="type-ico" style="background:#3a2200;color:#fbbf24;font-size:11px;font-weight:700;">CR</div>
                 <div class="type-info">
                   <div class="type-name">Crypto</div>
-                  <div class="type-sub">USDT / BTC，需加密貨幣錢包</div>
+                  <div class="type-sub">USDT / BTC, crypto wallet needed</div>
                 </div>
                 <div class="type-arrow">›</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">選 E-wallet 開始存款</button>
+              <button class="big-btn primary">Start with E-wallet</button>
             </div>
           </div>
 
@@ -831,7 +830,19 @@
 
     <!-- PHONE P2 -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p2-phone-label">狀態 1 — 現況問題</div>
+      <div class="phone-label" id="p2-phone-label">State 1 — Current Issue</div>
+
+      <!-- 千人千面 Demo 身份切換器（只在原型 Demo 時顯示）-->
+      <div id="p2-persona-switcher" style="display:none;margin-bottom:10px;background:#1e1e2e;border:1px solid #3a3a5c;border-radius:10px;padding:8px 10px;">
+        <div style="font-size:9px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;">✦ Demo · 千人千面 — 切換玩家身份</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button onclick="p2ApplyPersona('L03')" id="p2-p-L03" style="flex:1;padding:5px 6px;border-radius:7px;border:1.5px solid #3a3a5c;background:transparent;font-size:10px;font-weight:600;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all 0.15s;">L03 試玩新戶</button>
+          <button onclick="p2ApplyPersona('L05')" id="p2-p-L05" style="flex:1;padding:5px 6px;border-radius:7px;border:1.5px solid #27b488;background:rgba(39,180,136,0.15);font-size:10px;font-weight:600;color:#27b488;cursor:pointer;white-space:nowrap;transition:all 0.15s;">L05 活躍玩家</button>
+          <button onclick="p2ApplyPersona('L06')" id="p2-p-L06" style="flex:1;padding:5px 6px;border-radius:7px;border:1.5px solid #3a3a5c;background:transparent;font-size:10px;font-weight:600;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all 0.15s;">L06 待召回</button>
+          <button onclick="p2ApplyPersona('L08')" id="p2-p-L08" style="flex:1;padding:5px 6px;border-radius:7px;border:1.5px solid #3a3a5c;background:transparent;font-size:10px;font-weight:600;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all 0.15s;">L08 流失玩家</button>
+        </div>
+      </div>
+
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -840,15 +851,15 @@
           <div class="pstate active" id="p2-s1">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">E-wallet 存款</div>
+              <div class="app-bar-title">E-wallet Deposit</div>
             </div>
             <div class="scroll">
               <!-- Layer 1: Promotion -->
               <div class="alert amber" style="font-size:11px;">
-                <strong>第 1 層：選優惠</strong>請先選擇要套用的優惠活動
+                <strong>Layer 1: Promotion</strong> Please select a promotion to apply
               </div>
               <!-- Layer 2: Payment method tabs -->
-              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">第 2 層：選付款方式</div>
+              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Layer 2: Select payment method</div>
               <div class="ch-grid">
                 <div class="ch-btn sel">
                   <div class="ch-ico bk">bK</div>
@@ -876,17 +887,17 @@
                 </div>
               </div>
               <!-- Layer 3: Type -->
-              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">第 3 層：Type</div>
+              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Layer 3: Type</div>
               <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:10px;padding:9px 12px;font-size:12px;color:#aaa;display:flex;justify-content:space-between;">
                 <span>Personal</span><span style="color:#444;">▼</span>
               </div>
               <!-- Layer 4: Channel -->
-              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">第 4 層：Channel</div>
+              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Layer 4: Channel</div>
               <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:10px;padding:9px 12px;font-size:12px;color:#aaa;display:flex;justify-content:space-between;">
                 <span>017xxxxxxxx</span><span style="color:#444;">▼</span>
               </div>
               <div class="alert red" style="font-size:11px;margin-top:4px;">
-                <strong>現況問題</strong>還沒填金額就要做 4 層決策。玩家容易在這裡放棄。
+                <strong>Current issue</strong> 4 decisions required before entering an amount. Players often drop off here.
               </div>
             </div>
           </div>
@@ -896,8 +907,8 @@
             <!-- App bar: header 下拉選單 -->
             <div class="app-bar" style="position:relative;justify-content:space-between;">
               <div class="app-bar-back" onclick="p2CloseAll()">←</div>
-              <div onclick="p2ToggleTypeMenu()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.06);">
-                <span id="p2-type-label" style="font-size:13px;font-weight:600;color:#fff;">E-wallet 存款</span>
+              <div onclick="p2OpenPayment()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.06);">
+                <span id="p2-type-label" style="font-size:13px;font-weight:600;color:#fff;">E-wallet</span>
                 <span style="font-size:9px;color:#888;">▼</span>
               </div>
               <div style="width:30px;"></div>
@@ -909,21 +920,12 @@
               </div>
             </div>
 
-            <!-- 上次存款時間 -->
-            <div style="padding:10px 14px 0;flex-shrink:0;">
-              <div style="font-size:10px;color:#576775;margin-bottom:6px;">上次存款</div>
-              <div style="background:#222424;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
-                <div style="width:32px;height:32px;background:#e2136e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:600;color:#E2E6E9;">bKash · ৳1,000</div>
-                  <div style="font-size:11px;color:#657381;margin-top:2px;">2小時前 · 成功到帳</div>
-                </div>
-              </div>
-            </div>
+            <!-- 千人千面 Context Banner（依玩家身份顯示，預設隱藏）-->
+            <div id="p2-persona-banner" style="display:none;margin:8px 12px 0;border-radius:8px;padding:9px 12px;font-size:11px;line-height:1.4;flex-shrink:0;"></div>
 
             <!-- 金額輸入框 -->
             <div style="padding:12px 18px 8px;flex-shrink:0;">
-              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">花費</div>
+              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Amount</div>
               <div style="font-size:50px;font-weight:300;color:#fff;letter-spacing:-0.03em;line-height:1;" id="p2-amt">0</div>
               <div id="p2-limit" style="font-size:10px;color:#444;margin-top:3px;">限額 ৳100 – ৳50,000</div>
             </div>
@@ -933,21 +935,23 @@
               <div id="p2-pay-ico" style="width:26px;height:26px;background:#e2136e;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
               <div style="flex:1;">
                 <div style="font-size:12px;font-weight:600;color:#fff;" id="p2-pay-name">bKash</div>
-                <div style="font-size:10px;color:#555;margin-top:1px;" id="p2-pay-sub">Personal · 017xxxxxxxx</div>
+                <div style="font-size:10px;color:#555;margin-top:1px;" id="p2-pay-sub">Payment Gateway · AB 01</div>
               </div>
               <div style="font-size:15px;color:#444;">›</div>
             </div>
 
             <!-- 優惠選擇 row -->
-            <div id="p2-promo-row" onclick="p2OpenPromo()" style="margin:0 12px 6px;background:#242424;border-radius:2px 2px 10px 10px;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;">
-              <div style="width:26px;height:26px;background:rgba(39,180,136,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div id="p2-promo-row" onclick="p2OpenPromo()" style="margin:0 12px 6px;background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;cursor:pointer;min-height:52px;">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                <div style="width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="1.5"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#E2E6E9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="p2-promo-name">Promotion</div>
               </div>
-              <div style="flex:1;">
-                <div style="font-size:12px;font-weight:600;color:#fff;" id="p2-promo-name">首存紅利 30%</div>
-                <div style="font-size:10px;color:#27b488;margin-top:1px;" id="p2-promo-sub">最高獎勵 ৳3,000</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <div style="font-size:12px;color:#E2E6E9;white-space:nowrap;" id="p2-promo-sub">Up to ৳3,000 bonus</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
-              <div style="font-size:15px;color:#444;">›</div>
             </div>
 
             <!-- spacer：讓快速金額自然沉到底 -->
@@ -955,10 +959,10 @@
 
             <!-- 快速金額選項 + 收合箭頭 -->
             <div style="padding:0 12px 4px;display:flex;align-items:center;gap:4px;flex-shrink:0;">
-              <div id="p2-chip-clear" class="p2-chip" onclick="p2SetAmt('clear')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">清除</div>
-              <div id="p2-chip-min" class="p2-chip" onclick="p2SetAmt('min')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">最低</div>
+              <div id="p2-chip-clear" class="p2-chip" onclick="p2SetAmt('clear')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Clear</div>
+              <div id="p2-chip-min" class="p2-chip" onclick="p2SetAmt('min')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Min</div>
               <div id="p2-chip-1000" class="p2-chip" onclick="p2SetAmt('1000')" style="padding:5px 7px;background:rgba(39,180,136,0.1);border:1.5px solid #27b488;border-radius:7px;font-size:10px;color:#27b488;font-weight:600;cursor:pointer;white-space:nowrap;">৳1,000</div>
-              <div id="p2-chip-max" class="p2-chip" onclick="p2SetAmt('max')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">最高</div>
+              <div id="p2-chip-max" class="p2-chip" onclick="p2SetAmt('max')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Max</div>
               <div style="flex:1;"></div>
               <div id="p2-kb-arrow" onclick="p2ToggleKb()" style="padding:5px 9px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:13px;color:#555;cursor:pointer;">▾</div>
             </div>
@@ -968,7 +972,7 @@
 
             <!-- 確認存款按鈕（在鍵盤之上）-->
             <div id="p2-confirm-area" style="padding:4px 12px;flex-shrink:0;">
-              <button id="p2-confirm" class="big-btn primary" style="height:40px;font-size:13px;border-radius:12px;">確認存款</button>
+              <button id="p2-confirm"  class="big-btn primary" style="height:40px;font-size:13px;border-radius:12px;">Confirm</button>
             </div>
 
             <!-- 數字鍵盤 -->
@@ -993,49 +997,46 @@
             <div id="p2-backdrop" onclick="p2CloseAll()" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:15;"></div>
 
             <!-- PAYMENT SHEET -->
-            <div id="p2-payment-sheet" style="position:absolute;bottom:0;left:0;right:0;height:70%;background:#1e1e1e;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
-              <div style="padding:8px 0 4px;flex-shrink:0;text-align:center;">
-                <div style="width:32px;height:3px;background:#444;border-radius:9999px;display:inline-block;"></div>
-              </div>
-              <div style="padding:4px 14px 8px;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">選擇支付方式</div>
-              <div style="flex:1;overflow-y:auto;padding:0 10px;">
-                <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;padding:0 2px;">E-Wallet</div>
-                <div onclick="p2SelectPayment('bKash','#e2136e','bK','Personal · 017xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #27b488;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#e2136e;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">bKash</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent · Merchant</div></div>
+            <div id="p2-payment-sheet" style="position:absolute;bottom:0;left:0;right:0;height:95%;background:#141515;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
+              <!-- Header: tabs -->
+              <div style="flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08);">
+                <!-- close row -->
+                <div style="display:flex;align-items:center;justify-content:flex-end;padding:10px 14px 0;">
+                  <div onclick="p2CloseAll()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;background:rgba(255,255,255,0.08);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </div>
                 </div>
-                <div onclick="p2SelectPayment('Nagad','#e8621a','Na','Personal · 018xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#e8621a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">Na</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Nagad</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent</div></div>
-                </div>
-                <div onclick="p2SelectPayment('Rocket','#8b2fc9','Ro','Personal · 019xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#8b2fc9;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">Ro</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Rocket</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · Agent</div></div>
-                </div>
-                <div onclick="p2SelectPayment('OK Wallet','#1a56db','OK','Personal · 016xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#1a56db;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">OK</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">OK Wallet</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal</div></div>
-                </div>
-                <div onclick="p2SelectPayment('Bangkok Pay','#0066cc','BP','Agent · 015xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#0066cc;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">BP</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Bangkok Pay</div><div style="font-size:9px;color:#555;margin-top:1px;">Agent · 015xxxxxxxx</div></div>
-                </div>
-                <div onclick="p2SelectPayment('Baji','#ff6b00','BJ','Personal · 013xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:8px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#ff6b00;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">BJ</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Baji</div><div style="font-size:9px;color:#555;margin-top:1px;">Personal · 013xxxxxxxx</div></div>
-                </div>
-                <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;padding:0 2px;">Local Bank</div>
-                <div onclick="p2SelectPayment('Dutch Bangla','#e83030','DB','DB · 016xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;margin-bottom:3px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#e83030;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">DB</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">Dutch Bangla</div><div style="font-size:9px;color:#555;margin-top:1px;">NPSB · BEFTN</div></div>
-                </div>
-                <div onclick="p2SelectPayment('City Bank','#0a5fb4','CB','CB · 017xxxxxxxx');p2CloseAll();" style="background:#242424;border:1.5px solid #333;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;">
-                  <div style="width:26px;height:26px;background:#0a5fb4;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;">CB</div>
-                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#fff;">City Bank</div><div style="font-size:9px;color:#555;margin-top:1px;">NPSB · BEFTN</div></div>
+                <!-- tab row -->
+                <div id="p2-type-tabs" style="display:flex;padding:0 16px;">
+                  <div onclick="p2SwitchType('ewallet')" data-tab="ewallet" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid #27b488;color:#E2E6E9;transition:all 0.18s;">E-wallet</div>
+                  <div onclick="p2SwitchType('localbank')" data-tab="localbank" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;">Local Bank</div>
+                  <div onclick="p2SwitchType('crypto')" data-tab="crypto" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;">Crypto</div>
                 </div>
               </div>
-              <div style="padding:8px 10px 12px;flex-shrink:0;">
-                <button onclick="p2CloseAll()" class="big-btn outline" style="height:38px;font-size:12px;border-radius:10px;">取消</button>
+              <!-- Scrollable body -->
+              <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;">
+                <!-- Select payment -->
+                <div>
+                  <div style="font-size:14px;color:#8D9AA5;margin-bottom:8px;">Select payment</div>
+                  <div id="p2-payment-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+                </div>
+                <!-- Select type -->
+                <div id="p2-type-section">
+                  <div style="font-size:14px;color:#8D9AA5;margin-bottom:8px;">Select type</div>
+                  <div id="p2-type-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+                <!-- Deposit channel -->
+                <div>
+                  <div style="font-size:14px;color:#8D9AA5;margin-bottom:8px;">Deposit channel</div>
+                  <div style="background:#222424;border-radius:3px;padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                    <span id="p2-channel-val" style="font-size:14px;color:#E2E6E9;">AB 01</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+              </div>
+              <!-- Continue button -->
+              <div style="padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom,12px));flex-shrink:0;background:#141515;border-top:1px solid rgba(255,255,255,0.06);">
+                <button id="p2-payment-continue" onclick="p2ConfirmPayment();" class="big-btn primary" style="height:50px;font-size:16px;border-radius:3px;">Continue</button>
               </div>
             </div>
 
@@ -1110,7 +1111,7 @@
             <div style="font-size:28px;color:#333;">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
             </div>
-            <div style="font-size:11px;color:#555;text-align:center;padding:0 20px;line-height:1.6;">切換至<br><span style="color:#27b488;font-weight:600;">狀態 2 互動原型</span><br>點擊支付方式列操作</div>
+            <div style="font-size:11px;color:#555;text-align:center;padding:0 20px;line-height:1.6;">Switch to<br><span style="color:#27b488;font-weight:600;">State 2 interactive prototype</span><br>tap the payment row</div>
           </div>
 
           <!-- STATE 4: 優惠自動套用（場景說明，手機參考狀態 2） -->
@@ -1118,7 +1119,7 @@
             <div style="font-size:28px;color:#333;">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
             </div>
-            <div style="font-size:11px;color:#555;text-align:center;padding:0 20px;line-height:1.6;">切換至<br><span style="color:#27b488;font-weight:600;">狀態 2 互動原型</span><br>點擊優惠選擇列操作</div>
+            <div style="font-size:11px;color:#555;text-align:center;padding:0 20px;line-height:1.6;">Switch to<br><span style="color:#27b488;font-weight:600;">State 2 interactive prototype</span><br>tap the promotion row</div>
           </div>
 
         </div>
@@ -1214,7 +1215,7 @@
 
     <!-- PHONE P3 -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p3-phone-label">狀態 1 — 有遊戲紀錄</div>
+      <div class="phone-label" id="p3-phone-label">State 1 — Has game history</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -1241,10 +1242,10 @@
                   <div class="p3-banner-bar"></div>
                   <div class="p3-banner-icon">🃏</div>
                   <div class="p3-banner-text">
-                    <div class="p3-banner-label">繼續上次</div>
+                    <div class="p3-banner-label">Resume</div>
                     <div class="p3-banner-game">Teen Patti</div>
                   </div>
-                  <button class="p3-banner-btn">去玩</button>
+                  <button class="p3-banner-btn">Play</button>
                   <div class="p3-banner-close">✕</div>
                 </div>
               </div>
@@ -1273,10 +1274,10 @@
                   <div class="p3-banner-bar"></div>
                   <div class="p3-banner-icon">🎯</div>
                   <div class="p3-banner-text">
-                    <div class="p3-banner-label">新手推薦</div>
+                    <div class="p3-banner-label">For Beginners</div>
                     <div class="p3-banner-game">Color Prediction</div>
                   </div>
-                  <button class="p3-banner-btn">試試</button>
+                  <button class="p3-banner-btn">Try it</button>
                   <div class="p3-banner-close">✕</div>
                 </div>
               </div>
@@ -1305,10 +1306,10 @@
                   <div class="p3-banner-bar"></div>
                   <div class="p3-banner-icon">🃏</div>
                   <div class="p3-banner-text">
-                    <div class="p3-banner-label">紅利可用</div>
+                    <div class="p3-banner-label">Bonus ready</div>
                     <div class="p3-banner-game">Teen Patti</div>
                   </div>
-                  <button class="p3-banner-btn">用紅利玩</button>
+                  <button class="p3-banner-btn">Play with bonus</button>
                   <div class="p3-banner-close">✕</div>
                 </div>
               </div>
@@ -1337,10 +1338,10 @@
                   <div class="p3-banner-bar"></div>
                   <div class="p3-banner-icon" style="background:#451a03;">♠</div>
                   <div class="p3-banner-text">
-                    <div class="p3-banner-label" style="color:#f59e0b;">Gold VIP 專屬</div>
+                    <div class="p3-banner-label" style="color:#f59e0b;">Gold VIP Exclusive</div>
                     <div class="p3-banner-game">Live Baccarat</div>
                   </div>
-                  <button class="p3-banner-btn">進入</button>
+                  <button class="p3-banner-btn">Enter</button>
                   <div class="p3-banner-close">✕</div>
                 </div>
               </div>
@@ -1365,7 +1366,6 @@
 
   <div class="state-switcher">
     <button class="state-btn s-amber active" onclick="switchState('p4','s1',this)">狀態 1 · 離開意圖問卷</button>
-    <button class="state-btn s-green" onclick="switchState('p4','s3',this)">狀態 2 · 到帳時間 + 信任訊號</button>
   </div>
 
   <div class="layout">
@@ -1435,43 +1435,12 @@
         </div>
       </div>
 
-      <!-- 說明：狀態3 -->
-      <div class="p4-info" id="p4-s3-info" style="display:none;">
-        <div class="card" style="border-color:var(--green-border);">
-          <div class="card-header green-bg">
-            <div class="cname">狀態 3 — 到帳時間標示 + 信任訊號</div>
-            <div class="csub">支付方式旁標示速度，頁面頂部加信任保障聲明。參考：Crypto.com（IMG_0731）、Bitget（IMG_0718、0729）</div>
-          </div>
-          <div class="card-body">
-            <div class="panel">
-              <div class="panel-title">為什麼要做這個</div>
-              <ul class="pl">
-                <li><span class="pi pi-ok">✓</span><span>追損玩家（情境 02）和遊戲中存款（情境 04）最關心的問題是：「錢什麼時候到？」</span></li>
-                <li><span class="pi pi-ok">✓</span><span>FTD 玩家信任度最低，一行信任聲明可以降低他們的疑慮</span></li>
-                <li><span class="pi pi-tip">→</span><span>Crypto.com 實作：「借記卡 即時 · 首7天免手續費」、「USD帳戶 1-5個工作天 · 免手續費」</span></li>
-                <li><span class="pi pi-tip">→</span><span>Bitget 實作：頁面第一行「您的資產將由 Bitget 風險保護基金提供保障」</span></li>
-              </ul>
-            </div>
-            <div class="panel">
-              <div class="panel-title">設計重點</div>
-              <ul class="pl">
-                <li><span class="pi pi-ok">✓</span><span>每個支付方式旁標示到帳速度：bKash「即時」、Local Bank「約1-3小時」</span></li>
-                <li><span class="pi pi-ok">✓</span><span>標示哪個方式「今日最穩定」或「使用最多」— 降低決策焦慮</span></li>
-                <li><span class="pi pi-ok">✓</span><span>頁面頂部一行信任聲明：「已有 XXX 萬名玩家安全存款」或「存款受到保障」</span></li>
-              </ul>
-            </div>
-            <div class="callout green">
-              <span><strong>成本最低、效果最快的改善：</strong>只需要前端改動，不需要後端 API。預期最能直接提升 FTD 轉換率和降低存款方式選擇頁面的流失。</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
 
     <!-- PHONE P4 -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p4-phone-label">狀態 1 — 離開意圖問卷</div>
+      <div class="phone-label" id="p4-phone-label">State 1 — Exit Intent Survey</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -1480,17 +1449,17 @@
           <div class="pstate active" id="p4-s1">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款</div>
+              <div class="app-bar-title">Deposit</div>
               <div class="app-bar-sub">E-wallet</div>
             </div>
             <div class="scroll" style="opacity:0.35;pointer-events:none;">
               <div class="presel-bar">
                 <div class="presel-ico bk" style="background:#e2136e;">bK</div>
-                <div class="presel-text">bKash · 即時到帳</div>
-                <div class="presel-edit">更換</div>
+                <div class="presel-text">bKash · Instant</div>
+                <div class="presel-edit">Change</div>
               </div>
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val">৳ <span style="color:#555;">____</span></div>
               </div>
               <div class="qrow">
@@ -1502,16 +1471,16 @@
             <!-- Exit intent bottom sheet -->
             <div style="position:absolute;bottom:0;left:0;right:0;background:#252525;border-radius:20px 20px 0 0;padding:20px 16px 24px;border-top:1px solid #333;">
               <div style="width:36px;height:4px;background:#444;border-radius:9999px;margin:0 auto 16px;"></div>
-              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:5px;">要離開了嗎？</div>
-              <div style="font-size:11px;color:#666;margin-bottom:14px;">告訴我們原因，讓我們做得更好</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:5px;">Leaving?</div>
+              <div style="font-size:11px;color:#666;margin-bottom:14px;">Tell us why — help us improve</div>
               <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">金額超出我的預算</div>
-                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">不確定怎麼操作</div>
-                <div style="background:#2a2a2a;border:1.5px solid #27b488;border-radius:11px;padding:10px 14px;font-size:12px;color:#27b488;background:rgba(39,180,136,0.08);">想稍後再存款 ✓</div>
-                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">擔心安全或隱私問題</div>
-                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#777;">其他</div>
+                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">Amount exceeds my budget</div>
+                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">Not sure how to proceed</div>
+                <div style="background:#2a2a2a;border:1.5px solid #27b488;border-radius:11px;padding:10px 14px;font-size:12px;color:#27b488;background:rgba(39,180,136,0.08);">Will deposit later ✓</div>
+                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#ccc;">Concerned about security</div>
+                <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:11px;padding:10px 14px;font-size:12px;color:#777;">Other</div>
               </div>
-              <button class="big-btn primary" style="margin-top:14px;">送出並離開</button>
+              <button class="big-btn primary" style="margin-top:14px;">Submit &amp; leave</button>
             </div>
           </div>
 
@@ -1519,86 +1488,35 @@
           <div class="pstate" id="p4-s2">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款結果</div>
+              <div class="app-bar-title">Deposit result</div>
             </div>
             <div class="scroll">
               <!-- Failed hero -->
               <div style="background:rgba(220,38,38,0.08);border:1.5px solid rgba(220,38,38,0.3);border-radius:16px;padding:20px 14px;text-align:center;">
                 <div style="width:56px;height:56px;background:rgba(220,38,38,0.15);border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;">✕</div>
-                <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">存款未完成</div>
+                <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">Deposit incomplete</div>
                 <div style="font-size:11px;color:#666;">৳ 1,000 · bKash</div>
               </div>
               <!-- Possible reason -->
               <div class="alert amber">
-                <strong>可能原因</strong>
-                bKash 交易在這個時段流量較高，系統未能完成處理。您的帳戶<strong style="color:#fbbf24;">未被扣款</strong>。
+                <strong>Possible reason</strong>
+                bKash traffic was high during this period and the transaction could not be processed. Your account was <strong style="color:#fbbf24;">not charged</strong>.
               </div>
               <!-- Actions -->
-              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin:4px 0 8px;">建議下一步</div>
-              <button class="big-btn primary" style="margin-bottom:8px;">再試一次（同方式）</button>
-              <button class="big-btn outline" style="margin-bottom:8px;">換 Nagad 試試</button>
+              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin:4px 0 8px;">Next steps</div>
+              <button class="big-btn primary" style="margin-bottom:8px;">Try again (same method)</button>
+              <button class="big-btn outline" style="margin-bottom:8px;">Try Nagad instead</button>
               <div style="background:#2a2a2a;border:1px solid #333;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px;">
                 <div style="width:30px;height:30px;border-radius:8px;background:#1a3a5c;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">💬</div>
                 <div style="flex:1;">
-                  <div style="font-size:12px;font-weight:600;color:#ddd;">聯絡客服</div>
-                  <div style="font-size:10px;color:#555;">平均回覆 3 分鐘</div>
+                  <div style="font-size:12px;font-weight:600;color:#ddd;">Contact support</div>
+                  <div style="font-size:10px;color:#555;">Avg. response 3 min</div>
                 </div>
                 <div style="font-size:12px;color:#444;">›</div>
               </div>
             </div>
           </div>
 
-          <!-- STATE 3: Trust Signals + ETA -->
-          <div class="pstate" id="p4-s3">
-            <div class="app-bar">
-              <div class="app-bar-back">←</div>
-              <div class="app-bar-title">選擇支付方式</div>
-            </div>
-            <div class="scroll">
-              <!-- Trust banner -->
-              <div style="background:rgba(39,180,136,0.08);border:1px solid rgba(39,180,136,0.25);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;">
-                <div style="font-size:16px;">🔒</div>
-                <div style="font-size:11px;color:#4ade80;line-height:1.5;">已有 <strong>230 萬+</strong> 名玩家安全存款<br><span style="color:#555;">存款加密傳輸，資料安全有保障</span></div>
-              </div>
-              <!-- Payment methods with ETA -->
-              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin:4px 0 6px;">E-wallet</div>
-              <div class="method-row sel">
-                <div class="mico bk">bK</div>
-                <div class="minfo">
-                  <div class="mname">bKash</div>
-                  <div class="msub">即時到帳</div>
-                </div>
-                <span class="mbadge ok">最多人用</span>
-              </div>
-              <div class="method-row">
-                <div class="mico na">Na</div>
-                <div class="minfo">
-                  <div class="mname">Nagad</div>
-                  <div class="msub">即時到帳</div>
-                </div>
-                <span class="mbadge ok">今日穩定</span>
-              </div>
-              <div class="method-row">
-                <div class="mico ro">Ro</div>
-                <div class="minfo">
-                  <div class="mname">Rocket</div>
-                  <div class="msub">即時到帳</div>
-                </div>
-              </div>
-              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin:8px 0 6px;">Local Bank</div>
-              <div class="method-row">
-                <div class="mico ok">LB</div>
-                <div class="minfo">
-                  <div class="mname">Local Bank</div>
-                  <div class="msub">約 1–3 小時到帳</div>
-                </div>
-                <span class="mbadge war">較慢</span>
-              </div>
-            </div>
-            <div class="bottom-bar">
-              <button class="big-btn primary">用 bKash 存款</button>
-            </div>
-          </div>
 
         </div>
       </div>
@@ -1676,7 +1594,7 @@
       </div>
     </div>
     <div class="phone-wrap">
-      <div class="phone-label" id="p5-phone-label">狀態 1 — 遊戲中途（極簡版）</div>
+      <div class="phone-label" id="p5-phone-label">State 1 — In-game (minimal)</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -1685,20 +1603,20 @@
             <div class="app-bar" style="justify-content:space-between;">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div class="app-bar-back">←</div>
-                <div class="app-bar-title">快速存款</div>
+                <div class="app-bar-title">Quick Deposit</div>
               </div>
-              <div style="font-size:11px;color:#555;background:#2a2a2a;padding:4px 10px;border-radius:9999px;cursor:pointer;">返回遊戲 ✕</div>
+              <div style="font-size:11px;color:#555;background:#2a2a2a;padding:4px 10px;border-radius:9999px;cursor:pointer;">Back to game ✕</div>
             </div>
             <div class="scroll" style="justify-content:center;gap:14px;">
               <div class="presel-bar">
                 <div class="presel-ico bk" style="background:#e2136e;">bK</div>
-                <div class="presel-text">bKash · 即時到帳</div>
-                <div class="presel-edit">換</div>
+                <div class="presel-text">bKash · Instant</div>
+                <div class="presel-edit">Change</div>
               </div>
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val">৳ <span style="color:#27b488;">1,000</span></div>
-                <div class="amt-hint">上次金額</div>
+                <div class="amt-hint">Last amount</div>
               </div>
               <div class="qrow" style="justify-content:center;">
                 <div class="qchip">৳ 500</div>
@@ -1708,27 +1626,27 @@
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary" style="height:52px;font-size:15px;">存款 ৳1,000 並返回遊戲</button>
+              <button class="big-btn primary" style="height:52px;font-size:15px;">Deposit ৳1,000 &amp; return to game</button>
             </div>
           </div>
           <!-- P5 S2: deep link pre-filled -->
           <div class="pstate" id="p5-s2">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款</div>
+              <div class="app-bar-title">Deposit</div>
             </div>
             <div class="scroll">
               <div class="alert blue" style="display:flex;align-items:center;gap:8px;">
                 <span style="font-size:14px;">🔔</span>
-                <span><strong style="display:inline;">通知帶入：</strong>上次設定已預填</span>
+                <span><strong style="display:inline;">Notification:</strong> Last settings pre-filled</span>
               </div>
               <div class="presel-bar">
                 <div class="presel-ico bk" style="background:#e2136e;">bK</div>
-                <div class="presel-text">bKash · 即時到帳</div>
-                <div class="presel-edit">更換</div>
+                <div class="presel-text">bKash · Instant</div>
+                <div class="presel-edit">Change</div>
               </div>
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val">৳ <span style="color:#27b488;">1,000</span></div>
               </div>
               <div class="qrow">
@@ -1739,7 +1657,7 @@
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">確認存款</button>
+              <button class="big-btn primary">Confirm deposit</button>
             </div>
           </div>
         </div>
@@ -1835,46 +1753,46 @@
       </div>
     </div>
     <div class="phone-wrap">
-      <div class="phone-label" id="p6-phone-label">狀態 1 — 首頁 FTD Banner</div>
+      <div class="phone-label" id="p6-phone-label">State 1 — Homepage FTD Banner</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
           <!-- P6 S1: FTD homepage banner -->
           <div class="pstate" id="p6-s1">
             <div class="app-bar">
-              <div style="font-size:13px;font-weight:700;color:#fff;">首頁</div>
+              <div style="font-size:13px;font-weight:700;color:#fff;">Home</div>
               <div class="app-bar-sub">BJ Platform</div>
             </div>
             <div class="scroll">
               <!-- FTD onboarding banner -->
               <div style="background:linear-gradient(135deg,#1a3a2a,#0f2a1a);border:1.5px solid rgba(39,180,136,0.3);border-radius:16px;padding:14px;">
-                <div style="font-size:10px;color:#27b488;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">新玩家引導</div>
+                <div style="font-size:10px;color:#27b488;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">New player guide</div>
                 <!-- Step progress -->
                 <div style="display:flex;align-items:center;gap:0;margin-bottom:12px;">
                   <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
                     <div style="width:24px;height:24px;border-radius:50%;background:rgba(39,180,136,0.2);border:2px solid #27b488;display:flex;align-items:center;justify-content:center;font-size:10px;color:#27b488;font-weight:700;">✓</div>
-                    <div style="font-size:9px;color:#27b488;">註冊</div>
+                    <div style="font-size:9px;color:#27b488;">Sign up</div>
                   </div>
                   <div style="flex:1;height:2px;background:rgba(39,180,136,0.4);margin-bottom:10px;"></div>
                   <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
                     <div style="width:24px;height:24px;border-radius:50%;background:rgba(39,180,136,0.15);border:2px solid #27b488;display:flex;align-items:center;justify-content:center;font-size:10px;color:#27b488;font-weight:700;animation:pulse 1.5s infinite;">2</div>
-                    <div style="font-size:9px;color:#27b488;font-weight:600;">存款</div>
+                    <div style="font-size:9px;color:#27b488;font-weight:600;">Deposit</div>
                   </div>
                   <div style="flex:1;height:2px;background:#333;margin-bottom:10px;"></div>
                   <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
                     <div style="width:24px;height:24px;border-radius:50%;background:#2a2a2a;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">3</div>
-                    <div style="font-size:9px;color:#555;">開始玩</div>
+                    <div style="font-size:9px;color:#555;">Play</div>
                   </div>
                 </div>
                 <!-- Offer -->
-                <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">存 ৳500 得 ৳1,000 遊戲金</div>
+                <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Deposit ৳500, get ৳1,000 play credits</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-                  <div style="font-size:11px;color:#ef4444;">⏱ 剩 11:23:45 過期</div>
-                  <button class="game-btn" style="font-size:11px;">立即存款</button>
+                  <div style="font-size:11px;color:#ef4444;">⏱ Expires in 11:23:45</div>
+                  <button class="game-btn" style="font-size:11px;">Deposit now</button>
                 </div>
               </div>
               <!-- Placeholder games -->
-              <div style="font-size:11px;color:#555;text-align:center;padding:20px 0;">熱門遊戲...</div>
+              <div style="font-size:11px;color:#555;text-align:center;padding:20px 0;">Popular games...</div>
             </div>
           </div>
           <!-- P6 S2: one-tap repeat deposit -->
@@ -1884,21 +1802,48 @@
               <div class="app-bar-title">存款</div>
             </div>
             <div class="scroll">
-              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">上次存款</div>
-              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;">
+              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Previous deposits</div>
+
+              <!-- 最近存款記錄 1（最新）-->
+              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:8px;">
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
                   <div class="mico bk">bK</div>
                   <div>
                     <div style="font-size:13px;font-weight:600;color:#fff;">bKash · ৳ 1,000</div>
-                    <div style="font-size:10px;color:#555;">2 小時前 · 成功到帳</div>
+                    <div style="font-size:10px;color:#555;">Payment Gateway · AB 01</div>
+                    <div style="font-size:9px;color:#444;margin-top:2px;">Last deposit</div>
                   </div>
                 </div>
-                <button class="big-btn primary" style="height:46px;">一鍵再存 ৳ 1,000</button>
+                <button class="big-btn primary" style="height:46px;">Re-deposit ৳1,000</button>
               </div>
-              <div style="text-align:center;font-size:11px;color:#555;margin:8px 0;">或選擇其他方式</div>
-              <div class="type-row">
-                <div class="type-ico" style="background:#2a2a2a;color:#888;font-size:11px;font-weight:700;">其他</div>
-                <div class="type-info"><div class="type-name" style="color:#aaa;">重新選擇方式與金額</div></div>
+
+              <!-- 最近存款記錄 2 -->
+              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <div style="width:36px;height:36px;background:#8b2fc9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">Ro</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:#fff;">Rocket · ৳ 500</div>
+                    <div style="font-size:10px;color:#555;">Payment Gateway · AB 01</div>
+                  </div>
+                </div>
+                <button class="big-btn primary" style="height:46px;">Re-deposit ৳500</button>
+              </div>
+
+              <!-- 最近存款記錄 3 -->
+              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                  <div style="width:36px;height:36px;background:#26a17b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">₮</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:#fff;">USDT · ৳ 3,000</div>
+                    <div style="font-size:10px;color:#555;">TRC20 · Wallet 01</div>
+                  </div>
+                </div>
+                <button class="big-btn primary" style="height:46px;">Re-deposit ৳3,000</button>
+              </div>
+
+              <div style="text-align:center;font-size:11px;color:#555;margin:0 0 6px;">Or choose another method</div>
+              <div class="type-row" onclick="p6GoToP2S2()" style="cursor:pointer;">
+                <div class="type-info"><div class="type-name" style="color:#aaa;">Choose different method &amp; amount</div></div>
                 <div class="type-arrow">›</div>
               </div>
             </div>
@@ -1913,7 +1858,7 @@
               <!-- fake game screen -->
               <div style="width:100%;text-align:center;color:#333;font-size:12px;padding:40px 0;">
                 <div style="font-size:28px;margin-bottom:8px;">🎰</div>
-                <div>遊戲畫面</div>
+                <div>Game screen</div>
               </div>
               <!-- balance indicator in game -->
               <div style="position:absolute;top:14px;right:12px;background:rgba(0,0,0,0.7);border:1px solid #333;border-radius:9999px;padding:4px 10px;font-size:11px;font-weight:600;color:#ef4444;">৳ 50</div>
@@ -1921,10 +1866,10 @@
             <!-- low balance toast bar -->
             <div style="background:#1a2a1a;border-top:2px solid rgba(39,180,136,0.4);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
               <div style="flex:1;">
-                <div style="font-size:12px;font-weight:600;color:#fff;">餘額剩 ৳50</div>
-                <div style="font-size:10px;color:#666;">快速存款繼續玩</div>
+                <div style="font-size:12px;font-weight:600;color:#fff;">Balance: ৳50</div>
+                <div style="font-size:10px;color:#666;">Top up &amp; keep playing</div>
               </div>
-              <button class="game-btn">存 ৳500</button>
+              <button class="game-btn">Deposit ৳500</button>
               <div style="font-size:16px;color:#444;cursor:pointer;">✕</div>
             </div>
           </div>
@@ -1934,19 +1879,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     原型 7：存款過程體驗
-═══════════════════════════════════════ -->
-<div id="p7" class="proto">
-  <div class="proto-head">
-    <div class="proto-num">原型 7 · 存款過程中的體驗</div>
-    <div class="proto-title">從「送出」到「到帳」這段時間</div>
-    <p class="proto-desc">存款送出後，玩家進入等待狀態。這段時間是最容易讓玩家焦慮、誤以為失敗的時刻。三個設計方向：處理動畫、弱網路容錯、優惠視覺化計算機。</p>
-  </div>
-  <div class="state-switcher">
-    <button class="state-btn s-blue active" onclick="switchState('p7','s1',this)">狀態 1 · 存款等待頁動畫</button>
-  </div>
-  <div class="layout">
+  <div class="layout" style="display:none;">
     <div class="info">
       <div class="p7-info" id="p7-s1-info">
         <div class="card" style="border-color:var(--blue-border);">
@@ -2027,86 +1960,205 @@
           </div>
         </div>
       </div>
+      <div class="p7-info" id="p7-s4-info" style="display:none;">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">狀態 3 — 等待頁改版</div>
+            <div class="csub">對照 Figma 現有設計，三個關鍵改動讓玩家敢離開這個畫面</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">現有設計的問題</div>
+              <ul class="pl">
+                <li><span class="pi pi-warn">!</span><span>唯一按鈕是「Close」— 關掉後去哪？玩家不知道</span></li>
+                <li><span class="pi pi-warn">!</span><span>沒有告訴玩家「到帳後會收到通知」— 玩家不敢離開，一直留在等待頁</span></li>
+                <li><span class="pi pi-warn">!</span><span>資訊只有「IN · Local bank · 金額」— 缺乏流程感，不知道現在在哪個步驟</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">改版的三個改動</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span><strong>推播承諾</strong> — 明確告知「到帳後你會立即收到通知」，讓玩家敢離開</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>按鈕改成「去首頁」</strong> — 給玩家明確的下一步，不是模糊的「Close」</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>狀態里程碑</strong> — 已送出 ✓ / 等待確認中 / 入帳完成，讓玩家看到自己在哪裡</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">不做的事</div>
+              <ul class="pl">
+                <li><span class="pi pi-warn">!</span><span>不顯示「預計到帳時間」— 第三方確認時間無法預測，給了時間反而製造預期落差</span></li>
+              </ul>
+            </div>
+            <div class="callout green"><span>這三個改動純前端實作，不需要後端 API 改動。最大的影響是：玩家離開等待頁去玩遊戲，等待期間情緒更穩定，到帳推播的點擊率也會更高。</span></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="phone-wrap">
-      <div class="phone-label" id="p7-phone-label">狀態 1 — 存款等待頁動畫</div>
+      <div class="phone-label" id="p7-phone-label">State 1 — Processing animation</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
           <!-- P7 S1: Processing animation -->
           <div class="pstate active" id="p7-s1">
             <div class="app-bar">
-              <div class="app-bar-title">存款處理中</div>
+              <div class="app-bar-title">Processing deposit</div>
             </div>
             <div class="scroll" style="align-items:center;justify-content:center;gap:24px;">
               <div style="text-align:center;">
                 <div style="width:64px;height:64px;border-radius:50%;background:rgba(39,180,136,0.1);border:3px solid rgba(39,180,136,0.4);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;">
                   <div style="width:40px;height:40px;border-radius:50%;border:3px solid transparent;border-top-color:#27b488;animation:spin 1s linear infinite;"></div>
                 </div>
-                <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">處理中</div>
-                <div style="font-size:11px;color:#555;">bKash 通常即時 · 預計 15 秒</div>
+                <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">Processing</div>
+                <div style="font-size:11px;color:#555;">bKash · Awaiting confirmation</div>
               </div>
               <div class="prog-wrap" style="width:100%;">
                 <div class="prog-row">
                   <div class="pdot done">✓</div>
                   <div class="pinfo">
-                    <div class="pname">存款申請已送出</div>
-                    <div class="ptime">完成</div>
+                    <div class="pname">Deposit submitted</div>
+                    <div class="ptime">Done</div>
                   </div>
                 </div>
                 <div class="prog-row">
                   <div class="pdot now">●</div>
                   <div class="pinfo">
-                    <div class="pname">bKash 確認中</div>
-                    <div class="ptime blue">處理中...</div>
-                  </div>
-                </div>
-                <div class="prog-row">
-                  <div class="pdot wait">3</div>
-                  <div class="pinfo">
-                    <div class="pname dim">餘額到帳</div>
-                    <div class="ptime">等待中</div>
+                    <div class="pname">bKash confirming</div>
+                    <div class="ptime blue">Processing...</div>
                   </div>
                 </div>
               </div>
-              <div style="font-size:11px;color:#444;text-align:center;">請勿關閉此頁面</div>
+              <!-- Loading bar -->
+              <div style="padding:0 4px;width:100%;">
+                <div style="background:rgba(255,255,255,0.08);border-radius:9999px;height:4px;overflow:hidden;">
+                  <div id="p7-progress-bar" style="height:100%;background:#27b488;width:0%;border-radius:9999px;transition:width 3.5s linear;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- 存款成功 overlay -->
+            <div id="p7-success-overlay" style="display:none;position:absolute;inset:0;background:#141515;z-index:50;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;">
+              <div style="width:72px;height:72px;border-radius:50%;background:rgba(39,180,136,0.15);border:3px solid #27b488;display:flex;align-items:center;justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:13px;color:#8D9AA5;margin-bottom:6px;">Deposit successful</div>
+                <div style="font-size:36px;font-weight:300;color:#27b488;letter-spacing:-0.03em;">৳ 1,000</div>
+                <div style="font-size:11px;color:#555;margin-top:6px;">bKash · Credited</div>
+              </div>
+              <button onclick="p7BackToHome()" class="big-btn primary" style="width:100%;height:48px;font-size:15px;border-radius:10px;margin-top:8px;">Back to home</button>
             </div>
           </div>
+          <!-- P7 S4: 等待頁改版（對照現有 Figma 設計） -->
+          <div class="pstate" id="p7-s4" style="background:#111213;position:relative;display:flex;flex-direction:column;">
+            <!-- 狀態列 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 16px 0;flex-shrink:0;">
+              <div style="font-size:9px;font-weight:600;color:#E2E6E9;">9:41</div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <svg width="12" height="9" viewBox="0 0 15 12" fill="#E2E6E9"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4" y="2" width="3" height="10" rx="1"/><rect x="8" y="1" width="3" height="11" rx="1"/><rect x="12" y="0" width="3" height="12" rx="1"/></svg>
+                <svg width="12" height="9" viewBox="0 0 25 12" fill="#E2E6E9"><rect x="0" y="0" width="22" height="12" rx="2" fill="none" stroke="#E2E6E9" stroke-width="1.5"/><rect x="2" y="2" width="16" height="8" rx="1" fill="#E2E6E9"/><rect x="22" y="4" width="3" height="4" rx="1" fill="#E2E6E9"/></svg>
+              </div>
+            </div>
+            <!-- X 按鈕（右上角，原設計位置） -->
+            <div style="display:flex;justify-content:flex-end;padding:6px 16px 0;flex-shrink:0;">
+              <div style="font-size:16px;color:#8D9AA5;cursor:pointer;line-height:1;">✕</div>
+            </div>
+            <!-- 主體內容 -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 16px 0;gap:12px;overflow:hidden;">
+              <!-- 沙漏 icon（對應 Figma 的 3D 沙漏） -->
+              <div style="font-size:52px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">⏳</div>
+              <!-- 標題 -->
+              <div style="font-size:18px;font-weight:700;color:#fff;text-align:center;">Transaction in progress</div>
+              <!-- ✦ 改動 1：副標題改為推播承諾（原本是「去看紀錄」） -->
+              <div style="font-size:12px;color:#8D9AA5;text-align:center;line-height:1.6;padding:0 8px;">
+                You'll get notified the moment it arrives<br>
+                <span style="color:#555;">Go play now — no need to wait here</span>
+              </div>
+              <!-- 交易卡片（對照 Figma 原有樣式） -->
+              <div style="width:100%;background:#1c1c1e;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+                <!-- 上半：狀態 badge + 方向 + 通道 + Details -->
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+                  <div>
+                    <!-- ✦ 改動 2：Processing badge + 里程碑點取代原本只有 badge -->
+                    <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(217,119,6,0.15);border:1px solid rgba(217,119,6,0.3);border-radius:99px;padding:3px 8px;margin-bottom:7px;">
+                      <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:pulse 1.2s ease-in-out infinite;"></div>
+                      <span style="font-size:10px;font-weight:600;color:#f59e0b;">Processing</span>
+                    </div>
+                    <div style="font-size:15px;font-weight:700;color:#fff;">IN</div>
+                    <div style="font-size:11px;color:#8D9AA5;margin-top:1px;">Local bank</div>
+                  </div>
+                  <div style="border:1px solid #3a3a3a;border-radius:7px;padding:5px 10px;font-size:11px;color:#8D9AA5;">Details</div>
+                </div>
+                <!-- 分隔線 -->
+                <div style="height:1px;background:#2a2a2a;"></div>
+                <!-- 下半：時間 + 金額 -->
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#555;">2024-10-24 17:37:11</div>
+                  <div style="font-size:14px;font-weight:700;color:#27b488;">+350.00</div>
+                </div>
+              </div>
+              <!-- ✦ 改動 3：新增里程碑進度（原設計沒有） -->
+              <div style="width:100%;display:flex;align-items:center;gap:0;">
+                <div style="flex:1;text-align:center;">
+                  <div style="width:20px;height:20px;border-radius:50%;background:#27b488;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">Submitted</div>
+                </div>
+                <div style="flex:1;height:1.5px;background:linear-gradient(90deg,#27b488,rgba(39,180,136,0.2));margin-bottom:14px;"></div>
+                <div style="flex:1;text-align:center;">
+                  <div style="width:20px;height:20px;border-radius:50%;background:rgba(245,158,11,0.15);border:2px solid #f59e0b;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;">
+                    <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:pulse 1.2s ease-in-out infinite;"></div>
+                  </div>
+                  <div style="font-size:9px;color:#f59e0b;font-weight:600;">Confirming</div>
+                </div>
+                <div style="flex:1;height:1.5px;background:#2a2a2a;margin-bottom:14px;"></div>
+                <div style="flex:1;text-align:center;">
+                  <div style="width:20px;height:20px;border-radius:50%;background:#222;border:2px solid #333;margin:0 auto 4px;"></div>
+                  <div style="font-size:9px;color:#444;font-weight:600;">Credited</div>
+                </div>
+              </div>
+            </div>
+            <!-- 底部按鈕（原本是 Close，改為去首頁） -->
+            <div style="padding:12px 16px 24px;flex-shrink:0;">
+              <button class="big-btn primary" style="height:50px;font-size:15px;font-weight:600;border-radius:12px;">Go home</button>
+            </div>
+          </div>
+
           <!-- P7 S2: Weak network waiting -->
           <div class="pstate" id="p7-s2">
             <div class="app-bar">
-              <div class="app-bar-title">存款處理中</div>
+              <div class="app-bar-title">Processing deposit</div>
             </div>
             <div class="scroll" style="align-items:center;justify-content:center;gap:16px;">
               <div class="net-banner" style="width:100%;">
                 <div class="net-dot"></div>
-                <div>網路中斷，正在等待重新連線...</div>
+                <div>Connection lost, reconnecting...</div>
               </div>
               <div style="text-align:center;padding:20px 0;">
                 <div style="font-size:32px;margin-bottom:12px;">📶</div>
-                <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:6px;">網路暫時中斷</div>
-                <div style="font-size:12px;color:#666;line-height:1.6;">您的存款申請已送出<br>請勿重新提交</div>
+                <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:6px;">Connection lost</div>
+                <div style="font-size:12px;color:#666;line-height:1.6;">Your deposit has been submitted<br>Do not resubmit</div>
               </div>
               <div class="alert amber" style="width:100%;">
-                <strong>自動重連中</strong>恢復連線後將自動確認您的存款狀態，結果會立即顯示。
+                <strong>Reconnecting</strong>Your deposit status will be confirmed automatically once connected.
               </div>
-              <div style="font-size:11px;color:#444;text-align:center;">如 5 分鐘後仍無回應，請聯絡客服</div>
+              <div style="font-size:11px;color:#444;text-align:center;">If no response after 5 minutes, please contact support</div>
             </div>
           </div>
           <!-- P7 S3: Bonus calculator -->
           <div class="pstate" id="p7-s3">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">E-wallet 存款</div>
+              <div class="app-bar-title">E-wallet Deposit</div>
             </div>
             <div class="scroll">
               <div class="presel-bar">
                 <div class="presel-ico bk" style="background:#e2136e;">bK</div>
-                <div class="presel-text">bKash · 即時到帳</div>
-                <div class="presel-edit">換</div>
+                <div class="presel-text">bKash · Instant</div>
+                <div class="presel-edit">Change</div>
               </div>
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val">৳ <span style="color:#27b488;">500</span></div>
               </div>
               <div class="qrow">
@@ -2117,30 +2169,29 @@
               </div>
               <!-- Live bonus calculator -->
               <div style="background:linear-gradient(135deg,#1a3a2a,#0f2a20);border:1.5px solid rgba(39,180,136,0.35);border-radius:14px;padding:14px;">
-                <div style="font-size:10px;color:#27b488;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">首存 100% 加碼</div>
+                <div style="font-size:10px;color:#27b488;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">First deposit 100% bonus</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;">
                   <div style="text-align:center;">
-                    <div style="font-size:10px;color:#666;margin-bottom:2px;">您支付</div>
+                    <div style="font-size:10px;color:#666;margin-bottom:2px;">You pay</div>
                     <div style="font-size:20px;font-weight:700;color:#fff;">৳ 500</div>
                   </div>
                   <div style="font-size:20px;color:#27b488;">→</div>
                   <div style="text-align:center;">
-                    <div style="font-size:10px;color:#27b488;margin-bottom:2px;">您可以玩</div>
+                    <div style="font-size:10px;color:#27b488;margin-bottom:2px;">You get</div>
                     <div style="font-size:20px;font-weight:700;color:#27b488;">৳ 1,000</div>
                   </div>
                 </div>
-                <div style="font-size:10px;color:#555;margin-top:8px;text-align:center;">加碼 ৳500 · 活動截止 23:59</div>
+                <div style="font-size:10px;color:#555;margin-top:8px;text-align:center;">Bonus ৳500 · Offer ends 23:59</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">存款並領取 ৳500 加碼</button>
+              <button class="big-btn primary">Deposit &amp; claim ৳500 bonus</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 <!-- ═══════════════════════════════════════
      原型 8：存款完成體驗
@@ -2213,14 +2264,14 @@
       </div>
     </div>
     <div class="phone-wrap">
-      <div class="phone-label" id="p8-phone-label">狀態 1 — 存款成功慶祝動畫</div>
+      <div class="phone-label" id="p8-phone-label">State 1 — Success celebration</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
           <!-- P8 S1: Success celebration -->
           <div class="pstate active" id="p8-s1">
             <div class="app-bar">
-              <div class="app-bar-title">存款完成</div>
+              <div class="app-bar-title">Deposit complete</div>
             </div>
             <div class="scroll" style="align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at 50% 30%, rgba(39,180,136,0.12) 0%, #1a1a1a 70%);">
               <!-- Celebration hero -->
@@ -2230,9 +2281,9 @@
                   <div style="position:absolute;inset:4px;border-radius:50%;border:2px solid rgba(39,180,136,0.35);animation:ping 1.5s ease-out 0.3s infinite;"></div>
                   <div style="position:absolute;inset:0;border-radius:50%;background:rgba(39,180,136,0.15);border:2px solid rgba(39,180,136,0.5);display:flex;align-items:center;justify-content:center;font-size:28px;">✓</div>
                 </div>
-                <div style="font-size:13px;font-weight:600;color:#aaa;margin-bottom:4px;">存款成功</div>
+                <div style="font-size:13px;font-weight:600;color:#aaa;margin-bottom:4px;">Deposit successful</div>
                 <div style="font-size:32px;font-weight:700;color:#27b488;letter-spacing:-0.04em;animation:pulse 0.6s ease;">৳ 1,000</div>
-                <div style="font-size:11px;color:#555;margin-top:4px;">bKash · 即時到帳 · 新餘額 ৳2,350</div>
+                <div style="font-size:11px;color:#555;margin-top:4px;">bKash · Instant · New balance ৳2,350</div>
               </div>
               <!-- Confetti dots (CSS only) -->
               <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;width:200px;">
@@ -2244,61 +2295,61 @@
                 <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24;opacity:0.7;"></div>
               </div>
               <!-- Resume game card -->
-              <div style="font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:0.06em;">繼續遊戲</div>
+              <div style="font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:0.06em;">Resume game</div>
               <div class="game-card">
                 <div class="game-thumb">🎰</div>
                 <div class="game-info">
                   <div class="game-name">Mega Fortune</div>
-                  <div class="game-sub">上次遊玩 · 今日 22:18</div>
+                  <div class="game-sub">Last played · Today 22:18</div>
                 </div>
-                <button class="game-btn">繼續</button>
+                <button class="game-btn">Resume</button>
               </div>
             </div>
           </div>
           <!-- P8 S2: bKash cross-app guide -->
           <div class="pstate" id="p8-s2">
             <div class="app-bar">
-              <div class="app-bar-title">完成 bKash 付款</div>
+              <div class="app-bar-title">Complete bKash payment</div>
             </div>
             <div class="scroll" style="gap:14px;">
               <div class="alert blue">
-                <strong>申請已送出</strong>請到 bKash app 完成確認步驟
+                <strong>Request submitted</strong>Please open bKash app to complete confirmation
               </div>
               <!-- Step guide -->
               <div class="prog-wrap">
                 <div class="prog-row">
                   <div class="pdot done">✓</div>
                   <div class="pinfo">
-                    <div class="pname">申請已送出</div>
-                    <div class="ptime">完成</div>
+                    <div class="pname">Request submitted</div>
+                    <div class="ptime">Done</div>
                   </div>
                 </div>
                 <div class="prog-row" style="background:rgba(252,211,77,0.06);">
                   <div class="pdot now" style="background:rgba(251,191,36,0.15);color:#fbbf24;border-color:rgba(251,191,36,0.4);">2</div>
                   <div class="pinfo">
-                    <div class="pname" style="color:#fbbf24;">打開 bKash app</div>
-                    <div class="ptime" style="color:#d97706;">現在需要您操作</div>
+                    <div class="pname" style="color:#fbbf24;">Open bKash app</div>
+                    <div class="ptime" style="color:#d97706;">Action required</div>
                   </div>
                 </div>
                 <div class="prog-row">
                   <div class="pdot wait">3</div>
                   <div class="pinfo">
-                    <div class="pname dim">輸入 4 位 PIN 並確認</div>
+                    <div class="pname dim">Enter 4-digit PIN and confirm</div>
                   </div>
                 </div>
                 <div class="prog-row">
                   <div class="pdot wait">4</div>
                   <div class="pinfo">
-                    <div class="pname dim">自動返回平台，餘額到帳</div>
+                    <div class="pname dim">Auto-return to platform, balance credited</div>
                   </div>
                 </div>
               </div>
               <div style="background:#2a2a2a;border:1px solid #333;border-radius:12px;padding:12px 14px;">
-                <div style="font-size:11px;color:#666;margin-bottom:6px;">存款金額</div>
+                <div style="font-size:11px;color:#666;margin-bottom:6px;">Deposit amount</div>
                 <div style="font-size:20px;font-weight:700;color:#fff;">৳ 1,000</div>
-                <div style="font-size:10px;color:#555;margin-top:3px;">bKash 手機號：+880 1X-XXXX-XXXX</div>
+                <div style="font-size:10px;color:#555;margin-top:3px;">bKash number: +880 1X-XXXX-XXXX</div>
               </div>
-              <button class="big-btn outline">打開 bKash app</button>
+              <button class="big-btn outline">Open bKash app</button>
             </div>
           </div>
         </div>
@@ -2393,7 +2444,7 @@
 
     <!-- PHONE -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p9-phone-label">狀態 1 — 金額智能推薦</div>
+      <div class="phone-label" id="p9-phone-label">State 1 — Smart amount suggestion</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -2402,44 +2453,44 @@
           <div class="pstate active" id="p9-s1">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款</div>
+              <div class="app-bar-title">Deposit</div>
             </div>
             <div class="scroll">
               <!-- 個人化提示 -->
               <div style="background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.3);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;">
                 <div style="font-size:16px;">🧠</div>
                 <div>
-                  <div style="font-size:11px;font-weight:600;color:#93c5fd;">根據您的存款習慣</div>
-                  <div style="font-size:10px;color:#555;margin-top:1px;">已為您預選最常用金額</div>
+                  <div style="font-size:11px;font-weight:600;color:#93c5fd;">Based on your deposit habits</div>
+                  <div style="font-size:10px;color:#555;margin-top:1px;">Most-used amount pre-selected for you</div>
                 </div>
               </div>
 
               <!-- 金額顯示 -->
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val"><span class="amt-currency">৳ </span>500</div>
-                <div class="amt-hint">您最常存的金額</div>
+                <div class="amt-hint">Your most-used amount</div>
               </div>
 
               <!-- 快速金額 -->
               <div>
-                <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:7px;">快速選擇</div>
+                <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:7px;">Quick select</div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
                   <!-- 上次存款 -->
                   <div style="background:#2a2a2a;border:1.5px solid #444;border-radius:11px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;">
                     <div>
-                      <div style="font-size:11px;color:#888;margin-bottom:2px;">上次存款</div>
+                      <div style="font-size:11px;color:#888;margin-bottom:2px;">Last deposit</div>
                       <div style="font-size:16px;font-weight:700;color:#fff;">৳ 1,000</div>
                     </div>
-                    <div style="font-size:10px;color:#555;">昨天 22:14</div>
+                    <div style="font-size:10px;color:#555;">Yesterday 22:14</div>
                   </div>
                   <!-- 最常用（預選） -->
                   <div style="background:rgba(39,180,136,0.08);border:1.5px solid #27b488;border-radius:11px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;">
                     <div>
-                      <div style="font-size:11px;color:#00a854;margin-bottom:2px;">✦ 您最常存</div>
+                      <div style="font-size:11px;color:#00a854;margin-bottom:2px;">✦ Most used</div>
                       <div style="font-size:16px;font-weight:700;color:#27b488;">৳ 500</div>
                     </div>
-                    <div style="font-size:9px;font-weight:700;background:rgba(39,180,136,0.15);color:#27b488;padding:3px 8px;border-radius:9999px;">已選擇</div>
+                    <div style="font-size:9px;font-weight:700;background:rgba(39,180,136,0.15);color:#27b488;padding:3px 8px;border-radius:9999px;">Selected</div>
                   </div>
                 </div>
                 <!-- 其他金額橫排 -->
@@ -2456,13 +2507,13 @@
                 <div class="type-ico" style="background:#e2136e;font-size:10px;font-weight:800;">bK</div>
                 <div class="type-info">
                   <div class="type-name">bKash</div>
-                  <div class="type-sub">您上次使用的方式 · 約 2 分鐘</div>
+                  <div class="type-sub">Last used · ~2 min</div>
                 </div>
-                <div class="type-tag green">推薦</div>
+                <div class="type-tag green">Recommended</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn primary">確認存款 ৳500</button>
+              <button class="big-btn primary">Confirm ৳500</button>
             </div>
           </div>
 
@@ -2470,44 +2521,44 @@
           <div class="pstate" id="p9-s2">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款</div>
+              <div class="app-bar-title">Deposit</div>
             </div>
             <div class="scroll">
               <!-- VIP 進度橫幅 -->
               <div class="vip-bar">
                 <div class="vip-top">
                   <div>
-                    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">VIP 等級進度</div>
-                    <div style="font-size:13px;font-weight:700;color:#fff;">銅卡 → 銀卡</div>
+                    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">VIP progress</div>
+                    <div style="font-size:13px;font-weight:700;color:#fff;">Bronze → Silver</div>
                   </div>
                   <div style="text-align:right;">
-                    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;">還差</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px;">Short by</div>
                     <div style="font-size:18px;font-weight:800;color:#fff;">৳ 300</div>
                   </div>
                 </div>
                 <div class="vip-track">
                   <div class="vip-fill" style="width:78%;"></div>
                 </div>
-                <div class="vip-sub">升銀卡解鎖：返水 1.8% → 2.5% · 提款優先處理</div>
+                <div class="vip-sub">Unlock Silver: cashback 1.8% → 2.5% · Priority withdrawal</div>
               </div>
 
               <!-- 金額 -->
               <div class="amt-box">
-                <div class="amt-label">存款金額</div>
+                <div class="amt-label">Deposit amount</div>
                 <div class="amt-val"><span class="amt-currency">৳ </span>300</div>
-                <div class="amt-hint" style="color:#a78bfa;">恰好達到銀卡升級門檻</div>
+                <div class="amt-hint" style="color:#a78bfa;">Exactly meets Silver upgrade threshold</div>
               </div>
 
               <!-- 快速金額，高亮 ৳300 -->
               <div>
-                <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:7px;">快速選擇</div>
+                <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:7px;">Quick select</div>
                 <div style="display:flex;gap:7px;flex-wrap:wrap;">
                   <div class="qchip">৳ 200</div>
-                  <div class="qchip" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.1);">৳ 300 ✦升級</div>
+                  <div class="qchip" style="border-color:#a78bfa;color:#a78bfa;background:rgba(124,58,237,0.1);">৳ 300 ✦ Upgrade</div>
                   <div class="qchip">৳ 500</div>
                   <div class="qchip">৳ 1,000</div>
                 </div>
-                <div style="margin-top:8px;font-size:10px;color:#666;text-align:center;">存 ৳500 可多累積 ৳200 升級進度</div>
+                <div style="margin-top:8px;font-size:10px;color:#666;text-align:center;">Deposit ৳500 to gain ৳200 more toward upgrade</div>
               </div>
 
               <!-- 方式 -->
@@ -2515,13 +2566,13 @@
                 <div class="type-ico" style="background:#e2136e;font-size:10px;font-weight:800;">bK</div>
                 <div class="type-info">
                   <div class="type-name">bKash</div>
-                  <div class="type-sub">約 2 分鐘 · 成功率 98%</div>
+                  <div class="type-sub">~2 min · 98% success rate</div>
                 </div>
-                <div class="type-tag green">最快</div>
+                <div class="type-tag green">Fastest</div>
               </div>
             </div>
             <div class="bottom-bar">
-              <button class="big-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;">存 ৳300 · 立即升銀卡</button>
+              <button class="big-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;">Deposit ৳300 · Upgrade to Silver now</button>
             </div>
           </div>
 
@@ -2617,7 +2668,7 @@
 
     <!-- PHONE -->
     <div class="phone-wrap">
-      <div class="phone-label" id="p10-phone-label">狀態 1 — 支付方式智能排序</div>
+      <div class="phone-label" id="p10-phone-label">State 1 — Smart payment ranking</div>
       <div class="phone">
         <div class="phone-notch"></div>
         <div class="phone-screen">
@@ -2626,12 +2677,12 @@
           <div class="pstate active" id="p10-s1">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">選擇付款方式</div>
+              <div class="app-bar-title">Select payment method</div>
               <div class="app-bar-sub">৳ 500</div>
             </div>
             <div class="scroll">
               <!-- 資料說明 -->
-              <div style="font-size:10px;color:#555;text-align:center;">根據過去 1 小時交易資料自動排序</div>
+              <div style="font-size:10px;color:#555;text-align:center;">Auto-ranked by last 1 hour transaction data</div>
 
               <!-- 方式 1：bKash 推薦 -->
               <div class="type-row sel">
@@ -2639,12 +2690,12 @@
                 <div class="type-info">
                   <div class="type-name" style="display:flex;align-items:center;gap:6px;">
                     bKash
-                    <span style="font-size:9px;font-weight:700;background:rgba(39,180,136,0.15);color:#27b488;padding:2px 7px;border-radius:9999px;">現在推薦</span>
+                    <span style="font-size:9px;font-weight:700;background:rgba(39,180,136,0.15);color:#27b488;padding:2px 7px;border-radius:9999px;">Recommended</span>
                   </div>
                   <div class="type-sub">
-                    <span style="color:#27b488;">約 2 分鐘</span>
+                    <span style="color:#27b488;">~2 min</span>
                     <span style="margin:0 5px;color:#444;">·</span>
-                    成功率 98%
+                    98% success
                   </div>
                 </div>
                 <div class="type-arrow">›</div>
@@ -2656,9 +2707,9 @@
                 <div class="type-info">
                   <div class="type-name">Nagad</div>
                   <div class="type-sub">
-                    約 5 分鐘
+                    ~5 min
                     <span style="margin:0 5px;color:#444;">·</span>
-                    成功率 94%
+                    94% success
                   </div>
                 </div>
                 <div class="type-arrow">›</div>
@@ -2670,12 +2721,12 @@
                 <div class="type-info">
                   <div class="type-name" style="display:flex;align-items:center;gap:6px;">
                     Rocket
-                    <span style="font-size:9px;font-weight:700;background:rgba(217,119,6,0.15);color:#d97706;padding:2px 7px;border-radius:9999px;">稍慢</span>
+                    <span style="font-size:9px;font-weight:700;background:rgba(217,119,6,0.15);color:#d97706;padding:2px 7px;border-radius:9999px;">Slower</span>
                   </div>
                   <div class="type-sub">
-                    約 15–30 分鐘
+                    ~15–30 min
                     <span style="margin:0 5px;color:#444;">·</span>
-                    成功率 87%
+                    87% success
                   </div>
                 </div>
                 <div class="type-arrow">›</div>
@@ -2687,16 +2738,16 @@
                 <div class="type-info">
                   <div class="type-name" style="display:flex;align-items:center;gap:6px;">
                     DBBL
-                    <span style="font-size:9px;font-weight:700;background:rgba(220,38,38,0.15);color:#ef4444;padding:2px 7px;border-radius:9999px;">維護中</span>
+                    <span style="font-size:9px;font-weight:700;background:rgba(220,38,38,0.15);color:#ef4444;padding:2px 7px;border-radius:9999px;">Maintenance</span>
                   </div>
-                  <div class="type-sub" style="color:#e74c3c;">暫時無法使用</div>
+                  <div class="type-sub" style="color:#e74c3c;">Currently unavailable</div>
                 </div>
               </div>
 
               <!-- 提示 -->
               <div class="alert blue">
-                <strong>選 bKash 最穩</strong>
-                過去 1 小時內 bKash 平均 98% 成功率，建議優先選用。
+                <strong>bKash is most reliable right now</strong>
+                98% success rate in the past hour — recommended first.
               </div>
             </div>
           </div>
@@ -2705,32 +2756,32 @@
           <div class="pstate" id="p10-s2">
             <div class="app-bar">
               <div class="app-bar-back">←</div>
-              <div class="app-bar-title">存款狀態</div>
+              <div class="app-bar-title">Deposit status</div>
             </div>
             <div class="scroll">
               <!-- 超時警告 -->
               <div style="background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.35);border-radius:12px;padding:14px;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                   <div style="width:8px;height:8px;border-radius:50%;background:#d97706;animation:pulse 1s infinite;flex-shrink:0;"></div>
-                  <div style="font-size:12px;font-weight:700;color:#fbbf24;">存款超過預期到帳時間</div>
+                  <div style="font-size:12px;font-weight:700;color:#fbbf24;">Deposit taking longer than expected</div>
                 </div>
                 <div style="font-size:11px;color:#92400e;line-height:1.6;">
-                  您的 ৳500 bKash 存款已提交 <strong style="color:#fbbf24;">18 分鐘</strong>，正常應在 5 分鐘內到帳。請依下方步驟確認。
+                  Your ৳500 bKash deposit was submitted <strong style="color:#fbbf24;">18 min ago</strong>. It usually arrives within 5 min. Please follow the steps below.
                 </div>
               </div>
 
               <!-- 存款資訊 -->
               <div style="background:#2a2a2a;border:1px solid #333;border-radius:12px;padding:12px 14px;">
                 <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                  <div style="font-size:10px;color:#666;">存款金額</div>
+                  <div style="font-size:10px;color:#666;">Amount</div>
                   <div style="font-size:13px;font-weight:700;color:#fff;">৳ 500</div>
                 </div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                  <div style="font-size:10px;color:#666;">方式</div>
+                  <div style="font-size:10px;color:#666;">Method</div>
                   <div style="font-size:12px;color:#ccc;">bKash</div>
                 </div>
                 <div style="display:flex;justify-content:space-between;">
-                  <div style="font-size:10px;color:#666;">提交時間</div>
+                  <div style="font-size:10px;color:#666;">Submitted</div>
                   <div style="font-size:12px;color:#ccc;">22:41</div>
                 </div>
               </div>
@@ -2738,31 +2789,31 @@
               <!-- 排查 checklist -->
               <div style="background:#2a2a2a;border:1.5px solid #333;border-radius:14px;overflow:hidden;">
                 <div style="padding:12px 14px;border-bottom:1px solid #333;">
-                  <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px;">請確認以下幾點</div>
-                  <div style="font-size:10px;color:#555;">逐項確認後可加快處理速度</div>
+                  <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:2px;">Please check the following</div>
+                  <div style="font-size:10px;color:#555;">Checking each item helps speed up resolution</div>
                 </div>
                 <!-- 項目 1 -->
                 <div style="padding:11px 14px;border-bottom:1px solid #333;display:flex;align-items:flex-start;gap:10px;">
                   <div style="width:20px;height:20px;border-radius:6px;background:rgba(39,180,136,0.15);border:1.5px solid rgba(39,180,136,0.4);display:flex;align-items:center;justify-content:center;font-size:11px;color:#27b488;flex-shrink:0;margin-top:1px;">✓</div>
                   <div>
-                    <div style="font-size:12px;font-weight:500;color:#ddd;">bKash 已收到扣款簡訊</div>
-                    <div style="font-size:10px;color:#555;margin-top:2px;">確認您的 bKash 帳號有收到扣款通知</div>
+                    <div style="font-size:12px;font-weight:500;color:#ddd;">bKash deduction SMS received</div>
+                    <div style="font-size:10px;color:#555;margin-top:2px;">Confirm your bKash account received a deduction notice</div>
                   </div>
                 </div>
                 <!-- 項目 2 -->
                 <div style="padding:11px 14px;border-bottom:1px solid #333;display:flex;align-items:flex-start;gap:10px;">
                   <div style="width:20px;height:20px;border-radius:6px;background:rgba(39,180,136,0.15);border:1.5px solid rgba(39,180,136,0.4);display:flex;align-items:center;justify-content:center;font-size:11px;color:#27b488;flex-shrink:0;margin-top:1px;">✓</div>
                   <div>
-                    <div style="font-size:12px;font-weight:500;color:#ddd;">已上傳付款截圖</div>
-                    <div style="font-size:10px;color:#555;margin-top:2px;">截圖需包含交易編號與金額</div>
+                    <div style="font-size:12px;font-weight:500;color:#ddd;">Payment screenshot uploaded</div>
+                    <div style="font-size:10px;color:#555;margin-top:2px;">Screenshot must include transaction ID and amount</div>
                   </div>
                 </div>
                 <!-- 項目 3 -->
                 <div style="padding:11px 14px;display:flex;align-items:flex-start;gap:10px;">
                   <div style="width:20px;height:20px;border-radius:6px;background:#333;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:11px;color:#555;flex-shrink:0;margin-top:1px;">3</div>
                   <div>
-                    <div style="font-size:12px;font-weight:500;color:#999;">等待 5 分鐘後仍未到帳</div>
-                    <div style="font-size:10px;color:#555;margin-top:2px;">如已完成以上兩步，請聯繫客服</div>
+                    <div style="font-size:12px;font-weight:500;color:#999;">Still not credited after 5 minutes</div>
+                    <div style="font-size:10px;color:#555;margin-top:2px;">If you've completed the above steps, please contact support</div>
                   </div>
                 </div>
               </div>
@@ -2770,7 +2821,7 @@
               <!-- 客服按鈕 -->
               <button class="big-btn outline" style="border-color:#444;gap:7px;">
                 <span style="font-size:16px;">💬</span>
-                聯繫客服（線上 24/7）
+                Contact support (online 24/7)
               </button>
             </div>
           </div>
@@ -2778,6 +2829,456 @@
         </div>
       </div>
     </div><!-- end phone-wrap -->
+  </div>
+</div>
+
+<div id="ppush" class="proto" style="display:none!important">
+  <div class="proto-head">
+    <div class="proto-num">智慧推播通知</div>
+    <div class="proto-title">在對的時機，推對的內容給對的人</div>
+    <p class="proto-desc">結合千人千面分群（L / B 層標籤）與行為事件觸發，三個最高 ROI 的推播情境：存款後優惠提醒、存款失敗挽回、生命週期個人化召回。開發成本低，可直接落地。</p>
+  </div>
+  <div class="state-switcher">
+    <button class="state-btn s-green active" onclick="switchState('ppush','s1',this)">情境 1 · 存款後推播</button>
+    <button class="state-btn s-red"          onclick="switchState('ppush','s2',this)">情境 2 · 失敗挽回</button>
+    <button class="state-btn s-blue"         onclick="switchState('ppush','s3',this)">情境 3 · 千人千面召回</button>
+    <button class="state-btn s-purple"       onclick="switchState('ppush','s4',this)">情境 4 · 到帳落地頁 ← 點通知後</button>
+  </div>
+  <div class="layout">
+
+    <!-- ── INFO PANEL ── -->
+    <div class="info">
+
+      <!-- S1 info -->
+      <div class="ppush-info" id="ppush-s1-info">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">情境 1 — 存款到帳推播</div>
+            <div class="csub">觸發點：第三方回傳 deposit_success → 玩家已回首頁 → 推播通知到帳金額 + 優惠</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這個時機最有效</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>Lion 指出：存款後最多人查看 Promotion → 這是推播黃金窗口</span></li>
+                <li><span class="pi pi-ok">✓</span><span>玩家剛完成存款，心理上處於「最願意消費」的狀態</span></li>
+                <li><span class="pi pi-tip">→</span><span>不立即推（避免與存款成功通知疊在一起），等 3 分鐘後玩家進入遊戲時推</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">對應分群標籤</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">L</span><span><strong>L04 新付費新戶</strong> → 推首存專屬獎勵</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L05 活躍玩家</strong> → 推一般優惠或 VIP 加碼</span></li>
+                <li><span class="pi pi-ok">B</span><span><strong>SLOT 偏好</strong> → 推 SLOT 專屬優惠；CASINO 偏好 → 推真人返水</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">開發成本評估</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>監聽 deposit_success 事件 → 設 3min delay → 推播 API</span></li>
+                <li><span class="pi pi-ok">✓</span><span>一個 event listener + 一組 push template，可與情境 2 共用架構</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：後端 1 天 + 文案 0.5 天</span></li>
+              </ul>
+            </div>
+            <div class="callout green"><span>業界數據：存款後即時推播的點擊率比隨機推播高 3–4 倍。DraftKings 使用相同策略，存款後推播 CTR 達 22%。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2 info -->
+      <div class="ppush-info" id="ppush-s2-info" style="display:none;">
+        <div class="card" style="border-color:var(--red-border);">
+          <div class="card-header" style="background:var(--red-bg);">
+            <div class="cname">情境 2 — 存款失敗挽回</div>
+            <div class="csub">觸發點：第三方回傳 deposit_failed → 玩家已離開存款頁 → 推播通知引導重試</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這個最值得優先做</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>玩家已有存款意願，只是遇到技術問題（網路斷線 / 銀行拒絕）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>這是「主動想存款卻沒成功」的族群，回應率極高</span></li>
+                <li><span class="pi pi-tip">→</span><span>5 分鐘後推（讓玩家有時間自行解決），點擊後 deep link 直接到一鍵重試頁，帶預填資料</span></li>
+                <li><span class="pi pi-warn">!</span><span>每次失敗只推一次，不重複騷擾</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">對應分群標籤</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">L</span><span><strong>所有 L 層</strong>：任何嘗試存款但失敗的玩家都觸發</span></li>
+                <li><span class="pi pi-tip">→</span><span>優先程度：L03 試玩新戶失敗 → 首存挽回 ROI 最高</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">開發成本評估</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>架構與情境 1 完全相同，只是換觸發事件（deposit_failed）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>兩個情境可以同一批開發，邊際成本極低</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：後端 0.5 天（共用情境 1 架構）</span></li>
+              </ul>
+            </div>
+            <div class="callout amber"><span>這是 10 個 idea 中 ROI 最高的：流失的存款最貴，挽回成本卻最低。玩家主動想存款，推播只是在提醒他「路還在」。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 info -->
+      <div class="ppush-info" id="ppush-s3-info" style="display:none;">
+        <div class="card" style="border-color:var(--blue-border);">
+          <div class="card-header blue-bg">
+            <div class="cname">情境 3 — 千人千面生命週期召回</div>
+            <div class="csub">觸發點：每日跑分群 → 依 L 層標籤推不同內容，在 B 層時段對齊發送</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">千人千面 × 推播的核心邏輯</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">L</span><span><strong>L06 待召回</strong>（14–30 天未下注）→ 推「限時回歸優惠」，製造緊迫感</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L08 流失玩家</strong>（30 天以上）→ 推「專屬回歸禮包」，獎勵要夠大才有效</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L03 試玩新戶</strong>（有下注但未入金）→ 推「首存加碼」，降低付費門檻</span></li>
+                <li><span class="pi pi-ok">B</span><span><strong>時段對齊</strong>：讀 B 層「活躍時段標籤」→ 白天型在 14:00 推，晚間型在 21:00 推</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">為什麼不需要 ML</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>B 層「活躍時段占比標籤」已算好每個玩家的最佳時段</span></li>
+                <li><span class="pi pi-ok">✓</span><span>直接讀標籤 → 對應時段推播，效果等同於時段學習 ML，但不需要訓練模型</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：後端 2 天（排程 + 分群讀取）+ 文案 1 天</span></li>
+              </ul>
+            </div>
+            <div class="callout blue"><span>業界數據：分群推播 CTR 達 9.35%，是非分群推播的 14 倍。個人化推播比通用推播點擊率高 259%。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4 info -->
+      <div class="ppush-info" id="ppush-s4-info" style="display:none;">
+        <div class="card" style="border-color:rgba(168,85,247,0.4);">
+          <div class="card-header" style="background:rgba(168,85,247,0.12);">
+            <div class="cname">情境 4 — 到帳落地頁</div>
+            <div class="csub">玩家點擊推播通知後進入的頁面：存款確認 + 個人化推薦，把「到帳通知」從單純告知變成轉換入口</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這個時機推薦最有效</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>玩家剛確認存款成功 — 帳戶有錢，情緒最好，意願最高</span></li>
+                <li><span class="pi pi-ok">✓</span><span>玩家主動點擊推播進來 — 不是被動打斷，是主動行為，轉換率遠高於一般頁面</span></li>
+                <li><span class="pi pi-warn">!</span><span>等待頁不適合推薦（存款未確認，用戶有懸念）；落地頁才是對的時機</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">千人千面推薦策略</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">L</span><span><strong>L03 試玩新戶</strong> → 優惠倒數（加碼快到期）+ 新手入門遊戲</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L05 活躍玩家</strong> → 繼續上次遊戲 + VIP 進度提示</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L06 待召回</strong> → 回歸優惠剩餘時間 + 個人偏好遊戲</span></li>
+                <li><span class="pi pi-ok">L</span><span><strong>L08 流失玩家</strong> → 禮包已啟用確認 + 新遊戲探索</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">開發成本</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>推播 deep link 帶入 player_id → 前端讀取分群標籤 → 對應顯示推薦內容</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估：前端 1.5 天（頁面 + 分群邏輯）+ 推播 deep link 設定 0.5 天</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:rgba(168,85,247,0.08);border-color:rgba(168,85,247,0.3);color:#d8b4fe;"><span>點擊推播進入的用戶，已經完成「注意 → 點擊」兩步，只差最後一步「開始玩」。這個頁面的唯一目標就是讓這一步零阻力。</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PHONE ── -->
+    <div class="phone-wrap">
+      <div class="phone-label" id="ppush-phone-label">情境 1 — 存款後推播</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" style="background:#0f0f0f;">
+
+          <!-- PUSH S1: 存款後推播（玩家已回首頁，等待第三方確認） -->
+          <div class="pstate active" id="ppush-s1" style="background:#0d1117;position:relative;display:flex;flex-direction:column;">
+            <!-- 狀態列 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px 2px;flex-shrink:0;">
+              <div style="font-size:9px;font-weight:600;color:#E2E6E9;">9:41</div>
+              <div style="display:flex;gap:3px;align-items:center;">
+                <svg width="11" height="9" viewBox="0 0 24 18" fill="#E2E6E9"><path d="M1 1l22 16M5 5.4A12 12 0 0 1 19 5.4M9 9.8A6 6 0 0 1 15 9.8M12 14h.01" stroke="#E2E6E9" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                <svg width="12" height="9" viewBox="0 0 25 12" fill="#E2E6E9"><rect x="0" y="0" width="22" height="12" rx="2" fill="none" stroke="#E2E6E9" stroke-width="1.5"/><rect x="2" y="2" width="16" height="8" rx="1" fill="#E2E6E9"/><rect x="22" y="4" width="3" height="4" rx="1" fill="#E2E6E9"/></svg>
+              </div>
+            </div>
+            <!-- App Header -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px;flex-shrink:0;">
+              <div style="font-size:15px;font-weight:800;color:#27b488;letter-spacing:-0.5px;">PLATFORM</div>
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div style="background:#1e2a24;border:1px solid rgba(39,180,136,0.35);border-radius:14px;padding:4px 10px;font-size:10px;color:#27b488;font-weight:700;">৳ 1,300</div>
+                <div style="width:26px;height:26px;background:#1c1c1c;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                  <svg width="13" height="13" fill="none" stroke="#8D9AA5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+              </div>
+            </div>
+            <!-- Promo Banner -->
+            <div style="margin:0 10px 8px;border-radius:10px;background:linear-gradient(135deg,#1a3a2a,#0d2018);border:1px solid rgba(39,180,136,0.3);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+              <div>
+                <div style="font-size:10px;color:#27b488;font-weight:700;margin-bottom:1px;">🎁 首存加碼 30%</div>
+                <div style="font-size:9px;color:#8D9AA5;">存 ৳500 獎勵最高 ৳150</div>
+              </div>
+              <div style="font-size:9px;color:#27b488;border:1px solid rgba(39,180,136,0.4);border-radius:10px;padding:3px 8px;white-space:nowrap;">立即存款</div>
+            </div>
+            <!-- Game Tiles -->
+            <div style="padding:0 10px 6px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;margin-bottom:5px;">熱門遊戲</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+                <div style="background:linear-gradient(135deg,#1a1e3a,#0d1028);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">🎰</div>
+                <div style="background:linear-gradient(135deg,#3a1a1a,#280d0d);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">🃏</div>
+                <div style="background:linear-gradient(135deg,#1a2a3a,#0d1828);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">⚽</div>
+              </div>
+            </div>
+            <!-- Sports List -->
+            <div style="padding:0 10px;flex:1;overflow:hidden;">
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;margin-bottom:5px;">體育賽事</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div style="background:#181818;border-radius:7px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#E2E6E9;">🏏 孟加拉 vs 印度</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">2.15</div>
+                </div>
+                <div style="background:#181818;border-radius:7px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#E2E6E9;">⚽ 曼城 vs 阿森納</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">1.80</div>
+                </div>
+                <div style="background:#181818;border-radius:7px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#E2E6E9;">🏀 Lakers vs Warriors</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">1.65</div>
+                </div>
+              </div>
+            </div>
+            <!-- Push Notification（對照 Figma 設計，含遊戲推薦視覺化）-->
+            <div id="ppush-notif-1" onclick="ppushGoToLanding()" style="position:absolute;top:-130px;left:6px;right:6px;background:rgba(32,32,34,0.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:14px;padding:12px;box-shadow:0 4px 24px rgba(0,0,0,0.5);transition:top 0.45s cubic-bezier(.32,.72,0,1);z-index:99;cursor:pointer;">
+              <!-- 主列：icon + 文字 + X -->
+              <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#27b488;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                  <svg width="17" height="17" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;">Approved in</div>
+                  <div style="font-size:11px;color:#aaa;line-height:1.4;">In amount <span style="color:#27b488;font-weight:600;">+ ৳ 1,000.00</span> has been approved.</div>
+                </div>
+                <div style="font-size:14px;color:#555;flex-shrink:0;padding-left:4px;">✕</div>
+              </div>
+              <!-- 遊戲推薦視覺化列 -->
+              <div style="display:flex;gap:6px;align-items:stretch;">
+                <div style="flex:1;background:#1e2a1e;border:1px solid rgba(39,180,136,0.3);border-radius:9px;padding:7px 6px;text-align:center;">
+                  <div style="font-size:18px;line-height:1;">🎰</div>
+                  <div style="font-size:8px;color:#E2E6E9;font-weight:600;margin-top:3px;">Lucky Slot</div>
+                  <div style="font-size:7px;color:#27b488;margin-top:1px;">推薦</div>
+                </div>
+                <div style="flex:1;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:7px 6px;text-align:center;">
+                  <div style="font-size:18px;line-height:1;">🃏</div>
+                  <div style="font-size:8px;color:#E2E6E9;font-weight:600;margin-top:3px;">Dragon Tiger</div>
+                  <div style="font-size:7px;color:#555;margin-top:1px;">熱門</div>
+                </div>
+                <div style="flex:1;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:7px 6px;text-align:center;">
+                  <div style="font-size:18px;line-height:1;">⚽</div>
+                  <div style="font-size:8px;color:#E2E6E9;font-weight:600;margin-top:3px;">孟加拉杯</div>
+                  <div style="font-size:7px;color:#ef4444;margin-top:1px;">直播中</div>
+                </div>
+                <div style="display:flex;align-items:center;padding:0 2px;">
+                  <div style="font-size:14px;color:#27b488;">›</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PUSH S2: 存款失敗挽回（玩家已離開存款頁，回到首頁或其他地方） -->
+          <div class="pstate" id="ppush-s2" style="background:#0d1117;position:relative;display:flex;flex-direction:column;">
+            <!-- 狀態列 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 14px 2px;flex-shrink:0;">
+              <div style="font-size:9px;font-weight:600;color:#E2E6E9;">9:41</div>
+              <div style="display:flex;gap:3px;align-items:center;">
+                <svg width="11" height="9" viewBox="0 0 24 18" fill="#E2E6E9"><path d="M1 1l22 16M5 5.4A12 12 0 0 1 19 5.4M9 9.8A6 6 0 0 1 15 9.8M12 14h.01" stroke="#E2E6E9" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                <svg width="12" height="9" viewBox="0 0 25 12" fill="#E2E6E9"><rect x="0" y="0" width="22" height="12" rx="2" fill="none" stroke="#E2E6E9" stroke-width="1.5"/><rect x="2" y="2" width="14" height="8" rx="1" fill="#E2E6E9"/><rect x="22" y="4" width="3" height="4" rx="1" fill="#E2E6E9"/></svg>
+              </div>
+            </div>
+            <!-- App Header -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 12px 8px;flex-shrink:0;">
+              <div style="font-size:15px;font-weight:800;color:#27b488;letter-spacing:-0.5px;">PLATFORM</div>
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div style="background:#1e1e1e;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:4px 10px;font-size:10px;color:#8D9AA5;font-weight:600;">৳ 0</div>
+                <div style="width:26px;height:26px;background:#1c1c1c;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                  <svg width="13" height="13" fill="none" stroke="#8D9AA5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+              </div>
+            </div>
+            <!-- Game Tiles -->
+            <div style="padding:0 10px 6px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;margin-bottom:5px;">熱門遊戲</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+                <div style="background:linear-gradient(135deg,#1a1e3a,#0d1028);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">🎰</div>
+                <div style="background:linear-gradient(135deg,#3a1a1a,#280d0d);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">🃏</div>
+                <div style="background:linear-gradient(135deg,#1a2a3a,#0d1828);border-radius:8px;padding:12px 0;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(255,255,255,0.06);">⚽</div>
+              </div>
+            </div>
+            <!-- Sports + bottom deposit CTA -->
+            <div style="padding:0 10px;flex:1;overflow:hidden;">
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;margin-bottom:5px;">體育賽事</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div style="background:#181818;border-radius:7px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#E2E6E9;">🏏 孟加拉 vs 印度</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">2.15</div>
+                </div>
+                <div style="background:#181818;border-radius:7px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;color:#E2E6E9;">⚽ 曼城 vs 阿森納</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;">1.80</div>
+                </div>
+              </div>
+            </div>
+            <!-- Deposit reminder strip -->
+            <div style="margin:6px 10px 10px;background:#1a1010;border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+              <div style="font-size:10px;color:#8D9AA5;">餘額不足，無法下注</div>
+              <div style="font-size:9px;color:#ef4444;font-weight:600;">立即存款 →</div>
+            </div>
+            <!-- iOS Push（第三方回傳失敗後推送） -->
+            <div id="ppush-notif-2" style="position:absolute;top:-100px;left:10px;right:10px;background:rgba(28,28,30,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;padding:12px 14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);transition:top 0.45s cubic-bezier(.32,.72,0,1);z-index:99;border:1px solid rgba(255,255,255,0.08);">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#e2136e,#9d0e4c);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;">bK</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                    <div style="font-size:11px;font-weight:700;color:#E2E6E9;">Platform</div>
+                    <div style="font-size:10px;color:#555;">剛剛</div>
+                  </div>
+                  <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:2px;">你的 bKash 存款未成功</div>
+                  <div style="font-size:11px;color:#8D9AA5;line-height:1.4;">點擊一鍵重試，只需 10 秒 →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PUSH S3: 千人千面召回 -->
+          <div class="pstate" id="ppush-s3" style="background:#0f0f0f;position:relative;overflow:visible;">
+            <!-- 鎖定畫面模擬 -->
+            <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0a1628,#0f0f1a);z-index:0;"></div>
+            <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:0;">
+              <!-- 狀態列 -->
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 0;font-size:10px;color:rgba(255,255,255,0.6);">
+                <span>9:41</span>
+                <div style="display:flex;gap:5px;align-items:center;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+                  <svg width="14" height="10" viewBox="0 0 24 16" fill="rgba(255,255,255,0.6)"><rect x="0" y="4" width="4" height="12" rx="1"/><rect x="6" y="2" width="4" height="14" rx="1"/><rect x="12" y="0" width="4" height="16" rx="1"/><rect x="18" y="0" width="4" height="16" rx="1" opacity="0.3"/></svg>
+                  <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="2" stroke="rgba(255,255,255,0.6)"/><rect x="1.5" y="1.5" width="13" height="8" rx="1" fill="rgba(255,255,255,0.6)"/><path d="M20 3.5v4a2 2 0 000-4z" fill="rgba(255,255,255,0.4)"/></svg>
+                </div>
+              </div>
+              <!-- 時鐘 -->
+              <div style="text-align:center;padding:20px 0 12px;">
+                <div style="font-size:52px;font-weight:200;color:#fff;letter-spacing:-2px;line-height:1;">9:41</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.5);">週三，5月28日</div>
+              </div>
+              <!-- Persona 切換器 -->
+              <div style="margin:0 10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;">
+                <div style="font-size:9px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">✦ Demo · 切換玩家身份</div>
+                <div style="display:flex;gap:5px;">
+                  <button onclick="ppushApplyPersona('L03')" id="ppush-p-L03" style="flex:1;padding:4px 4px;border-radius:6px;border:1.5px solid #3a3a5c;background:transparent;font-size:9px;font-weight:600;color:#94a3b8;cursor:pointer;">L03 試玩</button>
+                  <button onclick="ppushApplyPersona('L06')" id="ppush-p-L06" style="flex:1;padding:4px 4px;border-radius:6px;border:1.5px solid #6366f1;background:rgba(99,102,241,0.15);font-size:9px;font-weight:600;color:#a5b4fc;cursor:pointer;">L06 待召回</button>
+                  <button onclick="ppushApplyPersona('L08')" id="ppush-p-L08" style="flex:1;padding:4px 4px;border-radius:6px;border:1.5px solid #3a3a5c;background:transparent;font-size:9px;font-weight:600;color:#94a3b8;cursor:pointer;">L08 流失</button>
+                </div>
+              </div>
+              <!-- 通知卡片 -->
+              <div id="ppush-recall-notif" style="margin:0 10px;background:rgba(30,30,35,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;padding:12px 14px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 4px 24px rgba(0,0,0,0.4);">
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                  <div id="ppush-recall-ico" style="width:32px;height:32px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">⏰</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                      <div style="font-size:11px;font-weight:700;color:#E2E6E9;">Platform</div>
+                      <div id="ppush-recall-time" style="font-size:10px;color:#555;">2 小時前</div>
+                    </div>
+                    <div id="ppush-recall-title" style="font-size:12px;font-weight:600;color:#fff;margin-bottom:3px;">你有限時回歸優惠 · 剩 3 天到期</div>
+                    <div id="ppush-recall-body" style="font-size:11px;color:#8D9AA5;line-height:1.4;">回來存款即可啟用 · 加碼 20% 只限今日 →</div>
+                  </div>
+                </div>
+              </div>
+              <!-- 發送時段說明 -->
+              <div style="margin:10px 12px 0;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:8px 11px;">
+                <div style="font-size:9px;font-weight:700;color:#6366f1;margin-bottom:3px;">B 層時段對齊</div>
+                <div id="ppush-time-tip" style="font-size:10px;color:#94a3b8;line-height:1.4;">此玩家為「晚間型玩家」(18–24時占比 62%)，推播排定於 21:00 發送</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PUSH S4: 到帳落地頁（點擊通知後） -->
+          <div class="pstate" id="ppush-s4" style="background:#111213;position:relative;display:flex;flex-direction:column;">
+            <!-- 狀態列 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 0;flex-shrink:0;">
+              <div style="font-size:9px;font-weight:600;color:#E2E6E9;">9:41</div>
+              <div style="display:flex;gap:3px;align-items:center;">
+                <svg width="12" height="9" viewBox="0 0 25 12" fill="#E2E6E9"><rect x="0" y="0" width="22" height="12" rx="2" fill="none" stroke="#E2E6E9" stroke-width="1.5"/><rect x="2" y="2" width="16" height="8" rx="1" fill="#E2E6E9"/><rect x="22" y="4" width="3" height="4" rx="1" fill="#E2E6E9"/></svg>
+              </div>
+            </div>
+            <!-- Header -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 8px;flex-shrink:0;">
+              <div style="font-size:9px;color:#555;">← 返回首頁</div>
+              <div style="background:#1e2a24;border:1px solid rgba(39,180,136,0.35);border-radius:14px;padding:4px 10px;font-size:10px;color:#27b488;font-weight:700;">৳ 1,300</div>
+            </div>
+            <!-- 存款確認卡 -->
+            <div style="margin:0 12px 10px;background:linear-gradient(135deg,#1a3a2a,#0d2018);border:1.5px solid rgba(39,180,136,0.4);border-radius:12px;padding:12px 14px;flex-shrink:0;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:#27b488;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="13" height="13" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;color:#27b488;">存款已到帳</div>
+                  <div style="font-size:10px;color:#555;">bKash · Payment Gateway · AB 01</div>
+                </div>
+                <div style="font-size:15px;font-weight:700;color:#27b488;">৳1,000</div>
+              </div>
+            </div>
+            <!-- 個人化推薦區（千人千面） -->
+            <div style="padding:0 12px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;" id="ppush-land-section-title">🎁 你的首存加碼已啟用</div>
+              <!-- 主推薦卡 -->
+              <div id="ppush-land-promo" style="background:#1a2a3a;border:1.5px solid rgba(99,102,241,0.3);border-radius:12px;padding:12px 14px;">
+                <div style="font-size:10px;color:#a5b4fc;font-weight:700;margin-bottom:4px;" id="ppush-land-promo-label">首存加碼 30% · 到期倒數</div>
+                <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:2px;" id="ppush-land-promo-value">23:59 到期</div>
+                <div style="font-size:10px;color:#8D9AA5;" id="ppush-land-promo-sub">存 ৳1,000 → 加碼 ৳300 · 現在去玩才能啟動</div>
+              </div>
+              <!-- 推薦遊戲 -->
+              <div style="font-size:10px;font-weight:700;color:#E2E6E9;" id="ppush-land-game-title">為你推薦</div>
+              <div style="display:flex;gap:6px;">
+                <div id="ppush-land-game-1" style="flex:1;background:#1c1c1e;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #2a2a2a;">
+                  <div style="font-size:22px;margin-bottom:4px;">🎰</div>
+                  <div style="font-size:9px;color:#E2E6E9;font-weight:600;">Lucky Slot</div>
+                  <div style="font-size:8px;color:#27b488;margin-top:2px;">新手推薦</div>
+                </div>
+                <div id="ppush-land-game-2" style="flex:1;background:#1c1c1e;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #2a2a2a;">
+                  <div style="font-size:22px;margin-bottom:4px;">🃏</div>
+                  <div style="font-size:9px;color:#E2E6E9;font-weight:600;">Dragon Tiger</div>
+                  <div style="font-size:8px;color:#555;margin-top:2px;">熱門</div>
+                </div>
+                <div id="ppush-land-game-3" style="flex:1;background:#1c1c1e;border-radius:10px;padding:10px 8px;text-align:center;border:1px solid #2a2a2a;">
+                  <div style="font-size:22px;margin-bottom:4px;">⚽</div>
+                  <div style="font-size:9px;color:#E2E6E9;font-weight:600;">孟加拉杯</div>
+                  <div style="font-size:8px;color:#555;margin-top:2px;">直播中</div>
+                </div>
+              </div>
+            </div>
+            <!-- 底部 CTA -->
+            <div style="padding:8px 12px 16px;flex-shrink:0;">
+              <button id="ppush-land-cta" class="big-btn primary" style="height:46px;font-size:13px;font-weight:600;">立即開始體驗 →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- Persona switcher for landing page -->
+      <div id="ppush-land-switcher" style="display:none;margin-top:10px;background:#1e1e2e;border:1px solid #3a3a5c;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:700;color:#6366f1;margin-bottom:7px;">✦ Demo · 千人千面 — 切換玩家身份</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button onclick="ppushLandingApplyPersona('L03')" id="ppush-land-L03" style="padding:5px 9px;border-radius:6px;border:1.5px solid #6366f1;background:rgba(99,102,241,0.15);font-size:9px;font-weight:600;color:#a5b4fc;cursor:pointer;">L03 試玩新戶</button>
+          <button onclick="ppushLandingApplyPersona('L05')" id="ppush-land-L05" style="padding:5px 9px;border-radius:6px;border:1.5px solid #3a3a5c;background:transparent;font-size:9px;font-weight:600;color:#94a3b8;cursor:pointer;">L05 活躍玩家</button>
+          <button onclick="ppushLandingApplyPersona('L06')" id="ppush-land-L06" style="padding:5px 9px;border-radius:6px;border:1.5px solid #3a3a5c;background:transparent;font-size:9px;font-weight:600;color:#94a3b8;cursor:pointer;">L06 待召回</button>
+          <button onclick="ppushLandingApplyPersona('L08')" id="ppush-land-L08" style="padding:5px 9px;border-radius:6px;border:1.5px solid #3a3a5c;background:transparent;font-size:9px;font-weight:600;color:#94a3b8;cursor:pointer;">L08 流失玩家</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2867,12 +3368,13 @@
 
   function switchState(proto, stateId, btn) {
     const prefix = proto + '-';
+
     // switch phone states
     document.querySelectorAll('[id^="' + prefix + 's"]').forEach(el => {
       if (el.classList.contains('pstate') || el.classList.contains('p1-info') ||
           el.classList.contains('p2-info') || el.classList.contains('p3-info') ||
           el.classList.contains('p4-info') || el.classList.contains('p5-info') ||
-          el.classList.contains('p6-info') || el.classList.contains('p7-info') ||
+          el.classList.contains('p6-info') ||
           el.classList.contains('p8-info') || el.classList.contains('p9-info') ||
           el.classList.contains('p10-info')) {
         el.style.display = 'none';
@@ -2891,6 +3393,9 @@
     // update buttons
     btn.closest('.state-switcher').querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    // 千人千面切換器：只在 p2-s2 時顯示
+    var switcher = document.getElementById('p2-persona-switcher');
+    if (switcher) switcher.style.display = (proto === 'p2' && stateId === 's2') ? 'block' : 'none';
   }
 
   // ── P2 Interactive State ────────────────────────────
@@ -2925,7 +3430,7 @@
     var el = document.getElementById('p2-amt');
     var btn = document.getElementById('p2-confirm');
     if (el) el.textContent = p2Amt;
-    if (btn) btn.textContent = p2Amt === '0' ? '確認存款' : '確認存款  ৳' + p2Amt;
+    if (btn) btn.textContent = p2Amt === '0' ? 'Confirm' : 'Confirm  ৳' + p2Amt;
   }
 
   function p2SetAmt(v) {
@@ -2946,23 +3451,281 @@
     m.style.display = m.style.display === 'none' ? 'block' : 'none';
   }
 
+  var p2CurrentType = 'ewallet';
+  var p2SelectedPaymentIdx = 0;
+  var p2SelectedTypeIdx = 0;
+
+  var p2PaymentData = {
+    ewallet: {
+      title: 'E-wallet',
+      payments: [
+        { name: 'bKash',      bg: '#e2136e', ico: 'bK', sub: 'Personal · 017xxxxxxxx' },
+        { name: 'Rocket',     bg: '#8b2fc9', ico: 'Ro', sub: 'Personal · 019xxxxxxxx' },
+        { name: 'OKwallet',   bg: '#1a56db', ico: 'OK', sub: 'Personal · 016xxxxxxxx' },
+        { name: 'Upay',       bg: '#00a859', ico: 'Up', sub: 'Personal · 014xxxxxxxx' },
+        { name: 'Nagad',      bg: '#e8621a', ico: 'Na', sub: 'Personal · 018xxxxxxxx' },
+        { name: 'Bangkok Pay',bg: '#0066cc', ico: 'BP', sub: 'Agent · 015xxxxxxxx' },
+        { name: 'Baji',       bg: '#ff6b00', ico: 'BJ', sub: 'Personal · 013xxxxxxxx' }
+      ],
+      types: ['Payment Gateway', 'Bank Transfer'],
+      channel: 'AB 01'
+    },
+    localbank: {
+      title: 'Local Bank',
+      payments: [
+        { name: 'Dutch Bangla', bg: '#e83030', ico: 'DB', sub: 'NPSB · BEFTN' },
+        { name: 'City Bank',    bg: '#0a5fb4', ico: 'CB', sub: 'NPSB · BEFTN' }
+      ],
+      types: ['NPSB', 'BEFTN'],
+      channel: 'Channel 01'
+    },
+    crypto: {
+      title: 'Crypto',
+      payments: [
+        { name: 'USDT', bg: '#26a17b', ico: '₮', sub: '0x7f···3a2b' },
+        { name: 'Bitcoin', bg: '#f7931a', ico: '₿', sub: 'bc1q···f4k2' },
+        { name: 'Ethereum', bg: '#627eea', ico: 'Ξ', sub: '0x3d···9c1a' }
+      ],
+      types: ['TRC20', 'ERC20', 'BEP20'],
+      channel: 'Wallet 01'
+    }
+  };
+
+  function p2BuildPaymentSheet() {
+    var cfg = p2PaymentData[p2CurrentType];
+    if (!cfg) return;
+
+    // Update tab highlight
+    document.querySelectorAll('#p2-type-tabs [data-tab]').forEach(function(tab) {
+      var active = tab.getAttribute('data-tab') === p2CurrentType;
+      tab.style.color = active ? '#E2E6E9' : '#657381';
+      tab.style.borderBottomColor = active ? '#27b488' : 'transparent';
+    });
+
+    // Update channel
+    var chEl = document.getElementById('p2-channel-val');
+    if (chEl) chEl.textContent = cfg.channel;
+
+    // Build payment grid
+    var grid = document.getElementById('p2-payment-grid');
+    if (grid) {
+      grid.innerHTML = '';
+      cfg.payments.forEach(function(pay, idx) {
+        var isSelected = idx === p2SelectedPaymentIdx;
+        var tile = document.createElement('div');
+        tile.style.cssText = 'background:#222424;border-radius:3px;height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;cursor:pointer;position:relative;border:1.5px solid ' + (isSelected ? '#14805e' : 'rgba(255,255,255,0.06)') + ';';
+        tile.setAttribute('data-idx', idx);
+        tile.innerHTML = '<div style="width:26px;height:26px;background:' + pay.bg + ';border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin-bottom:4px;">' + pay.ico + '</div>'
+          + '<div style="font-size:12px;color:#E2E6E9;text-align:center;line-height:1.2;">' + pay.name + '</div>'
+          ;
+        tile.addEventListener('click', function() {
+          p2SelectedPaymentIdx = parseInt(this.getAttribute('data-idx'));
+          p2BuildPaymentSheet();
+        });
+        grid.appendChild(tile);
+      });
+    }
+
+    // Build type rows
+    var typeRows = document.getElementById('p2-type-rows');
+    if (typeRows) {
+      typeRows.innerHTML = '';
+      cfg.types.forEach(function(typeName, idx) {
+        var isSelected = idx === p2SelectedTypeIdx;
+        var row = document.createElement('div');
+        row.style.cssText = 'background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;cursor:pointer;border:1.5px solid ' + (isSelected ? '#14805e' : 'transparent') + ';';
+        row.setAttribute('data-tidx', idx);
+        row.innerHTML = '<span style="font-size:14px;font-weight:600;color:#E2E6E9;">' + typeName + '</span>'
+          + '<div style="width:20px;height:20px;border-radius:50%;border:2px solid ' + (isSelected ? '#14805e' : '#454647') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+          + (isSelected ? '<div style="width:10px;height:10px;border-radius:50%;background:#14805e;"></div>' : '')
+          + '</div>';
+        row.addEventListener('click', function() {
+          p2SelectedTypeIdx = parseInt(this.getAttribute('data-tidx'));
+          p2BuildPaymentSheet();
+        });
+        typeRows.appendChild(row);
+      });
+    }
+  }
+
+  // ── 千人千面 Persona 設定 ──────────────────────────────
+  var p2PersonaConfigs = {
+    L03: {
+      label: 'L03 試玩新戶',
+      banner: {
+        text: '🎁 First deposit bonus up to 30% · Deposit now to unlock reward',
+        bg: 'linear-gradient(90deg,rgba(39,180,136,0.18),rgba(39,180,136,0.08))',
+        border: 'rgba(39,180,136,0.4)',
+        color: '#27b488'
+      },
+      promoName: 'First Deposit 30% Bonus',
+      promoSub:  'Deposit ৳500, earn up to ৳150',
+      promoSubColor: '#27b488',
+      chipHighlight: '500',
+      chipLabel: '৳500'
+    },
+    L05: {
+      label: 'L05 活躍玩家',
+      banner: null,
+      promoName: 'Promotion',
+      promoSub:  'Up to ৳3,000 bonus',
+      promoSubColor: '#E2E6E9',
+      chipHighlight: '1000',
+      chipLabel: '৳1,000'
+    },
+    L06: {
+      label: 'L06 待召回',
+      banner: {
+        text: '⏰ You have a limited-time comeback offer · Expires in 3 days',
+        bg: 'linear-gradient(90deg,rgba(39,180,136,0.2),rgba(39,180,136,0.08))',
+        border: 'rgba(39,180,136,0.5)',
+        color: '#27b488'
+      },
+      promoName: 'Comeback 20% Bonus',
+      promoSub:  'Today only · Deposit to activate',
+      promoSubColor: '#27b488',
+      chipHighlight: '1000',
+      chipLabel: '৳1,000'
+    },
+    L08: {
+      label: 'L08 流失玩家',
+      banner: {
+        text: '👋 Welcome back! Your exclusive 50% re-activation bonus is waiting',
+        bg: 'linear-gradient(90deg,rgba(39,180,136,0.2),rgba(39,180,136,0.08))',
+        border: 'rgba(39,180,136,0.5)',
+        color: '#27b488'
+      },
+      promoName: 'Re-activation 50% Bonus',
+      promoSub:  'Today only · First comeback deposit',
+      promoSubColor: '#27b488',
+      chipHighlight: '500',
+      chipLabel: '৳500'
+    }
+  };
+
+  var p2CurrentPersona = 'L05';
+
+  function p2ApplyPersona(id) {
+    var cfg = p2PersonaConfigs[id];
+    if (!cfg) return;
+    p2CurrentPersona = id;
+
+    // 更新 switcher 按鈕外觀
+    ['L03','L05','L06','L08'].forEach(function(k) {
+      var btn = document.getElementById('p2-p-' + k);
+      if (!btn) return;
+      var active = k === id;
+      btn.style.borderColor = active ? '#27b488' : '#3a3a5c';
+      btn.style.background  = active ? 'rgba(39,180,136,0.15)' : 'transparent';
+      btn.style.color       = active ? '#27b488' : '#94a3b8';
+    });
+
+    // Banner
+    var banner = document.getElementById('p2-persona-banner');
+    if (banner) {
+      if (cfg.banner) {
+        banner.style.display = 'block';
+        banner.style.background = cfg.banner.bg;
+        banner.style.border = '1px solid ' + cfg.banner.border;
+        banner.style.color = cfg.banner.color;
+        banner.textContent = cfg.banner.text;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    // Promo row
+    var promoName = document.getElementById('p2-promo-name');
+    var promoSub  = document.getElementById('p2-promo-sub');
+    if (promoName) promoName.textContent = cfg.promoName;
+    if (promoSub)  { promoSub.textContent = cfg.promoSub; promoSub.style.color = cfg.promoSubColor; }
+
+    // 快速金額 chip highlight
+    var chip = document.getElementById('p2-chip-1000');
+    if (chip) {
+      chip.textContent = cfg.chipLabel;
+      chip.setAttribute('onclick', "p2SetAmt('" + cfg.chipHighlight + "')");
+    }
+
+    // 確保存款頁在狀態 2
+    var s2 = document.getElementById('p2-s2');
+    if (s2 && !s2.classList.contains('active')) {
+      document.querySelectorAll('#p2 .pstate').forEach(function(s) { s.classList.remove('active'); });
+      s2.classList.add('active');
+    }
+  }
+
+  function p6GoToP2S2() {
+    // 切換到原型 2，直接進入狀態 2（互動原型）
+    document.querySelectorAll('.proto').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.ptab').forEach(function(t) { t.classList.remove('active'); });
+    var p2 = document.getElementById('p2');
+    if (p2) p2.classList.add('active');
+    document.querySelectorAll('.ptab').forEach(function(t) {
+      if (t.getAttribute('onclick') && t.getAttribute('onclick').indexOf("'p2'") !== -1) t.classList.add('active');
+    });
+    // 切到狀態 2
+    document.querySelectorAll('#p2 .pstate').forEach(function(s) { s.classList.remove('active'); });
+    var s2 = document.getElementById('p2-s2');
+    if (s2) s2.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function p2SwitchType(type) {
+    if (!p2PaymentData[type]) return;
+    p2CurrentType = type;
+    p2SelectedPaymentIdx = 0;
+    p2SelectedTypeIdx = 0;
+    p2BuildPaymentSheet();
+  }
+
+  function p2ConfirmPayment() {
+    var cfg = p2PaymentData[p2CurrentType];
+    if (!cfg) { p2CloseAll(); return; }
+    var pay = cfg.payments[p2SelectedPaymentIdx] || cfg.payments[0];
+    var typeName = cfg.types[p2SelectedTypeIdx] || cfg.types[0];
+
+    // 更新 payment row（名稱、icon、sub 顯示 type + channel）
+    p2SelectPayment(pay.name, pay.bg, pay.ico, typeName + ' · ' + cfg.channel);
+
+    // 更新最上方下拉標題
+    var typeCfg = p2TypeConfigs[p2CurrentType];
+    if (typeCfg) {
+      var labelEl = document.getElementById('p2-type-label');
+      if (labelEl) labelEl.textContent = typeCfg.label;
+      // 更新 checkmark
+      ['ewallet','localbank','crypto'].forEach(function(k) {
+        var chk  = document.getElementById('p2-chk-' + k);
+        var menu = document.getElementById('p2-menu-' + k);
+        if (chk)  chk.textContent = k === p2CurrentType ? '✓' : '';
+        if (menu) menu.style.color = k === p2CurrentType ? '#27b488' : '#ccc';
+      });
+      // 更新限額
+      var limitEl = document.getElementById('p2-limit');
+      if (limitEl) limitEl.textContent = typeCfg.limit;
+    }
+
+    p2CloseAll();
+  }
+
+
   var p2TypeConfigs = {
     ewallet: {
-      label: 'E-wallet 存款',
+      label: 'E-wallet',
       payBg: '#e2136e', payIco: 'bK', payName: 'bKash', paySub: 'Personal · 017xxxxxxxx',
-      promoName: '首存紅利 30%', promoSub: '最高獎勵 ৳3,000', promoColor: '#27b488',
+      promoName: 'Promotion', promoSub: '最高獎勵 ৳3,000', promoColor: '#27b488',
       limit: '限額 ৳100 – ৳50,000'
     },
     localbank: {
-      label: 'Local Bank 存款',
+      label: 'Local Bank',
       payBg: '#e83030', payIco: 'DB', payName: 'Dutch Bangla', paySub: 'NPSB · 016xxxxxxxx',
-      promoName: '再存紅利 10%', promoSub: '每次存款最高 ৳1,000', promoColor: '#60a5fa',
+      promoName: 'Promotion', promoSub: '每次存款最高 ৳1,000', promoColor: '#60a5fa',
       limit: '限額 ৳500 – ৳50,000'
     },
     crypto: {
-      label: 'Crypto 存款',
+      label: 'Crypto',
       payBg: '#26a17b', payIco: '₮', payName: 'USDT (TRC20)', paySub: '0x7f···3a2b',
-      promoName: '不使用優惠', promoSub: 'Crypto 通道不參與優惠活動', promoColor: '#555',
+      promoName: 'Promotion', promoSub: 'Crypto 通道不參與優惠活動', promoColor: '#555',
       limit: '限額 ৳1,000 – 無上限'
     }
   };
@@ -2970,6 +3733,9 @@
   function p2SelectType(type) {
     var cfg = p2TypeConfigs[type];
     if (!cfg) return;
+    p2CurrentType = type;
+    p2SelectedPaymentIdx = 0;
+    p2SelectedTypeIdx = 0;
 
     // 更新標題 + 關閉下拉
     var labelEl = document.getElementById('p2-type-label');
@@ -2997,13 +3763,14 @@
     if (promoRow) { promoRow.classList.remove('p2-row-ready'); promoRow.classList.add('p2-row-loading'); }
 
     setTimeout(function() {
-      // 更新付款帳號列
+      // 更新付款帳號列（用 p2PaymentData 第一筆 payment + 第一個 type + channel）
+      var pData = p2PaymentData[type];
       var icoEl      = document.getElementById('p2-pay-ico');
       var nameEl     = document.getElementById('p2-pay-name');
       var subEl      = document.getElementById('p2-pay-sub');
-      if (icoEl)  { icoEl.textContent = cfg.payIco; icoEl.style.background = cfg.payBg; }
-      if (nameEl) nameEl.textContent = cfg.payName;
-      if (subEl)  subEl.textContent  = cfg.paySub;
+      if (pData && icoEl)  { icoEl.textContent = pData.payments[0].ico; icoEl.style.background = pData.payments[0].bg; }
+      if (pData && nameEl) nameEl.textContent = pData.payments[0].name;
+      if (pData && subEl)  subEl.textContent  = pData.types[0] + ' · ' + pData.channel;
 
       // 更新優惠列
       var promoNameEl = document.getElementById('p2-promo-name');
@@ -3018,6 +3785,9 @@
   }
 
   function p2OpenPayment() {
+    p2SelectedPaymentIdx = 0;
+    p2SelectedTypeIdx = 0;
+    p2BuildPaymentSheet();
     var s = document.getElementById('p2-payment-sheet');
     var b = document.getElementById('p2-backdrop');
     if (s) s.style.transform = 'translateY(0)';
@@ -3074,7 +3844,7 @@
     if (!el.classList.contains('active')) el.style.display = 'none';
     else el.style.display = 'flex';
   });
-  document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p7-info, .p8-info, .p9-info, .p10-info').forEach(el => {
+  document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p8-info, .p9-info, .p10-info').forEach(el => {
     if (el.style.display !== 'none') el.style.display = 'block';
   });
 </script>
