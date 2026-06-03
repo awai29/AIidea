@@ -578,6 +578,10 @@ table.rtbl tr:hover td{background:rgba(0,0,0,.015)}
     <div>
       <div class="sec-title">Android Chrome Web Push</div>
       <div class="sec-desc">透過 FCM 推送的原生系統通知，玩家不在 App 中也能收到，觸達率依授權比例而定</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11px;color:var(--muted)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Device token 存於 Redis，TTL 30 天。玩家未登入期間仍可收到推播，只需曾授權過通知權限。
+      </div>
     </div>
   </div>
 
