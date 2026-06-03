@@ -429,10 +429,6 @@ main {
   <span class="filter-label">篩選</span>
   <div class="filters">
     <button class="fb f-all on" onclick="fil('all',this)">全部</button>
-    <button class="fb f-round2" onclick="fil('round2',this)" style="background:var(--purple-bg);border-color:var(--purple-border);color:var(--purple);font-weight:700">ROUND 2</button>
-    <button class="fb f-acquisition" onclick="fil('acquisition',this)">新客獲取</button>
-    <button class="fb f-existing" onclick="fil('existing',this)">既有用戶</button>
-    <button class="fb f-tech" onclick="fil('tech',this)">技術優化</button>
     <button class="fb f-archive" onclick="fil('archive',this)">ARCHIVE</button>
   </div>
 </div>
@@ -448,11 +444,10 @@ main {
 
 <script>
 const CATS = [
-  { key:'round2',      label:'ROUND 2',  accent:'var(--purple)' },
   { key:'acquisition', label:'新客獲取', accent:'var(--coral)' },
   { key:'existing',    label:'既有用戶', accent:'var(--blue)' },
   { key:'tech',        label:'技術優化', accent:'var(--teal)' },
-  { key:'archive',     label:'ARCHIVE',  accent:'#6b6b6b' },
+  { key:'archive',     label:'ARCHIVE', accent:'#6b6b6b' },
 ];
 
 const ALL = [
@@ -497,7 +492,7 @@ fetchLayout() {
    predict:'最常去的頁面自然靠近拇指熱區，減少尋找時間。',
    api:'GET /api/user/nav-order → CategoryItem[]'},
 
-  {id:'p4',cat:'archive',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'p4',cat:'existing',isNew:false,name:'存款金額智慧預設',ico:'◎',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['ux','fe','be'],diff:'mid',
    problem:'存款快捷按鈕金額固定，和玩家實際習慣落差大。',
    desc:'平時都存 500 的玩家，快捷按鈕就出現 450、475、500、525、550，不是死板的 100/500/1000，＋10% 那顆特別顯眼。',
@@ -548,7 +543,7 @@ providerList = computed(() =>
    predict:'玩家進 Slot 頁，常玩的 Pragmatic 已在第一格；切到「平台熱度」，看的是全站流水最高的排法。不需搜尋，不需滾動。',
    api:'GET /api/providers/ranked?mode=global|personal → Provider[]（後端依 mode 排序後回傳）'},
 
-  {id:'p8',cat:'round2',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'p8',cat:'tech',isNew:true,name:'圖片模糊漸進載入（Blur-Up）',ico:'⬡',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['fe','ui','ux'],diff:'easy',
    problem:'網路慢時頁面出現白框或破圖，影響第一印象。',
    desc:'頁面先顯示極小縮圖並放大模糊（LQIP），真實圖片下載完成後以 CSS transition 清晰淡入。純 CSS + JS 實現，所有瀏覽器皆相容，無需任何新 API。',
@@ -615,7 +610,7 @@ export class BlurUpDirective implements AfterViewInit {
    predict:'AI 知道此刻在做什麼，主動說出最相關的下一步。',
    api:'POST /api/chat → { reply }（後端帶 context 給 LLM）'},
 
-  {id:'p9',cat:'archive',isNew:true,name:'客服反饋標籤化 + 問卷送 Point',ico:'⊕',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+  {id:'p9',cat:'existing',isNew:true,name:'客服反饋標籤化 + 問卷送 Point',ico:'⊕',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
    types:['ux','be','ai','mkt'],diff:'mid',
    problem:'客服工單散亂，難以找出哪些流程問題最集中。',
    desc:'AI 自動將客服工單與玩家訊息分類標籤（存款問題 / 活動疑問 / 技術異常…），統整成可讀報表；反饋量不足時觸發「填問卷送 Point」活動，主動補充資料缺口。',
@@ -650,7 +645,7 @@ completeSurvey(answers: SurveyAnswer[]) {
    predict:'產品團隊每週看到標籤分佈報表，能快速找出最需要優化的流程；問卷資料補足 AI 分類的死角，形成玩家反饋的正向循環。',
    api:'GET /api/feedback/summary → { labels: TagCount[], trend: WeeklyTrend[], topIssues: Issue[] } / POST /api/survey/complete → { pointsAwarded } / GET /api/survey/active → Survey | null'},
 
-  {id:'p10',cat:'archive',isNew:true,name:'Personal Lobby',ico:'◈',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+  {id:'p10',cat:'existing',isNew:true,name:'Personal Lobby',ico:'◈',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
    types:['ux','fe','be','ai'],diff:'hard',
    problem:'首頁 Banner、推薦遊戲、活動 Offer 三層各跑各的，Provider 清單又靠人工或固定順序排列，所有玩家看到的內容大同小異，個人化感全無。',
    desc:'Personal Lobby 讓進站的瞬間，三層內容（Banner、推薦、Offer）與 Provider 排序同時對齊。Slot 玩家看到 Slot 相關 Banner、常玩的 Pragmatic 自動置頂、Free Spin Offer；Sports 玩家看到今晚賽事 Banner、熱門賽事、賽事加碼。Provider 排序結合全站流水與個人習慣兩個維度，玩家可自己切換「依平台熱度 / 依我的習慣」。新用戶以 UTM 渠道推斷初始 segment，累積行為後自動切換真正個人化。行銷重大活動時可強制覆蓋 Banner，下方推薦與 Provider 繼續個人化。',
@@ -680,7 +675,7 @@ ngOnInit() {
    api:'GET /api/lobby/config?segment=&providerSort=global|personal → LobbyConfig（後端統一決策）'},
 
   // ── ACQUISITION ──
-  {id:'a1',cat:'archive',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'a1',cat:'acquisition',isNew:true,name:'Landing Page 個人化標籤分類',ico:'⊙',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['mkt','fe','be','ai'],diff:'mid',
    problem:'新玩家從廣告點進來，看到的是一個通用 LP，體育和 Slot 玩家看到一模一樣的內容，轉換動機不足。即使完成註冊，主站也不知道這個玩家偏好什麼，錯過了最佳個人化時機，Welcome Offer 和推薦遊戲與玩家完全無關。',
    why:'玩家的偏好在「點擊廣告的那一刻」就已暴露，但這個訊號目前完全浪費掉了。從渠道分流 → LP 個人化 → 快速註冊 → 個人化 Lobby → 符合分類的 Welcome Offer → 推薦第一款遊戲，整條新客漏斗每一步都與玩家偏好對齊，可顯著提升 FTD 轉換率。',
@@ -709,7 +704,7 @@ ngOnInit() {
    predict:'系統知道這個用戶從哪個廣告來，給他最短的註冊路徑。',
    api:'GET /api/register/config?intent=sports → FormConfig'},
 
-  {id:'a3',cat:'archive',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'a3',cat:'acquisition',isNew:true,name:'Welcome Offer 智慧配對',ico:'♦',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['mkt','ux','be','ai'],diff:'mid',
    problem:'所有新用戶看同一張歡迎優惠，配對錯誤直接影響首次存款率。',
    desc:'從體育相關渠道帶進來的新用戶，註冊完會看到體育首存 Bonus 並引導去體育投注；Slot 及 Casino 渠道也是相同的邏輯。不是同一張通用 Bonus Offer。',
@@ -770,7 +765,7 @@ ngOnInit() {
    api:'POST /api/auth/complete → { token, user, offerSuggestion }'},
 
   // ── DEPOSIT ──
-  {id:'d1',cat:'round2',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d1',cat:'archive',isNew:true,name:'存款意圖即時偵測',ico:'◉',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['predict','be','ai'],diff:'hard',
    problem:'不知道什麼時候介入最有效，要嘛太早要嘛太晚。',
    desc:'玩家連續瀏覽存款頁兩次、餘額又接近低點，系統判斷他快要存了，這時才出現優惠提示，不是一進站就給所有人看。',
@@ -788,7 +783,7 @@ connect() {
    predict:'用戶還沒點存款按鈕，系統已知道他快要存了。',
    api:'SSE /api/stream/deposit-intent → { score, triggerReason }'},
 
-  {id:'d2',cat:'round2',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'d2',cat:'archive',isNew:true,name:'餘額臨界點 Banner',ico:'▽',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['predict','ux','fe','be'],diff:'easy',
    problem:'玩家餘額快沒了自己不一定察覺，悄悄就離開了。',
    desc:'Slot 玩家餘額剩不到平常最低的三成，頁面頂部輕輕出現一條提示，附的是 Slot 相關存款 Bonus，不是通用廣告。',
@@ -803,7 +798,7 @@ connect() {
    predict:'系統知道用戶快沒子彈了，主動提醒而不是等他自己發現。',
    api:'GET /api/user/balance-status → { balance, threshold, nudgeContent }'},
 
-  {id:'d3',cat:'round2',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'d3',cat:'archive',isNew:true,name:'放棄存款頁面救回',ico:'↩',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['predict','ux','fe','be'],diff:'mid',
    problem:'進了存款頁又走掉，平台沒有任何挽回動作。',
    desc:'玩家打開存款頁停了 20 秒沒動就離開，系統在下一個頁面底部滑出一個存款 Offer，不是強制彈窗，是給個理由讓他考慮一下。',
@@ -819,7 +814,7 @@ ngOnDestroy() {
    predict:'系統偵測猶豫行為，在最後一刻給出最相關的理由讓他完成存款。',
    api:'POST /api/deposit/abandon → { offer: AbandonOffer }（即時生成）'},
 
-  {id:'d4',cat:'round2',isNew:true,name:'存款金額升級 Offer',ico:'▲',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'d4',cat:'archive',isNew:true,name:'存款金額升級 Offer',ico:'▲',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['boost','ux','fe','be'],diff:'mid',
    problem:'玩家不知道多存一點能解鎖什麼，自然不會主動提高金額。',
    desc:'玩家輸入 300，旁邊立刻出現「再存 200 可解鎖雙倍 Free Spin」，讓他自己決定要不要加碼，不是強迫，是告知。',
@@ -834,7 +829,7 @@ ngOnDestroy() {
    predict:'用戶輸入 300，系統立刻顯示「再存 200 即可雙倍 bonus」。',
    api:'GET /api/deposit/upgrade-hint?amount=N → UpgradeHint（<200ms）'},
 
-  {id:'d5',cat:'round2',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d5',cat:'archive',isNew:true,name:'個人化存款週期提醒',ico:'◷',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['predict','be','ai'],diff:'mid',
    problem:'提醒時機不準，太早玩家沒感覺，太晚已經錯過。',
    desc:'這個玩家每週五晚上固定存款，系統週五下午推一則提醒附上當週最新活動，剛好在他準備存款前出現。',
@@ -848,7 +843,7 @@ ngOnDestroy() {
    predict:'系統知道用戶通常週四晚上存款，週四下午就推最新活動。',
    api:'後端排程 job + POST /api/notify/deposit-reminder'},
 
-  {id:'d6',cat:'round2',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
+  {id:'d6',cat:'archive',isNew:true,name:'Tier 解鎖進度顯示',ico:'◈',icoBg:'var(--amber-dim)',accentColor:'var(--amber)',
    types:['boost','ux','fe'],diff:'easy',
    problem:'玩家不知道距離升等還差多少，缺乏繼續存款的動力。',
    desc:'存款頁顯示「距離黃金會員還差 NT$800」，旁邊列明升等後的 Cashback，讓人覺得再存一點很值得。',
@@ -864,7 +859,7 @@ ngOnDestroy() {
    predict:'AI 計算最能打動這個用戶的里程碑，顯示在進度條旁。',
    api:'GET /api/user/tier-status → TierStatus'},
 
-  {id:'d7',cat:'round2',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d7',cat:'archive',isNew:true,name:'時機型存款 Offer 推送',ico:'⚡',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['boost','predict','be','ai'],diff:'hard',
    problem:'固定時間發優惠，玩家預期甚至刻意等，稀缺感全無。',
    desc:'玩家剛輸完一場、餘額降低，又剛好是週末賽事高峰，系統判斷這時最可能存款，限時 Offer 才出現，不是每天固定時間發給所有人。',
@@ -878,7 +873,7 @@ ngOnDestroy() {
    predict:'系統判斷「現在最可能存款」，在精準時間點送出限時 offer。',
    api:'GET /api/offers/timed → TimedOffer | null'},
 
-  {id:'d8',cat:'round2',isNew:true,name:'存款流程障礙分析',ico:'⊟',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
+  {id:'d8',cat:'archive',isNew:true,name:'存款流程障礙分析',ico:'⊟',icoBg:'var(--purple-dim)',accentColor:'var(--purple)',
    types:['boost','ux','fe','be'],diff:'mid',
    problem:'不知道玩家在哪個步驟放棄，只能靠猜來優化。',
    desc:'發現一批玩家都在「選支付方式」那步流失，AI 標出來，產品才知道先去優化那個步驟，不用靠猜。',
@@ -894,7 +889,7 @@ ngOnDestroy() {
    predict:'AI 識別哪類用戶更容易在哪個步驟放棄，推薦針對性簡化。',
    api:'POST /api/analytics/deposit-step / GET /api/analytics/funnel-report'},
 
-  {id:'d9',cat:'archive',isNew:true,name:'快沒籌碼？再撐幾回合',ico:'⟲',icoBg:'var(--green-dim)',accentColor:'var(--green)',
+  {id:'d9',cat:'existing',isNew:true,name:'快沒籌碼？再撐幾回合',ico:'⟲',icoBg:'var(--green-dim)',accentColor:'var(--green)',
    types:['predict','boost','ux','fe','be'],diff:'mid',
    problem:'餘額快沒是最危險的時刻，平台卻沒有即時挽留機制。',
    desc:'玩家餘額趨近於零時，系統即時給予固定金額免費籌碼（Free Credit），讓他多玩幾回合；完成指定輪數後解鎖存款 Bonus，把「快放棄」的時機轉換成再次存款的動力。',
@@ -914,7 +909,7 @@ this.roundCount$.pipe(
    api:'POST /api/offers/last-chance → { freeCredit, wagerRequired, bonusOnDeposit }'},
 
   // ── TECH ──
-  {id:'t2',cat:'round2',isNew:true,name:'圖片格式轉換（PNG → WebP/JPG）',ico:'⟁',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
+  {id:'t2',cat:'tech',isNew:true,name:'圖片格式轉換（PNG → WebP/JPG）',ico:'⟁',icoBg:'var(--teal-dim)',accentColor:'var(--teal)',
    types:['fe','be'],diff:'easy',
    problem:'PNG 圖片體積大，頁面載入速度慢，在行動裝置上尤其明顯。',
    desc:'遊戲縮圖、Banner 等靜態圖片從 PNG 轉為 WebP（支援 WebP 的瀏覽器）或 JPG fallback，檔案大小縮減 40–70%，載入速度大幅提升。現代瀏覽器以 <picture> 元素自動選擇最佳格式，或透過 CDN URL 參數（如 Cloudinary f_auto）一行解決。',
@@ -940,7 +935,7 @@ await sharp('input.png')
    api:'若用 CDN：URL 參數即可（f_auto）；若自建：POST /api/images/convert → { webpUrl, jpgUrl }'},
 
   // ── RISK ──
-  {id:'r4',cat:'round2',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
+  {id:'r4',cat:'existing',isNew:true,name:'多情境智慧推播 — 回流刺激',ico:'◎',icoBg:'var(--coral-dim)',accentColor:'var(--coral)',
    types:['ux','be','ai','mkt'],diff:'mid',
    problem:'通用推播開啟率極低，等於在浪費每一次推播機會。',
    desc:'依玩家行為與平台事件，分 8 種情境精準觸發 Push Notification，每則推播都帶個人化內容與深連結，直接帶回對應頁面，不是一句通用文字。',
@@ -1120,11 +1115,7 @@ function cardHTML(d){
 
 function render(f) {
   const main = document.getElementById('main');
-  const catKeys = ['round2', 'acquisition', 'existing', 'tech'];
-  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive')
-    : f === 'archive' ? ALL.filter(d => d.cat === 'archive')
-    : catKeys.includes(f) ? ALL.filter(d => d.cat === f)
-    : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
+  const filtered = f === 'all' ? ALL.filter(d => d.cat !== 'archive') : f === 'archive' ? ALL.filter(d => d.cat === 'archive') : ALL.filter(d => d.types.includes(f) && d.cat !== 'archive');
   let html = '';
   let shown = 0;
   CATS.forEach(cat => {
