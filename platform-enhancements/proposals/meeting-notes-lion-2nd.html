@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第二次提案會議摘要 — Lion Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── SHADCN DESIGN SYSTEM ── */
+:root {
+  --background: #efefef;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --radius: 8px;
+
+  --blue: #2563eb;   --blue-bg: #eff6ff;   --blue-border: #bfdbfe;
+  --teal: #0d9488;   --teal-bg: #f0fdfa;   --teal-border: #99f6e4;
+  --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #ddd6fe;
+  --amber: #d97706;  --amber-bg: #fffbeb;  --amber-border: #fde68a;
+  --pink: #db2777;   --pink-bg: #fdf2f8;   --pink-border: #fbcfe8;
+  --coral: #ea580c;  --coral-bg: #fff7ed;  --coral-border: #fed7aa;
+  --green: #16a34a;  --green-bg: #f0fdf4;  --green-border: #bbf7d0;
+  --red: #dc2626;    --red-bg: #fef2f2;    --red-border: #fecaca;
+}
+
+html { scroll-behavior: smooth; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 2rem 2.5rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+h1 {
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -.04em;
+  line-height: 1.15;
+}
+h1 span { color: var(--green); }
+.header-sub {
+  margin-top: .375rem;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -.01em;
+}
+.stats-row {
+  display: flex;
+  gap: .625rem;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-width: 80px;
+}
+.stat-n {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-l {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* ── MAIN ── */
+main { padding: 2rem 2.5rem 5rem; }
+
+.section { margin-bottom: 2.75rem; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-bottom: .625rem;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.035em;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+  margin-bottom: 12px;
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+.card-header {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.card-header-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -.02em;
+}
+.card-body { padding: 18px 24px 20px; }
+
+/* verdict card */
+.verdict-card {
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 2rem;
+}
+.verdict-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: -.02em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.verdict-body {
+  font-size: 13px;
+  color: #166534;
+  line-height: 1.7;
+}
+
+/* ── TAGS ── */
+.tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+.tag-green  { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+.tag-red    { background: var(--red-bg);    border-color: var(--red-border);    color: var(--red); }
+.tag-amber  { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+.tag-blue   { background: var(--blue-bg);   border-color: var(--blue-border);   color: var(--blue); }
+.tag-purple { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple); }
+.tag-gray   { background: var(--muted);     border-color: var(--border);        color: var(--muted-foreground); }
+.tag-coral  { background: var(--coral-bg);  border-color: var(--coral-border);  color: var(--coral); }
+
+/* ── DATA TABLE ── */
+.dtable { width: 100%; border-collapse: collapse; }
+.dtable th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+}
+.dtable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: #3f3f46;
+  line-height: 1.5;
+  vertical-align: top;
+}
+.dtable tr:last-child td { border-bottom: none; }
+.dtable td:first-child { font-weight: 600; color: var(--foreground); white-space: nowrap; }
+.num-red    { color: var(--red);    font-weight: 700; font-variant-numeric: tabular-nums; }
+.num-green  { color: var(--green);  font-weight: 700; font-variant-numeric: tabular-nums; }
+.num-amber  { color: var(--amber);  font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ── POINT LIST ── */
+.plist { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.plist li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #3f3f46;
+  line-height: 1.65;
+}
+.pi {
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border: 1px solid;
+  font-family: 'JetBrains Mono', monospace;
+}
+.pi-ok    { background: var(--green-bg);  border-color: var(--green-border);  color: var(--green); }
+.pi-warn  { background: var(--amber-bg);  border-color: var(--amber-border);  color: var(--amber); }
+.pi-block { background: var(--red-bg);    border-color: var(--red-border);    color: var(--red); }
+.pi-note  { background: var(--blue-bg);   border-color: var(--blue-border);   color: var(--blue); }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  margin-top: 14px;
+  border: 1px solid;
+}
+.callout-amber { background: var(--amber-bg); border-color: var(--amber-border); color: #92400e; }
+.callout-red   { background: var(--red-bg);   border-color: var(--red-border);   color: #991b1b; }
+.callout-green { background: var(--green-bg); border-color: var(--green-border); color: #166534; }
+.callout-blue  { background: var(--blue-bg);  border-color: var(--blue-border);  color: #1e40af; }
+.callout strong { font-weight: 700; }
+
+/* ── LION QUOTE ── */
+.lion-quote {
+  background: var(--muted);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #3f3f46;
+  line-height: 1.7;
+  margin-top: 14px;
+  font-style: italic;
+}
+.lion-quote::before {
+  content: 'Lion ── ';
+  font-style: normal;
+  font-weight: 700;
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+/* ── SUB HEADING ── */
+.sub-heading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.sub-heading:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+/* ── ACTION GRID ── */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 10px;
+}
+.action-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: box-shadow .2s;
+}
+.action-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.action-num {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--purple-bg);
+  border: 1px solid var(--purple-border);
+  font-size: 11px; font-weight: 700;
+  color: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.action-text { font-size: 13px; color: #3f3f46; line-height: 1.55; }
+.action-text strong { color: var(--foreground); font-weight: 600; display: block; margin-bottom: 3px; }
+.action-owner {
+  font-size: 10.5px;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 5px;
+  letter-spacing: .02em;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 1.25rem 2.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-left { font-size: 11px; color: var(--muted-foreground); font-family: 'JetBrains Mono', monospace; letter-spacing: .04em; }
+.proto-links { display: flex; gap: 6px; flex-wrap: wrap; }
+.proto-link {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: all .15s;
+  font-family: 'Inter', sans-serif;
+}
+.proto-link:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+/* ── TWO-COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } .action-grid { grid-template-columns: 1fr; } header { padding: 1.5rem; } main { padding: 1.5rem 1.5rem 4rem; } }
+
+/* ── STICKY NAV ── */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(239,239,239,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sticky-nav::-webkit-scrollbar { display: none; }
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all .15s;
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+}
+.nav-pill:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+.nav-pill.active { border-color: var(--green); color: var(--green); background: var(--green-bg); font-weight: 600; }
+.nav-pill .nav-num {
+  width: 16px; height: 16px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 4px;
+  font-size: 10px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+.nav-pill.active .nav-num { background: var(--green); }
+.nav-divider { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+
+/* ── ACTION ITEM CHECKBOX ── */
+.action-item { cursor: pointer; }
+.action-item.done { opacity: .55; }
+.action-item.done .action-text strong { text-decoration: line-through; }
+.action-check {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all .15s;
+}
+.action-item.done .action-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.action-item.done .action-check svg { display: block; }
+.action-check svg { display: none; }
+
+/* ── BACK TO TOP ── */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 38px; height: 38px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all .2s;
+  z-index: 200;
+}
+.back-to-top.visible { opacity: 1; pointer-events: all; }
+.back-to-top:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: var(--green);
+  z-index: 999;
+  transition: width .1s linear;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- back to top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂端">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- ── HEADER ── -->
+<header id="top">
+  <div>
+    <div class="eyebrow">Platform Enhancements · Lion Review · 第二次提案</div>
+    <h1>會議摘要 <span>Lion × 團隊</span></h1>
+    <p class="header-sub">三大提案回饋、重要技術限制、漏斗分析解讀 — 三週後全部門報告</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-n">3</div>
+      <div class="stat-l">PROPOSALS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:var(--green);">6</div>
+      <div class="stat-l">ACTION ITEMS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" style="color:var(--amber);">3W</div>
+      <div class="stat-l">TO REPORT</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── STICKY NAV ── -->
+<nav class="sticky-nav" id="stickyNav">
+  <a class="nav-pill active" href="#s1" data-section="s1">
+    <span class="nav-num">1</span>存款流程
+  </a>
+  <a class="nav-pill" href="#s2" data-section="s2">
+    <span class="nav-num">2</span>圖片載入
+  </a>
+  <a class="nav-pill" href="#s3" data-section="s3">
+    <span class="nav-num">3</span>推播通知
+  </a>
+  <div class="nav-divider"></div>
+  <a class="nav-pill" href="#actions" data-section="actions">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    行動項目
+  </a>
+</nav>
+
+<main>
+
+  <!-- Verdict -->
+  <div class="verdict-card">
+    <div class="verdict-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      整體評價：達到第二次提案應有水準
+    </div>
+    <div class="verdict-body">Lion 肯定三個提案都做到了互動 Demo 與實際畫面呈現，符合「要讓人看到你的想法是對還是錯」的標準。其中<strong>存款流程優化是本次最有價值的部分</strong>，因為存款是平台命脈。三組皆有提圖片優化，各自保留觀點，報告後再統一整合落地。三週後進行全部門報告（設計 + 前端），每組約 30 分鐘。</div>
+  </div>
+
+  <!-- ═════════════════════════════
+       SECTION 1: 存款流程
+  ═════════════════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-label">Proposal 01</div>
+    <div class="section-title">
+      <span class="section-num">1</span>
+      優化存款流程
+      <a href="https://awai29.github.io/AIidea/platform-enhancements/proposals/payment-ux-prototypes-v2.html" target="_blank" style="font-size:12px;font-weight:500;color:var(--blue);text-decoration:none;margin-left:auto;letter-spacing:-.01em;">查看原型 ↗</a>
+    </div>
+
+    <!-- 漏斗數據 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-red">漏斗分析</span>
+        <span class="card-header-title">現有數據解讀</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="dtable">
+          <thead>
+            <tr>
+              <th>步驟</th>
+              <th>流失率</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Step 1 → Step 2<br><span style="font-size:11px;color:var(--muted-foreground);font-weight:400;">入口 → 方式選擇</span></td>
+              <td><span class="num-red">64%</span></td>
+              <td>約 24 萬人點擊，15 萬人在第一步離開。<strong>離開原因尚不明確</strong>（叉掉？滑走？斷網？）— 這是最關鍵的待查問題</td>
+            </tr>
+            <tr>
+              <td>Step 2 → Step 3<br><span style="font-size:11px;color:var(--muted-foreground);font-weight:400;">方式選擇 → 表單填寫</span></td>
+              <td><span class="num-green">0.37%</span></td>
+              <td>幾乎無流失。選好方式的人目的明確，會繼續完成</td>
+            </tr>
+            <tr>
+              <td>Step 3 → Step 4<br><span style="font-size:11px;color:var(--muted-foreground);font-weight:400;">表單填寫 → 完成</span></td>
+              <td><span class="num-amber">17%</span></td>
+              <td>可接受範圍。表單填寫階段的正常流失</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:16px 20px;">
+          <div class="callout callout-amber"><strong>最優先待辦：</strong>確認 64% 流失的玩家到底如何離開。如果大多是「主動叉掉」，表示 Step 1 頁面有明顯問題；若是滑走 / 斷網，問題性質完全不同。不搞清楚這件事，後續所有優化方向都可能是錯的。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 渠道分佈 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-blue">渠道數據</span>
+        <span class="card-header-title">支付方式選擇分佈</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="dtable">
+          <thead><tr><th>方式</th><th>佔比</th><th>備註</th></tr></thead>
+          <tbody>
+            <tr><td>E-wallet</td><td><span class="num-green">73.6%</span></td><td>絕大多數用戶首選，約 8 成</td></tr>
+            <tr><td>快速存款</td><td>24%</td><td>點擊率看似不低，但可能有「誤點進去不會用、再跳出走一般存款」的假象</td></tr>
+            <tr><td>Local Bank</td><td>1.58%</td><td>極少數</td></tr>
+            <tr><td>Crypto</td><td>0.8%</td><td>極少數</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:16px 20px;">
+          <div class="callout callout-blue"><strong>快速存款 24% 的疑慮：</strong>建議向通婭取得：使用快速存款的用戶 vs. 一般存款用戶，在<strong>存款金額</strong>上是否有差異，藉此判斷快速存款是否真的服務到目標用戶，還是只是誤點後再跳出。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Promotion 技術限制 -->
+    <div class="card" style="border-color: var(--red-border);">
+      <div class="card-header" style="background: var(--red-bg);">
+        <span class="tag tag-red">重要限制</span>
+        <span class="card-header-title">Promotion 驅動整個金流邏輯 — 必須理解</span>
+      </div>
+      <div class="card-body">
+        <ul class="plist">
+          <li><span class="pi pi-block">!</span><span>所有支付渠道建立在 Promotion 之上。後端邏輯：<strong>先選 Promotion → 才決定哪些渠道可用、各有哪些優惠</strong>。這是技術架構，不是 UX 選擇。</span></li>
+          <li><span class="pi pi-block">!</span><span>「No Promotion」佔比高達 <strong>98%</strong> — 很可能是玩家選了某個 Promotion 後，再選了不支援的渠道，系統自動帶回 No Promotion，但玩家渾然不知。</span></li>
+          <li><span class="pi pi-block">!</span><span>若將 Promotion 移到步驟 3（玩家已填好金額+選好渠道），玩家再改 Promotion，前面所有選擇會<strong>清空重填</strong> → 極差體驗，直接導致流失。</span></li>
+          <li><span class="pi pi-note">→</span><span>建議先確認此技術限制現況（問 Wayne / Sane），再決定 UX 改動的邊界。</span></li>
+        </ul>
+        <div class="lion-quote">這是當初一直想跳出去重新寫的原因，一直繞不過去的硬傷。你們要想辦法讓邏輯不變，但讓 UX 看起來是自然的。</div>
+      </div>
+    </div>
+
+    <!-- Lion 設計方向 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-green">Lion 建議方向</span>
+        <span class="card-header-title">快速存款入口 ＆ Step 2 改動原則</span>
+      </div>
+      <div class="card-body">
+        <div class="sub-heading">快速存款入口問題</div>
+        <ul class="plist">
+          <li><span class="pi pi-warn">!</span><span>「+」號按鈕點擊率不到 1 成，玩家不知道那是快速存款，也沒有文字說明。</span></li>
+          <li><span class="pi pi-ok">→</span><span>建議：在首頁入口旁<strong>新增獨立「快速存款」按鈕</strong>，讓它成為最顯眼選項，與一般存款做 A/B 測試。</span></li>
+          <li><span class="pi pi-note">i</span><span>也可嘗試把「+」號換成金錢符號（注意：不同市場錢的符號不同，有執行難度）。</span></li>
+        </ul>
+        <div class="sub-heading">Step 2 改動原則</div>
+        <ul class="plist">
+          <li><span class="pi pi-block">!</span><span><strong>不要完全改掉 Step 2 的外觀。</strong>用戶習慣了目前流程，突然看到完全不同的頁面反而困惑。</span></li>
+          <li><span class="pi pi-ok">→</span><span>在現有 Step 2 的框架內<strong>增加 widget 或按鈕</strong>（如一鍵上次金額），引導用戶進入快速流程，而不是替換整頁。</span></li>
+          <li><span class="pi pi-note">i</span><span>客戶要求在頁面一開始秀出所有渠道圖示的原因：讓玩家第一眼知道「支付方式很多、很方便」，類似看到 Apple Pay / Line Pay 圖示的安心感。</span></li>
+        </ul>
+        <div class="lion-quote">你不能改掉 Step 2 因為他們習慣了這個流程。你可以在裡面增加某個 widget 或按鈕，讓它變成一鍵直接跳到快速路徑。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════
+       SECTION 2: 圖片載入
+  ═════════════════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-label">Proposal 02</div>
+    <div class="section-title">
+      <span class="section-num">2</span>
+      圖片載入優化
+      <a href="https://awai29.github.io/AIidea/platform-enhancements/proposals/image-optimization-demo.html" target="_blank" style="font-size:12px;font-weight:500;color:var(--blue);text-decoration:none;margin-left:auto;letter-spacing:-.01em;">查看原型 ↗</a>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-blue">實測數據</span>
+        <span class="card-header-title">隨機抽取 6 張遊戲圖的比較結果</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="dtable">
+          <thead><tr><th>優化方式</th><th>效果</th><th>備註</th></tr></thead>
+          <tbody>
+            <tr><td>JPG 壓縮 70%</td><td><span class="num-green">減少 ~50%</span></td><td>肉眼幾乎無法分辨顏色差異</td></tr>
+            <tr><td>WebP 格式</td><td><span class="num-green">減少 ~79%</span></td><td>舊版瀏覽器不支援，需評估相容性</td></tr>
+            <tr><td>1x / 2x 圖優化</td><td>有限</td><td>90% 用戶使用 3x 螢幕，效益約 8%</td></tr>
+            <tr><td>網速自適應解析度</td><td><span class="num-green">體驗大幅改善</span></td><td>前後端、CDN 均可支援；孟加拉市場 3G~4G</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:16px 20px;">
+          <div class="callout callout-amber"><strong>待確認：</strong>後台是否有擋住超過 80KB 的圖片上傳？抽查發現部分圖高達 255~268KB。遊戲圖、Banner 圖都需確認 — 若後台沒有擋，網站負重問題不能歸咎設計端。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-green">Lion 回饋</span>
+        <span class="card-header-title">評價與後續方向</span>
+      </div>
+      <div class="card-body">
+        <ul class="plist">
+          <li><span class="pi pi-ok">+</span><span>有拉出真實數據（而非只說「我想優化圖片」），比其他組的提法更有說服力。</span></li>
+          <li><span class="pi pi-ok">+</span><span>6 張圖就差 2 倍下載量，全站 3000+ 張圖的潛在優化空間相當可觀。</span></li>
+          <li><span class="pi pi-note">i</span><span>三組都有提圖片優化，各自保留觀點。最終報告完後統一看如何整合、由誰落地，不需要提前合併。</span></li>
+          <li><span class="pi pi-note">i</span><span>Lazy loading 目前一格格秀出體驗差，可結合網速偵測做漸進式載入改善（CDN 現有即可支援）。</span></li>
+        </ul>
+        <div class="lion-quote">6 張圖差了兩倍，你全站有那麼多圖，效果不小。先去確認後台到底有沒有擋圖片大小。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════
+       SECTION 3: 推播通知
+  ═════════════════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-label">Proposal 03</div>
+    <div class="section-title">
+      <span class="section-num">3</span>
+      推播通知設計
+      <a href="https://awai29.github.io/AIidea/platform-enhancements/proposals/push-notification-design.html" target="_blank" style="font-size:12px;font-weight:500;color:var(--blue);text-decoration:none;margin-left:auto;letter-spacing:-.01em;">查看原型 ↗</a>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="tag tag-gray">現況</span>
+        <span class="card-header-title">功能剛完成開發，尚未正式啟用（均為測試帳號）</span>
+      </div>
+      <div class="card-body">
+        <ul class="plist">
+          <li><span class="pi pi-note">i</span><span>使用 Firebase，約 <strong>80% 用戶為 Android</strong>。</span></li>
+          <li><span class="pi pi-note">i</span><span>用戶只要在網站登入過，裝置 Token 可保存 30 天，理論上可對這些用戶發推播。</span></li>
+          <li><span class="pi pi-note">i</span><span>推播背景：數據顯示輸錢後七天未登入的玩家幾乎不會自己回來 — 推播是召回的核心機制。</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--amber-border);">
+      <div class="card-header" style="background: var(--amber-bg);">
+        <span class="tag tag-amber">Lion 重點建議</span>
+        <span class="card-header-title">推播要成功落地，必須做到這三件事</span>
+      </div>
+      <div class="card-body">
+        <div class="sub-heading">1 · 直接使用 CRM 的 Tag，不要自己定義規則</div>
+        <ul class="plist">
+          <li><span class="pi pi-ok">→</span><span>CRM（雷拉那邊）已有完整用戶分群 tag 及 Day 1 / Day 3 / Day 7 推播時機規劃（做轉盤任務時已撈過真實數據）。</span></li>
+          <li><span class="pi pi-ok">→</span><span>直接拿 CRM 的 tag 做推播條件，不需自己定義「什麼情況推、防洗錢條件怎麼設」。向阿翰提案時也不需要解釋規則合理性 — CRM 已幫你解釋完了。</span></li>
+        </ul>
+        <div class="lion-quote">你直接拿 CRM 的 tag，你不需要再去跟任何人解釋為什麼要用這個條件。那已經是有公信力的東西了。</div>
+
+        <div class="sub-heading">2 · 先確認「允許推播」的用戶比例</div>
+        <ul class="plist">
+          <li><span class="pi pi-warn">!</span><span>如果 80% 用戶不允許推播，這個功能就不值得優先投入。<strong>必須有數據追蹤允許 vs. 不允許的比例。</strong></span></li>
+          <li><span class="pi pi-ok">→</span><span>這是新功能，只要確保上線後有辦法追蹤這個數據即可。</span></li>
+        </ul>
+
+        <div class="sub-heading">3 · 推播授權要放在個人設定頁，不是進站就問</div>
+        <ul class="plist">
+          <li><span class="pi pi-block">!</span><span>一進站就跳系統推播授權彈窗 → <strong>幾乎 100% 的用戶會按取消</strong>（因為還不知道你要推什麼）。</span></li>
+          <li><span class="pi pi-ok">→</span><span>正確流程：個人設定頁面加入「通知設定」，讓用戶在理解推播內容後主動開啟。</span></li>
+          <li><span class="pi pi-ok">→</span><span>新功能上線時，在首頁 banner 或彈窗引導用戶「去設定看看有什麼新通知」，先建立期待感，再觸發系統授權請求，授權率會大幅提升。</span></li>
+          <li><span class="pi pi-note">i</span><span>隱私考量：部分用戶不希望家人看到推播。推播設定頁可加入「靜音 / 隱藏通知內容」選項。</span></li>
+        </ul>
+        <div class="lion-quote">我連你要推什麼都不知道，你就跳出來問我要不要接受推播，我當然全部按取消。你要讓我先知道你會推什麼好東西，我才願意讓你推。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════════════════════════
+       ACTION ITEMS
+  ═════════════════════════════ -->
+  <div class="section" id="actions">
+    <div class="section-label">Next Steps</div>
+    <div class="section-title">
+      <span class="section-num" style="background:var(--purple);color:#fff;">A</span>
+      後續行動項目
+    </div>
+    <div id="doneCount" style="font-size:12px;color:var(--muted-foreground);font-family:'JetBrains Mono',monospace;margin-bottom:10px;letter-spacing:.03em;">0 / 6 完成</div>
+    <div class="action-grid">
+      <div class="action-item" data-key="a1" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">1</div>
+        <div>
+          <div class="action-text"><strong>確認 64% 流失的離開方式</strong>GA / 數據追查：玩家是主動叉掉、滑走還是斷網？這決定後續所有優化方向。</div>
+          <div class="action-owner">負責 → 數據分析 / 通婭</div>
+        </div>
+      </div>
+      <div class="action-item" data-key="a2" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">2</div>
+        <div>
+          <div class="action-text"><strong>確認後台圖片大小擋機制</strong>確認遊戲圖、Banner 圖是否都有 80KB 限制。若沒有，補上擋機制。</div>
+          <div class="action-owner">負責 → 後端確認</div>
+        </div>
+      </div>
+      <div class="action-item" data-key="a3" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">3</div>
+        <div>
+          <div class="action-text"><strong>確認 Promotion 驅動邏輯現況</strong>問 Wayne 或 Sane：改 Promotion 是否仍會清空渠道選擇？這是存款 UX 改動的技術邊界。</div>
+          <div class="action-owner">負責 → Wayne / Sane</div>
+        </div>
+      </div>
+      <div class="action-item" data-key="a4" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">4</div>
+        <div>
+          <div class="action-text"><strong>找 CRM（雷拉）了解 Tag 與時機規劃</strong>直接拿 Day 1/3/7 的 tag 和召回邏輯，不要重新定義規則。</div>
+          <div class="action-owner">負責 → 找雷拉</div>
+        </div>
+      </div>
+      <div class="action-item" data-key="a5" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">5</div>
+        <div>
+          <div class="action-text"><strong>快速存款入口設計方案</strong>在不改動 Step 2 整體外觀的前提下，提出新增快速存款入口或快捷 widget 的設計方案。</div>
+          <div class="action-owner">負責 → 設計</div>
+        </div>
+      </div>
+      <div class="action-item" data-key="a6" onclick="toggleAction(this)">
+        <div class="action-check">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="action-num">6</div>
+        <div>
+          <div class="action-text"><strong>確認推播允許率追蹤機制</strong>上線後必須能知道有多少 % 的用戶允許推播，這決定功能是否值得繼續投入。</div>
+          <div class="action-owner">負責 → 前端 / Firebase</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-left">Platform Enhancements · 第二次提案摘要 · Lion Review</div>
+  <div class="proto-links">
+    <a class="proto-link" href="https://awai29.github.io/AIidea/platform-enhancements/proposals/payment-ux-prototypes-v2.html" target="_blank">存款流程原型</a>
+    <a class="proto-link" href="https://awai29.github.io/AIidea/platform-enhancements/proposals/image-optimization-demo.html" target="_blank">圖片載入原型</a>
+    <a class="proto-link" href="https://awai29.github.io/AIidea/platform-enhancements/proposals/push-notification-design.html" target="_blank">推播通知原型</a>
+  </div>
+</footer>
+
+<script>
+// ── Smooth scroll for nav pills ──
+document.querySelectorAll('.nav-pill[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// ── Progress bar ──
+const bar = document.getElementById('progressBar');
+function updateProgress() {
+  const scrolled = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+}
+
+// ── Back to top ──
+const btn = document.getElementById('backToTop');
+function updateBackTop() {
+  btn.classList.toggle('visible', window.scrollY > 300);
+}
+
+// ── Scrollspy ──
+const sections = ['s1','s2','s3','actions'];
+const pills = {};
+sections.forEach(id => { pills[id] = document.querySelector(`.nav-pill[data-section="${id}"]`); });
+function updateScrollspy() {
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 80) current = id;
+  });
+  sections.forEach(id => {
+    if (pills[id]) pills[id].classList.toggle('active', id === current);
+  });
+}
+
+window.addEventListener('scroll', () => {
+  updateProgress();
+  updateBackTop();
+  updateScrollspy();
+}, { passive: true });
+
+// ── Action items (with localStorage) ──
+const STORAGE_KEY = 'meeting-lion-2nd-actions';
+function loadDone() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveDone(done) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); } catch {}
+}
+function updateDoneCount() {
+  const items = document.querySelectorAll('.action-item');
+  const done = Array.from(items).filter(el => el.classList.contains('done')).length;
+  const el = document.getElementById('doneCount');
+  if (el) el.textContent = done + ' / ' + items.length + ' 完成';
+}
+function toggleAction(el) {
+  const key = el.dataset.key;
+  el.classList.toggle('done');
+  const done = loadDone();
+  done[key] = el.classList.contains('done');
+  saveDone(done);
+  updateDoneCount();
+}
+
+// Restore state on load
+(function() {
+  const done = loadDone();
+  Object.entries(done).forEach(([key, isDone]) => {
+    if (isDone) {
+      const el = document.querySelector(`.action-item[data-key="${key}"]`);
+      if (el) el.classList.add('done');
+    }
+  });
+  updateDoneCount();
+})();
+</script>
+</body>
+</html>
