@@ -253,6 +253,139 @@ section{scroll-margin-top:70px}
       <div class="sec-desc">同樣 6 張圖，切換解析度版本，觀察 6 張合計流量差距。Tab 預設為你的螢幕 DPR 對應版本。</div>
     </div>
   </div>
+
+  <!-- GA4 用戶 DPR 實際分布 -->
+  <div class="card cp" style="margin-bottom:16px">
+
+    <!-- 標題列 -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">用戶實際 DPR 分布</div>
+        <div style="font-size:11px;color:var(--muted)">來源：GA4 · N = 3,560,322（排除 other）· 依解析度推算裝置 DPR</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <span class="bdg bg">3x ~90%</span>
+        <span class="bdg ba">2x ~8%</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:2px 7px;border-radius:9999px;border:1px solid var(--border)">1x ~2%</span>
+      </div>
+    </div>
+
+    <!-- 兩欄：表格 + 橫條圖 -->
+    <div style="display:grid;grid-template-columns:1fr 220px;gap:20px;align-items:start">
+
+      <!-- 表格 -->
+      <table class="rtbl">
+        <thead><tr>
+          <th style="width:88px">解析度</th>
+          <th style="width:66px">佔比</th>
+          <th>裝置</th>
+          <th style="width:50px;text-align:center">DPR</th>
+          <th style="width:52px;text-align:center">倍速圖</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><code>360×800</code></td>
+            <td><strong>38.22%</strong></td>
+            <td>Samsung Galaxy A / S 系列</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span></td>
+          </tr>
+          <tr>
+            <td><code>385×854</code></td>
+            <td>12.93%</td>
+            <td>Samsung Galaxy A54 / A55</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span></td>
+          </tr>
+          <tr>
+            <td><code>393×873</code></td>
+            <td>10.82%</td>
+            <td>iPhone 14 / 15</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span></td>
+          </tr>
+          <tr>
+            <td><code>360×806</code></td>
+            <td>10.30%</td>
+            <td>Samsung Galaxy</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span></td>
+          </tr>
+          <tr>
+            <td><code>412×915</code></td>
+            <td>9.19%</td>
+            <td>Google Pixel 6 / 7</td>
+            <td style="text-align:center;color:var(--muted)">2.625</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span><sup style="color:var(--muted);font-size:8px">※</sup></td>
+          </tr>
+          <tr>
+            <td><code>375×812</code></td>
+            <td style="color:var(--muted)">8.03% <sup>†</sup></td>
+            <td>iPhone X / 11 / 12</td>
+            <td style="text-align:center">3</td>
+            <td style="text-align:center"><span class="bdg bg">3x</span></td>
+          </tr>
+          <tr style="border-bottom:none">
+            <td><code>414×896</code></td>
+            <td style="color:var(--muted)">1.70% <sup>†</sup></td>
+            <td>iPhone XR / 11</td>
+            <td style="text-align:center">2</td>
+            <td style="text-align:center"><span class="bdg ba">2x</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 右側：橫條圖 + 結論 -->
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">DPR 分布</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <!-- 3x -->
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--green)">3x</span>
+              <span style="font-size:11px;font-weight:700;color:var(--green)">~90%</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+              <div style="width:90%;height:100%;background:var(--green);border-radius:99px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px">Samsung / iPhone 主流</div>
+          </div>
+          <!-- 2x -->
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber)">2x</span>
+              <span style="font-size:11px;font-weight:700;color:var(--amber)">~8%</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+              <div style="width:8%;height:100%;background:var(--amber);border-radius:99px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px">iPhone XR / 舊 Android</div>
+          </div>
+          <!-- 1x -->
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted)">1x</span>
+              <span style="font-size:11px;color:var(--muted)">~2%</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+              <div style="width:2%;height:100%;background:var(--muted);border-radius:99px"></div>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px">桌機 / 舊裝置</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.6">
+          ※ Pixel 2.625x → srcset 選 3x<br>
+          † StatCounter 來源
+        </div>
+      </div>
+    </div>
+
+    <!-- 結論 -->
+    <div class="notice" style="margin-top:14px;margin-bottom:0">
+      💡 <strong>主流（~90%）用戶吃的就是 3x 圖。</strong> BO 現在全部上傳 3x 對這些用戶是正確的。優化重點不是降到 2x，而是透過 <strong>WebP + CDN 壓縮</strong> 縮小 3x 圖的實際體積（WebP 比 PNG 省 30–50%）。
+    </div>
+  </div>
+
   <div class="card cp">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
       <div class="res-tabs" id="res-tabs">
@@ -260,7 +393,6 @@ section{scroll-margin-top:70px}
         <button class="rtab" data-tier="2x" data-w="200"  data-h="266">2x — 200×266</button>
         <button class="rtab" data-tier="3x" data-w="9999" data-h="462">3x — 348×462</button>
       </div>
-      <span class="dpr-badge">你的 DPR: <span id="dpr-val">…</span> → 建議: <span id="dpr-rec">…</span></span>
     </div>
     <div class="ig" id="res-grid"></div>
     <div class="stats">
@@ -340,12 +472,13 @@ export class CdnImagePipe implements PipeTransform {
         <div class="mc" style="background:var(--pbg);border-color:var(--pbdr)">
           <div class="mc-name" style="color:var(--purple)">DPR 對應規則</div>
           <div class="mc-tags"><span class="mc-tag" style="color:var(--purple);background:var(--pbg)">東南亞裝置參考</span></div>
-          <div class="mc-cmd">devicePixelRatio  裝置類型          寬度
-─────────────────────────────────────
-&lt; 1.5            低密度桌機/舊機   → 1x (116px)
-1.5 – 2.4        Android 主流       → 2x (232px)
-≥ 2.5            iPhone / 高階 DPR → 3x (348px)</div>
-          <div class="mc-note" style="color:var(--purple)">東南亞市場大多數 Android 裝置落在 2x，套用 2x 可省下約 34% 流量，且肉眼無法察覺差異。</div>
+          <div class="mc-cmd">devicePixelRatio  裝置類型                    寬度
+───────────────────────────────────────────────
+&lt; 1.5            桌機 / 舊裝置              → 1x (116px)
+1.5 – 2.4        iPhone XR/11 / 舊 Android  → 2x (232px)
+≥ 2.5            Samsung Galaxy / iPhone 14+
+                 / Pixel 6+ （主流 ~90%）   → 3x (348px)</div>
+          <div class="mc-note" style="color:var(--purple)">GA4 實測：主流用戶（~90%）是 3x 裝置。優化重點是壓縮 3x 圖的檔案大小（WebP），而非降 DPR。</div>
         </div>
 
       </div>
@@ -696,8 +829,10 @@ let res1xBytes = 0; // store 1x baseline for comparison
 function initS2() {
   const dpr = window.devicePixelRatio||1;
   const rec = dpr>=2.5?'3x':dpr>=1.5?'2x':'1x';
-  document.getElementById('dpr-val').textContent = dpr.toFixed(2);
-  document.getElementById('dpr-rec').textContent = rec;
+  const dprVal = document.getElementById('dpr-val');
+  const dprRec = document.getElementById('dpr-rec');
+  if (dprVal) dprVal.textContent = dpr.toFixed(2);
+  if (dprRec) dprRec.textContent = rec;
 
   document.querySelectorAll('.rtab').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.tier===rec);

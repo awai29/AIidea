@@ -335,14 +335,16 @@
       <span class="badge badge-amber">2026-05-18 · 真實數據驗證更新</span>
     </div>
     <div style="margin-top:14px;padding:11px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:12.5px;color:#92400e;line-height:1.6;">
-      <strong>數據更新：</strong>真實完成率 85.5%（非假設的 62%）· 放棄率 14.2%（70,671 次）· 最大流失點：Step 2 方式選擇頁（73% 在此離開）和 Step 3 表單頁（複雜 4 層決策）。詳見 R2 提案。
+      <strong>存款完成率：</strong>整體加權平均 <strong>85.1%</strong>（675,273 / 793,945）· 放棄 118,556 人（14.9%）· Step 3 表單每日放棄 14,506 人，是最有介入價值的流失點。
     </div>
   </div>
 </div>
 
 <div class="proto-tabs">
   <div class="proto-tabs-inner">
-    <button class="ptab active" onclick="switchProto('p2',this)">快速存款</button>
+    <button class="ptab active" onclick="switchProto('funnel',this)">📊 漏斗分析</button>
+    <span style="width:1px;height:18px;background:var(--border);display:inline-block;margin:0 4px;flex-shrink:0;align-self:center;"></span>
+    <button class="ptab" onclick="switchProto('p2',this)">快速存款</button>
     <button class="ptab" onclick="switchProto('p4',this)">流失後問卷</button>
     <button class="ptab" onclick="switchProto('p6',this)">一鍵重複存款</button>
     <span style="width:1px;height:18px;background:var(--border);display:inline-block;margin:0 4px;flex-shrink:0;align-self:center;"></span>
@@ -351,6 +353,170 @@
 </div>
 
 <div class="main">
+
+<!-- ═══════════════════════════════════════
+     漏斗分析：為什麼要優化存款流程
+═══════════════════════════════════════ -->
+<div id="funnel" class="proto active" style="max-width:860px;margin:0 auto">
+  <div class="proto-head">
+    <div class="proto-num">開場 · 數據說明</div>
+    <div class="proto-title">為什麼針對 Payment 做優化</div>
+    <p class="proto-desc">存款是平台最核心的收入轉化動作。整體完成率 85.1%，看起來不低，但 14.9%（118,556 人）選擇放棄。其中 Step 3 表單每天有 14,506 人放棄，這是最有介入價值的流失點。</p>
+  </div>
+
+  <!-- 核心數字（Step 漏斗，BH 品牌） -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;border-top:3px solid #15803d">
+      <div style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">整體完成率</div>
+      <div style="font-size:34px;font-weight:800;color:#15803d;letter-spacing:-.02em;line-height:1">79.5%</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">675,273 completed / 793,945 總計</div>
+    </div>
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;border-top:3px solid #b45309">
+      <div style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Step 3 每日放棄（全站）</div>
+      <div style="font-size:34px;font-weight:800;color:#b45309;letter-spacing:-.02em;line-height:1">14,506</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">到達表單但 20 秒後離開</div>
+    </div>
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:18px;border-top:3px solid #15803d">
+      <div style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px">Quick Deposit 使用率</div>
+      <div style="font-size:34px;font-weight:800;color:#15803d;letter-spacing:-.02em;line-height:1">6.3%</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">首存新客 24h 內</div>
+    </div>
+  </div>
+
+  <!-- 漏斗視覺化 + 表格 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+    <!-- 漏斗圖 -->
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+      <div style="font-size:12px;font-weight:600;margin-bottom:16px">存款流程漏斗</div>
+      <!-- funnel bars -->
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:600">Step 1 · 入口點擊</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--muted)">237,058 · 100%</span>
+          </div>
+          <div style="height:28px;background:#15803d;border-radius:6px;display:flex;align-items:center;padding-left:10px">
+            <span style="font-size:10px;font-weight:700;color:#fff">100%</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:10px;font-weight:700;color:#dc2626">↓ 64.88% 流失（153,814 人）</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:600">Step 2 · 方式選擇</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--muted)">83,244 · 35.12%</span>
+          </div>
+          <div style="height:28px;background:#22c55e;border-radius:6px;width:35.12%;display:flex;align-items:center;padding-left:8px">
+            <span style="font-size:10px;font-weight:700;color:#fff">35%</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:10px;color:var(--muted)">↓ 0.37% 流失（306 人）正常</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:600">Step 3 · 到達表單頁</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--muted)">82,938 · 34.99%</span>
+          </div>
+          <div style="height:28px;background:#f59e0b;border-radius:6px;width:34.99%;display:flex;align-items:center;padding-left:8px">
+            <span style="font-size:10px;font-weight:700;color:#fff">35%</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:2px 0">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:10px;font-weight:700;color:#b45309">↓ 17.49% 流失（14,506 人）⚠</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:600">Step 4 · 存款完成</span>
+            <span style="font-family:monospace;font-size:11px;color:var(--muted)">68,432 · 28.87%</span>
+          </div>
+          <div style="height:28px;background:#dc2626;border-radius:6px;width:28.87%;display:flex;align-items:center;padding-left:8px">
+            <span style="font-size:10px;font-weight:700;color:#fff">28.87%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 詳細表格 -->
+    <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+      <div style="font-size:12px;font-weight:600;margin-bottom:14px">存款流程_漏斗分析</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:6px 8px;font-family:monospace;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase">步驟</th>
+            <th style="text-align:right;padding:6px 8px;font-family:monospace;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase">人數</th>
+            <th style="text-align:right;padding:6px 8px;font-family:monospace;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase">放棄率</th>
+            <th style="text-align:left;padding:6px 8px;font-family:monospace;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase">狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 8px;font-weight:600">Step 1 · 入口點擊</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace">237,058</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace;font-weight:700;color:#dc2626">64.88%</td>
+            <td style="padding:9px 8px"><span style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">流失點</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 8px;font-weight:600">Step 2 · 方式選擇</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace">83,244</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace;color:var(--muted)">0.37%</td>
+            <td style="padding:9px 8px"><span style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">正常</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 8px;font-weight:600">Step 3 · 到達表單頁</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace">82,938</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace;font-weight:700;color:#b45309">17.49%</td>
+            <td style="padding:9px 8px"><span style="background:#fffbeb;border:1px solid #fde68a;color:#b45309;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">流失點</span></td>
+          </tr>
+          <tr>
+            <td style="padding:9px 8px;font-weight:600">Step 4 · 存款完成</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace;font-weight:700">68,432</td>
+            <td style="padding:9px 8px;text-align:right;font-family:monospace;color:var(--muted)">—</td>
+            <td style="padding:9px 8px"><span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">目標</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;padding:10px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e;line-height:1.6">
+        ⚡ <strong>64.88% 在 Step 1 就放棄</strong>——這是最大機會，但原因待確認（是 UX 問題、網速、意圖不強？）<br>
+        ⚠ <strong>14,506 人/日</strong>到達表單但未完成，這是最有即時 Offer 介入價值的時機點
+      </div>
+    </div>
+  </div>
+
+  <!-- 為什麼這三個方向 -->
+  <div style="background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px">
+    <div style="font-size:12px;font-weight:600;margin-bottom:14px">從數據到提案 — 三個前端可主導的改善方向</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="padding:14px;border-radius:8px;border:1px solid var(--border);border-top:3px solid #ea580c">
+        <div style="font-size:11px;font-weight:700;margin-bottom:4px">↩ 放棄偵測 + 即時 Offer</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.55">針對 Step 3 的 14,506 人：進入表單超過 20 秒未完成，下個頁面底部滑出存款 Offer</div>
+        <div style="margin-top:8px;font-family:monospace;font-size:10px;color:#ea580c">目標：Step 3→4 完成率↑</div>
+      </div>
+      <div style="padding:14px;border-radius:8px;border:1px solid var(--border);border-top:3px solid #7c3aed">
+        <div style="font-size:11px;font-weight:700;margin-bottom:4px">⚡ Quick Deposit 降低摩擦</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.55">把多步驟流程壓縮成一鍵操作，特別針對回流玩家，預選上次方式 + 上次金額</div>
+        <div style="margin-top:8px;font-family:monospace;font-size:10px;color:#7c3aed">目標：Step 1→2 流失率↓</div>
+      </div>
+      <div style="padding:14px;border-radius:8px;border:1px solid var(--border);border-top:3px solid #15803d">
+        <div style="font-size:11px;font-weight:700;margin-bottom:4px">🎯 金額智慧預設</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.55">依個人歷史存款動態生成快捷金額，加 +10% 選項引導向上存，Quick Deposit 使用率 6.3% → 目標 20%</div>
+        <div style="margin-top:8px;font-family:monospace;font-size:10px;color:#15803d">目標：客均存款金額↑</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="ptab" onclick="switchProto('p2', document.querySelector('.ptab:nth-child(4)'))" style="background:var(--fg);color:#fff;border-color:var(--fg);font-size:12px">查看快速存款原型 →</button>
+      <button class="ptab" onclick="switchProto('p4', document.querySelector('.ptab:nth-child(5)'))" style="font-size:12px">查看流失後問卷原型 →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════
      原型 1：Step 2 方式選擇改善
@@ -693,7 +859,7 @@
 <!-- ═══════════════════════════════════════
      原型 2：Step 3 表單精簡改善
 ═══════════════════════════════════════ -->
-<div id="p2" class="proto active">
+<div id="p2" class="proto">
   <div class="proto-head">
     <div class="proto-num">原型 2 · Step 3 最大流失點（第二）</div>
     <div class="proto-title">表單精簡改善</div>
