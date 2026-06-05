@@ -25,9 +25,8 @@ function computeHistogramFromPixels(pixels: Uint8Array): number[] {
   return hist
 }
 
-const lutEngine = new LutEngine()
-
 export default function App() {
+  const lutEngine = useRef(new LutEngine()).current
   const [tool, setTool] = useState<ToolId>('hsl')
   const [params, setParams] = useState<AdjustmentParams>(defaultAdjustmentParams())
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 })
@@ -55,9 +54,12 @@ export default function App() {
     })
   }, [])
 
-  const handleParamsChange = (next: AdjustmentParams) => {
-    setParams(next)
-    if (isLoaded) scheduleLutUpdate(next)
+  const handleParamsChange = (updater: (prev: AdjustmentParams) => AdjustmentParams) => {
+    setParams(prev => {
+      const next = updater(prev)
+      if (isLoaded) scheduleLutUpdate(next)
+      return next
+    })
   }
 
   // 接收來自 plugin code 的訊息
@@ -116,11 +118,9 @@ export default function App() {
       const canvas = document.createElement('canvas')
       canvas.width = width
       canvas.height = height
-      const ctx = canvas.getContext('2d')!
-      const plainBuffer = pixels.buffer instanceof SharedArrayBuffer
-        ? (pixels.buffer.slice(0) as unknown as ArrayBuffer)
-        : (pixels.buffer as unknown as ArrayBuffer)
-      const imageData = new ImageData(new Uint8ClampedArray(plainBuffer), width, height)
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('無法建立 2D canvas context')
+      const imageData = new ImageData(new Uint8ClampedArray(pixels), width, height)
       ctx.putImageData(imageData, 0, 0)
 
       const blob = await new Promise<Blob>((resolve, reject) =>
@@ -139,9 +139,9 @@ export default function App() {
     }
   }
 
-  const resetHsl = () => handleParamsChange({ ...params, hsl: defaultHslParams() })
-  const resetColorBalance = () => handleParamsChange({ ...params, colorBalance: defaultColorBalanceParams() })
-  const resetLevels = () => handleParamsChange({ ...params, levels: defaultLevelsParams() })
+  const resetHsl = () => handleParamsChange(prev => ({ ...prev, hsl: defaultHslParams() }))
+  const resetColorBalance = () => handleParamsChange(prev => ({ ...prev, colorBalance: defaultColorBalanceParams() }))
+  const resetLevels = () => handleParamsChange(prev => ({ ...prev, levels: defaultLevelsParams() }))
 
   if (errorMessage) {
     return <ErrorState message={errorMessage} />
@@ -173,14 +173,14 @@ export default function App() {
           {tool === 'hsl' && (
             <HueSaturation
               params={params.hsl}
-              onChange={(hsl) => handleParamsChange({ ...params, hsl })}
+              onChange={(hsl) => handleParamsChange(prev => ({ ...prev, hsl }))}
               onReset={resetHsl}
             />
           )}
           {tool === 'colorBalance' && (
             <ColorBalance
               params={params.colorBalance}
-              onChange={(colorBalance) => handleParamsChange({ ...params, colorBalance })}
+              onChange={(colorBalance) => handleParamsChange(prev => ({ ...prev, colorBalance }))}
               onReset={resetColorBalance}
             />
           )}
@@ -188,7 +188,7 @@ export default function App() {
             <Levels
               params={params.levels}
               histogram={histogram}
-              onChange={(levels) => handleParamsChange({ ...params, levels })}
+              onChange={(levels) => handleParamsChange(prev => ({ ...prev, levels }))}
               onReset={resetLevels}
             />
           )}
@@ -203,8 +203,9 @@ export default function App() {
         }}>
           <button
             onClick={() => {
-              setParams(defaultAdjustmentParams())
-              scheduleLutUpdate(defaultAdjustmentParams())
+              const defaults = defaultAdjustmentParams()
+              setParams(defaults)
+              scheduleLutUpdate(defaults)
             }}
             style={{
               flex: 1, padding: '6px 0', border: '1px solid #d4d4d4',
