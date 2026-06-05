@@ -19,12 +19,17 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
     if (Number.isFinite(v)) onChange(Math.max(min, Math.min(max, v)))
   }
 
+  // 防止 min === max 時除以零
+  const range = max - min;
+  const pct = range === 0 ? 0 : ((value - min) / range) * 100;
+
   return (
     <div style={{ marginBottom: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <span style={{ fontSize: 11, color: '#555' }}>{label}</span>
         <input
           type="number"
+          aria-label={label}
           value={value}
           min={min}
           max={max}
@@ -53,7 +58,7 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
         <div style={{
           position: 'absolute',
           top: '50%',
-          left: `${((value - min) / (max - min)) * 100}%`,
+          left: `${pct}%`,
           transform: 'translate(-50%, -50%)',
           width: 14, height: 14,
           borderRadius: '50%',
