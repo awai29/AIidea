@@ -56,6 +56,11 @@ function createProgram(gl: WebGL2RenderingContext): WebGLProgram {
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     throw new Error(`Program link error: ${gl.getProgramInfoLog(program)}`);
   }
+  // 連結完成後刪除 shader 物件，釋放 GPU 記憶體
+  gl.detachShader(program, vs);
+  gl.detachShader(program, fs);
+  gl.deleteShader(vs);
+  gl.deleteShader(fs);
   return program;
 }
 
@@ -94,7 +99,7 @@ export class WebGLRenderer {
    */
   loadImage(bytes: Uint8Array, width: number, height: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      const blob = new Blob([bytes.buffer as ArrayBuffer]);
+      const blob = new Blob([bytes as unknown as BlobPart]);
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = () => {
@@ -172,6 +177,9 @@ export class WebGLRenderer {
     const w = this.imageWidth;
     const h = this.imageHeight;
 
+    // 防呆：尚未載入圖片時直接拋錯
+    if (w === 0 || h === 0) throw new Error('尚未載入圖片，無法讀取像素');
+
     // 建立離屏 Framebuffer 以原圖解析度讀取
     const fb = gl.createFramebuffer()!;
     const tex = gl.createTexture()!;
@@ -187,6 +195,7 @@ export class WebGLRenderer {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.deleteFramebuffer(fb);
       gl.deleteTexture(tex);
+      this.render();  // 恢復 canvas 顯示
       throw new Error('離屏 Framebuffer 建立失敗');
     }
 
