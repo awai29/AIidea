@@ -168,6 +168,24 @@ export class WebGLRenderer {
     gl.bindVertexArray(null);
   }
 
+  /** 清理所有 GPU 資源，在元件卸載時呼叫 */
+  destroy(): void {
+    const { gl } = this;
+    if (this.imageTexture) {
+      gl.deleteTexture(this.imageTexture);
+      this.imageTexture = null;
+    }
+    if (this.lutTexture) {
+      gl.deleteTexture(this.lutTexture);
+      this.lutTexture = null;
+    }
+    gl.deleteVertexArray(this.vao);
+    gl.deleteProgram(this.program);
+    // 釋放 WebGL context
+    const ext = gl.getExtension('WEBGL_lose_context');
+    ext?.loseContext();
+  }
+
   /**
    * 讀取目前渲染結果的像素（RGBA Uint8Array）
    * 在 Apply 時呼叫，回傳圖片 bytes 傳給 plugin code

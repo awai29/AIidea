@@ -27,6 +27,10 @@ export const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview(
     } catch (e) {
       console.error('WebGL 初始化失敗：', e)
     }
+    return () => {
+      rendererRef.current?.destroy()
+      rendererRef.current = null
+    }
   }, [])
 
   useImperativeHandle(ref, () => ({
