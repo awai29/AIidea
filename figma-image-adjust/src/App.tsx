@@ -35,8 +35,12 @@ export default function App() {
   const [isApplying, setIsApplying] = useState(false)
   const [histogram, setHistogram] = useState<number[] | null>(null)
 
+  const [isComparing, setIsComparing] = useState(false)
+
   const previewRef = useRef<PreviewHandle>(null)
   const rafRef = useRef<number | null>(null)
+  const identityLutRef = useRef<Uint8Array | null>(null)  // 原圖 identity LUT（對比用）
+  const currentLutRef = useRef<Uint8Array | null>(null)   // 目前調整後的 LUT
 
   const waitForPreview = useCallback(async (): Promise<PreviewHandle> => {
     if (previewRef.current) return previewRef.current
@@ -45,14 +49,29 @@ export default function App() {
     return previewRef.current
   }, [])
 
-  // 每次 params 改變，重新計算 LUT 並更新預覽
+  // 每次 params 改變，重新計算 LUT 並更新預覽（非對比模式才顯示）
   const scheduleLutUpdate = useCallback((nextParams: AdjustmentParams) => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
     rafRef.current = requestAnimationFrame(() => {
       const lutData = lutEngine.compute(nextParams)
-      previewRef.current?.updateLut(lutData)
+      currentLutRef.current = lutData
+      if (!isComparingRef.current) previewRef.current?.updateLut(lutData)
     })
   }, [])
+
+  // 用 ref 追蹤 isComparing，讓 scheduleLutUpdate callback 不需要重建
+  const isComparingRef = useRef(false)
+
+  // 對比切換：按住看原圖，放開看調整後
+  useEffect(() => {
+    isComparingRef.current = isComparing
+    if (!previewRef.current) return
+    if (isComparing && identityLutRef.current) {
+      previewRef.current.updateLut(identityLutRef.current)
+    } else if (!isComparing && currentLutRef.current) {
+      previewRef.current.updateLut(currentLutRef.current)
+    }
+  }, [isComparing])
 
   const handleParamsChange = (updater: (prev: AdjustmentParams) => AdjustmentParams) => {
     setParams(prev => {
@@ -85,6 +104,8 @@ export default function App() {
           // 初始化預設 LUT（identity）
           const initParams = defaultAdjustmentParams()
           const lutData = lutEngine.compute(initParams)
+          identityLutRef.current = lutData   // 存起來供對比用
+          currentLutRef.current = lutData
           preview.updateLut(lutData)
 
           // 計算直方圖（讀取初始 RGBA pixels）
@@ -148,7 +169,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ width: 360, minHeight: 480, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: 380, minHeight: 480, display: 'flex', flexDirection: 'column' }}>
       <Sidebar active={tool} onChange={setTool} />
 
       {/* Preview 永遠掛載（使 WebGLRenderer 在訊息到達前就初始化完成）
@@ -212,7 +233,22 @@ export default function App() {
               borderRadius: 6, fontSize: 12, cursor: 'pointer', background: '#fff',
             }}
           >
-            全部重設
+            重設
+          </button>
+          {/* 按住查看原圖，放開回到調整後 */}
+          <button
+            onMouseDown={() => setIsComparing(true)}
+            onMouseUp={() => setIsComparing(false)}
+            onMouseLeave={() => setIsComparing(false)}
+            style={{
+              flex: 1, padding: '6px 0', border: '1px solid',
+              borderColor: isComparing ? '#18A0FB' : '#d4d4d4',
+              borderRadius: 6, fontSize: 12, cursor: 'pointer',
+              background: isComparing ? '#e8f4ff' : '#fff',
+              color: isComparing ? '#18A0FB' : '#555',
+            }}
+          >
+            {isComparing ? '原圖' : '對比'}
           </button>
           <button
             onClick={handleApply}

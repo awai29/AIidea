@@ -13,7 +13,7 @@ function isFillableNode(node: SceneNode): node is FillableNode {
 }
 
 // Plugin 視窗尺寸
-figma.showUI(__html__, { width: 360, height: 560, title: 'Image Adjust' });
+figma.showUI(__html__, { width: 380, height: 720, title: 'Image Adjust' });
 
 // 取得選取節點的第一個 ImagePaint fill 的圖片 bytes
 async function getImageBytesFromSelection(): Promise<

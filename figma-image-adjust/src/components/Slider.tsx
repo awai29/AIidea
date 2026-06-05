@@ -19,13 +19,9 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
     if (Number.isFinite(v)) onChange(Math.max(min, Math.min(max, v)))
   }
 
-  // 防止 min === max 時除以零
-  const range = max - min;
-  const pct = range === 0 ? 0 : ((value - min) / range) * 100;
-
   return (
     <div style={{ marginBottom: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
         <span style={{ fontSize: 11, color: '#555' }}>{label}</span>
         <input
           type="number"
@@ -41,33 +37,17 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
           }}
         />
       </div>
-      <div style={{ position: 'relative', height: 6, borderRadius: 3, background: gradient }}>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={handleInput}
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            opacity: 0, cursor: 'pointer', margin: 0,
-          }}
-        />
-        {/* 拖柄 */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: `${pct}%`,
-          transform: 'translate(-50%, -50%)',
-          width: 14, height: 14,
-          borderRadius: '50%',
-          background: '#fff',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-          border: '1px solid #ccc',
-          pointerEvents: 'none',
-        }} />
-      </div>
+      {/* 原生 range input，gradient 透過 CSS variable 傳入 track — thumb 由瀏覽器原生處理，即時無延遲 */}
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={handleInput}
+        style={{ '--track-gradient': gradient } as React.CSSProperties}
+      />
     </div>
   )
 }
