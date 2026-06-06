@@ -359,7 +359,45 @@ section{scroll-margin-top:70px}
 .ps-radio.selected::after{content:'';width:9px;height:9px;border-radius:50%;background:#14805e}
 .ps-radio.unselected{border-color:#454647}
 
-/* Toast */
+/* BJ Platform Toast */
+.bj-toast{
+  background:#303232;border-radius:3px;position:relative;overflow:hidden;
+  box-shadow:0 2px 5px rgba(0,0,0,.6);font-family:'Poppins','Inter',sans-serif;
+}
+.bj-toast-bar{
+  position:absolute;left:0;top:0;bottom:0;width:5px;
+  background:#38ba9d;border-radius:3px 0 0 3px;
+}
+.bj-toast-content{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 14px 10px 20px;
+}
+.bj-toast-icon{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 35%,#3ed9a8,#14805e);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(20,128,94,.5);
+}
+.bj-toast-text{flex:1;min-width:0}
+.bj-toast-title{
+  font-size:12px;font-weight:600;color:#e2e6e9;
+  line-height:1.4;margin-bottom:2px;
+}
+.bj-toast-body{font-size:11px;color:#8d9aa5;line-height:1.4}
+.bj-toast-amount{color:#27b488;font-weight:600}
+.bj-toast-close{
+  font-size:12px;color:#8d9aa5;background:none;border:none;
+  cursor:pointer;flex-shrink:0;padding:0 2px;line-height:1;
+}
+.bj-toast-progress{
+  height:5px;background:#393b3b;position:relative;
+}
+.bj-toast-progress-fill{
+  position:absolute;left:0;top:0;bottom:0;width:50%;
+  background:#454647;border-radius:3px 0 0 3px;
+}
+
+/* Android Toast (fallback, kept for non-BJ screens) */
 .android-toast{
   position:absolute;bottom:60px;left:12px;right:12px;z-index:30;
   background:#323232;color:#fff;border-radius:8px;padding:11px 14px;
@@ -564,56 +602,46 @@ section{scroll-margin-top:70px}
 
     <div class="phones-row">
 
-      <!-- STEP 1: Our app — deposit success -->
+      <!-- STEP 1: Our app — deposit success (home page + BJ toast) -->
       <div class="phone-col">
         <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
-            <div class="asb" style="background:#0f2240;color:#fff">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
               <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#fff">
-                <span class="asb-signal">▲</span>
-                <span class="asb-wifi">WiFi</span>
-                <span style="font-size:10px">🔋</span>
+              <div class="asb-icons" style="color:#e2e6e9">
+                <span style="font-size:10px">▲ WiFi 🔋</span>
               </div>
             </div>
-            <div class="app-screen">
-              <div class="app-topbar">
-                <span class="app-topbar-back">←</span>
-                <span class="app-topbar-title">存款</span>
-                <span style="width:20px"></span>
-              </div>
-              <div class="app-body">
-                <div class="dep-check">✓</div>
-                <div style="text-align:center;margin-bottom:8px">
-                  <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:4px">存款成功！</div>
-                  <div class="dep-amount">฿ 1,000</div>
-                  <div class="dep-note">已到帳，可立即使用</div>
-                </div>
-                <div class="dep-row" style="margin-bottom:6px">
-                  <div><div class="dep-lbl">支付方式</div><div class="dep-val">PromptPay</div></div>
-                  <div><div class="dep-lbl">到帳</div><div class="dep-val">即時</div></div>
-                  <div><div class="dep-lbl">手續費</div><div class="dep-val">免費</div></div>
-                </div>
-                <div style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
-                  border-radius:10px;padding:9px 12px">
-                  <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:2px">首存獎勵</div>
-                  <div style="font-size:12px;font-weight:600;color:#4ade80">+฿ 500 紅利已解鎖</div>
-                </div>
-                <div style="flex:1"></div>
-                <div style="background:#14805e;border-radius:10px;padding:11px;text-align:center">
-                  <div style="font-size:13px;font-weight:600;color:#fff">前往下注</div>
+            <!-- Home page background + toast overlay -->
+            <div style="position:relative;overflow:hidden">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
+              <!-- BJ Platform Toast -->
+              <div style="position:absolute;top:10px;left:10px;right:10px;z-index:10">
+                <div class="bj-toast">
+                  <div class="bj-toast-bar"></div>
+                  <div class="bj-toast-content">
+                    <div class="bj-toast-icon">✓</div>
+                    <div class="bj-toast-text">
+                      <div class="bj-toast-title">Approved in</div>
+                      <div class="bj-toast-body">In amount <span class="bj-toast-amount">+฿ 1,000.00</span> has been approved.</div>
+                    </div>
+                    <button class="bj-toast-close">✕</button>
+                  </div>
+                  <div class="bj-toast-progress">
+                    <div class="bj-toast-progress-fill"></div>
+                  </div>
                 </div>
               </div>
             </div>
             <!-- Android nav bar -->
-            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
             </div>
           </div>
         </div>
-        <div class="phone-label">存款成功畫面<br><span style="color:var(--purple)">我們平台的設計</span></div>
+        <div class="phone-label">存款成功 — BJ 首頁 + Toast<br><span style="color:var(--purple)">我們平台的設計</span></div>
       </div>
 
       <!-- STEP 2: Our app — pre-prompt sheet -->
@@ -726,8 +754,23 @@ section{scroll-margin-top:70px}
                   <div style="font-size:12px;font-weight:600;color:#4ade80">✓ 通知已開啟</div>
                 </div>
               </div>
-              <!-- Android Toast -->
-              <div class="android-toast">通知已開啟</div>
+              <!-- BJ Platform Toast -->
+              <div style="position:absolute;bottom:30px;left:8px;right:8px;z-index:30">
+                <div class="bj-toast">
+                  <div class="bj-toast-bar"></div>
+                  <div class="bj-toast-content">
+                    <div class="bj-toast-icon">🔔</div>
+                    <div class="bj-toast-text">
+                      <div class="bj-toast-title">Notifications enabled</div>
+                      <div class="bj-toast-body">You'll receive personalised alerts.</div>
+                    </div>
+                    <button class="bj-toast-close">✕</button>
+                  </div>
+                  <div class="bj-toast-progress">
+                    <div class="bj-toast-progress-fill"></div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
               <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
