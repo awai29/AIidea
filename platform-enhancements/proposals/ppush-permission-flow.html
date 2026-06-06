@@ -650,20 +650,13 @@ section{scroll-margin-top:70px}
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
-            <div class="asb" style="background:#0f2240;color:#fff">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
               <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div class="app-screen" style="position:relative">
+            <div style="position:relative;overflow:hidden">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
               <div class="platform-overlay"></div>
-              <div class="app-topbar" style="opacity:.5">
-                <span class="app-topbar-back">←</span>
-                <span class="app-topbar-title">存款</span>
-              </div>
-              <div class="app-body" style="opacity:.5;min-height:430px">
-                <div class="dep-check">✓</div>
-                <div style="text-align:center"><div class="dep-amount">฿ 1,000</div></div>
-              </div>
               <div class="platform-sheet">
                 <div class="sheet-handle"></div>
                 <div class="sheet-ico">🔔</div>
@@ -678,8 +671,8 @@ section{scroll-margin-top:70px}
                 <button class="sheet-secondary">稍後再說</button>
               </div>
             </div>
-            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
             </div>
           </div>
         </div>
@@ -692,18 +685,14 @@ section{scroll-margin-top:70px}
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
-            <div class="asb" style="background:#0f2240;color:#fff">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
               <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div style="position:relative">
-              <div class="app-topbar" style="opacity:.4"><span class="app-topbar-title">存款</span></div>
-              <div class="app-body" style="opacity:.35;min-height:418px">
-                <div class="dep-check">✓</div>
-                <div style="text-align:center"><div class="dep-amount">฿ 1,000</div></div>
-              </div>
+            <div style="position:relative;overflow:hidden">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block;opacity:.45">
               <!-- Chrome native permission dialog -->
-              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.5)">
+              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.55)">
                 <div class="chrome-permission">
                   <div class="cp-header">
                     <div class="cp-site-icon" style="background:#222424;overflow:hidden;padding:2px">
@@ -731,31 +720,20 @@ section{scroll-margin-top:70px}
         <div class="phone-label">Chrome 授權彈窗<br><span style="color:#2e7d32">Android Chrome 原生 UI</span></div>
       </div>
 
-      <!-- STEP 4a: Success + notification shade -->
+      <!-- STEP 4a: Success -->
       <div class="phone-col">
-        <div class="phone-step">STEP 04a · 允許 · <span style="color:#2e7d32">🤖 Android 原生</span></div>
+        <div class="phone-step">STEP 04a · 允許 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
-            <div class="asb" style="background:#0f2240;color:#fff">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
               <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div style="position:relative">
-              <div class="app-topbar"><span class="app-topbar-title">存款</span></div>
-              <div class="app-body" style="min-height:418px">
-                <div class="dep-check">✓</div>
-                <div style="text-align:center;margin-bottom:8px">
-                  <div class="dep-amount">฿ 1,000</div>
-                  <div class="dep-note">已到帳</div>
-                </div>
-                <div style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
-                  border-radius:10px;padding:10px;text-align:center">
-                  <div style="font-size:12px;font-weight:600;color:#4ade80">✓ 通知已開啟</div>
-                </div>
-              </div>
-              <!-- BJ Platform Toast -->
-              <div style="position:absolute;bottom:30px;left:8px;right:8px;z-index:30">
+            <div style="position:relative;overflow:hidden">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
+              <!-- BJ Toast top -->
+              <div style="position:absolute;top:10px;left:10px;right:10px;z-index:30">
                 <div class="bj-toast">
                   <div class="bj-toast-bar"></div>
                   <div class="bj-toast-content">
@@ -772,12 +750,12 @@ section{scroll-margin-top:70px}
                 </div>
               </div>
             </div>
-            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
             </div>
           </div>
         </div>
-        <div class="phone-label">授權成功<br><span style="color:#2e7d32">Android Toast 通知</span></div>
+        <div class="phone-label">授權成功<br><span style="color:var(--purple)">BJ 平台 Toast</span></div>
       </div>
 
       <!-- STEP 4b: Snackbar after deny -->
@@ -786,29 +764,20 @@ section{scroll-margin-top:70px}
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
-            <div class="asb" style="background:#0f2240;color:#fff">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
               <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div style="position:relative">
-              <div class="app-topbar"><span class="app-topbar-title">存款</span></div>
-              <div class="app-body" style="min-height:418px">
-                <div class="dep-check">✓</div>
-                <div style="text-align:center;margin-bottom:8px">
-                  <div class="dep-amount">฿ 1,000</div>
-                </div>
-                <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:11px;text-align:center">
-                  <div style="font-size:12px;color:rgba(255,255,255,.4)">繼續遊玩</div>
-                </div>
-              </div>
+            <div style="position:relative;overflow:hidden">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
               <!-- Android Snackbar -->
               <div class="android-snackbar">
                 <div class="snack-text">可在帳號設定中開啟通知</div>
                 <div class="snack-action">前往設定</div>
               </div>
             </div>
-            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
             </div>
           </div>
         </div>
