@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import { buildCurveLut } from '../lut/curves'
 import type { CurvesParams, CurvePoint, HistogramData } from '../types'
 
@@ -40,6 +40,8 @@ interface CurvesProps {
 export function Curves({ params, histogram, onChange, onReset }: CurvesProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const dragRef = useRef<number | null>(null)
+  // 懸停提示（input → output 數值）
+  const [hoverPt, setHoverPt] = useState<[number, number] | null>(null)
 
   // 用 ref 儲存最新的 params / onChange，讓全域事件處理函數永遠讀到最新值
   const paramsRef = useRef(params)
@@ -111,6 +113,16 @@ export function Curves({ params, histogram, onChange, onReset }: CurvesProps) {
     const cur = paramsRef.current
     onChangeRef.current({ ...cur, [cur.channel]: { points: pts.filter((_, i) => i !== idx) } })
   }, [])
+
+  // 滑鼠移入 SVG：更新懸停提示
+  const handleSvgMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current) return
+    const rect = svgRef.current.getBoundingClientRect()
+    const sx = e.clientX - rect.left
+    if (sx < 0 || sx > W) { setHoverPt(null); return }
+    const input = Math.round(Math.max(0, Math.min(255, (sx / W) * 255)))
+    setHoverPt([input, lut[input]])
+  }, [lut])
 
   // SVG 空白處按下：新增控制點並立即拖曳
   const handleSvgMouseDown = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
@@ -184,6 +196,8 @@ export function Curves({ params, histogram, onChange, onReset }: CurvesProps) {
         width={W}
         height={H}
         onMouseDown={handleSvgMouseDown}
+        onMouseMove={handleSvgMouseMove}
+        onMouseLeave={() => setHoverPt(null)}
         style={{
           display: 'block', cursor: 'crosshair',
           border: '1px solid #2a2a2a', borderRadius: 4,
@@ -227,8 +241,10 @@ export function Curves({ params, histogram, onChange, onReset }: CurvesProps) {
         })}
       </svg>
 
-      <div style={{ fontSize: 10, color: 'var(--text-faint)', marginTop: 4 }}>
-        點擊曲線新增控制點・雙擊控制點刪除
+      <div style={{ fontSize: 10, color: 'var(--text-faint)', marginTop: 4, height: 14 }}>
+        {hoverPt
+          ? `輸入：${hoverPt[0]}　輸出：${hoverPt[1]}`
+          : '點擊曲線新增控制點・雙擊控制點刪除'}
       </div>
 
       <button

@@ -1,7 +1,7 @@
 // WebGL 2 渲染引擎
 // 負責：初始化、載入圖片 Texture、上傳 3D LUT、渲染、readPixels
 
-const LUT_SIZE = 33;
+const LUT_SIZE = 17;
 
 const VERTEX_SHADER_SRC = `#version 300 es
 in vec2 a_position;
@@ -22,6 +22,8 @@ out vec4 fragColor;
 
 uniform sampler2D u_image;
 uniform sampler3D u_lut;
+// 分割預覽：< 0 = 無分割；0-1 = 分割線的水平位置（左側顯示原圖）
+uniform float u_splitX;
 
 void main() {
   vec4 color = texture(u_image, v_texCoord);
@@ -31,9 +33,14 @@ void main() {
   float scale = (${LUT_SIZE}.0 - 1.0) / ${LUT_SIZE}.0;
   float offset = 0.5 / ${LUT_SIZE}.0;
   vec3 lutCoord = color.rgb * scale + offset;
-
   vec3 adjusted = texture(u_lut, lutCoord).rgb;
-  fragColor = vec4(adjusted, color.a);
+
+  // 分割線左側顯示原圖，右側顯示調整後
+  if (u_splitX >= 0.0 && v_texCoord.x < u_splitX) {
+    fragColor = color;
+  } else {
+    fragColor = vec4(adjusted, color.a);
+  }
 }`;
 
 function compileShader(gl: WebGL2RenderingContext, type: number, src: string): WebGLShader {
@@ -72,6 +79,8 @@ export class WebGLRenderer {
   private lutTexture: WebGLTexture | null = null;
   private imageWidth = 0;
   private imageHeight = 0;
+  private splitXLoc: WebGLUniformLocation | null = null;
+  private splitX = -1;  // < 0 表示無分割
 
   constructor(canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl2');
@@ -91,6 +100,8 @@ export class WebGLRenderer {
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     gl.bindVertexArray(null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    this.splitXLoc = gl.getUniformLocation(this.program, 'u_splitX');
   }
 
   /**
@@ -111,7 +122,9 @@ export class WebGLRenderer {
         this.imageTexture = gl.createTexture()!;
         gl.bindTexture(gl.TEXTURE_2D, this.imageTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        // 產生 mipmap，使預覽縮小時做三線性過濾，避免鋸齒
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -164,6 +177,8 @@ export class WebGLRenderer {
     gl.bindTexture(gl.TEXTURE_3D, this.lutTexture);
     gl.uniform1i(gl.getUniformLocation(this.program, 'u_lut'), 1);
 
+    gl.uniform1f(this.splitXLoc, this.splitX);
+
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindVertexArray(null);
   }
@@ -184,6 +199,32 @@ export class WebGLRenderer {
     // 釋放 WebGL context
     const ext = gl.getExtension('WEBGL_lose_context');
     ext?.loseContext();
+  }
+
+  /**
+   * 設定分割線位置（0-1），< 0 表示關閉分割
+   */
+  setSplit(x: number): void {
+    this.splitX = x;
+    this.render();
+  }
+
+  /** 回傳目前 canvas 的繪圖緩衝區尺寸 */
+  getDisplaySize(): { width: number; height: number } {
+    return { width: this.gl.drawingBufferWidth, height: this.gl.drawingBufferHeight }
+  }
+
+  /**
+   * 讀取目前 canvas viewport 的像素（預覽解析度，速度快）
+   * 供即時直方圖更新使用，不需 Y-flip（只計算顏色分布）
+   */
+  readViewportPixels(): Uint8Array {
+    const { gl } = this;
+    const w = gl.drawingBufferWidth;
+    const h = gl.drawingBufferHeight;
+    const pixels = new Uint8Array(w * h * 4);
+    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    return pixels;
   }
 
   /**
@@ -220,14 +261,22 @@ export class WebGLRenderer {
     // 以原圖尺寸重新渲染一次
     this.render(w, h);
 
-    const pixels = new Uint8Array(w * h * 4);
-    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    const raw = new Uint8Array(w * h * 4);
+    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, raw);
 
     // 清理
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.deleteFramebuffer(fb);
     gl.deleteTexture(tex);
     this.render();
+
+    // WebGL readPixels 的 Y 軸與 Canvas 2D 相反（WebGL Y=0 在底部）
+    // 需要反轉行順序，否則 putImageData 後圖片會上下翻轉
+    const rowBytes = w * 4;
+    const pixels = new Uint8Array(raw.length);
+    for (let row = 0; row < h; row++) {
+      pixels.set(raw.subarray((h - 1 - row) * rowBytes, (h - row) * rowBytes), row * rowBytes);
+    }
 
     return { pixels, width: w, height: h };
   }

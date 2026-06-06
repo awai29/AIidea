@@ -7,6 +7,7 @@ export interface PreviewHandle {
   readPixels: () => { pixels: Uint8Array; width: number; height: number };
   readViewportPixels: () => Uint8Array;
   setSplit: (x: number) => void;
+  getDisplaySize: () => { width: number; height: number };
 }
 
 interface PreviewProps {
@@ -16,10 +17,12 @@ interface PreviewProps {
   splitX: number;            // 0-1，分割線位置
   onSplitDrag: (x: number) => void;
   onContextRestored?: () => void;  // WebGL context 重建後回呼（重新載入圖片）
+  eyedropperActive?: boolean;      // 眼滴管模式（點擊 canvas 取色）
+  onNormalizedClick?: (normX: number, normY: number) => void;  // canvas 點擊的正規化座標
 }
 
 export const Preview = forwardRef<PreviewHandle, PreviewProps>(
-  function Preview({ width, height, isSplit, splitX, onSplitDrag, onContextRestored }, ref) {
+  function Preview({ width, height, isSplit, splitX, onSplitDrag, onContextRestored, eyedropperActive, onNormalizedClick }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const rendererRef = useRef<WebGLRenderer | null>(null)
@@ -91,6 +94,9 @@ export const Preview = forwardRef<PreviewHandle, PreviewProps>(
       setSplit: (x) => {
         rendererRef.current?.setSplit(x)
       },
+      getDisplaySize: () => {
+        return rendererRef.current?.getDisplaySize() ?? { width: 0, height: 0 }
+      },
     }), [])
 
     // 拖曳分割線
@@ -129,7 +135,15 @@ export const Preview = forwardRef<PreviewHandle, PreviewProps>(
         }}
       >
         {/* 相對定位容器，讓分割線疊在 canvas 上 */}
-        <div style={{ position: 'relative', width: displayWidth, height: displayHeight }}>
+        <div
+          style={{ position: 'relative', width: displayWidth, height: displayHeight, cursor: eyedropperActive ? 'crosshair' : undefined }}
+          onClick={eyedropperActive ? (e) => {
+            const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+            const normX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+            const normY = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
+            onNormalizedClick?.(normX, normY)
+          } : undefined}
+        >
           <canvas
             ref={canvasRef}
             width={displayWidth}

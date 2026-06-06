@@ -7,8 +7,10 @@ import { ColorBalance } from './tools/ColorBalance'
 import { Levels } from './tools/Levels'
 import { Curves } from './tools/Curves'
 import { LutEngine } from './lut/LutEngine'
-// @ts-ignore - Vite ?worker&inline：打包進 HTML，不產生獨立檔案
+// @ts-ignore
 import LutWorker from './lut/lut-worker?worker&inline'
+// @ts-ignore
+import HistogramWorker from './lut/histogram-worker?worker&inline'
 import {
   defaultAdjustmentParams,
   defaultHslParams,
@@ -71,20 +73,34 @@ export default function App() {
   const workerRef = useRef<Worker | null>(null)
   const lutGenRef = useRef(0)  // 版本號：忽略過期的 Worker 回應
 
+  // 直方圖 Worker（背景執行緒計算，釋放主執行緒）
+  const histogramWorkerRef = useRef<Worker | null>(null)
+
   // 儲存最後一張圖片 bytes，讓 WebGL context restore 時可重新載入
   const currentImageBytesRef = useRef<{ bytes: Uint8Array; width: number; height: number } | null>(null)
+
+  // 原始 viewport 像素（identity LUT 下的顏色，供 eyedropper 使用）
+  const originalVpRef = useRef<{ pixels: Uint8Array; width: number; height: number } | null>(null)
+  // 原始直方圖（identity LUT 下，供 Auto Levels 使用）
+  const originalHistogramRef = useRef<HistogramData | null>(null)
 
   // 分割預覽
   const [isSplit, setIsSplit] = useState(false)
   const [splitX, setSplitX] = useState(0.5)
   const isSplitRef = useRef(false)
 
+  // 複製/貼上調整參數
+  const [copiedParams, setCopiedParams] = useState<AdjustmentParams | null>(null)
+
+  // Eyedropper 模式（null = 關閉, 'black' | 'white' = 設定黑/白點）
+  const [eyedropperMode, setEyedropperMode] = useState<'black' | 'white' | null>(null)
+
   // 將 data-theme 設到 <html>，讓 CSS 變數在全域生效
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
-  // 建立 Web Worker（若 Figma iframe CSP 不允許則 fallback 到同步計算）
+  // 建立 LUT Worker + Histogram Worker（Figma CSP 不允許時 fallback 同步）
   useEffect(() => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,9 +109,20 @@ export default function App() {
       console.warn('LUT Worker 無法啟動，改用同步計算')
       workerRef.current = null
     }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hw: Worker = new (HistogramWorker as any)()
+      hw.onmessage = (e: MessageEvent<HistogramData>) => setHistogram(e.data)
+      histogramWorkerRef.current = hw
+    } catch {
+      console.warn('Histogram Worker 無法啟動，改用同步計算')
+      histogramWorkerRef.current = null
+    }
     return () => {
       workerRef.current?.terminate()
       workerRef.current = null
+      histogramWorkerRef.current?.terminate()
+      histogramWorkerRef.current = null
     }
   }, [])
 
@@ -126,7 +153,15 @@ export default function App() {
         // 分割模式下 viewport 含原圖像素，跳過直方圖更新
         if (!isSplitRef.current) {
           const px = previewRef.current?.readViewportPixels()
-          if (px) setHistogram(computeHistogramFromPixels(px))
+          if (px) {
+            const hw = histogramWorkerRef.current
+            if (hw) {
+              // 傳入 Worker 計算（Transferable，零拷貝）
+              hw.postMessage(px, [px.buffer])
+            } else {
+              setHistogram(computeHistogramFromPixels(px))
+            }
+          }
         }
       }
 
@@ -233,6 +268,55 @@ export default function App() {
     }
   }, [splitX])
 
+  // Auto Levels：根據原始直方圖，自動設定目前色版的黑/白點（0.1%~99.9% 百分位數）
+  const handleAutoLevels = useCallback(() => {
+    const hist = originalHistogramRef.current
+    if (!hist) return
+    const ch = paramsRef.current.levels.channel
+    const channelData = ch === 'r' ? hist.r : ch === 'g' ? hist.g : ch === 'b' ? hist.b : hist.lum
+
+    // 從直方圖計算百分位數
+    const total = channelData.reduce((a, b) => a + b, 0)
+    let cum = 0
+    let blackVal = 0, whiteVal = 255
+    for (let i = 0; i < 256; i++) {
+      cum += channelData[i]
+      if (cum < total * 0.001) blackVal = i
+      if (cum < total * 0.999) whiteVal = i
+    }
+    whiteVal = Math.min(255, whiteVal + 1)
+
+    handleParamsChange(prev => ({
+      ...prev,
+      levels: { ...prev.levels, [ch]: { ...prev.levels[ch], inBlack: blackVal, inWhite: Math.max(blackVal + 2, whiteVal) } }
+    }))
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Eyedropper 點擊：從原始 viewport 像素取色，設定 Levels 黑/白點
+  const handleNormalizedClick = useCallback((normX: number, normY: number) => {
+    const vp = originalVpRef.current
+    if (!vp) return
+    const vx = Math.min(vp.width - 1, Math.round(normX * (vp.width - 1)))
+    const vy = Math.min(vp.height - 1, Math.round(normY * (vp.height - 1)))
+    // WebGL readViewportPixels 的 Y 軸從底部開始，需翻轉
+    const flippedVy = vp.height - 1 - vy
+    const idx = (flippedVy * vp.width + vx) * 4
+    const r = vp.pixels[idx], g = vp.pixels[idx + 1], b = vp.pixels[idx + 2]
+
+    const ch = paramsRef.current.levels.channel
+    const val = ch === 'r' ? r : ch === 'g' ? g : ch === 'b' ? b : Math.round((r + g + b) / 3)
+
+    handleParamsChange(prev => {
+      const chParams = prev.levels[ch]
+      if (eyedropperMode === 'white') {
+        return { ...prev, levels: { ...prev.levels, [ch]: { ...chParams, inWhite: Math.max(chParams.inBlack + 2, val) } } }
+      } else {
+        return { ...prev, levels: { ...prev.levels, [ch]: { ...chParams, inBlack: Math.min(chParams.inWhite - 2, val) } } }
+      }
+    })
+    setEyedropperMode(null)
+  }, [eyedropperMode])  // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey
@@ -292,11 +376,16 @@ export default function App() {
           const preview = await waitForPreview()
           await preview.loadImage(msg.bytes, msg.width, msg.height)
 
-          // 先用 identity LUT 讀取原始像素，計算初始直方圖
+          // identity LUT 渲染，讀取原始 viewport 像素
           const identityLut = lutEngine.compute(defaultAdjustmentParams())
           preview.updateLut(identityLut)
-          const { pixels } = preview.readPixels()
-          setHistogram(computeHistogramFromPixels(pixels))
+          const origVpPixels = preview.readViewportPixels()
+          const displaySize = preview.getDisplaySize()
+          originalVpRef.current = { pixels: origVpPixels, ...displaySize }
+          // 計算並儲存原始直方圖（供 Auto Levels 使用）
+          const origHist = computeHistogramFromPixels(origVpPixels)
+          originalHistogramRef.current = origHist
+          setHistogram(origHist)
 
           // 套用儲存的（或預設）調整數值
           const savedLut = lutEngine.compute(savedParams)
@@ -380,6 +469,8 @@ export default function App() {
           splitX={splitX}
           onSplitDrag={(x) => setSplitX(x)}
           onContextRestored={handleContextRestored}
+          eyedropperActive={eyedropperMode !== null && tool === 'levels'}
+          onNormalizedClick={handleNormalizedClick}
         />
       </div>
 
@@ -412,6 +503,9 @@ export default function App() {
               histogram={histogram}
               onChange={(levels) => handleParamsChange(prev => ({ ...prev, levels }))}
               onReset={resetLevels}
+              onAutoLevels={handleAutoLevels}
+              eyedropperMode={eyedropperMode}
+              onEyedropperModeChange={setEyedropperMode}
             />
           )}
           {tool === 'curves' && (
@@ -443,6 +537,38 @@ export default function App() {
             }}
           >
             全部重設
+          </button>
+
+          {/* 複製調整 */}
+          <button
+            title="複製目前所有調整參數"
+            onClick={() => setCopiedParams(params)}
+            style={{
+              flex: 1, padding: '6px 0',
+              border: '1px solid var(--btn-border)',
+              borderRadius: 6, fontSize: 12, cursor: 'pointer',
+              background: 'var(--btn-bg)', color: 'var(--text-dim)',
+            }}
+          >
+            複製
+          </button>
+
+          {/* 貼上調整 */}
+          <button
+            title="貼上已複製的調整參數"
+            onClick={() => copiedParams && handleParamsChange(() => copiedParams)}
+            disabled={!copiedParams}
+            style={{
+              flex: 1, padding: '6px 0',
+              border: '1px solid var(--btn-border)',
+              borderRadius: 6, fontSize: 12,
+              cursor: copiedParams ? 'pointer' : 'default',
+              background: 'var(--btn-bg)',
+              color: copiedParams ? 'var(--text-dim)' : 'var(--text-faint)',
+              opacity: copiedParams ? 1 : 0.5,
+            }}
+          >
+            貼上
           </button>
 
           {/* 分割預覽 toggle */}

@@ -6,6 +6,9 @@ interface LevelsProps {
   histogram: HistogramData | null;
   onChange: (params: LevelsParams) => void;
   onReset: () => void;
+  onAutoLevels: () => void;
+  eyedropperMode: 'black' | 'white' | null;
+  onEyedropperModeChange: (mode: 'black' | 'white' | null) => void;
 }
 
 // ── 小數字輸入框 ─────────────────────────────────────────────────────────────
@@ -261,7 +264,7 @@ const CHANNEL_OPTIONS: { value: LevelsParams['channel']; label: string }[] = [
   { value: 'b', label: '藍' },
 ]
 
-export function Levels({ params, histogram, onChange, onReset }: LevelsProps) {
+export function Levels({ params, histogram, onChange, onReset, onAutoLevels, eyedropperMode, onEyedropperModeChange }: LevelsProps) {
   const ch = params.channel
   const channelParams: LevelsChannelParams = params[ch]
 
@@ -299,16 +302,66 @@ export function Levels({ params, histogram, onChange, onReset }: LevelsProps) {
       <div style={{ fontSize: 10, color: 'var(--text-faint)', margin: '12px 0 4px' }}>輸出色階</div>
       <OutputLevels channelParams={channelParams} onChangeKey={onChangeKey} />
 
-      <button
-        onClick={onReset}
-        style={{
-          marginTop: 10, padding: '4px 12px', border: '1px solid var(--btn-border)',
-          borderRadius: 4, fontSize: 11, cursor: 'pointer',
-          background: 'var(--btn-bg)', color: 'var(--text-dim)',
-        }}
-      >
-        重設
-      </button>
+      <div style={{ display: 'flex', gap: 6, marginTop: 10, alignItems: 'center' }}>
+        {/* Auto Levels */}
+        <button
+          onClick={onAutoLevels}
+          title="自動偵測黑白點（0.1%~99.9% 百分位數）"
+          style={{
+            padding: '4px 10px', border: '1px solid var(--btn-border)',
+            borderRadius: 4, fontSize: 11, cursor: 'pointer',
+            background: 'var(--btn-bg)', color: 'var(--text-dim)',
+          }}
+        >
+          Auto
+        </button>
+
+        {/* 黑點眼滴管 */}
+        <button
+          onClick={() => onEyedropperModeChange(eyedropperMode === 'black' ? null : 'black')}
+          title="點擊圖片設定黑點"
+          style={{
+            padding: '4px 8px', border: '1px solid',
+            borderColor: eyedropperMode === 'black' ? '#18A0FB' : 'var(--btn-border)',
+            borderRadius: 4, fontSize: 11, cursor: 'pointer',
+            background: eyedropperMode === 'black' ? '#18A0FB' : 'var(--btn-bg)',
+            color: eyedropperMode === 'black' ? '#fff' : 'var(--text-dim)',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="18" r="4"/><path d="M17 2l5 5-11 11H6v-5L17 2z"/></svg>
+          黑
+        </button>
+
+        {/* 白點眼滴管 */}
+        <button
+          onClick={() => onEyedropperModeChange(eyedropperMode === 'white' ? null : 'white')}
+          title="點擊圖片設定白點"
+          style={{
+            padding: '4px 8px', border: '1px solid',
+            borderColor: eyedropperMode === 'white' ? '#18A0FB' : 'var(--btn-border)',
+            borderRadius: 4, fontSize: 11, cursor: 'pointer',
+            background: eyedropperMode === 'white' ? '#18A0FB' : 'var(--btn-bg)',
+            color: eyedropperMode === 'white' ? '#fff' : 'var(--text-dim)',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="18" r="4" stroke="currentColor" strokeWidth="1.5" fill="none"/><path d="M17 2l5 5-11 11H6v-5L17 2z"/></svg>
+          白
+        </button>
+
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={onReset}
+          style={{
+            padding: '4px 12px', border: '1px solid var(--btn-border)',
+            borderRadius: 4, fontSize: 11, cursor: 'pointer',
+            background: 'var(--btn-bg)', color: 'var(--text-dim)',
+          }}
+        >
+          重設
+        </button>
+      </div>
     </div>
   )
 }

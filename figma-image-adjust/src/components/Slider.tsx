@@ -6,11 +6,12 @@ interface SliderProps {
   min: number;
   max: number;
   step?: number;
+  defaultValue?: number;  // 雙擊歸零用
   gradient: string; // CSS linear-gradient 字串
   onChange: (value: number) => void;
 }
 
-export function Slider({ label, value, min, max, step = 1, gradient, onChange }: SliderProps) {
+export function Slider({ label, value, min, max, step = 1, defaultValue = 0, gradient, onChange }: SliderProps) {
   // range 拖曳時顯示 tooltip
   const [isDragging, setIsDragging] = useState(false)
   // number input 拖曳 scrub 的狀態
@@ -63,6 +64,9 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
     window.addEventListener('mouseup', onUp)
   }
 
+  // 雙擊任意輸入歸零
+  const handleDoubleClick = () => onChange(defaultValue)
+
   // range input 開始拖曳時顯示 tooltip
   const handleRangeMouseDown = () => {
     setIsDragging(true)
@@ -92,6 +96,7 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
           step={step}
           onChange={handleNumberInput}
           onMouseDown={handleNumberMouseDown}
+          onDoubleClick={handleDoubleClick}
           style={{
             width: 48, padding: '2px 4px',
             borderRadius: 3, fontSize: 11, textAlign: 'right',
@@ -111,6 +116,7 @@ export function Slider({ label, value, min, max, step = 1, gradient, onChange }:
           value={value}
           onChange={handleInput}
           onMouseDown={handleRangeMouseDown}
+          onDoubleClick={handleDoubleClick}
           style={{ '--track-gradient': gradient } as React.CSSProperties}
         />
         {isDragging && (
