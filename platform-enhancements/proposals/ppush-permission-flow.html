@@ -690,9 +690,11 @@ section{scroll-margin-top:70px}
               <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
             <div style="position:relative;overflow:hidden">
-              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block;opacity:.45">
+              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
+              <!-- Semi-transparent overlay -->
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:10"></div>
               <!-- Chrome native permission dialog -->
-              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.55)">
+              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.2)">
                 <div class="chrome-permission">
                   <div class="cp-header">
                     <div class="cp-site-icon" style="background:#222424;overflow:hidden;padding:2px">
