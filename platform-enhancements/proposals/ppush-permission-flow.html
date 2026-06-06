@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推播權限申請流程 · 隱私模式設計</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:8px;
+  --sans:'Inter',system-ui,sans-serif;
+  --roboto:'Roboto',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --teal:#0d9488;--tbg:#f0fdfa;--tbdr:#99f6e4;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  /* Android Material You colors */
+  --md-primary:#1a73e8;
+  --md-surface:#fff;
+  --md-surface-variant:#f1f3f4;
+  --md-on-surface:#202124;
+  --md-on-surface-variant:#5f6368;
+  --md-outline:#dadce0;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6}
+
+/* ── Page Header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(239,239,239,.87);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.hdr-in{max-width:1280px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-title{font-size:14px;font-weight:600}
+.nav{display:flex;gap:4px;overflow-x:auto}
+.nl{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;
+  padding:4px 9px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nl:hover{background:var(--card);color:var(--fg)}
+
+/* ── Page Layout ── */
+main{max-width:1280px;margin:0 auto;padding:40px 24px 80px;display:flex;flex-direction:column;gap:64px}
+section{scroll-margin-top:70px}
+.sec-hd{margin-bottom:24px}
+.eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--purple);margin-bottom:8px}
+.sec-title{font-size:clamp(18px,2.2vw,24px);font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.sec-desc{font-size:13px;color:var(--muted);line-height:1.7;max-width:640px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);border:1px solid var(--border)}
+.cp{padding:20px 22px}
+
+/* badges */
+.bdg{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:500;
+  padding:2px 8px;border-radius:9999px;border:1px solid}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.br{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.bp{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+.bt{color:var(--teal);background:var(--tbg);border-color:var(--tbdr)}
+
+/* ── Trigger cards ── */
+.trigger-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.trigger-card{border-radius:var(--rsm);border:1px solid var(--border);background:var(--card);
+  box-shadow:var(--sh);overflow:hidden}
+.tc-head{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.tc-priority{width:28px;height:28px;border-radius:50%;font-family:var(--mono);font-size:12px;
+  font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tc-title{font-size:13px;font-weight:600}
+.tc-body{padding:11px 15px;font-size:12px;color:var(--muted);line-height:1.6}
+.tc-body strong{color:var(--fg)}
+.no-trigger{border-color:var(--rbdr);background:var(--rbg)}
+.no-trigger .tc-title{color:var(--red)}
+
+/* ── Flow diagram ── */
+.flow-diagram{display:flex;align-items:center;gap:0;overflow-x:auto;padding:24px;
+  background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--sh)}
+.flow-node{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;min-width:110px}
+.flow-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.flow-label{font-size:11px;font-weight:600;text-align:center;line-height:1.35;max-width:100px}
+.flow-sub{font-size:10px;color:var(--muted);text-align:center;line-height:1.3;max-width:100px}
+.flow-arrow{font-size:18px;color:#ccc;flex-shrink:0;margin:0 4px;margin-bottom:28px}
+.flow-branch{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+
+/* ── Label chip ── */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:9999px;font-family:var(--mono)}
+.chip-android{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.chip-platform{background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)}
+
+/* ══════════════════════════════════════
+   ANDROID PHONE MOCKUP
+══════════════════════════════════════ */
+.phones-row{display:flex;gap:32px;overflow-x:auto;padding:4px 4px 16px;align-items:flex-start}
+.phone-col{display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
+.phone-label{font-size:11px;font-weight:600;color:var(--muted);text-align:center;line-height:1.45;max-width:200px}
+.phone-step{font-family:var(--mono);font-size:10px;color:var(--purple);text-align:center;margin-bottom:2px}
+
+/* Android phone shell - Pixel style */
+.android-phone{
+  width:260px;
+  background:#111;
+  border-radius:36px;
+  padding:8px;
+  position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.06) inset,
+             inset 0 0 0 1px rgba(255,255,255,.04);
+}
+/* Volume buttons */
+.android-phone::before{
+  content:'';position:absolute;left:-3px;top:88px;
+  width:3px;height:40px;background:#1e1e1e;border-radius:3px 0 0 3px;
+}
+/* Power button */
+.android-phone::after{
+  content:'';position:absolute;right:-3px;top:106px;
+  width:3px;height:32px;background:#1e1e1e;border-radius:0 3px 3px 0;
+}
+.android-screen{
+  background:#fff;
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+}
+
+/* Android status bar */
+.asb{
+  height:28px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;
+  font-family:var(--roboto);
+}
+.asb-time{font-size:12px;font-weight:500;line-height:1}
+.asb-icons{display:flex;align-items:center;gap:3px}
+/* SVG-like icons using CSS */
+.asb-signal{font-size:11px}
+.asb-wifi{font-size:11px}
+.asb-battery{
+  width:22px;height:11px;border:1.5px solid currentColor;border-radius:2px;
+  position:relative;display:inline-flex;align-items:center;padding:1px;
+}
+.asb-battery::after{
+  content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);
+  width:2px;height:5px;background:currentColor;border-radius:0 1px 1px 0;
+}
+.asb-battery-fill{background:currentColor;border-radius:1px;height:100%;width:70%}
+
+/* Punch-hole camera */
+.android-camera{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:12px;height:12px;background:#111;border-radius:50%;z-index:10;
+}
+
+/* ── OUR APP screens (platform design) ── */
+.app-screen{
+  font-family:var(--sans);
+  display:flex;flex-direction:column;
+  position:relative;
+}
+/* Platform app header */
+.app-topbar{
+  display:flex;align-items:center;padding:10px 14px 8px;
+  background:#0f2240;
+}
+.app-topbar-title{font-size:14px;font-weight:600;color:#fff;flex:1;text-align:center}
+.app-topbar-back{font-size:11px;color:rgba(255,255,255,.5)}
+.app-body{flex:1;display:flex;flex-direction:column;padding:14px;gap:10px;background:#0d1f3c;min-height:480px}
+
+/* Deposit success */
+.dep-check{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#15803d);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  margin:16px auto 10px;box-shadow:0 0 0 8px rgba(22,163,74,.15)}
+.dep-amount{font-size:30px;font-weight:700;color:#fff;text-align:center;letter-spacing:-.02em}
+.dep-note{font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px}
+.dep-row{display:flex;justify-content:space-between;background:rgba(255,255,255,.07);
+  border-radius:10px;padding:9px 12px;border:1px solid rgba(255,255,255,.06)}
+.dep-lbl{font-size:10px;color:rgba(255,255,255,.4)}
+.dep-val{font-size:11px;font-weight:600;color:#fff}
+
+/* Platform pre-prompt sheet */
+.platform-sheet{
+  position:absolute;bottom:0;left:0;right:0;z-index:20;
+  background:#1c1c1e;border-radius:20px 20px 0 0;
+  padding:0 0 16px;overflow:hidden;
+}
+.sheet-handle{width:32px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:10px auto 14px}
+.sheet-ico{width:48px;height:48px;border-radius:12px;background:rgba(52,211,153,.15);
+  display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px}
+.sheet-ttl{font-size:15px;font-weight:700;color:#fff;text-align:center;padding:0 18px;margin-bottom:5px}
+.sheet-sub{font-size:11.5px;color:rgba(255,255,255,.5);text-align:center;padding:0 22px;margin-bottom:12px;line-height:1.5}
+.sheet-benefits{display:flex;flex-direction:column;gap:1px;margin:0 14px 12px;border-radius:12px;overflow:hidden}
+.sb-row{display:flex;align-items:center;gap:9px;padding:8px 11px;background:rgba(255,255,255,.06)}
+.sb-icon{font-size:13px;flex-shrink:0}
+.sb-text{font-size:11px;color:rgba(255,255,255,.7);line-height:1.3}
+.sheet-primary{margin:0 14px 6px;background:#34d399;color:#000;font-size:13px;font-weight:700;
+  border:none;border-radius:12px;padding:12px;cursor:pointer;width:calc(100% - 28px);font-family:var(--sans)}
+.sheet-secondary{margin:0 14px;background:transparent;color:rgba(255,255,255,.4);
+  font-size:12px;border:none;cursor:pointer;width:calc(100% - 28px);padding:6px;font-family:var(--sans)}
+
+/* Platform app overlay */
+.platform-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:15}
+
+/* ── ANDROID NOTIFICATION SHADE ── */
+.android-shade{
+  font-family:var(--roboto);
+  background:#e8eaed;
+  display:flex;flex-direction:column;
+}
+.shade-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px 6px;
+}
+.shade-title{font-size:11px;color:#5f6368;font-weight:500;letter-spacing:.02em}
+.shade-clear{font-size:11px;color:var(--md-primary);font-weight:500}
+.shade-cards{display:flex;flex-direction:column;gap:6px;padding:0 8px 12px}
+
+/* Android notification card - Material You style */
+.anc{
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
+}
+/* App source row */
+.anc-src{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 12px 4px;
+}
+.anc-src-icon{
+  width:16px;height:16px;border-radius:3px;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+/* Chrome "C" icon using CSS */
+.chrome-icon{
+  width:16px;height:16px;border-radius:50%;
+  background:conic-gradient(#ea4335 0deg 90deg,#fbbc04 90deg 180deg,#34a853 180deg 270deg,#4285f4 270deg 360deg);
+  position:relative;flex-shrink:0;
+}
+.chrome-icon::after{
+  content:'';position:absolute;inset:4px;background:#fff;border-radius:50%;
+}
+.anc-app-name{font-size:11px;color:#5f6368;font-weight:500;flex:1}
+.anc-time{font-size:11px;color:#80868b}
+.anc-dismiss{font-size:12px;color:#80868b;background:none;border:none;cursor:pointer;
+  padding:0 2px;line-height:1}
+
+/* Notification content row */
+.anc-content{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:2px 12px 10px;
+}
+.anc-text-block{flex:1;min-width:0}
+.anc-title{font-size:14px;font-weight:500;color:#202124;line-height:1.3;margin-bottom:2px}
+.anc-body{font-size:12px;color:#5f6368;line-height:1.4}
+.anc-large-icon{
+  width:40px;height:40px;border-radius:8px;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Image */
+.anc-image{line-height:0;margin:0 12px 10px;border-radius:8px;overflow:hidden}
+.anc-image-inner{
+  height:64px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,#0f3460,#1a5276);
+}
+
+/* Actions */
+.anc-actions{
+  display:flex;gap:0;border-top:1px solid #f1f3f4;
+  padding:2px 4px;
+}
+.anc-action{
+  flex:1;text-align:center;padding:8px 6px;
+  font-size:12px;font-weight:500;color:var(--md-primary);
+  background:none;border:none;cursor:pointer;border-radius:8px;
+  font-family:var(--roboto);
+}
+.anc-action:hover{background:#f1f3f4}
+
+/* Privacy mode notification card */
+.anc-priv .anc-title{color:#202124}
+.anc-priv .anc-body{color:#5f6368}
+
+/* ── CHROME PERMISSION PROMPT (Android) ── */
+.chrome-permission{
+  font-family:var(--roboto);
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding:20px 20px 16px;
+  box-shadow:0 -2px 16px rgba(0,0,0,.12);
+}
+.cp-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.cp-site-icon{
+  width:32px;height:32px;border-radius:8px;background:#14805e;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;font-family:var(--roboto);
+}
+.cp-site-info{}
+.cp-site-name{font-size:13px;font-weight:500;color:#202124}
+.cp-site-url{font-size:11px;color:#5f6368}
+.cp-question{font-size:15px;font-weight:500;color:#202124;margin-bottom:6px;line-height:1.35}
+.cp-desc{font-size:12px;color:#5f6368;line-height:1.55;margin-bottom:18px}
+.cp-btns{display:flex;gap:8px;justify-content:flex-end}
+.cp-btn{padding:9px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  border:none;cursor:pointer;font-family:var(--roboto)}
+.cp-btn-block{background:transparent;color:#5f6368}
+.cp-btn-block:hover{background:#f1f3f4}
+.cp-btn-allow{background:var(--md-primary);color:#fff}
+.cp-btn-allow:hover{background:#1557b0}
+
+/* ── PLATFORM SETTINGS screen (Figma design system) ── */
+.platform-settings{
+  font-family:'Poppins','Inter',sans-serif;
+  background:#141515;
+  display:flex;flex-direction:column;
+}
+.ps-topbar{
+  height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:#141515;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.ps-topbar-back{font-size:18px;color:#e2e6e9;line-height:1;flex-shrink:0;cursor:pointer}
+.ps-topbar-title{font-size:17px;font-weight:600;color:#e2e6e9;flex:1;text-align:center}
+.ps-section-label{font-size:10px;font-weight:600;color:#8d9aa5;letter-spacing:.06em;
+  text-transform:uppercase;padding:12px 16px 6px}
+.ps-group{background:#222424;margin-bottom:8px}
+.ps-row{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.ps-row:last-child{border-bottom:none}
+.ps-row-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;color:#8d9aa5;font-size:15px}
+.ps-row-text{flex:1;min-width:0}
+.ps-row-label{font-size:13px;font-weight:400;color:#e2e6e9;line-height:1.3}
+.ps-row-sub{font-size:10px;color:#8d9aa5;margin-top:2px;line-height:1.3}
+/* Platform toggle */
+.ps-toggle{
+  width:40px;height:24px;border-radius:12px;position:relative;
+  flex-shrink:0;cursor:pointer;transition:background .2s;
+}
+.ps-toggle.on{background:#14805e}
+.ps-toggle.off{background:#454647}
+.ps-toggle-thumb{
+  width:18px;height:18px;border-radius:50%;background:#fff;
+  position:absolute;top:3px;transition:left .15s;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.ps-toggle.on .ps-toggle-thumb{left:19px}
+.ps-toggle.off .ps-toggle-thumb{left:3px}
+/* Platform radio */
+.ps-radio{width:18px;height:18px;border-radius:50%;border:2px solid;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.ps-radio.selected{border-color:#14805e}
+.ps-radio.selected::after{content:'';width:9px;height:9px;border-radius:50%;background:#14805e}
+.ps-radio.unselected{border-color:#454647}
+
+/* Toast */
+.android-toast{
+  position:absolute;bottom:60px;left:12px;right:12px;z-index:30;
+  background:#323232;color:#fff;border-radius:8px;padding:11px 14px;
+  font-family:var(--roboto);font-size:13px;text-align:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+
+/* Re-engage snackbar */
+.android-snackbar{
+  position:absolute;bottom:10px;left:8px;right:8px;z-index:30;
+  background:#323232;border-radius:4px;padding:10px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--roboto);box-shadow:0 3px 10px rgba(0,0,0,.3);
+}
+.snack-text{font-size:12px;color:#fff;line-height:1.4}
+.snack-action{font-size:12px;color:#8ab4f8;font-weight:500;padding:4px 6px;margin-left:8px;flex-shrink:0}
+
+/* ── Comparison dark cards ── */
+.notif-dark-card{
+  background:#1c1c1e;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);font-family:var(--roboto);
+}
+.ndc-src{display:flex;align-items:center;gap:6px;padding:9px 12px 4px}
+.ndc-src-icon{width:14px;height:14px;border-radius:3px;background:#1a73e8;
+  display:flex;align-items:center;justify-content:center}
+.ndc-app{font-size:11px;color:rgba(255,255,255,.4);flex:1}
+.ndc-time{font-size:11px;color:rgba(255,255,255,.25)}
+.ndc-body{display:flex;gap:10px;align-items:flex-start;padding:2px 12px 10px}
+.ndc-txt{flex:1;min-width:0}
+.ndc-title{font-size:13px;font-weight:500;color:#e8eaed;margin-bottom:2px;line-height:1.3}
+.ndc-text{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.4}
+.ndc-icon{width:36px;height:36px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ndc-image{margin:0 12px 8px;border-radius:8px;overflow:hidden;line-height:0}
+.ndc-actions{display:flex;border-top:1px solid rgba(255,255,255,.06);padding:2px 4px}
+.ndc-action{flex:1;text-align:center;padding:7px;font-size:11px;font-weight:500;
+  color:rgba(138,180,248,.9);background:none;border:none;cursor:pointer;border-radius:8px;font-family:var(--roboto)}
+
+/* ── Re-engage flow ── */
+.re-flow{display:flex;flex-direction:column;gap:1px}
+.rf-row{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--card)}
+.rf-row:first-child{border-radius:var(--rsm) var(--rsm) 0 0}
+.rf-row:last-child{border-radius:0 0 var(--rsm) var(--rsm)}
+.rf-row+.rf-row{border-top:1px solid var(--border)}
+.rf-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.rf-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.rf-body{font-size:12px;color:var(--muted);line-height:1.6}
+.rf-body strong{color:var(--fg)}
+
+/* ── Payload code ── */
+.code-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.code-block{border-radius:var(--rsm);overflow:hidden;border:1px solid var(--border)}
+.code-hd{padding:8px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);
+  font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px}
+.code-body{font-family:var(--mono);font-size:10.5px;background:#09090b;color:#d4d4d8;
+  padding:14px;line-height:1.75;white-space:pre;overflow-x:auto;margin:0}
+.ck{color:#93c5fd}.cv{color:#86efac}.cc{color:#6b7280}
+
+/* tip boxes */
+.tip{padding:11px 14px;border-radius:var(--rsm);font-size:12px;line-height:1.65;margin-top:12px}
+.tip-blue{background:var(--bbg);border:1px solid var(--bbdr);color:var(--blue)}
+.tip-amber{background:var(--abg);border:1px solid var(--abdr);color:var(--amber)}
+.tip-green{background:var(--gbg);border:1px solid var(--gbdr);color:var(--green)}
+.tip-purple{background:var(--pbg);border:1px solid var(--pbdr);color:var(--purple)}
+
+@media(max-width:900px){
+  .code-compare{grid-template-columns:1fr}
+  .trigger-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-title">推播權限申請流程 · 隱私模式 · Android Web Push</div>
+    <nav class="nav">
+      <a class="nl" href="#s-trigger">觸發時機</a>
+      <a class="nl" href="#s-flow">申請流程</a>
+      <a class="nl" href="#s-privacy">隱私模式</a>
+      <a class="nl" href="#s-compare">樣式對比</a>
+      <a class="nl" href="#s-reengage">再觸發</a>
+      <a class="nl" href="#s-payload">Payload</a>
+      <a class="nl" href="#s-personalization">千人千面</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+  <!-- INTRO -->
+  <div style="padding-top:8px">
+    <div class="eyebrow">Android Chrome · Web Push Notification</div>
+    <h1 style="font-size:clamp(22px,3vw,34px);font-weight:700;letter-spacing:-.03em;margin-bottom:10px">推播權限申請 + 隱私模式</h1>
+    <p style="font-size:14px;color:var(--muted);line-height:1.75;max-width:680px;margin-bottom:14px">
+      不在一進網站就要求，而是在用戶最有意願的時刻，先透過<strong style="color:var(--fg)">我們自己的說明 Sheet</strong>說服用戶，再呼叫 Chrome 原生授權彈窗。
+      博弈平台特別設計隱私模式，讓用戶選擇是否在通知欄顯示平台及下注相關資訊。
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <span class="chip chip-android">🤖 Android 原生 UI</span>
+      <span class="chip chip-platform">◈ 平台自訂 UI</span>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1: 觸發時機 ══ -->
+  <section id="s-trigger">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 01</div>
+      <h2 class="sec-title">觸發時機</h2>
+      <p class="sec-desc">什麼時候問用戶，和接受率直接相關。在正向情緒高、推播最相關的時刻出現。</p>
+    </div>
+    <div class="trigger-grid">
+      <div class="trigger-card">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:#16a34a;color:#fff">P1</div>
+          <div><div class="tc-title">首次存款成功後</div><span class="bdg bg" style="margin-top:3px;display:inline-flex">最高優先</span></div>
+        </div>
+        <div class="tc-body">帳戶剛到帳，<strong>情緒最正向</strong>。<br>推播 benefit 聚焦：存款獎勵、優惠到帳通知。</div>
+      </div>
+      <div class="trigger-card">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:#2563eb;color:#fff">P2</div>
+          <div><div class="tc-title">首次投注成功後</div><span class="bdg bb" style="margin-top:3px;display:inline-flex">高優先</span></div>
+        </div>
+        <div class="tc-body">有皮膚在局裡，<strong>最想知道比賽結果</strong>。<br>推播 benefit 聚焦：比賽結果、賠率變動。</div>
+      </div>
+      <div class="trigger-card">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:#7c3aed;color:#fff">P3</div>
+          <div><div class="tc-title">第 3 次登入，仍未訂閱</div><span class="bdg bp" style="margin-top:3px;display:inline-flex">中優先</span></div>
+        </div>
+        <div class="tc-body">確認是回頭客，<strong>有使用意願</strong>。<br>推播 benefit 聚焦：優惠到期、個人化推薦。</div>
+      </div>
+      <div class="trigger-card">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:#d97706;color:#fff">P4</div>
+          <div><div class="tc-title">主動瀏覽優惠頁 30 秒以上</div><span class="bdg ba" style="margin-top:3px;display:inline-flex">情境觸發</span></div>
+        </div>
+        <div class="tc-body">對優惠有興趣，<strong>推播最相關</strong>。<br>推播 benefit 聚焦：優惠截止、新優惠上架。</div>
+      </div>
+      <div class="trigger-card no-trigger">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:var(--red);color:#fff">✕</div>
+          <div><div class="tc-title">一進網站就問</div></div>
+        </div>
+        <div class="tc-body"><strong>接受率極低（&lt;5%）</strong>，用戶完全不認識平台，沒有信任基礎。</div>
+      </div>
+      <div class="trigger-card no-trigger">
+        <div class="tc-head">
+          <div class="tc-priority" style="background:var(--red);color:#fff">✕</div>
+          <div><div class="tc-title">未登入狀態</div></div>
+        </div>
+        <div class="tc-body">沒有用戶資料，<strong>推播無法個人化</strong>，且不符規範要求。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2: 申請流程 ══ -->
+  <section id="s-flow">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 02</div>
+      <h2 class="sec-title">申請流程 — 畫面設計</h2>
+      <p class="sec-desc">以「首次存款成功後」為例，展示完整四個步驟。<span class="chip chip-android" style="vertical-align:middle;margin-left:4px">🤖 Android 原生 UI</span> 為 Android/Chrome 的真實介面；<span class="chip chip-platform" style="vertical-align:middle;margin-left:4px">◈ 平台自訂</span> 為我們自己設計的畫面。</p>
+    </div>
+
+    <!-- Flow diagram -->
+    <div class="flow-diagram" style="margin-bottom:28px">
+      <div class="flow-node">
+        <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">💰</div>
+        <div class="flow-label" style="color:var(--green)">觸發時機</div>
+        <div class="flow-sub">存款成功</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-circle" style="background:var(--pbg);border:2px solid var(--pbdr)">📋</div>
+        <div class="flow-label">自製說明 Sheet</div>
+        <div class="flow-sub" style="color:var(--purple)">◈ 平台自訂</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div class="flow-circle" style="background:#e8f5e9;border:2px solid #a5d6a7">🌐</div>
+        <div class="flow-label">Chrome 授權彈窗</div>
+        <div class="flow-sub" style="color:#2e7d32">🤖 Android 原生</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-branch">
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:8px">
+          <div class="flow-node">
+            <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">✅</div>
+            <div class="flow-label" style="color:var(--green)">允許</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="flow-node">
+            <div class="flow-circle" style="background:var(--rbg);border:2px solid var(--rbdr)">⏭️</div>
+            <div class="flow-label" style="color:var(--red)">稍後/封鎖</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phones-row">
+
+      <!-- STEP 1: Our app — deposit success -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#0f2240;color:#fff">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#fff">
+                <span class="asb-signal">▲</span>
+                <span class="asb-wifi">WiFi</span>
+                <span style="font-size:10px">🔋</span>
+              </div>
+            </div>
+            <div class="app-screen">
+              <div class="app-topbar">
+                <span class="app-topbar-back">←</span>
+                <span class="app-topbar-title">存款</span>
+                <span style="width:20px"></span>
+              </div>
+              <div class="app-body">
+                <div class="dep-check">✓</div>
+                <div style="text-align:center;margin-bottom:8px">
+                  <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:4px">存款成功！</div>
+                  <div class="dep-amount">฿ 1,000</div>
+                  <div class="dep-note">已到帳，可立即使用</div>
+                </div>
+                <div class="dep-row" style="margin-bottom:6px">
+                  <div><div class="dep-lbl">支付方式</div><div class="dep-val">PromptPay</div></div>
+                  <div><div class="dep-lbl">到帳</div><div class="dep-val">即時</div></div>
+                  <div><div class="dep-lbl">手續費</div><div class="dep-val">免費</div></div>
+                </div>
+                <div style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
+                  border-radius:10px;padding:9px 12px">
+                  <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:2px">首存獎勵</div>
+                  <div style="font-size:12px;font-weight:600;color:#4ade80">+฿ 500 紅利已解鎖</div>
+                </div>
+                <div style="flex:1"></div>
+                <div style="background:#14805e;border-radius:10px;padding:11px;text-align:center">
+                  <div style="font-size:13px;font-weight:600;color:#fff">前往下注</div>
+                </div>
+              </div>
+            </div>
+            <!-- Android nav bar -->
+            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">存款成功畫面<br><span style="color:var(--purple)">我們平台的設計</span></div>
+      </div>
+
+      <!-- STEP 2: Our app — pre-prompt sheet -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#0f2240;color:#fff">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+            </div>
+            <div class="app-screen" style="position:relative">
+              <div class="platform-overlay"></div>
+              <div class="app-topbar" style="opacity:.5">
+                <span class="app-topbar-back">←</span>
+                <span class="app-topbar-title">存款</span>
+              </div>
+              <div class="app-body" style="opacity:.5;min-height:430px">
+                <div class="dep-check">✓</div>
+                <div style="text-align:center"><div class="dep-amount">฿ 1,000</div></div>
+              </div>
+              <div class="platform-sheet">
+                <div class="sheet-handle"></div>
+                <div class="sheet-ico">🔔</div>
+                <div class="sheet-ttl">不想錯過這些嗎？</div>
+                <div class="sheet-sub">開啟通知，好消息第一時間推給你</div>
+                <div class="sheet-benefits">
+                  <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">優惠 &amp; 紅利到帳通知</div></div>
+                  <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">比賽結果 &amp; 賠率提醒</div></div>
+                  <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">隱私模式：不顯示平台資訊</div></div>
+                </div>
+                <button class="sheet-primary">開啟通知</button>
+                <button class="sheet-secondary">稍後再說</button>
+              </div>
+            </div>
+            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">自製說明 Sheet<br><span style="color:var(--purple)">我們平台的設計</span></div>
+      </div>
+
+      <!-- STEP 3: Chrome permission — Android native -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 03 · <span style="color:#2e7d32">🤖 Android 原生</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#0f2240;color:#fff">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+            </div>
+            <div style="position:relative">
+              <div class="app-topbar" style="opacity:.4"><span class="app-topbar-title">存款</span></div>
+              <div class="app-body" style="opacity:.35;min-height:418px">
+                <div class="dep-check">✓</div>
+                <div style="text-align:center"><div class="dep-amount">฿ 1,000</div></div>
+              </div>
+              <!-- Chrome native permission dialog -->
+              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.5)">
+                <div class="chrome-permission">
+                  <div class="cp-header">
+                    <div class="cp-site-icon">B</div>
+                    <div class="cp-site-info">
+                      <div class="cp-site-name">Platform</div>
+                      <div class="cp-site-url">platform.com</div>
+                    </div>
+                  </div>
+                  <div class="cp-question">傳送通知？</div>
+                  <div class="cp-desc">允許 platform.com 傳送通知給您？您可以隨時在設定中變更。</div>
+                  <div class="cp-btns">
+                    <button class="cp-btn cp-btn-block">封鎖</button>
+                    <button class="cp-btn cp-btn-allow">允許</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="height:20px;background:#f8f9fa;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">Chrome 授權彈窗<br><span style="color:#2e7d32">Android Chrome 原生 UI</span></div>
+      </div>
+
+      <!-- STEP 4a: Success + notification shade -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 04a · 允許 · <span style="color:#2e7d32">🤖 Android 原生</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#0f2240;color:#fff">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+            </div>
+            <div style="position:relative">
+              <div class="app-topbar"><span class="app-topbar-title">存款</span></div>
+              <div class="app-body" style="min-height:418px">
+                <div class="dep-check">✓</div>
+                <div style="text-align:center;margin-bottom:8px">
+                  <div class="dep-amount">฿ 1,000</div>
+                  <div class="dep-note">已到帳</div>
+                </div>
+                <div style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);
+                  border-radius:10px;padding:10px;text-align:center">
+                  <div style="font-size:12px;font-weight:600;color:#4ade80">✓ 通知已開啟</div>
+                </div>
+              </div>
+              <!-- Android Toast -->
+              <div class="android-toast">通知已開啟</div>
+            </div>
+            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">授權成功<br><span style="color:#2e7d32">Android Toast 通知</span></div>
+      </div>
+
+      <!-- STEP 4b: Snackbar after deny -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 04b · 稍後</div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#0f2240;color:#fff">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#fff"><span>▲ WiFi 🔋</span></div>
+            </div>
+            <div style="position:relative">
+              <div class="app-topbar"><span class="app-topbar-title">存款</span></div>
+              <div class="app-body" style="min-height:418px">
+                <div class="dep-check">✓</div>
+                <div style="text-align:center;margin-bottom:8px">
+                  <div class="dep-amount">฿ 1,000</div>
+                </div>
+                <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:11px;text-align:center">
+                  <div style="font-size:12px;color:rgba(255,255,255,.4)">繼續遊玩</div>
+                </div>
+              </div>
+              <!-- Android Snackbar -->
+              <div class="android-snackbar">
+                <div class="snack-text">可在帳號設定中開啟通知</div>
+                <div class="snack-action">前往設定</div>
+              </div>
+            </div>
+            <div style="height:20px;background:#0d1f3c;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.25);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">稍後/拒絕<br><span style="color:#2e7d32">Android Snackbar 提示</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 3: 隱私模式 ══ -->
+  <section id="s-privacy">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 03</div>
+      <h2 class="sec-title">隱私模式設定</h2>
+      <p class="sec-desc">在我們自己平台的設定頁讓用戶選擇通知模式。介面採用平台 Figma 設計系統（深色主題 · Poppins · 綠色品牌色），不需要改 Android 原生設定。</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start">
+
+      <!-- Platform settings mockup (Figma design system) -->
+      <div class="phone-col" style="gap:10px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--purple)">◈ 平台自訂設計</div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
+            </div>
+            <div class="platform-settings">
+              <div class="ps-topbar">
+                <div class="ps-topbar-back">←</div>
+                <div class="ps-topbar-title">Notifications</div>
+                <div style="width:24px"></div>
+              </div>
+
+              <div class="ps-section-label">Push Notifications</div>
+              <div class="ps-group">
+                <div class="ps-row">
+                  <div class="ps-row-icon">🔔</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Receive Notifications</div>
+                    <div class="ps-row-sub">Disable to stop all alerts</div>
+                  </div>
+                  <div class="ps-toggle on"><div class="ps-toggle-thumb"></div></div>
+                </div>
+              </div>
+
+              <div class="ps-section-label">Notification Mode</div>
+              <div class="ps-group">
+                <div class="ps-row">
+                  <div class="ps-row-icon">☀️</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Standard Mode</div>
+                    <div class="ps-row-sub">Show full event & brand info</div>
+                  </div>
+                  <div class="ps-radio selected"></div>
+                </div>
+                <div class="ps-row">
+                  <div class="ps-row-icon">🔒</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Privacy Mode</div>
+                    <div class="ps-row-sub">Only show "New message"</div>
+                  </div>
+                  <div class="ps-radio unselected"></div>
+                </div>
+              </div>
+
+              <div class="ps-section-label">Notification Types</div>
+              <div class="ps-group">
+                <div class="ps-row">
+                  <div class="ps-row-icon">⚽</div>
+                  <div class="ps-row-text"><div class="ps-row-label">Match Results</div></div>
+                  <div class="ps-toggle on"><div class="ps-toggle-thumb"></div></div>
+                </div>
+                <div class="ps-row">
+                  <div class="ps-row-icon">🎁</div>
+                  <div class="ps-row-text"><div class="ps-row-label">Bonuses &amp; Promos</div></div>
+                  <div class="ps-toggle on"><div class="ps-toggle-thumb"></div></div>
+                </div>
+                <div class="ps-row">
+                  <div class="ps-row-icon">💰</div>
+                  <div class="ps-row-text"><div class="ps-row-label">Deposits &amp; Withdrawals</div></div>
+                  <div class="ps-toggle off"><div class="ps-toggle-thumb"></div></div>
+                </div>
+              </div>
+
+            </div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode explanation -->
+      <div style="display:flex;flex-direction:column;gap:14px;padding-top:8px">
+        <div class="card cp">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--bbg);display:flex;align-items:center;justify-content:center;font-size:18px">☀️</div>
+            <div>
+              <div style="font-size:14px;font-weight:700">一般模式</div>
+              <div style="font-size:11px;color:var(--muted)">完整資訊，清楚明確</div>
+            </div>
+          </div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted);width:80px">標題</td><td style="padding:6px 0;font-weight:500">⚽ BAN vs QAT 賽前推播</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">內文</td><td style="padding:6px 0">主隊勝 1.85 · 立即投注</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">平台品牌 Logo（192×192）</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0">賽事 Banner / 遊戲封面</td></tr>
+            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0">「立即投注」「查看賠率」</td></tr>
+          </table>
+        </div>
+        <div class="card cp" style="border-color:var(--pbdr);background:var(--pbg)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:18px">🔒</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--purple)">隱私模式</div>
+              <div style="font-size:11px;color:var(--muted)">中性內容，看不出是哪個平台</div>
+            </div>
+          </div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted);width:80px">標題</td><td style="padding:6px 0;font-weight:500">您有一則新訊息</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">內文</td><td style="padding:6px 0">點擊查看詳情</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">中性圖示（鈴鐺），非品牌</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0;color:var(--red)">✕ 不傳送</td></tr>
+            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0;color:var(--red)">✕ 不傳送</td></tr>
+          </table>
+        </div>
+        <div class="tip tip-amber">⚠️ 唯一無法控制的：通知卡片最下方 Chrome 強制顯示的來源資訊（「platform.com」）— 這是 Chrome 規範，無法移除。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 4: 樣式對比 ══ -->
+  <section id="s-compare">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 04</div>
+      <h2 class="sec-title">Android 通知欄 — 樣式對比</h2>
+      <p class="sec-desc">下拉通知欄的真實 Android Material You 通知卡片樣式，一般 vs 隱私。</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+      <!-- Normal mode phone -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="font-size:15px">☀️</span>
+          <span style="font-size:14px;font-weight:700">一般模式</span>
+          <span class="bdg bb">Sports Push</span>
+        </div>
+
+        <!-- Android notification shade mockup -->
+        <div class="android-phone" style="width:260px">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <!-- Status bar -->
+            <div class="asb" style="background:#202124;color:#e8eaed">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#e8eaed"><span style="font-size:10px">▲ WiFi 🔋</span></div>
+            </div>
+            <!-- Shade area -->
+            <div class="android-shade" style="min-height:500px">
+              <div class="shade-header" style="padding-top:12px">
+                <span class="shade-title">通知</span>
+                <span class="shade-clear">全部清除</span>
+              </div>
+              <div class="shade-cards">
+
+                <!-- Chrome web push notification card - Normal -->
+                <div class="anc">
+                  <div class="anc-src">
+                    <div class="chrome-icon"></div>
+                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-time">剛才</span>
+                    <button class="anc-dismiss">✕</button>
+                  </div>
+                  <div class="anc-content">
+                    <div class="anc-text-block">
+                      <div class="anc-title">⚽ BAN vs QAT 賽前推播</div>
+                      <div class="anc-body">主隊勝 1.85 | 客隊勝 3.20 · 立即投注</div>
+                    </div>
+                    <div class="anc-large-icon" style="background:#14805e;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                  </div>
+                  <div class="anc-image">
+                    <div class="anc-image-inner">
+                      <span style="font-size:18px">🇧🇩</span>
+                      <span style="font-size:11px;font-weight:700;color:#fff;margin:0 14px">VS</span>
+                      <span style="font-size:18px">🇶🇦</span>
+                    </div>
+                  </div>
+                  <div class="anc-actions">
+                    <button class="anc-action">立即投注</button>
+                    <button class="anc-action">查看賠率</button>
+                  </div>
+                </div>
+
+                <!-- Another notification -->
+                <div class="anc" style="opacity:.6">
+                  <div class="anc-src">
+                    <div class="chrome-icon"></div>
+                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-time">5 分鐘前</span>
+                    <button class="anc-dismiss">✕</button>
+                  </div>
+                  <div class="anc-content">
+                    <div class="anc-text-block">
+                      <div class="anc-title">🎁 首存獎勵即將到期</div>
+                      <div class="anc-body">還差 ฿200 即可領取 100% 獎勵</div>
+                    </div>
+                    <div class="anc-large-icon" style="background:#dc2626;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div style="height:20px;background:#e8eaed;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+          平台名稱、賽事圖、賠率、行動按鈕全部清楚可見。<br>旁人看到就知道是博彩平台的通知。
+        </p>
+      </div>
+
+      <!-- Privacy mode phone -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="font-size:15px">🔒</span>
+          <span style="font-size:14px;font-weight:700">隱私模式</span>
+          <span class="bdg bp">同一則通知</span>
+        </div>
+
+        <div class="android-phone" style="width:260px">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#202124;color:#e8eaed">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#e8eaed"><span style="font-size:10px">▲ WiFi 🔋</span></div>
+            </div>
+            <div class="android-shade" style="min-height:500px">
+              <div class="shade-header" style="padding-top:12px">
+                <span class="shade-title">通知</span>
+                <span class="shade-clear">全部清除</span>
+              </div>
+              <div class="shade-cards">
+
+                <!-- Chrome web push notification card - Privacy -->
+                <div class="anc">
+                  <div class="anc-src">
+                    <div class="chrome-icon"></div>
+                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-time">剛才</span>
+                    <button class="anc-dismiss">✕</button>
+                  </div>
+                  <div class="anc-content">
+                    <div class="anc-text-block">
+                      <div class="anc-title">您有一則新訊息</div>
+                      <div class="anc-body">點擊查看詳情</div>
+                    </div>
+                    <div class="anc-large-icon" style="background:#e8eaed;font-size:16px;border-radius:8px">🔔</div>
+                  </div>
+                  <!-- 無 image，無 actions -->
+                </div>
+
+                <div class="anc" style="opacity:.6">
+                  <div class="anc-src">
+                    <div class="chrome-icon"></div>
+                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-time">5 分鐘前</span>
+                    <button class="anc-dismiss">✕</button>
+                  </div>
+                  <div class="anc-content">
+                    <div class="anc-text-block">
+                      <div class="anc-title">您有一則新訊息</div>
+                      <div class="anc-body">點擊查看詳情</div>
+                    </div>
+                    <div class="anc-large-icon" style="background:#e8eaed;font-size:16px;border-radius:8px">🔔</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div style="height:20px;background:#e8eaed;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+          完全看不出內容是什麼。<br>點開後才在 App 內看到真正的通知詳情。<br>
+          <span style="color:var(--amber)">⚠ 「platform.com」來源無法隱藏，這是 Chrome 強制規範。</span>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 5: 再觸發 ══ -->
+  <section id="s-reengage">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 05</div>
+      <h2 class="sec-title">再觸發邏輯</h2>
+      <p class="sec-desc">用戶說「稍後」不代表永遠不要，節制地再問；用戶選「封鎖」則不再主動打擾。</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card" style="overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">點「稍後再說」</div>
+        <div class="re-flow">
+          <div class="rf-row"><div class="rf-dot" style="background:var(--gbg);color:var(--green);border:1px solid var(--gbdr)">1</div><div><div class="rf-title">記錄狀態 + 等 7 天</div><div class="rf-body">localStorage 存 <strong>dismissedAt</strong>，7 天內不再彈出</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr)">2</div><div><div class="rf-title">第 2 次觸發（7 天後）</div><div class="rf-body">下一個 P1/P2 時機（存款或投注後）再出現說明 Sheet</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">3</div><div><div class="rf-title">第 3 次觸發（再 14 天後）</div><div class="rf-body">最後一次主動詢問，之後<strong>不再打擾</strong></div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">✓</div><div><div class="rf-title">設定頁永遠可手動開啟</div><div class="rf-body">帳號設定 → 通知偏好，隨時可以開啟</div></div></div>
+        </div>
+      </div>
+      <div class="card" style="overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">點「封鎖」（Chrome 原生）</div>
+        <div class="re-flow">
+          <div class="rf-row"><div class="rf-dot" style="background:var(--rbg);color:var(--red);border:1px solid var(--rbdr)">!</div><div><div class="rf-title">無法再呼叫原生彈窗</div><div class="rf-body">Chrome 封鎖後，<strong>我們呼叫 permission API 會被靜默忽略</strong></div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--abg);color:var(--amber);border:1px solid var(--abdr)">→</div><div><div class="rf-title">設定頁顯示手動解鎖教學</div><div class="rf-body">帳號設定 → 通知偏好 → 顯示步驟說明</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">→</div><div><div class="rf-title">Chrome 手動解鎖步驟</div><div class="rf-body">網址列 🔒 圖示 → 網站設定 → 通知 → <strong>允許</strong></div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 6: Payload ══ -->
+  <section id="s-payload">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 06</div>
+      <h2 class="sec-title">技術實作 — Payload 對比</h2>
+      <p class="sec-desc">後端根據用戶的 <code>notificationMode</code> 組不同 Payload 送出。DeepLink 兩者都送。</p>
+    </div>
+    <div class="code-compare">
+      <div class="code-block">
+        <div class="code-hd" style="background:var(--gbg)"><span style="color:var(--green)">●</span> 一般模式</div>
+        <pre class="code-body"><span class="cc">// notificationMode === 'normal'</span>
+{
+  <span class="ck">"title"</span>:   <span class="cv">"⚽ BAN vs QAT 賽前推播"</span>,
+  <span class="ck">"body"</span>:    <span class="cv">"主隊勝 1.85 · 立即投注"</span>,
+  <span class="ck">"icon"</span>:    <span class="cv">"/icons/platform-logo-192.png"</span>,
+  <span class="ck">"badge"</span>:   <span class="cv">"/icons/badge-mono-96.png"</span>,
+  <span class="ck">"image"</span>:   <span class="cv">"/images/ban-qat-banner.jpg"</span>,
+  <span class="ck">"actions"</span>: [
+    { <span class="ck">"action"</span>: <span class="cv">"bet"</span>,  <span class="ck">"title"</span>: <span class="cv">"立即投注"</span> },
+    { <span class="ck">"action"</span>: <span class="cv">"view"</span>, <span class="ck">"title"</span>: <span class="cv">"查看賠率"</span> }
+  ],
+  <span class="ck">"data"</span>: { <span class="ck">"deepLink"</span>: <span class="cv">"/match/ban-qat"</span> }
+}</pre>
+      </div>
+      <div class="code-block">
+        <div class="code-hd" style="background:var(--pbg)"><span style="color:var(--purple)">●</span> 隱私模式</div>
+        <pre class="code-body"><span class="cc">// notificationMode === 'privacy'</span>
+{
+  <span class="ck">"title"</span>:  <span class="cv">"您有一則新訊息"</span>,
+  <span class="ck">"body"</span>:   <span class="cv">"點擊查看詳情"</span>,
+  <span class="ck">"icon"</span>:   <span class="cv">"/icons/generic-bell-192.png"</span>,
+
+  <span class="cc">// badge / image / actions 全部不送</span>
+
+  <span class="ck">"data"</span>: { <span class="ck">"deepLink"</span>: <span class="cv">"/match/ban-qat"</span> }
+  <span class="cc">// deepLink 仍送，點開後正常導向</span>
+}</pre>
+      </div>
+    </div>
+    <div class="tip tip-blue" style="margin-top:14px"><strong>後端邏輯：</strong>送推播前查用戶的 <code>notificationMode</code>（存於 user profile DB）。Normal → 完整 payload；Privacy → 精簡 payload。</div>
+    <div class="tip tip-amber" style="margin-top:6px"><strong>無法隱藏的：</strong>Android Chrome 通知卡片的來源列固定顯示「Chrome · platform.com」，這是 Chrome 規範強制呈現，非 payload 控制範圍。</div>
+  </section>
+
+  <!-- ══ SECTION 7: 千人千面 ══ -->
+  <section id="s-personalization">
+    <div class="sec-hd">
+      <div class="eyebrow">Section 07</div>
+      <h2 class="sec-title">千人千面 — 個人化推播邏輯</h2>
+      <p class="sec-desc">後端根據用戶的行為標籤（Tags）決定要不要送、送什麼內容。不是廣播，是「剛好在對的時刻說對的話」。</p>
+    </div>
+
+    <!-- Overview -->
+    <div class="card cp" style="margin-bottom:24px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🎯</span> 千人千面的核心邏輯
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center">
+        <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">🏷️</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">用戶行為 Tags</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">投注紀錄<br>損益狀態<br>偏好運動<br>活躍程度</div>
+        </div>
+        <div style="font-size:20px;color:#ccc;padding:0 12px">→</div>
+        <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">⚙️</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">後端判斷</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">符合條件？<br>選擇推播類型<br>組個人化文案</div>
+        </div>
+        <div style="font-size:20px;color:#ccc;padding:0 12px">→</div>
+        <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;margin-bottom:6px">📲</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">個人化通知</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">對的時機<br>對的理由<br>對的內容</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 1: Sports Push -->
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:18px">⚽</div>
+        <div>
+          <div style="font-size:15px;font-weight:700">Sports Push · 類型 1 · 賽前期</div>
+          <div style="font-size:12px;color:var(--muted)">Android Chrome Web Push</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Tags -->
+        <div class="card" style="overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;
+            background:var(--gbg);color:var(--green)">✅ 符合以下全部條件才推送</div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue);width:200px">preferredSport</td>
+              <td style="padding:10px 14px">= <strong>football</strong>（曾主動下注足球）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastBetLeague</td>
+              <td style="padding:10px 14px">包含<strong>此場比賽所屬聯賽</strong>的投注紀錄</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">accountBalance</td>
+              <td style="padding:10px 14px">&gt; 0（<strong>有餘額</strong>，才有意義推）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastLoginHours</td>
+              <td style="padding:10px 14px">&lt; 48h（<strong>近期活躍</strong>，非沈睡用戶）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">pushOptIn</td>
+              <td style="padding:10px 14px">= true（<strong>已授權推播</strong>）</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">kickoffTime</td>
+              <td style="padding:10px 14px">距開賽 <strong>2 小時內</strong>（賽前黃金時段）</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Why + Notifications -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card cp" style="border-color:var(--gbdr);background:var(--gbg)">
+            <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">為什麼推這個人</div>
+            <p style="font-size:12px;color:var(--fg);line-height:1.7">
+              他過去投注過這場比賽的相關聯賽 ＋ 目前有餘額 ＋ 比賽快開始了<br>
+              → <strong>「他有可能想押這場，只是還沒看到入口」</strong><br><br>
+              不是廣播給所有人，而是只推給「這場比賽對他有意義」的用戶。
+            </p>
+          </div>
+
+          <!-- Normal notification preview -->
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ 一般模式通知</div>
+            <div class="anc" style="font-family:var(--roboto)">
+              <div class="anc-src">
+                <div class="chrome-icon"></div>
+                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-time">剛才</span>
+                <button class="anc-dismiss">✕</button>
+              </div>
+              <div class="anc-content">
+                <div class="anc-text-block">
+                  <div class="anc-title">⚽ BAN vs QAT 2 小時後開賽</div>
+                  <div class="anc-body">主隊賠率 1.85 · 你上次也押了亞洲盃</div>
+                </div>
+                <div class="anc-large-icon" style="background:#14805e;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+              </div>
+              <div class="anc-actions">
+                <button class="anc-action">立即投注</button>
+                <button class="anc-action">查看賠率</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 隱私模式通知</div>
+            <div class="anc" style="font-family:var(--roboto)">
+              <div class="anc-src">
+                <div class="chrome-icon"></div>
+                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-time">剛才</span>
+                <button class="anc-dismiss">✕</button>
+              </div>
+              <div class="anc-content">
+                <div class="anc-text-block">
+                  <div class="anc-title">您有一則新訊息</div>
+                  <div class="anc-body">點擊查看詳情</div>
+                </div>
+                <div class="anc-large-icon" style="background:#e8eaed;font-size:16px;border-radius:8px">🔔</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario 2: Slot Push -->
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--rbg);display:flex;align-items:center;justify-content:center;font-size:18px">🎰</div>
+        <div>
+          <div style="font-size:15px;font-weight:700">Slot Push · 2b · 連輸保護 Loss Rebate</div>
+          <div style="font-size:12px;color:var(--muted)">Android Chrome Web Push</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- Tags -->
+        <div class="card" style="overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;
+            background:var(--rbg);color:var(--red)">✅ 符合以下全部條件才推送</div>
+          <table style="width:100%;font-size:12px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue);width:200px">consecutiveLosses</td>
+              <td style="padding:10px 14px">&gt;= 5（<strong>連輸 5 局</strong>以上）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">sessionLossAmount</td>
+              <td style="padding:10px 14px">&gt; 設定閾值（<strong>本次損失達門檻</strong>）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastActivityHours</td>
+              <td style="padding:10px 14px">&lt; 24h（<strong>剛輸完還沒走遠</strong>）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">churnRiskScore</td>
+              <td style="padding:10px 14px">= medium–high（<strong>流失風險高</strong>）</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">rebateEligible</td>
+              <td style="padding:10px 14px">= true（<strong>後端確認符合 Rebate 資格</strong>）</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">pushOptIn</td>
+              <td style="padding:10px 14px">= true（<strong>已授權推播</strong>）</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Why + Notifications -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card cp" style="border-color:var(--rbdr);background:var(--rbg)">
+            <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">為什麼推這個人</div>
+            <p style="font-size:12px;color:var(--fg);line-height:1.7">
+              他剛連輸，情緒低落，有流失傾向，但後端確認他符合 Loss Rebate 資格<br>
+              → <strong>「平台主動給補償，讓他覺得被照顧，而不是被榨乾」</strong><br><br>
+              關鍵：不是連輸就推，是「連輸 ＋ 有資格領」才推。否則是騷擾。
+            </p>
+          </div>
+
+          <!-- Normal notification preview -->
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ 一般模式通知</div>
+            <div class="anc" style="font-family:var(--roboto)">
+              <div class="anc-src">
+                <div class="chrome-icon"></div>
+                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-time">剛才</span>
+                <button class="anc-dismiss">✕</button>
+              </div>
+              <div class="anc-content">
+                <div class="anc-text-block">
+                  <div class="anc-title">🎁 連輸保護啟動</div>
+                  <div class="anc-body">你有 ฿50 Loss Rebate 可以領取</div>
+                </div>
+                <div class="anc-large-icon" style="background:#dc2626;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+              </div>
+              <div class="anc-actions">
+                <button class="anc-action">立即領取</button>
+                <button class="anc-action">查看詳情</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 隱私模式通知</div>
+            <div class="anc" style="font-family:var(--roboto)">
+              <div class="anc-src">
+                <div class="chrome-icon"></div>
+                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-time">剛才</span>
+                <button class="anc-dismiss">✕</button>
+              </div>
+              <div class="anc-content">
+                <div class="anc-text-block">
+                  <div class="anc-title">您有一則新訊息</div>
+                  <div class="anc-body">點擊查看詳情</div>
+                </div>
+                <div class="anc-large-icon" style="background:#e8eaed;font-size:16px;border-radius:8px">🔔</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permission sheet personalization -->
+    <div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">📋</span> 申請推播時的說明 Sheet 也個人化
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">
+        用戶看到的 Sheet 文案根據他的類型切換，不是一段通用文字。
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--gbg);color:var(--green)">⚽ 足球投注用戶</div>
+          <div style="padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「不想錯過比賽結果嗎？」</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.65">
+              🏆 比賽開踢提醒<br>
+              📊 即時賠率變動<br>
+              ✅ 投注結果第一時間通知
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--rbg);color:var(--red)">🎰 Slot 連輸用戶</div>
+          <div style="padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「好消息讓我們第一時間通知你」</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.65">
+              🛡️ 連輸保護自動啟動通知<br>
+              🎁 專屬回饋優惠<br>
+              💰 紅利到帳提醒
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--abg);color:var(--amber)">💰 存款但未投注</div>
+          <div style="padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「你的優惠快截止了」</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.65">
+              ⏰ 首存獎勵到期提醒<br>
+              🎯 專屬限定優惠<br>
+              🔔 新活動上架通知
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="tip tip-purple" style="margin-top:14px">
+        <strong>技術實作：</strong>前端呼叫 <code>GET /api/user/push-context</code>，後端回傳 <code>{ sheetVariant: 'sports' | 'loss' | 'deposit' | 'default' }</code>，前端依此選擇對應的 Sheet 文案版本。
+      </div>
+    </div>
+
+  </section>
+
+</main>
+</body>
+</html>
