@@ -1,8 +1,40 @@
-// 色相/飽和度 參數
-export interface HslParams {
+// 色相/飽和度 單一色版調整量
+export interface HslChannelAdjust {
   hue: number;        // -180 ~ +180
   saturation: number; // -100 ~ +100
   brightness: number; // -100 ~ +100
+}
+
+// 可選的色版：全部 / 6 個色系
+export type HslChannel = 'all' | 'red' | 'yellow' | 'green' | 'cyan' | 'blue' | 'magenta'
+
+// 色相/飽和度 參數（含 per-channel 調整）
+export interface HslParams {
+  channel: HslChannel;      // UI 目前選取的色版
+  all: HslChannelAdjust;    // 影響全部色系
+  red: HslChannelAdjust;
+  yellow: HslChannelAdjust;
+  green: HslChannelAdjust;
+  cyan: HslChannelAdjust;
+  blue: HslChannelAdjust;
+  magenta: HslChannelAdjust;
+}
+
+// 曲線控制點 [輸入 0-255, 輸出 0-255]
+export type CurvePoint = [number, number]
+
+// 曲線單一色版參數
+export interface CurvesChannelParams {
+  points: CurvePoint[]; // 至少 2 個，已按 x 排序
+}
+
+// 曲線 參數（RGB 整體 + 各色版獨立）
+export interface CurvesParams {
+  channel: 'rgb' | 'r' | 'g' | 'b'; // UI 目前選取
+  rgb: CurvesChannelParams;
+  r: CurvesChannelParams;
+  g: CurvesChannelParams;
+  b: CurvesChannelParams;
 }
 
 // 色彩平衡單一色調區段（陰影/中間調/亮部）
@@ -43,11 +75,20 @@ export interface AdjustmentParams {
   hsl: HslParams;
   colorBalance: ColorBalanceParams;
   levels: LevelsParams;
+  curves: CurvesParams;
+}
+
+// 直方圖資料（各色版 256 個 bucket）
+export interface HistogramData {
+  lum: number[];  // 亮度
+  r: number[];    // 紅色
+  g: number[];    // 綠色
+  b: number[];    // 藍色
 }
 
 // Plugin → UI 的訊息
 export type PluginToUIMessage =
-  | { type: 'image'; bytes: Uint8Array; width: number; height: number }
+  | { type: 'image'; bytes: Uint8Array; width: number; height: number; nodeId: string }
   | { type: 'error'; message: string };
 
 // UI → Plugin 的訊息
@@ -56,8 +97,35 @@ export type UIToPluginMessage =
   | { type: 'ready' };
 
 // 預設值工廠
-export function defaultHslParams(): HslParams {
+function defaultHslChannelAdjust(): HslChannelAdjust {
   return { hue: 0, saturation: 0, brightness: 0 };
+}
+
+export function defaultHslParams(): HslParams {
+  return {
+    channel: 'all',
+    all: defaultHslChannelAdjust(),
+    red: defaultHslChannelAdjust(),
+    yellow: defaultHslChannelAdjust(),
+    green: defaultHslChannelAdjust(),
+    cyan: defaultHslChannelAdjust(),
+    blue: defaultHslChannelAdjust(),
+    magenta: defaultHslChannelAdjust(),
+  };
+}
+
+export function defaultCurvesChannel(): CurvesChannelParams {
+  return { points: [[0, 0], [255, 255]] };
+}
+
+export function defaultCurvesParams(): CurvesParams {
+  return {
+    channel: 'rgb',
+    rgb: defaultCurvesChannel(),
+    r: defaultCurvesChannel(),
+    g: defaultCurvesChannel(),
+    b: defaultCurvesChannel(),
+  };
 }
 
 export function defaultColorBalanceTone(): ColorBalanceTone {
@@ -92,5 +160,6 @@ export function defaultAdjustmentParams(): AdjustmentParams {
     hsl: defaultHslParams(),
     colorBalance: defaultColorBalanceParams(),
     levels: defaultLevelsParams(),
+    curves: defaultCurvesParams(),
   };
 }
