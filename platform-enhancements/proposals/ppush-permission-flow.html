@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>推播權限申請流程 · 隱私模式設計</title>
+<title>BJ · 推播權限申請流程 · 隱私模式設計</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -677,14 +677,16 @@ section{scroll-margin-top:70px}
               <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.5)">
                 <div class="chrome-permission">
                   <div class="cp-header">
-                    <div class="cp-site-icon">B</div>
+                    <div class="cp-site-icon" style="background:#fff;overflow:hidden;padding:2px">
+                      <img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain">
+                    </div>
                     <div class="cp-site-info">
-                      <div class="cp-site-name">Platform</div>
-                      <div class="cp-site-url">platform.com</div>
+                      <div class="cp-site-name">BJ</div>
+                      <div class="cp-site-url">bj.com</div>
                     </div>
                   </div>
                   <div class="cp-question">傳送通知？</div>
-                  <div class="cp-desc">允許 platform.com 傳送通知給您？您可以隨時在設定中變更。</div>
+                  <div class="cp-desc">允許 bj.com 傳送通知給您？您可以隨時在設定中變更。</div>
                   <div class="cp-btns">
                     <button class="cp-btn cp-btn-block">封鎖</button>
                     <button class="cp-btn cp-btn-allow">允許</button>
@@ -892,9 +894,97 @@ section{scroll-margin-top:70px}
             <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0;color:var(--red)">✕ 不傳送</td></tr>
           </table>
         </div>
-        <div class="tip tip-amber">⚠️ 唯一無法控制的：通知卡片最下方 Chrome 強制顯示的來源資訊（「platform.com」）— 這是 Chrome 規範，無法移除。</div>
+        <div class="tip tip-amber">⚠️ 唯一無法控制的：通知卡片最下方 Chrome 強制顯示的來源資訊（「bj.com」）— 這是 Chrome 規範，無法移除。</div>
       </div>
     </div>
+
+    <!-- 白話說明：玩家設定流程 -->
+    <div style="margin-top:32px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--purple)">HOW IT WORKS</span>
+        <span style="font-size:14px;font-weight:700">玩家怎麼一步一步設定</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- 設定步驟 -->
+        <div class="card" style="overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--pbg);color:var(--purple)">
+            設定步驟（全在 BJ 網站內，不需要去 Android 設定）
+          </div>
+          <div class="re-flow">
+            <div class="rf-row">
+              <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">1</div>
+              <div>
+                <div class="rf-title">進入「個人設定」</div>
+                <div class="rf-body">點右上角頭像或選單 → <strong>Account Settings</strong></div>
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">2</div>
+              <div>
+                <div class="rf-title">點進「Notifications」</div>
+                <div class="rf-body">設定列表中找到通知選項 → 點進去</div>
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">3</div>
+              <div>
+                <div class="rf-title">在「Notification Mode」選擇模式</div>
+                <div class="rf-body">
+                  ● <strong>Standard Mode</strong> — 顯示完整賽事資訊<br>
+                  ● <strong>Privacy Mode</strong> — 只顯示「您有一則新訊息」
+                </div>
+              </div>
+            </div>
+            <div class="rf-row">
+              <div class="rf-dot" style="background:var(--gbg);color:var(--green);border:1px solid var(--gbdr)">✓</div>
+              <div>
+                <div class="rf-title">選完即時生效，隨時可以改回來</div>
+                <div class="rf-body">後端記錄偏好，下一次推播就會用新的模式送出</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 兩種模式差異 -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="card cp" style="border-color:var(--gbdr);background:var(--gbg)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="font-size:16px">☀️</span>
+              <div style="font-size:13px;font-weight:700;color:var(--green)">Standard Mode（一般）</div>
+            </div>
+            <div style="font-size:12px;color:var(--fg);line-height:1.75">
+              通知欄直接顯示：<br>
+              <strong>標題</strong>：⚽ BAN vs QAT 賽前推播<br>
+              <strong>內容</strong>：主隊勝 1.85 · 立即投注<br>
+              <strong>圖片 + 按鈕</strong>：立即投注 / 查看賠率<br>
+              <span style="color:var(--muted);font-size:11px">旁人看到通知，會知道是博彩平台</span>
+            </div>
+          </div>
+
+          <div class="card cp" style="border-color:var(--pbdr);background:var(--pbg)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="font-size:16px">🔒</span>
+              <div style="font-size:13px;font-weight:700;color:var(--purple)">Privacy Mode（隱私）</div>
+            </div>
+            <div style="font-size:12px;color:var(--fg);line-height:1.75">
+              通知欄只顯示：<br>
+              <strong>標題</strong>：您有一則新訊息<br>
+              <strong>內容</strong>：點擊查看詳情<br>
+              <strong>無圖片、無按鈕</strong><br>
+              <span style="color:var(--muted);font-size:11px">點開之後，在 BJ 網站內才看到真正內容</span>
+            </div>
+          </div>
+
+          <div class="tip tip-amber" style="margin-top:0">
+            <strong>有一個地方藏不住：</strong>Chrome 通知卡片固定會顯示「Chrome · bj.com」，這是 Google 強制規範，任何網站都無法移除。
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </section>
 
   <!-- ══ SECTION 4: 樣式對比 ══ -->
@@ -936,7 +1026,7 @@ section{scroll-margin-top:70px}
                 <div class="anc">
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
-                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-app-name">Chrome · bj.com</span>
                     <span class="anc-time">剛才</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
@@ -945,7 +1035,7 @@ section{scroll-margin-top:70px}
                       <div class="anc-title">⚽ BAN vs QAT 賽前推播</div>
                       <div class="anc-body">主隊勝 1.85 | 客隊勝 3.20 · 立即投注</div>
                     </div>
-                    <div class="anc-large-icon" style="background:#14805e;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                    <div class="anc-large-icon" style="background:#fff;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
                   </div>
                   <div class="anc-image">
                     <div class="anc-image-inner">
@@ -964,7 +1054,7 @@ section{scroll-margin-top:70px}
                 <div class="anc" style="opacity:.6">
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
-                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-app-name">Chrome · bj.com</span>
                     <span class="anc-time">5 分鐘前</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
@@ -973,7 +1063,7 @@ section{scroll-margin-top:70px}
                       <div class="anc-title">🎁 首存獎勵即將到期</div>
                       <div class="anc-body">還差 ฿200 即可領取 100% 獎勵</div>
                     </div>
-                    <div class="anc-large-icon" style="background:#dc2626;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                    <div class="anc-large-icon" style="background:#fff;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
                   </div>
                 </div>
 
@@ -1015,7 +1105,7 @@ section{scroll-margin-top:70px}
                 <div class="anc">
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
-                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-app-name">Chrome · bj.com</span>
                     <span class="anc-time">剛才</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
@@ -1032,7 +1122,7 @@ section{scroll-margin-top:70px}
                 <div class="anc" style="opacity:.6">
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
-                    <span class="anc-app-name">Chrome · platform.com</span>
+                    <span class="anc-app-name">Chrome · bj.com</span>
                     <span class="anc-time">5 分鐘前</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
@@ -1054,7 +1144,7 @@ section{scroll-margin-top:70px}
         </div>
         <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
           完全看不出內容是什麼。<br>點開後才在 App 內看到真正的通知詳情。<br>
-          <span style="color:var(--amber)">⚠ 「platform.com」來源無法隱藏，這是 Chrome 強制規範。</span>
+          <span style="color:var(--amber)">⚠ 「bj.com」來源無法隱藏，這是 Chrome 強制規範。</span>
         </p>
       </div>
 
@@ -1103,7 +1193,7 @@ section{scroll-margin-top:70px}
 {
   <span class="ck">"title"</span>:   <span class="cv">"⚽ BAN vs QAT 賽前推播"</span>,
   <span class="ck">"body"</span>:    <span class="cv">"主隊勝 1.85 · 立即投注"</span>,
-  <span class="ck">"icon"</span>:    <span class="cv">"/icons/platform-logo-192.png"</span>,
+  <span class="ck">"icon"</span>:    <span class="cv">"/icons/bj-logo-192.png"</span>,
   <span class="ck">"badge"</span>:   <span class="cv">"/icons/badge-mono-96.png"</span>,
   <span class="ck">"image"</span>:   <span class="cv">"/images/ban-qat-banner.jpg"</span>,
   <span class="ck">"actions"</span>: [
@@ -1129,7 +1219,7 @@ section{scroll-margin-top:70px}
       </div>
     </div>
     <div class="tip tip-blue" style="margin-top:14px"><strong>後端邏輯：</strong>送推播前查用戶的 <code>notificationMode</code>（存於 user profile DB）。Normal → 完整 payload；Privacy → 精簡 payload。</div>
-    <div class="tip tip-amber" style="margin-top:6px"><strong>無法隱藏的：</strong>Android Chrome 通知卡片的來源列固定顯示「Chrome · platform.com」，這是 Chrome 規範強制呈現，非 payload 控制範圍。</div>
+    <div class="tip tip-amber" style="margin-top:6px"><strong>無法隱藏的：</strong>Android Chrome 通知卡片的來源列固定顯示「Chrome · bj.com」，這是 Chrome 規範強制呈現，非 payload 控制範圍。</div>
   </section>
 
   <!-- ══ SECTION 7: 千人千面 ══ -->
@@ -1227,7 +1317,7 @@ section{scroll-margin-top:70px}
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
-                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-app-name">Chrome · bj.com</span>
                 <span class="anc-time">剛才</span>
                 <button class="anc-dismiss">✕</button>
               </div>
@@ -1236,7 +1326,7 @@ section{scroll-margin-top:70px}
                   <div class="anc-title">⚽ BAN vs QAT 2 小時後開賽</div>
                   <div class="anc-body">主隊賠率 1.85 · 你上次也押了亞洲盃</div>
                 </div>
-                <div class="anc-large-icon" style="background:#14805e;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                <div class="anc-large-icon" style="background:#fff;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
               </div>
               <div class="anc-actions">
                 <button class="anc-action">立即投注</button>
@@ -1250,7 +1340,7 @@ section{scroll-margin-top:70px}
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
-                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-app-name">Chrome · bj.com</span>
                 <span class="anc-time">剛才</span>
                 <button class="anc-dismiss">✕</button>
               </div>
@@ -1328,7 +1418,7 @@ section{scroll-margin-top:70px}
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
-                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-app-name">Chrome · bj.com</span>
                 <span class="anc-time">剛才</span>
                 <button class="anc-dismiss">✕</button>
               </div>
@@ -1337,7 +1427,7 @@ section{scroll-margin-top:70px}
                   <div class="anc-title">🎁 連輸保護啟動</div>
                   <div class="anc-body">你有 ฿50 Loss Rebate 可以領取</div>
                 </div>
-                <div class="anc-large-icon" style="background:#dc2626;font-size:13px;font-weight:700;color:#fff;border-radius:8px">B</div>
+                <div class="anc-large-icon" style="background:#fff;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
               </div>
               <div class="anc-actions">
                 <button class="anc-action">立即領取</button>
@@ -1351,7 +1441,7 @@ section{scroll-margin-top:70px}
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
-                <span class="anc-app-name">Chrome · platform.com</span>
+                <span class="anc-app-name">Chrome · bj.com</span>
                 <span class="anc-time">剛才</span>
                 <button class="anc-dismiss">✕</button>
               </div>
