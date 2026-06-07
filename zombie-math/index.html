@@ -285,6 +285,136 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    // ── 遊戲狀態 ──────────────────────────────────────────
+    const state = {
+      lives: 3,
+      score: 0,
+      wave: 1,
+      combo: 0,
+      comboActive: false,   // 連擊特效是否啟動（連對3題後下一發打2隻）
+      correctCount: 0,
+      totalAnswers: 0,
+      zombies: [],          // 目前畫面上的殭屍陣列
+      gameRunning: false,
+      waveClearing: false,  // 正在進行波次切換
+      zombieIdCounter: 0,   // 產生唯一 ID 用
+      gameLoopId: null,
+    };
+
+    // ── 殭屍產生 ──────────────────────────────────────────
+    // 在右邊隨機位置產生一隻殭屍，加入 DOM 與 state.zombies
+    function spawnZombie() {
+      const q = generateQuestion(state.wave);
+      const id = `zombie-${state.zombieIdCounter++}`;
+      const startX = window.innerWidth + 20; // 從右邊畫面外進入
+
+      // DOM 元素
+      const el = document.createElement('div');
+      el.className = 'zombie';
+      el.id = id;
+      el.style.left = startX + 'px';
+      el.innerHTML = `
+        <div class="zombie-label">${q.question} = ?</div>
+        <span class="zombie-body" style="display:inline-block;animation:zombieWalk 0.4s infinite">🧟</span>
+      `;
+      document.getElementById('game-area').appendChild(el);
+
+      // 速度依波數決定（px / 秒）
+      const speed = getZombieSpeed();
+
+      state.zombies.push({ id, el, answer: q.answer, x: startX, speed });
+    }
+
+    function getZombieSpeed() {
+      if (state.wave <= 3) return randInt(40, 60);
+      if (state.wave <= 6) return randInt(60, 80);
+      if (state.wave <= 9) return randInt(75, 100);
+      return randInt(90, 130);
+    }
+
+    // ── 殭屍移動主迴圈 ────────────────────────────────────
+    let lastTime = null;
+
+    function gameLoop(timestamp) {
+      if (!state.gameRunning) return;
+
+      const dt = lastTime ? (timestamp - lastTime) / 1000 : 0;
+      lastTime = timestamp;
+
+      const PLAYER_X = 100; // 殭屍到達此 X 就扣命
+
+      for (let i = state.zombies.length - 1; i >= 0; i--) {
+        const z = state.zombies[i];
+        z.x -= z.speed * dt;
+        z.el.style.left = z.x + 'px';
+
+        if (z.x < PLAYER_X) {
+          // 殭屍到達邊界
+          removeZombie(i);
+          loseLife();
+        }
+      }
+
+      // 檢查是否全部殭屍清除
+      if (state.zombies.length === 0 && !state.waveClearing) {
+        state.waveClearing = true;
+        showWaveClear();
+      }
+
+      state.gameLoopId = requestAnimationFrame(gameLoop);
+    }
+
+    function removeZombie(index) {
+      const z = state.zombies[index];
+      z.el.remove();
+      state.zombies.splice(index, 1);
+    }
+
+    function removeZombieById(id) {
+      const index = state.zombies.findIndex(z => z.id === id);
+      if (index !== -1) removeZombie(index);
+    }
+
+    function loseLife() {
+      state.lives--;
+      state.combo = 0;
+      updateHUD();
+
+      // 紅色閃爍
+      const gameArea = document.getElementById('game-area');
+      gameArea.classList.remove('flash');
+      void gameArea.offsetWidth; // 強制 reflow 讓動畫重新觸發
+      gameArea.classList.add('flash');
+      setTimeout(() => gameArea.classList.remove('flash'), 500);
+
+      if (state.lives <= 0) {
+        endGame();
+      }
+    }
+
+    function updateHUD() {
+      // 生命值
+      const hearts = ['❤️', '❤️', '❤️'].slice(0, state.lives).join(' ')
+        + ['🖤', '🖤', '🖤'].slice(state.lives, 3).join(' ');
+      document.getElementById('lives').textContent = hearts;
+
+      // 分數
+      document.getElementById('score').textContent = `分數：${state.score.toLocaleString()}`;
+
+      // 波數
+      document.getElementById('wave-label').textContent = `第 ${state.wave} 波`;
+
+      // 連擊
+      const comboEl = document.getElementById('combo-display');
+      if (state.combo >= 3) {
+        comboEl.textContent = `🔥 連擊 x${state.combo}`;
+      } else if (state.combo > 0) {
+        comboEl.textContent = `連對 ${state.combo}`;
+      } else {
+        comboEl.textContent = '';
+      }
+    }
+
     // ── 佔位函式（Task 4、Task 5 會實作完整版本）──
     function startGame() { /* Task 5 實作 */ }
     function submitAnswer() { /* Task 4 實作 */ }
