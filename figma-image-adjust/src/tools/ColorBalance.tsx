@@ -37,10 +37,10 @@ export function ColorBalance({ params, onChange, onReset }: ColorBalanceProps) {
             onClick={() => setActiveTone(key)}
             style={{
               flex: 1, padding: '4px 0', border: '1px solid',
-              borderColor: activeTone === key ? '#18A0FB' : '#d4d4d4',
+              borderColor: activeTone === key ? '#18A0FB' : 'var(--btn-border)',
               borderRadius: 4, fontSize: 11, cursor: 'pointer',
-              background: activeTone === key ? '#18A0FB' : '#fff',
-              color: activeTone === key ? '#fff' : '#555',
+              background: activeTone === key ? '#18A0FB' : 'var(--btn-bg)',
+              color: activeTone === key ? '#fff' : 'var(--text-dim)',
             }}
           >
             {label}
@@ -74,7 +74,7 @@ export function ColorBalance({ params, onChange, onReset }: ColorBalanceProps) {
       />
 
       {/* 保留明度 */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#555', marginBottom: 8 }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-dim)', marginBottom: 8 }}>
         <input
           type="checkbox"
           checked={params.preserveLuminosity}
@@ -86,8 +86,9 @@ export function ColorBalance({ params, onChange, onReset }: ColorBalanceProps) {
       <button
         onClick={onReset}
         style={{
-          padding: '4px 12px', border: '1px solid #d4d4d4',
-          borderRadius: 4, fontSize: 11, cursor: 'pointer', background: '#fff',
+          padding: '4px 12px', border: '1px solid var(--btn-border)',
+          borderRadius: 4, fontSize: 11, cursor: 'pointer',
+          background: 'var(--btn-bg)', color: 'var(--text-dim)',
         }}
       >
         重設

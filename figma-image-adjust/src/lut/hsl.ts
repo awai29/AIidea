@@ -1,5 +1,6 @@
 // RGB ↔ HSL 轉換，並套用色相/飽和度/亮度調整
 // HSL 中：H 為 0-360 度，S 為 0-100，L 為 0-100
+import type { HslParams } from '../types'
 
 // 將數值限制在 0-1 範圍內
 function clamp01(value: number): number {
@@ -80,36 +81,60 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   return [clampByte(r * 255), clampByte(g * 255), clampByte(b * 255)]
 }
 
+// 六個色系的中心色相（度）
+const CHANNEL_CENTERS: Record<string, number> = {
+  red: 0,
+  yellow: 60,
+  green: 120,
+  cyan: 180,
+  blue: 240,
+  magenta: 300,
+}
+
+// 計算某色相對特定色系的影響權重
+// 中心 ±30° 全影響，再延伸 15° 平滑淡出（共 60° 範圍，類 Photoshop）
+function channelWeight(pixelHueDeg: number, centerHueDeg: number): number {
+  const halfWidth = 30
+  const feather = 15
+  const diff = Math.abs(((pixelHueDeg - centerHueDeg + 540) % 360) - 180)
+  if (diff <= halfWidth) return 1
+  if (diff >= halfWidth + feather) return 0
+  const t = (diff - halfWidth) / feather
+  return 1 - (3 * t * t - 2 * t * t * t) // smoothstep
+}
+
 /**
- * 對單一像素套用色相/飽和度/亮度調整
- * @param r 紅色通道 0-255
- * @param g 綠色通道 0-255
- * @param b 藍色通道 0-255
- * @param hue 色相偏移量 -180 ~ +180 度
- * @param saturation 飽和度偏移量 -100 ~ +100
- * @param brightness 亮度偏移量 -100 ~ +100
- * @returns [r, g, b] 調整後的 RGB 值
+ * 套用含 per-channel 的色相/飽和度/亮度調整（對應 Photoshop 色相/飽和度面板）
+ * 以像素原始色相計算各色系的影響權重，再一次性累加套用
  */
-export function applyHsl(
+export function applyHslWithChannels(
   r: number,
   g: number,
   b: number,
-  hue: number,
-  saturation: number,
-  brightness: number
+  params: HslParams
 ): [number, number, number] {
-  const safeHue = Number.isFinite(hue) ? hue : 0
-  const safeSaturation = Number.isFinite(saturation) ? saturation : 0
-  const safeBrightness = Number.isFinite(brightness) ? brightness : 0
-
-  // 將 RGB 轉為 HSL
   let [h, s, l] = rgbToHsl(clampByte(r), clampByte(g), clampByte(b))
+  const origH = h  // 用原始色相計算各色系權重
 
-  // 套用調整
-  h = wrapHue(h + safeHue)
-  s = Math.max(0, Math.min(100, s + safeSaturation))
-  l = Math.max(0, Math.min(100, l + safeBrightness))
+  // 累計所有調整量（全部 + 各色系加權）
+  let dh = params.all.hue
+  let ds = params.all.saturation
+  let dl = params.all.brightness
 
-  // 轉回 RGB 並回傳
+  const COLOR_CHANNELS = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta'] as const
+  for (const ch of COLOR_CHANNELS) {
+    const w = channelWeight(origH, CHANNEL_CENTERS[ch])
+    if (w <= 0) continue
+    const adj = params[ch]
+    dh += adj.hue * w
+    ds += adj.saturation * w
+    dl += adj.brightness * w
+  }
+
+  // 一次套用所有累計調整
+  h = wrapHue(h + dh)
+  s = Math.max(0, Math.min(100, s + ds))
+  l = Math.max(0, Math.min(100, l + dl))
+
   return hslToRgb(h, s, l)
 }

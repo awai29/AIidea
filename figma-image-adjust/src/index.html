@@ -5,10 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Image Adjust</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: 'Inter', -apple-system, sans-serif; font-size: 12px; color: #1e1e1e; background: #fff; }
+      /* ── Theme tokens ─────────────────────────────────────────────────── */
+      :root {
+        --app-bg:       #ffffff;
+        --sidebar-bg:   #fafafa;
+        --border:       #e5e5e5;
+        --text:         #1e1e1e;
+        --text-dim:     #555555;
+        --text-faint:   #888888;
+        --input-bg:     #ffffff;
+        --input-border: #d4d4d4;
+        --btn-bg:       #ffffff;
+        --btn-border:   #d4d4d4;
+      }
+      [data-theme="dark"] {
+        --app-bg:       #1e1e1e;
+        --sidebar-bg:   #252525;
+        --border:       #363636;
+        --text:         #e0e0e0;
+        --text-dim:     #aaaaaa;
+        --text-faint:   #777777;
+        --input-bg:     #2e2e2e;
+        --input-border: #484848;
+        --btn-bg:       #2e2e2e;
+        --btn-border:   #484848;
+      }
 
-      /* 原生 range input 樣式 — 讓 thumb 由瀏覽器原生處理，零延遲 */
+      /* ── Base ─────────────────────────────────────────────────────────── */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 12px;
+        color: var(--text);
+        background: var(--app-bg);
+      }
+
+      /* number input — 繼承 theme，inline style 不需再重複 */
+      input[type=number] {
+        background: var(--input-bg);
+        color: var(--text);
+        border: 1px solid var(--input-border);
+        border-radius: 3px;
+      }
+
+      /* ── Range input ─────────────────────────────────────────────────── */
       input[type=range] {
         -webkit-appearance: none;
         appearance: none;
@@ -28,8 +68,8 @@
         height: 14px;
         border-radius: 50%;
         background: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        border: 1px solid #bbb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.35);
         cursor: pointer;
       }
       input[type=range]::-moz-range-thumb {
@@ -37,9 +77,10 @@
         height: 14px;
         border-radius: 50%;
         background: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        border: 1px solid #bbb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.35);
         cursor: pointer;
+        border: none;
       }
       input[type=range]::-moz-range-track {
         background: var(--track-gradient, #ddd);

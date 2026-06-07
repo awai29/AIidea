@@ -17,7 +17,7 @@ figma.showUI(__html__, { width: 380, height: 720, title: 'Image Adjust' });
 
 // 取得選取節點的第一個 ImagePaint fill 的圖片 bytes
 async function getImageBytesFromSelection(): Promise<
-  { bytes: Uint8Array; width: number; height: number } | { error: string }
+  { bytes: Uint8Array; width: number; height: number; nodeId: string } | { error: string }
 > {
   const selection = figma.currentPage.selection;
 
@@ -55,8 +55,18 @@ async function getImageBytesFromSelection(): Promise<
     return { error: `圖片尺寸超過 WebGL 限制（最大 4096px，目前 ${size.width}×${size.height}）` };
   }
 
-  return { bytes, width: size.width, height: size.height };
+  return { bytes, width: size.width, height: size.height, nodeId: node.id };
 }
+
+// 選取變更時（點擊不同圖片節點），自動切換到新圖片
+figma.on('selectionchange', async () => {
+  const result = await getImageBytesFromSelection();
+  if ('error' in result) {
+    figma.ui.postMessage({ type: 'error', message: result.error });
+    return;
+  }
+  figma.ui.postMessage({ type: 'image', bytes: result.bytes, width: result.width, height: result.height, nodeId: result.nodeId });
+});
 
 // Plugin 啟動：等待 UI ready 後傳送圖片
 figma.ui.onmessage = async (msg: PluginMessage) => {
@@ -68,7 +78,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
       return;
     }
 
-    figma.ui.postMessage({ type: 'image', bytes: result.bytes, width: result.width, height: result.height });
+    figma.ui.postMessage({ type: 'image', bytes: result.bytes, width: result.width, height: result.height, nodeId: result.nodeId });
   }
 
   if (msg.type === 'apply') {
