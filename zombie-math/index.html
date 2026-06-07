@@ -424,6 +424,8 @@
 
     // ── 遊戲開始 ─────────────────────────────────────────
     function startGame() {
+      // 取消舊的動畫迴圈（防止重複啟動時多個 gameLoop 同時跑）
+      if (state.gameLoopId) cancelAnimationFrame(state.gameLoopId);
       // 清除舊殭屍
       state.zombies.forEach(z => z.el.remove());
       Object.assign(state, {
