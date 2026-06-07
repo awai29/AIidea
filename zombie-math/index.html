@@ -422,8 +422,86 @@
       }
     }
 
-    // ── 佔位函式（Task 4、Task 5 會實作完整版本）──
-    function startGame() { /* Task 5 實作 */ }
+    // ── 遊戲開始 ─────────────────────────────────────────
+    function startGame() {
+      // 清除舊殭屍
+      state.zombies.forEach(z => z.el.remove());
+      Object.assign(state, {
+        lives: 3, score: 0, wave: 1, combo: 0,
+        comboActive: false, correctCount: 0, totalAnswers: 0,
+        zombies: [], gameRunning: true, waveClearing: false,
+        zombieIdCounter: 0,
+      });
+
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('game-over-screen').style.display = 'none';
+      updateHUD();
+      lastTime = null;
+      startWave();
+      requestAnimationFrame(gameLoop);
+      document.getElementById('answer-input').focus();
+    }
+
+    // ── 波次開始 ─────────────────────────────────────────
+    function startWave() {
+      const count = getZombieCount();
+      let spawned = 0;
+      state.waveClearing = false; // 重置，防止 spawning 期間誤觸波次清除
+
+      const interval = setInterval(() => {
+        if (spawned >= count || !state.gameRunning) {
+          clearInterval(interval);
+          return;
+        }
+        spawnZombie();
+        spawned++;
+      }, 1200); // 每隻間隔 1.2 秒出現
+    }
+
+    function getZombieCount() {
+      if (state.wave <= 3) return randInt(3, 5);
+      if (state.wave <= 6) return randInt(4, 6);
+      if (state.wave <= 9) return randInt(5, 7);
+      return randInt(6, 8);
+    }
+
+    // ── 波次通過 ─────────────────────────────────────────
+    function showWaveClear() {
+      const msg = document.createElement('div');
+      msg.className = 'wave-clear-msg';
+      msg.style.cssText = 'position:absolute;top:40%;left:50%;transform:translateX(-50%);z-index:15;pointer-events:none;';
+      msg.textContent = `✅ 第 ${state.wave} 波通過！`;
+      document.getElementById('game-area').appendChild(msg);
+
+      setTimeout(() => {
+        msg.remove();
+        state.wave++;
+        state.waveClearing = false;
+        updateHUD();
+        startWave();
+      }, 1500);
+    }
+
+    // ── 遊戲結束 ─────────────────────────────────────────
+    function endGame() {
+      state.gameRunning = false;
+      cancelAnimationFrame(state.gameLoopId);
+
+      // 儲存最高分
+      const prev = parseInt(localStorage.getItem('zombieMathHighScore') || '0', 10);
+      const high = Math.max(prev, state.score);
+      localStorage.setItem('zombieMathHighScore', high);
+
+      // 正確率
+      const accuracy = state.totalAnswers > 0
+        ? Math.round((state.correctCount / state.totalAnswers) * 100)
+        : 0;
+
+      document.getElementById('final-score').textContent = `本次分數：${state.score.toLocaleString()}`;
+      document.getElementById('high-score-display').textContent = `最高紀錄：${high.toLocaleString()}`;
+      document.getElementById('accuracy-display').textContent = `答題正確率：${accuracy}%（${state.correctCount}/${state.totalAnswers}）`;
+      document.getElementById('game-over-screen').style.display = 'flex';
+    }
 
     // ── 答題處理 ─────────────────────────────────────────
     function submitAnswer() {
