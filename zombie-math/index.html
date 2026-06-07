@@ -361,7 +361,9 @@
         showWaveClear();
       }
 
-      state.gameLoopId = requestAnimationFrame(gameLoop);
+      if (state.gameRunning) {
+        state.gameLoopId = requestAnimationFrame(gameLoop);
+      }
     }
 
     function removeZombie(index) {
@@ -394,8 +396,9 @@
 
     function updateHUD() {
       // 生命值
-      const hearts = ['❤️', '❤️', '❤️'].slice(0, state.lives).join(' ')
-        + ['🖤', '🖤', '🖤'].slice(state.lives, 3).join(' ');
+      const redPart  = ['❤️', '❤️', '❤️'].slice(0, state.lives).join(' ');
+      const darkPart = ['🖤', '🖤', '🖤'].slice(state.lives, 3).join(' ');
+      const hearts   = [redPart, darkPart].filter(Boolean).join(' ');
       document.getElementById('lives').textContent = hearts;
 
       // 分數
