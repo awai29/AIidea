@@ -196,6 +196,10 @@
       font-weight: bold;
       text-shadow: 0 0 15px #7cfc00;
     }
+    @keyframes scorePop {
+      0%   { opacity:1; transform:translateY(0); }
+      100% { opacity:0; transform:translateY(-20px); }
+    }
   </style>
 </head>
 <body>
@@ -420,7 +424,80 @@
 
     // ── 佔位函式（Task 4、Task 5 會實作完整版本）──
     function startGame() { /* Task 5 實作 */ }
-    function submitAnswer() { /* Task 4 實作 */ }
+
+    // ── 答題處理 ─────────────────────────────────────────
+    function submitAnswer() {
+      if (!state.gameRunning) return;
+
+      const input = document.getElementById('answer-input');
+      const val = parseInt(input.value, 10);
+      input.value = '';
+      input.focus();
+
+      if (isNaN(val)) return;
+
+      state.totalAnswers++;
+
+      // 找出所有答案符合的殭屍，按 x 座標排序（最靠左的優先被打）
+      const matches = state.zombies
+        .filter(z => z.answer === val)
+        .sort((a, b) => a.x - b.x);
+
+      if (matches.length === 0) {
+        // 答錯：輸入框震動
+        input.classList.remove('shake');
+        void input.offsetWidth;
+        input.classList.add('shake');
+        setTimeout(() => input.classList.remove('shake'), 300);
+        return;
+      }
+
+      // 答對：連擊計數
+      state.combo++;
+      state.correctCount++;
+      state.score += 10 * state.wave;
+
+      // 連擊3題以上觸發貫穿（打2隻）
+      const hitCount = state.comboActive ? 2 : 1;
+      state.comboActive = state.combo >= 3; // 下一題是否啟動貫穿
+
+      const toHit = matches.slice(0, hitCount);
+      toHit.forEach(z => {
+        showExplosion(z.x + 20, z.el.offsetTop);
+        removeZombieById(z.id);
+      });
+
+      showScorePopup(10 * state.wave);
+      updateHUD();
+    }
+
+    function showExplosion(x, y) {
+      const el = document.createElement('div');
+      el.className = 'explosion';
+      el.textContent = '💥';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      document.getElementById('game-area').appendChild(el);
+      setTimeout(() => el.remove(), 500);
+    }
+
+    function showScorePopup(points) {
+      const popup = document.createElement('span');
+      popup.textContent = `+${points}`;
+      popup.style.cssText = `
+        color:#7cfc00;font-weight:bold;font-size:18px;
+        margin-left:8px;
+        animation:scorePop 0.8s ease-out forwards;
+        display:inline-block;
+      `;
+      document.getElementById('score').appendChild(popup);
+      setTimeout(() => popup.remove(), 800);
+    }
+
+    // Enter 鍵觸發送出
+    document.getElementById('answer-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitAnswer();
+    });
   </script>
 </body>
 </html>
