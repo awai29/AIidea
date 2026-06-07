@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BJ · 推播權限申請流程 · 隱私模式設計</title>
+<title>BJ · Push Notification Permission Flow · Privacy Mode Design</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -474,16 +474,16 @@ section{scroll-margin-top:70px}
 
 <div class="hdr">
   <div class="hdr-in">
-    <div class="hdr-title">推播權限申請流程 · 隱私模式 · Android Web Push</div>
+    <div class="hdr-title">Push Notification Permission Flow · Privacy Mode · Android Web Push</div>
     <nav class="nav">
-      <a class="nl" href="#s-trigger">觸發時機</a>
-      <a class="nl" href="#s-flow">申請流程</a>
-      <a class="nl" href="#s-scenarios">場景展示</a>
-      <a class="nl" href="#s-privacy">隱私模式</a>
-      <a class="nl" href="#s-compare">樣式對比</a>
-      <a class="nl" href="#s-reengage">再觸發</a>
+      <a class="nl" href="#s-trigger">Trigger Moments</a>
+      <a class="nl" href="#s-flow">Permission Flow</a>
+      <a class="nl" href="#s-scenarios">Scenarios</a>
+      <a class="nl" href="#s-privacy">Privacy Mode</a>
+      <a class="nl" href="#s-compare">Style Comparison</a>
+      <a class="nl" href="#s-reengage">Re-engage</a>
       <a class="nl" href="#s-payload">Payload</a>
-      <a class="nl" href="#s-personalization">千人千面</a>
+      <a class="nl" href="#s-personalization">Personalisation</a>
     </nav>
   </div>
 </div>
@@ -493,14 +493,14 @@ section{scroll-margin-top:70px}
   <!-- INTRO -->
   <div style="padding-top:8px">
     <div class="eyebrow">Android Chrome · Web Push Notification</div>
-    <h1 style="font-size:clamp(22px,3vw,34px);font-weight:700;letter-spacing:-.03em;margin-bottom:10px">推播權限申請 + 隱私模式</h1>
+    <h1 style="font-size:clamp(22px,3vw,34px);font-weight:700;letter-spacing:-.03em;margin-bottom:10px">Push Permission + Privacy Mode</h1>
     <p style="font-size:14px;color:var(--muted);line-height:1.75;max-width:680px;margin-bottom:14px">
-      不在一進網站就要求，而是在用戶最有意願的時刻，先透過<strong style="color:var(--fg)">我們自己的說明 Sheet</strong>說服用戶，再呼叫 Chrome 原生授權彈窗。
-      博弈平台特別設計隱私模式，讓用戶選擇是否在通知欄顯示平台及下注相關資訊。
+      Rather than asking on first visit, we wait for the highest-intent moment — showing our own <strong style="color:var(--fg)">custom pre-prompt Sheet</strong> first, then triggering the native Chrome permission dialog.
+      A special Privacy Mode lets users choose whether to show platform or betting-related content in the notification shade.
     </p>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <span class="chip chip-android">🤖 Android 原生 UI</span>
-      <span class="chip chip-platform">◈ 平台自訂 UI</span>
+      <span class="chip chip-android">🤖 Android Native UI</span>
+      <span class="chip chip-platform">◈ Custom Platform UI</span>
     </div>
   </div>
 
@@ -508,72 +508,72 @@ section{scroll-margin-top:70px}
   <section id="s-trigger">
     <div class="sec-hd">
       <div class="eyebrow">Section 01</div>
-      <h2 class="sec-title">觸發時機</h2>
-      <p class="sec-desc">什麼時候問用戶，和接受率直接相關。在正向情緒高、推播最相關的時刻出現。</p>
+      <h2 class="sec-title">Trigger Moments</h2>
+      <p class="sec-desc">When you ask is just as important as how you ask. Show up at peak positive emotion, when push is most relevant.</p>
     </div>
     <div class="trigger-grid">
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#16a34a;color:#fff">P1</div>
-          <div><div class="tc-title">首次存款成功後</div><span class="bdg bg" style="margin-top:3px;display:inline-flex">最高優先</span></div>
+          <div><div class="tc-title">After First Deposit</div><span class="bdg bg" style="margin-top:3px;display:inline-flex">Top Priority</span></div>
         </div>
-        <div class="tc-body">帳戶剛到帳，<strong>情緒最正向</strong>。<br>推播 benefit 聚焦：存款獎勵、優惠到帳通知。</div>
+        <div class="tc-body">Funds just landed — <strong>peak positive emotion</strong>.<br>Push benefit focus: deposit bonuses, promo credit alerts.</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#2563eb;color:#fff">P2</div>
-          <div><div class="tc-title">首次投注成功後</div><span class="bdg bb" style="margin-top:3px;display:inline-flex">高優先</span></div>
+          <div><div class="tc-title">After First Bet Placed</div><span class="bdg bb" style="margin-top:3px;display:inline-flex">High</span></div>
         </div>
-        <div class="tc-body">有皮膚在局裡，<strong>最想知道比賽結果</strong>。<br>推播 benefit 聚焦：比賽結果、賠率變動。</div>
+        <div class="tc-body">They have skin in the game — <strong>they want to know the result</strong>.<br>Push benefit focus: match results, odds movement.</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#7c3aed;color:#fff">P3</div>
-          <div><div class="tc-title">第 3 次登入，仍未訂閱</div><span class="bdg bp" style="margin-top:3px;display:inline-flex">中優先</span></div>
+          <div><div class="tc-title">3rd Login, Still Not Subscribed</div><span class="bdg bp" style="margin-top:3px;display:inline-flex">Medium</span></div>
         </div>
-        <div class="tc-body">確認是回頭客，<strong>有使用意願</strong>。<br>推播 benefit 聚焦：優惠到期、個人化推薦。</div>
+        <div class="tc-body">Confirmed returning user — <strong>intent to continue</strong>.<br>Push benefit focus: promo expiry, personalised recommendations.</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#d97706;color:#fff">P4</div>
-          <div><div class="tc-title">主動瀏覽優惠頁 30 秒以上</div><span class="bdg ba" style="margin-top:3px;display:inline-flex">情境觸發</span></div>
+          <div><div class="tc-title">30s+ Browsing Promotions Page</div><span class="bdg ba" style="margin-top:3px;display:inline-flex">Contextual</span></div>
         </div>
-        <div class="tc-body">對優惠有興趣，<strong>推播最相關</strong>。<br>推播 benefit 聚焦：優惠截止、新優惠上架。</div>
+        <div class="tc-body">Interested in promos — <strong>push is highly relevant</strong>.<br>Push benefit focus: promo deadlines, new offers launching.</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#d97706;color:#fff">P2</div>
-          <div><div class="tc-title">連續登入 3 天</div><span class="bdg" style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-flex">習慣建立</span></div>
+          <div><div class="tc-title">3 Consecutive Login Days</div><span class="bdg" style="background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-flex">Habit Formed</span></div>
         </div>
-        <div class="tc-body">連續回來，代表<strong>已有使用習慣</strong>。用成就感包裝，「解鎖福利」而非「要求授權」。</div>
+        <div class="tc-body">Keeps coming back — <strong>habit established</strong>. Frame as "unlock a reward," not "grant permission."</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#0891b2;color:#fff">P2</div>
-          <div><div class="tc-title">第一次出金申請後</div><span class="bdg" style="background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-flex">信任確立</span></div>
+          <div><div class="tc-title">After First Withdrawal Request</div><span class="bdg" style="background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-flex">Trust Established</span></div>
         </div>
-        <div class="tc-body">用戶已完成一筆完整資金週期，<strong>信任度最高</strong>。「到帳馬上通知你」直接解決痛點。</div>
+        <div class="tc-body">User has completed a full money cycle — <strong>highest trust level</strong>. "Notify you when funds arrive" directly solves their anxiety.</div>
       </div>
       <div class="trigger-card">
         <div class="tc-head">
           <div class="tc-priority" style="background:#16a34a;color:#fff">P2</div>
-          <div><div class="tc-title">第一次贏錢後</div><span class="bdg bg" style="margin-top:3px;display:inline-flex">情緒高峰</span></div>
+          <div><div class="tc-title">After First Win</div><span class="bdg bg" style="margin-top:3px;display:inline-flex">Emotional Peak</span></div>
         </div>
-        <div class="tc-body">贏錢瞬間是<strong>正面情緒最強烈</strong>的時刻。「下次結果要第一個知道嗎？」轉化率極高。</div>
+        <div class="tc-body">Winning is the <strong>strongest positive emotional moment</strong>. "Want to be the first to know next time?" — conversion rate is very high.</div>
       </div>
       <div class="trigger-card no-trigger">
         <div class="tc-head">
           <div class="tc-priority" style="background:var(--red);color:#fff">✕</div>
-          <div><div class="tc-title">一進網站就問</div></div>
+          <div><div class="tc-title">Asking on First Visit</div></div>
         </div>
-        <div class="tc-body"><strong>接受率極低（&lt;5%）</strong>，用戶完全不認識平台，沒有信任基礎。</div>
+        <div class="tc-body"><strong>Opt-in rate extremely low (&lt;5%)</strong> — user doesn't know the platform yet, zero trust established.</div>
       </div>
       <div class="trigger-card no-trigger">
         <div class="tc-head">
           <div class="tc-priority" style="background:var(--red);color:#fff">✕</div>
-          <div><div class="tc-title">未登入狀態</div></div>
+          <div><div class="tc-title">User Not Logged In</div></div>
         </div>
-        <div class="tc-body">沒有用戶資料，<strong>推播無法個人化</strong>，且不符規範要求。</div>
+        <div class="tc-body">No user data available — <strong>push cannot be personalised</strong> and does not meet compliance requirements.</div>
       </div>
     </div>
   </section>
@@ -582,41 +582,41 @@ section{scroll-margin-top:70px}
   <section id="s-flow">
     <div class="sec-hd">
       <div class="eyebrow">Section 02</div>
-      <h2 class="sec-title">申請流程 — 畫面設計</h2>
-      <p class="sec-desc">以「首次存款成功後」為例，展示完整四個步驟。<span class="chip chip-android" style="vertical-align:middle;margin-left:4px">🤖 Android 原生 UI</span> 為 Android/Chrome 的真實介面；<span class="chip chip-platform" style="vertical-align:middle;margin-left:4px">◈ 平台自訂</span> 為我們自己設計的畫面。</p>
+      <h2 class="sec-title">Permission Flow — Screen Design</h2>
+      <p class="sec-desc">Using "first deposit" as the example, here are the 4 steps. <span class="chip chip-android" style="vertical-align:middle;margin-left:4px">🤖 Android Native UI</span> = real Android/Chrome interface; <span class="chip chip-platform" style="vertical-align:middle;margin-left:4px">◈ Custom UI</span> = our own platform screens.</p>
     </div>
 
     <!-- Flow diagram -->
     <div class="flow-diagram" style="margin-bottom:28px">
       <div class="flow-node">
         <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">💰</div>
-        <div class="flow-label" style="color:var(--green)">觸發時機</div>
-        <div class="flow-sub">存款成功</div>
+        <div class="flow-label" style="color:var(--green)">Trigger</div>
+        <div class="flow-sub">Deposit Success</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-node">
         <div class="flow-circle" style="background:var(--pbg);border:2px solid var(--pbdr)">📋</div>
-        <div class="flow-label">自製說明 Sheet</div>
-        <div class="flow-sub" style="color:var(--purple)">◈ 平台自訂</div>
+        <div class="flow-label">Custom Pre-prompt Sheet</div>
+        <div class="flow-sub" style="color:var(--purple)">◈ Custom UI</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-node">
         <div class="flow-circle" style="background:#e8f5e9;border:2px solid #a5d6a7">🌐</div>
-        <div class="flow-label">Chrome 授權彈窗</div>
-        <div class="flow-sub" style="color:#2e7d32">🤖 Android 原生</div>
+        <div class="flow-label">Chrome Permission Dialog</div>
+        <div class="flow-sub" style="color:#2e7d32">🤖 Android Native</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-branch">
         <div style="display:flex;align-items:center;gap:4px;margin-bottom:8px">
           <div class="flow-node">
             <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">✅</div>
-            <div class="flow-label" style="color:var(--green)">允許</div>
+            <div class="flow-label" style="color:var(--green)">Allow</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:4px">
           <div class="flow-node">
             <div class="flow-circle" style="background:var(--rbg);border:2px solid var(--rbdr)">⏭️</div>
-            <div class="flow-label" style="color:var(--red)">稍後/封鎖</div>
+            <div class="flow-label" style="color:var(--red)">Later / Block</div>
           </div>
         </div>
       </div>
@@ -626,7 +626,7 @@ section{scroll-margin-top:70px}
 
       <!-- STEP 1: Our app — deposit success (home page + BJ toast) -->
       <div class="phone-col">
-        <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+        <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -663,12 +663,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">存款成功 — BJ 首頁 + Toast<br><span style="color:var(--purple)">我們平台的設計</span></div>
+        <div class="phone-label">Deposit Success — BJ Home + Toast<br><span style="color:var(--purple)">Our platform's design</span></div>
       </div>
 
       <!-- STEP 2: Our app — pre-prompt sheet -->
       <div class="phone-col">
-        <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+        <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -682,15 +682,15 @@ section{scroll-margin-top:70px}
               <div class="platform-sheet">
                 <div class="sheet-handle"></div>
                 <div class="sheet-ico">🔔</div>
-                <div class="sheet-ttl">不想錯過這些嗎？</div>
-                <div class="sheet-sub">開啟通知，好消息第一時間推給你</div>
+                <div class="sheet-ttl">Don't want to miss out?</div>
+                <div class="sheet-sub">Enable notifications to get updates in real-time</div>
                 <div class="sheet-benefits">
-                  <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">優惠 &amp; 紅利到帳通知</div></div>
-                  <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">比賽結果 &amp; 賠率提醒</div></div>
-                  <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">隱私模式：不顯示平台資訊</div></div>
+                  <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">Bonus &amp; rebate credit alerts</div></div>
+                  <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">Match results &amp; odds alerts</div></div>
+                  <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">Privacy mode: no platform info shown</div></div>
                 </div>
-                <button class="sheet-primary">開啟通知</button>
-                <button class="sheet-secondary">稍後再說</button>
+                <button class="sheet-primary">Enable Notifications</button>
+                <button class="sheet-secondary">Maybe Later</button>
               </div>
             </div>
             <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -698,12 +698,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">自製說明 Sheet<br><span style="color:var(--purple)">我們平台的設計</span></div>
+        <div class="phone-label">Custom Pre-prompt Sheet<br><span style="color:var(--purple)">Our platform's design</span></div>
       </div>
 
       <!-- STEP 3: Chrome permission — Android native -->
       <div class="phone-col">
-        <div class="phone-step">STEP 03 · <span style="color:#2e7d32">🤖 Android 原生</span></div>
+        <div class="phone-step">STEP 03 · <span style="color:#2e7d32">🤖 Android Native</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -727,11 +727,11 @@ section{scroll-margin-top:70px}
                       <div class="cp-site-url">bj.com</div>
                     </div>
                   </div>
-                  <div class="cp-question">傳送通知？</div>
-                  <div class="cp-desc">允許 bj.com 傳送通知給您？您可以隨時在設定中變更。</div>
+                  <div class="cp-question">Show notifications?</div>
+                  <div class="cp-desc">Allow bj.com to send you notifications? You can change this any time in Settings.</div>
                   <div class="cp-btns">
-                    <button class="cp-btn cp-btn-block">封鎖</button>
-                    <button class="cp-btn cp-btn-allow">允許</button>
+                    <button class="cp-btn cp-btn-block">Block</button>
+                    <button class="cp-btn cp-btn-allow">Allow</button>
                   </div>
                 </div>
               </div>
@@ -741,12 +741,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">Chrome 授權彈窗<br><span style="color:#2e7d32">Android Chrome 原生 UI</span></div>
+        <div class="phone-label">Chrome Permission Dialog<br><span style="color:#2e7d32">Android Chrome Native UI</span></div>
       </div>
 
       <!-- STEP 4a: Success -->
       <div class="phone-col">
-        <div class="phone-step">STEP 04a · 允許 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+        <div class="phone-step">STEP 04a · Allow · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -779,12 +779,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">授權成功<br><span style="color:var(--purple)">BJ 平台 Toast</span></div>
+        <div class="phone-label">Permission Granted<br><span style="color:var(--purple)">BJ Platform Toast</span></div>
       </div>
 
       <!-- STEP 4b: Snackbar after deny -->
       <div class="phone-col">
-        <div class="phone-step">STEP 04b · 稍後</div>
+        <div class="phone-step">STEP 04b · Later</div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -796,8 +796,8 @@ section{scroll-margin-top:70px}
               <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
               <!-- Android Snackbar -->
               <div class="android-snackbar">
-                <div class="snack-text">可在帳號設定中開啟通知</div>
-                <div class="snack-action">前往設定</div>
+                <div class="snack-text">You can enable notifications in Account Settings</div>
+                <div class="snack-action">Go to Settings</div>
               </div>
             </div>
             <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -805,7 +805,7 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">稍後/拒絕<br><span style="color:#2e7d32">Android Snackbar 提示</span></div>
+        <div class="phone-label">Later / Declined<br><span style="color:#2e7d32">Android Snackbar</span></div>
       </div>
 
     </div>
@@ -815,8 +815,8 @@ section{scroll-margin-top:70px}
   <section id="s-scenarios">
     <div class="sec-hd">
       <div class="eyebrow">Section 02b</div>
-      <h2 class="sec-title">場景展示 — 其他觸發時機</h2>
-      <p class="sec-desc">不同觸發時機搭配不同的 Sheet 文案，讓「開啟通知」的理由更貼近當下的情境。</p>
+      <h2 class="sec-title">Scenario Walk-throughs — Other Trigger Moments</h2>
+      <p class="sec-desc">Each trigger moment pairs with tailored Sheet copy to make "Enable Notifications" feel relevant and timely.</p>
     </div>
 
     <!-- ── 場景 A: 連續登入 3 天 ── -->
@@ -824,15 +824,15 @@ section{scroll-margin-top:70px}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="width:36px;height:36px;border-radius:5px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:18px">🔥</div>
         <div>
-          <div style="font-size:15px;font-weight:700">場景 A · 連續登入 3 天</div>
-          <div style="font-size:12px;color:var(--muted)">用成就感包裝授權請求，轉化率高</div>
+          <div style="font-size:15px;font-weight:700">Scenario A · 3 Consecutive Login Days</div>
+          <div style="font-size:12px;color:var(--muted)">Wrapping the permission ask in an achievement moment — high conversion</div>
         </div>
       </div>
       <div class="phones-row">
 
         <!-- 觸發畫面 -->
         <div class="phone-col">
-          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -846,8 +846,8 @@ section{scroll-margin-top:70px}
                   <div style="background:#222424;border-radius:5px;padding:13px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08)">
                     <div style="font-size:26px;line-height:1">🔥</div>
                     <div style="flex:1;min-width:0">
-                      <div style="font-size:13px;font-weight:700;color:#e2e6e9;margin-bottom:2px">連續登入 3 天！</div>
-                      <div style="font-size:11px;color:#8d9aa5">Streak 解鎖 · 專屬福利等你領</div>
+                      <div style="font-size:13px;font-weight:700;color:#e2e6e9;margin-bottom:2px">3-Day Streak!</div>
+                      <div style="font-size:11px;color:#8d9aa5">Streak unlocked · Claim your exclusive reward</div>
                     </div>
                     <div style="display:flex;gap:3px">
                       <div style="width:7px;height:7px;border-radius:50%;background:#14805e"></div>
@@ -862,12 +862,12 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">連續 3 天成就卡<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">3-Day Achievement Card<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
         <!-- Platform Sheet -->
         <div class="phone-col">
-          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -881,15 +881,15 @@ section{scroll-margin-top:70px}
                 <div class="platform-sheet">
                   <div class="sheet-handle"></div>
                   <div class="sheet-ico">🔥</div>
-                  <div class="sheet-ttl">連到第 4 天？讓我提醒你！</div>
-                  <div class="sheet-sub">開啟通知，不中斷你的連勝紀錄</div>
+                  <div class="sheet-ttl">Aim for Day 4? Let me remind you!</div>
+                  <div class="sheet-sub">Enable notifications to keep your streak alive</div>
                   <div class="sheet-benefits">
-                    <div class="sb-row"><div class="sb-icon">⏰</div><div class="sb-text">每日登入提醒，保持 Streak</div></div>
-                    <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">連登獎勵到帳即時通知</div></div>
-                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">隱私模式：不顯示平台資訊</div></div>
+                    <div class="sb-row"><div class="sb-icon">⏰</div><div class="sb-text">Daily login reminder to keep your streak</div></div>
+                    <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">Streak reward credited alerts</div></div>
+                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">Privacy mode: no platform info shown</div></div>
                   </div>
-                  <button class="sheet-primary">開啟通知</button>
-                  <button class="sheet-secondary">稍後再說</button>
+                  <button class="sheet-primary">Enable Notifications</button>
+                  <button class="sheet-secondary">Maybe Later</button>
                 </div>
               </div>
               <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -897,7 +897,7 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">自製說明 Sheet · 連登版<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">Custom Sheet · Streak edition<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
       </div>
@@ -908,15 +908,15 @@ section{scroll-margin-top:70px}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="width:36px;height:36px;border-radius:5px;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:18px">💸</div>
         <div>
-          <div style="font-size:15px;font-weight:700">場景 B · 第一次出金申請後</div>
-          <div style="font-size:12px;color:var(--muted)">直接解決「到帳了嗎？」的焦慮</div>
+          <div style="font-size:15px;font-weight:700">Scenario B · After First Withdrawal Request</div>
+          <div style="font-size:12px;color:var(--muted)">Directly addressing "Did my money arrive?" anxiety</div>
         </div>
       </div>
       <div class="phones-row">
 
         <!-- 觸發畫面 -->
         <div class="phone-col">
-          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -932,8 +932,8 @@ section{scroll-margin-top:70px}
                     <div class="bj-toast-content">
                       <div class="bj-toast-icon" style="background:radial-gradient(circle at 35% 35%,#60d4b4,#0891b2)">↑</div>
                       <div class="bj-toast-text">
-                        <div class="bj-toast-title">提款申請已提交</div>
-                        <div class="bj-toast-body">提款 <span class="bj-toast-amount">฿ 5,000.00</span> 處理中，預計 24h 到帳</div>
+                        <div class="bj-toast-title">Withdrawal Submitted</div>
+                        <div class="bj-toast-body">฿ 5,000.00 processing · <span class="bj-toast-amount">Est. 24h arrival</span></div>
                       </div>
                       <button class="bj-toast-close">✕</button>
                     </div>
@@ -946,12 +946,12 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">出金申請成功 Toast<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">Withdrawal Submitted Toast<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
         <!-- Platform Sheet -->
         <div class="phone-col">
-          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -965,15 +965,15 @@ section{scroll-margin-top:70px}
                 <div class="platform-sheet">
                   <div class="sheet-handle"></div>
                   <div class="sheet-ico">💸</div>
-                  <div class="sheet-ttl">到帳了！第一時間通知你</div>
-                  <div class="sheet-sub">不用一直查，錢到帳自動推給你</div>
+                  <div class="sheet-ttl">Funds arrived! Get notified instantly</div>
+                  <div class="sheet-sub">No need to keep checking — we'll push it to you</div>
                   <div class="sheet-benefits">
-                    <div class="sb-row"><div class="sb-icon">💰</div><div class="sb-text">出金到帳即時通知</div></div>
-                    <div class="sb-row"><div class="sb-icon">✅</div><div class="sb-text">存款確認、紅利到帳提醒</div></div>
-                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">隱私模式：不顯示金額資訊</div></div>
+                    <div class="sb-row"><div class="sb-icon">💰</div><div class="sb-text">Withdrawal credited alerts</div></div>
+                    <div class="sb-row"><div class="sb-icon">✅</div><div class="sb-text">Deposit confirmed &amp; bonus arrival alerts</div></div>
+                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">Privacy mode: no amount shown</div></div>
                   </div>
-                  <button class="sheet-primary">開啟通知</button>
-                  <button class="sheet-secondary">稍後再說</button>
+                  <button class="sheet-primary">Enable Notifications</button>
+                  <button class="sheet-secondary">Maybe Later</button>
                 </div>
               </div>
               <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -981,7 +981,7 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">自製說明 Sheet · 出金版<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">Custom Sheet · Withdrawal edition<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
       </div>
@@ -992,15 +992,15 @@ section{scroll-margin-top:70px}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="width:36px;height:36px;border-radius:5px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:18px">🏆</div>
         <div>
-          <div style="font-size:15px;font-weight:700">場景 C · 第一次贏錢後</div>
-          <div style="font-size:12px;color:var(--muted)">情緒高峰，接受率最高的時機之一</div>
+          <div style="font-size:15px;font-weight:700">Scenario C · After First Win</div>
+          <div style="font-size:12px;color:var(--muted)">Emotional peak — one of the highest opt-in moments</div>
         </div>
       </div>
       <div class="phones-row">
 
         <!-- 觸發畫面 -->
         <div class="phone-col">
-          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -1014,10 +1014,10 @@ section{scroll-margin-top:70px}
                   <div style="background:#222424;border-radius:5px;padding:14px 14px;box-shadow:0 2px 10px rgba(0,0,0,.6);border:1px solid rgba(20,128,94,.35)">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                       <div style="font-size:18px">🏆</div>
-                      <div style="font-size:12px;font-weight:700;color:#27b488">注單獲勝！</div>
+                      <div style="font-size:12px;font-weight:700;color:#27b488">Bet Won!</div>
                       <div style="margin-left:auto;font-size:10px;color:#8d9aa5">BAN vs QAT</div>
                     </div>
-                    <div style="font-size:11px;color:#8d9aa5;margin-bottom:6px">主隊勝 · 賠率 1.85</div>
+                    <div style="font-size:11px;color:#8d9aa5;margin-bottom:6px">Home team wins · Odds 1.85</div>
                     <div style="font-size:24px;font-weight:700;color:#27b488;letter-spacing:-.02em">+฿ 370.00</div>
                   </div>
                 </div>
@@ -1027,12 +1027,12 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">注單獲勝 — 贏錢畫面<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">Bet Won — Win Screen<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
         <!-- Platform Sheet -->
         <div class="phone-col">
-          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ 平台自訂</span></div>
+          <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ Custom UI</span></div>
           <div class="android-phone">
             <div class="android-camera"></div>
             <div class="android-screen">
@@ -1046,15 +1046,15 @@ section{scroll-margin-top:70px}
                 <div class="platform-sheet">
                   <div class="sheet-handle"></div>
                   <div class="sheet-ico">🏆</div>
-                  <div class="sheet-ttl">下次結果，第一個知道！</div>
-                  <div class="sheet-sub">贏錢的感覺很好，開啟通知不錯過</div>
+                  <div class="sheet-ttl">Be the first to know next time!</div>
+                  <div class="sheet-sub">That winning feeling — enable notifications to keep it coming</div>
                   <div class="sheet-benefits">
-                    <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">比賽結果即時通知</div></div>
-                    <div class="sb-row"><div class="sb-icon">📈</div><div class="sb-text">賠率大變動提前提醒</div></div>
-                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">隱私模式：通知不顯示賠率</div></div>
+                    <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">Instant match result alerts</div></div>
+                    <div class="sb-row"><div class="sb-icon">📈</div><div class="sb-text">Early odds movement alerts</div></div>
+                    <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">Privacy mode: no odds shown in notification</div></div>
                   </div>
-                  <button class="sheet-primary">開啟通知</button>
-                  <button class="sheet-secondary">稍後再說</button>
+                  <button class="sheet-primary">Enable Notifications</button>
+                  <button class="sheet-secondary">Maybe Later</button>
                 </div>
               </div>
               <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -1062,7 +1062,7 @@ section{scroll-margin-top:70px}
               </div>
             </div>
           </div>
-          <div class="phone-label">自製說明 Sheet · 贏錢版<br><span style="color:var(--purple)">我們平台的設計</span></div>
+          <div class="phone-label">Custom Sheet · Win edition<br><span style="color:var(--purple)">Our platform's design</span></div>
         </div>
 
       </div>
@@ -1074,15 +1074,15 @@ section{scroll-margin-top:70px}
   <section id="s-privacy">
     <div class="sec-hd">
       <div class="eyebrow">Section 03</div>
-      <h2 class="sec-title">隱私模式設定</h2>
-      <p class="sec-desc">在我們自己平台的設定頁讓用戶選擇通知模式。介面採用平台 Figma 設計系統（深色主題 · Poppins · 綠色品牌色），不需要改 Android 原生設定。</p>
+      <h2 class="sec-title">Privacy Mode Settings</h2>
+      <p class="sec-desc">Users configure notification mode directly on the BJ website — no Android settings required. Built with the platform's Figma design system (dark theme · Poppins · brand green).</p>
     </div>
 
     <div style="display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start">
 
       <!-- Platform settings mockup (Figma design system) -->
       <div class="phone-col" style="gap:10px">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--purple)">◈ 平台自訂設計</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--purple)">◈ Custom Platform Design</div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -1162,35 +1162,35 @@ section{scroll-margin-top:70px}
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div style="width:36px;height:36px;border-radius:5px;background:var(--bbg);display:flex;align-items:center;justify-content:center;font-size:18px">☀️</div>
             <div>
-              <div style="font-size:14px;font-weight:700">一般模式</div>
-              <div style="font-size:11px;color:var(--muted)">完整資訊，清楚明確</div>
+              <div style="font-size:14px;font-weight:700">Standard Mode</div>
+              <div style="font-size:11px;color:var(--muted)">Full info, clear &amp; direct</div>
             </div>
           </div>
           <table style="width:100%;font-size:12px;border-collapse:collapse">
-            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted);width:80px">標題</td><td style="padding:6px 0;font-weight:500">⚽ BAN vs QAT 賽前推播</td></tr>
-            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">內文</td><td style="padding:6px 0">主隊勝 1.85 · 立即投注</td></tr>
-            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">平台品牌 Logo（192×192）</td></tr>
-            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0">賽事 Banner / 遊戲封面</td></tr>
-            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0">「立即投注」「查看賠率」</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted);width:80px">Title</td><td style="padding:6px 0;font-weight:500">⚽ BAN vs QAT — Pre-match alert</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Body</td><td style="padding:6px 0">Home 1.85 · Bet Now</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">Platform brand logo (192×192)</td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0">Match banner / game cover</td></tr>
+            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0">"Bet Now" &amp; "View Odds"</td></tr>
           </table>
         </div>
         <div class="card cp" style="border-color:var(--pbdr);background:var(--pbg)">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div style="width:36px;height:36px;border-radius:5px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:18px">🔒</div>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--purple)">隱私模式</div>
-              <div style="font-size:11px;color:var(--muted)">中性內容，看不出是哪個平台</div>
+              <div style="font-size:14px;font-weight:700;color:var(--purple)">Privacy Mode</div>
+              <div style="font-size:11px;color:var(--muted)">Neutral content, no platform identity visible</div>
             </div>
           </div>
           <table style="width:100%;font-size:12px;border-collapse:collapse">
-            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted);width:80px">標題</td><td style="padding:6px 0;font-weight:500">您有一則新訊息</td></tr>
-            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">內文</td><td style="padding:6px 0">點擊查看詳情</td></tr>
-            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">中性圖示（鈴鐺），非品牌</td></tr>
-            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0;color:var(--red)">✕ 不傳送</td></tr>
-            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0;color:var(--red)">✕ 不傳送</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted);width:80px">Title</td><td style="padding:6px 0;font-weight:500">You have a new message</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Body</td><td style="padding:6px 0">Tap to view details</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Icon</td><td style="padding:6px 0">Neutral icon (bell), non-branded</td></tr>
+            <tr style="border-bottom:1px solid var(--pbdr)"><td style="padding:6px 0;color:var(--muted)">Image</td><td style="padding:6px 0;color:var(--red)">✕ Not sent</td></tr>
+            <tr><td style="padding:6px 0;color:var(--muted)">Actions</td><td style="padding:6px 0;color:var(--red)">✕ Not sent</td></tr>
           </table>
         </div>
-        <div class="tip tip-amber">⚠️ 唯一無法控制的：通知卡片最下方 Chrome 強制顯示的來源資訊（「bj.com」）— 這是 Chrome 規範，無法移除。</div>
+        <div class="tip tip-amber">⚠️ One thing we can't control: Chrome forces a source line ("Chrome · bj.com") at the bottom of every notification card — this is Chrome policy and cannot be removed.</div>
       </div>
     </div>
 
@@ -1198,7 +1198,7 @@ section{scroll-margin-top:70px}
     <div style="margin-top:32px">
       <div style="font-size:13px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
         <span style="font-family:var(--mono);font-size:11px;color:var(--purple)">HOW IT WORKS</span>
-        <span style="font-size:14px;font-weight:700">玩家怎麼一步一步設定</span>
+        <span style="font-size:14px;font-weight:700">How Players Set It Up</span>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -1206,38 +1206,38 @@ section{scroll-margin-top:70px}
         <!-- 設定步驟 -->
         <div class="card" style="overflow:hidden">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--pbg);color:var(--purple)">
-            設定步驟（全在 BJ 網站內，不需要去 Android 設定）
+            Setup Steps (all within the BJ website — no Android settings required)
           </div>
           <div class="re-flow">
             <div class="rf-row">
               <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">1</div>
               <div>
-                <div class="rf-title">進入「個人設定」</div>
-                <div class="rf-body">點右上角頭像或選單 → <strong>Account Settings</strong></div>
+                <div class="rf-title">Go to "Account Settings"</div>
+                <div class="rf-body">Tap the avatar icon or menu → <strong>Account Settings</strong></div>
               </div>
             </div>
             <div class="rf-row">
               <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">2</div>
               <div>
-                <div class="rf-title">點進「Notifications」</div>
-                <div class="rf-body">設定列表中找到通知選項 → 點進去</div>
+                <div class="rf-title">Open "Notifications"</div>
+                <div class="rf-body">Find Notifications in the settings list → tap to open</div>
               </div>
             </div>
             <div class="rf-row">
               <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">3</div>
               <div>
-                <div class="rf-title">在「Notification Mode」選擇模式</div>
+                <div class="rf-title">In "Notification Mode", choose your mode</div>
                 <div class="rf-body">
-                  ● <strong>Standard Mode</strong> — 顯示完整賽事資訊<br>
-                  ● <strong>Privacy Mode</strong> — 只顯示「您有一則新訊息」
+                  ● <strong>Standard Mode</strong> — shows full match &amp; event info<br>
+                  ● <strong>Privacy Mode</strong> — shows only "You have a new message"
                 </div>
               </div>
             </div>
             <div class="rf-row">
               <div class="rf-dot" style="background:var(--gbg);color:var(--green);border:1px solid var(--gbdr)">✓</div>
               <div>
-                <div class="rf-title">選完即時生效，隨時可以改回來</div>
-                <div class="rf-body">後端記錄偏好，下一次推播就會用新的模式送出</div>
+                <div class="rf-title">Takes effect immediately — changeable any time</div>
+                <div class="rf-body">Backend stores the preference; the next push will use the updated mode</div>
               </div>
             </div>
           </div>
@@ -1248,33 +1248,33 @@ section{scroll-margin-top:70px}
           <div class="card cp" style="border-color:var(--gbdr);background:var(--gbg)">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
               <span style="font-size:16px">☀️</span>
-              <div style="font-size:13px;font-weight:700;color:var(--green)">Standard Mode（一般）</div>
+              <div style="font-size:13px;font-weight:700;color:var(--green)">Standard Mode</div>
             </div>
             <div style="font-size:12px;color:var(--fg);line-height:1.75">
-              通知欄直接顯示：<br>
-              <strong>標題</strong>：⚽ BAN vs QAT 賽前推播<br>
-              <strong>內容</strong>：主隊勝 1.85 · 立即投注<br>
-              <strong>圖片 + 按鈕</strong>：立即投注 / 查看賠率<br>
-              <span style="color:var(--muted);font-size:11px">旁人看到通知，會知道是博彩平台</span>
+              Shows in the notification shade:<br>
+              <strong>Title</strong>: ⚽ BAN vs QAT — Pre-match alert<br>
+              <strong>Body</strong>: Home 1.85 · Bet Now<br>
+              <strong>Image + Buttons</strong>: Bet Now / View Odds<br>
+              <span style="color:var(--muted);font-size:11px">Anyone nearby can see it's a betting platform notification</span>
             </div>
           </div>
 
           <div class="card cp" style="border-color:var(--pbdr);background:var(--pbg)">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
               <span style="font-size:16px">🔒</span>
-              <div style="font-size:13px;font-weight:700;color:var(--purple)">Privacy Mode（隱私）</div>
+              <div style="font-size:13px;font-weight:700;color:var(--purple)">Privacy Mode</div>
             </div>
             <div style="font-size:12px;color:var(--fg);line-height:1.75">
-              通知欄只顯示：<br>
-              <strong>標題</strong>：您有一則新訊息<br>
-              <strong>內容</strong>：點擊查看詳情<br>
-              <strong>無圖片、無按鈕</strong><br>
-              <span style="color:var(--muted);font-size:11px">點開之後，在 BJ 網站內才看到真正內容</span>
+              Shows in the notification shade:<br>
+              <strong>Title</strong>: You have a new message<br>
+              <strong>Body</strong>: Tap to view details<br>
+              <strong>No image, no buttons</strong><br>
+              <span style="color:var(--muted);font-size:11px">Real content only visible after opening the BJ website</span>
             </div>
           </div>
 
           <div class="tip tip-amber" style="margin-top:0">
-            <strong>有一個地方藏不住：</strong>Chrome 通知卡片固定會顯示「Chrome · bj.com」，這是 Google 強制規範，任何網站都無法移除。
+            <strong>One thing can't be hidden:</strong> Chrome notification cards always show "Chrome · bj.com" — this is Google's enforced policy, no website can remove it.
           </div>
         </div>
 
@@ -1287,8 +1287,8 @@ section{scroll-margin-top:70px}
   <section id="s-compare">
     <div class="sec-hd">
       <div class="eyebrow">Section 04</div>
-      <h2 class="sec-title">Android 通知欄 — 樣式對比</h2>
-      <p class="sec-desc">下拉通知欄的真實 Android Material You 通知卡片樣式，一般 vs 隱私。</p>
+      <h2 class="sec-title">Android Notification Shade — Style Comparison</h2>
+      <p class="sec-desc">Real Android Material You notification card appearance in the pull-down shade. Standard vs Privacy.</p>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
@@ -1297,7 +1297,7 @@ section{scroll-margin-top:70px}
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:15px">☀️</span>
-          <span style="font-size:14px;font-weight:700">一般模式</span>
+          <span style="font-size:14px;font-weight:700">Standard Mode</span>
           <span class="bdg bb">Sports Push</span>
         </div>
 
@@ -1313,8 +1313,8 @@ section{scroll-margin-top:70px}
             <!-- Shade area -->
             <div class="android-shade" style="min-height:500px">
               <div class="shade-header" style="padding-top:12px">
-                <span class="shade-title">通知</span>
-                <span class="shade-clear">全部清除</span>
+                <span class="shade-title">Notifications</span>
+                <span class="shade-clear">Clear all</span>
               </div>
               <div class="shade-cards">
 
@@ -1323,13 +1323,13 @@ section{scroll-margin-top:70px}
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
                     <span class="anc-app-name">Chrome · bj.com</span>
-                    <span class="anc-time">剛才</span>
+                    <span class="anc-time">just now</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
                   <div class="anc-content">
                     <div class="anc-text-block">
-                      <div class="anc-title">⚽ BAN vs QAT 賽前推播</div>
-                      <div class="anc-body">主隊勝 1.85 | 客隊勝 3.20 · 立即投注</div>
+                      <div class="anc-title">⚽ BAN vs QAT — Pre-match alert</div>
+                      <div class="anc-body">Home 1.85 | Away 3.20 · Bet Now</div>
                     </div>
                     <div class="anc-large-icon" style="background:#222424;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
                   </div>
@@ -1341,8 +1341,8 @@ section{scroll-margin-top:70px}
                     </div>
                   </div>
                   <div class="anc-actions">
-                    <button class="anc-action">立即投注</button>
-                    <button class="anc-action">查看賠率</button>
+                    <button class="anc-action">Bet Now</button>
+                    <button class="anc-action">View Odds</button>
                   </div>
                 </div>
 
@@ -1351,13 +1351,13 @@ section{scroll-margin-top:70px}
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
                     <span class="anc-app-name">Chrome · bj.com</span>
-                    <span class="anc-time">5 分鐘前</span>
+                    <span class="anc-time">5 min ago</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
                   <div class="anc-content">
                     <div class="anc-text-block">
-                      <div class="anc-title">🎁 首存獎勵即將到期</div>
-                      <div class="anc-body">還差 ฿200 即可領取 100% 獎勵</div>
+                      <div class="anc-title">🎁 Welcome bonus expiring soon</div>
+                      <div class="anc-body">฿200 more to unlock 100% bonus</div>
                     </div>
                     <div class="anc-large-icon" style="background:#222424;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
                   </div>
@@ -1371,7 +1371,7 @@ section{scroll-margin-top:70px}
           </div>
         </div>
         <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
-          平台名稱、賽事圖、賠率、行動按鈕全部清楚可見。<br>旁人看到就知道是博彩平台的通知。
+          Platform name, match image, odds &amp; action buttons all clearly visible.<br>Anyone nearby can see it's a betting platform notification.
         </p>
       </div>
 
@@ -1379,8 +1379,8 @@ section{scroll-margin-top:70px}
       <div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <span style="font-size:15px">🔒</span>
-          <span style="font-size:14px;font-weight:700">隱私模式</span>
-          <span class="bdg bp">同一則通知</span>
+          <span style="font-size:14px;font-weight:700">Privacy Mode</span>
+          <span class="bdg bp">Same notification</span>
         </div>
 
         <div class="android-phone" style="width:260px">
@@ -1392,8 +1392,8 @@ section{scroll-margin-top:70px}
             </div>
             <div class="android-shade" style="min-height:500px">
               <div class="shade-header" style="padding-top:12px">
-                <span class="shade-title">通知</span>
-                <span class="shade-clear">全部清除</span>
+                <span class="shade-title">Notifications</span>
+                <span class="shade-clear">Clear all</span>
               </div>
               <div class="shade-cards">
 
@@ -1402,13 +1402,13 @@ section{scroll-margin-top:70px}
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
                     <span class="anc-app-name">Chrome · bj.com</span>
-                    <span class="anc-time">剛才</span>
+                    <span class="anc-time">just now</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
                   <div class="anc-content">
                     <div class="anc-text-block">
-                      <div class="anc-title">您有一則新訊息</div>
-                      <div class="anc-body">點擊查看詳情</div>
+                      <div class="anc-title">You have a new message</div>
+                      <div class="anc-body">Tap to view details</div>
                     </div>
                     <div class="anc-large-icon" style="background:#454648;font-size:16px;border-radius:8px">🔔</div>
                   </div>
@@ -1419,13 +1419,13 @@ section{scroll-margin-top:70px}
                   <div class="anc-src">
                     <div class="chrome-icon"></div>
                     <span class="anc-app-name">Chrome · bj.com</span>
-                    <span class="anc-time">5 分鐘前</span>
+                    <span class="anc-time">5 min ago</span>
                     <button class="anc-dismiss">✕</button>
                   </div>
                   <div class="anc-content">
                     <div class="anc-text-block">
-                      <div class="anc-title">您有一則新訊息</div>
-                      <div class="anc-body">點擊查看詳情</div>
+                      <div class="anc-title">You have a new message</div>
+                      <div class="anc-body">Tap to view details</div>
                     </div>
                     <div class="anc-large-icon" style="background:#454648;font-size:16px;border-radius:8px">🔔</div>
                   </div>
@@ -1439,8 +1439,8 @@ section{scroll-margin-top:70px}
           </div>
         </div>
         <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
-          完全看不出內容是什麼。<br>點開後才在 App 內看到真正的通知詳情。<br>
-          <span style="color:var(--amber)">⚠ 「bj.com」來源無法隱藏，這是 Chrome 強制規範。</span>
+          Content is completely obscured.<br>Real details only visible after opening the BJ website.<br>
+          <span style="color:var(--amber)">⚠ The "bj.com" source line cannot be hidden — Chrome policy.</span>
         </p>
       </div>
 
@@ -1451,25 +1451,25 @@ section{scroll-margin-top:70px}
   <section id="s-reengage">
     <div class="sec-hd">
       <div class="eyebrow">Section 05</div>
-      <h2 class="sec-title">再觸發邏輯</h2>
-      <p class="sec-desc">用戶說「稍後」不代表永遠不要，節制地再問；用戶選「封鎖」則不再主動打擾。</p>
+      <h2 class="sec-title">Re-engagement Logic</h2>
+      <p class="sec-desc">"Maybe Later" doesn't mean never. Re-ask at the right intervals; never bother users who blocked.</p>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div class="card" style="overflow:hidden">
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">點「稍後再說」</div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">Tapped "Maybe Later"</div>
         <div class="re-flow">
-          <div class="rf-row"><div class="rf-dot" style="background:var(--gbg);color:var(--green);border:1px solid var(--gbdr)">1</div><div><div class="rf-title">記錄狀態 + 等 7 天</div><div class="rf-body">localStorage 存 <strong>dismissedAt</strong>，7 天內不再彈出</div></div></div>
-          <div class="rf-row"><div class="rf-dot" style="background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr)">2</div><div><div class="rf-title">第 2 次觸發（7 天後）</div><div class="rf-body">下一個 P1/P2 時機（存款或投注後）再出現說明 Sheet</div></div></div>
-          <div class="rf-row"><div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">3</div><div><div class="rf-title">第 3 次觸發（再 14 天後）</div><div class="rf-body">最後一次主動詢問，之後<strong>不再打擾</strong></div></div></div>
-          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">✓</div><div><div class="rf-title">設定頁永遠可手動開啟</div><div class="rf-body">帳號設定 → 通知偏好，隨時可以開啟</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--gbg);color:var(--green);border:1px solid var(--gbdr)">1</div><div><div class="rf-title">Record state + wait 7 days</div><div class="rf-body">localStorage saves <strong>dismissedAt</strong> — no re-prompt for 7 days</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bbg);color:var(--blue);border:1px solid var(--bbdr)">2</div><div><div class="rf-title">2nd trigger (after 7 days)</div><div class="rf-body">At the next P1/P2 moment (deposit or bet), show the pre-prompt Sheet again</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">3</div><div><div class="rf-title">3rd trigger (14 more days later)</div><div class="rf-body">Last proactive ask — <strong>no more interruptions</strong> after this</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">✓</div><div><div class="rf-title">Settings page always available</div><div class="rf-body">Account Settings → Notifications — enable any time</div></div></div>
         </div>
       </div>
       <div class="card" style="overflow:hidden">
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">點「封鎖」（Chrome 原生）</div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700">Tapped "Block" (Chrome native)</div>
         <div class="re-flow">
-          <div class="rf-row"><div class="rf-dot" style="background:var(--rbg);color:var(--red);border:1px solid var(--rbdr)">!</div><div><div class="rf-title">無法再呼叫原生彈窗</div><div class="rf-body">Chrome 封鎖後，<strong>我們呼叫 permission API 會被靜默忽略</strong></div></div></div>
-          <div class="rf-row"><div class="rf-dot" style="background:var(--abg);color:var(--amber);border:1px solid var(--abdr)">→</div><div><div class="rf-title">設定頁顯示手動解鎖教學</div><div class="rf-body">帳號設定 → 通知偏好 → 顯示步驟說明</div></div></div>
-          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">→</div><div><div class="rf-title">Chrome 手動解鎖步驟</div><div class="rf-body">網址列 🔒 圖示 → 網站設定 → 通知 → <strong>允許</strong></div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--rbg);color:var(--red);border:1px solid var(--rbdr)">!</div><div><div class="rf-title">Cannot re-trigger native dialog</div><div class="rf-body">After Chrome blocks, <strong>any permission API call is silently ignored</strong></div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--abg);color:var(--amber);border:1px solid var(--abdr)">→</div><div><div class="rf-title">Show manual unblock guide in Settings</div><div class="rf-body">Account Settings → Notification Preferences → Step-by-step guide</div></div></div>
+          <div class="rf-row"><div class="rf-dot" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">→</div><div><div class="rf-title">Chrome manual unblock steps</div><div class="rf-body">Address bar 🔒 icon → Site Settings → Notifications → <strong>Allow</strong></div></div></div>
         </div>
       </div>
     </div>
@@ -1479,75 +1479,75 @@ section{scroll-margin-top:70px}
   <section id="s-payload">
     <div class="sec-hd">
       <div class="eyebrow">Section 06</div>
-      <h2 class="sec-title">技術實作 — Payload 對比</h2>
-      <p class="sec-desc">後端根據用戶的 <code>notificationMode</code> 組不同 Payload 送出。DeepLink 兩者都送。</p>
+      <h2 class="sec-title">Technical Implementation — Payload Comparison</h2>
+      <p class="sec-desc">The backend builds different payloads based on the user's <code>notificationMode</code>. DeepLink is included in both.</p>
     </div>
     <div class="code-compare">
       <div class="code-block">
-        <div class="code-hd" style="background:var(--gbg)"><span style="color:var(--green)">●</span> 一般模式</div>
+        <div class="code-hd" style="background:var(--gbg)"><span style="color:var(--green)">●</span> Normal Mode</div>
         <pre class="code-body"><span class="cc">// notificationMode === 'normal'</span>
 {
-  <span class="ck">"title"</span>:   <span class="cv">"⚽ BAN vs QAT 賽前推播"</span>,
-  <span class="ck">"body"</span>:    <span class="cv">"主隊勝 1.85 · 立即投注"</span>,
+  <span class="ck">"title"</span>:   <span class="cv">"⚽ BAN vs QAT Pre-match Alert"</span>,
+  <span class="ck">"body"</span>:    <span class="cv">"Home win 1.85 · Bet Now"</span>,
   <span class="ck">"icon"</span>:    <span class="cv">"/icons/bj-logo-192.png"</span>,
   <span class="ck">"badge"</span>:   <span class="cv">"/icons/badge-mono-96.png"</span>,
   <span class="ck">"image"</span>:   <span class="cv">"/images/ban-qat-banner.jpg"</span>,
   <span class="ck">"actions"</span>: [
-    { <span class="ck">"action"</span>: <span class="cv">"bet"</span>,  <span class="ck">"title"</span>: <span class="cv">"立即投注"</span> },
-    { <span class="ck">"action"</span>: <span class="cv">"view"</span>, <span class="ck">"title"</span>: <span class="cv">"查看賠率"</span> }
+    { <span class="ck">"action"</span>: <span class="cv">"bet"</span>,  <span class="ck">"title"</span>: <span class="cv">"Bet Now"</span> },
+    { <span class="ck">"action"</span>: <span class="cv">"view"</span>, <span class="ck">"title"</span>: <span class="cv">"View Odds"</span> }
   ],
   <span class="ck">"data"</span>: { <span class="ck">"deepLink"</span>: <span class="cv">"/match/ban-qat"</span> }
 }</pre>
       </div>
       <div class="code-block">
-        <div class="code-hd" style="background:var(--pbg)"><span style="color:var(--purple)">●</span> 隱私模式</div>
+        <div class="code-hd" style="background:var(--pbg)"><span style="color:var(--purple)">●</span> Privacy Mode</div>
         <pre class="code-body"><span class="cc">// notificationMode === 'privacy'</span>
 {
-  <span class="ck">"title"</span>:  <span class="cv">"您有一則新訊息"</span>,
-  <span class="ck">"body"</span>:   <span class="cv">"點擊查看詳情"</span>,
+  <span class="ck">"title"</span>:  <span class="cv">"You have a new message"</span>,
+  <span class="ck">"body"</span>:   <span class="cv">"Tap to view details"</span>,
   <span class="ck">"icon"</span>:   <span class="cv">"/icons/generic-bell-192.png"</span>,
 
-  <span class="cc">// badge / image / actions 全部不送</span>
+  <span class="cc">// badge / image / actions all omitted</span>
 
   <span class="ck">"data"</span>: { <span class="ck">"deepLink"</span>: <span class="cv">"/match/ban-qat"</span> }
-  <span class="cc">// deepLink 仍送，點開後正常導向</span>
+  <span class="cc">// deepLink still included — tap opens normally</span>
 }</pre>
       </div>
     </div>
-    <div class="tip tip-blue" style="margin-top:14px"><strong>後端邏輯：</strong>送推播前查用戶的 <code>notificationMode</code>（存於 user profile DB）。Normal → 完整 payload；Privacy → 精簡 payload。</div>
-    <div class="tip tip-amber" style="margin-top:6px"><strong>無法隱藏的：</strong>Android Chrome 通知卡片的來源列固定顯示「Chrome · bj.com」，這是 Chrome 規範強制呈現，非 payload 控制範圍。</div>
+    <div class="tip tip-blue" style="margin-top:14px"><strong>Backend logic:</strong> check user's <code>notificationMode</code> (stored in user profile DB) before sending. Normal → full payload; Privacy → minimal payload.</div>
+    <div class="tip tip-amber" style="margin-top:6px"><strong>Cannot hide:</strong> Android Chrome notification always shows "Chrome · bj.com" in the source row — this is enforced by Chrome spec, not controllable via payload.</div>
   </section>
 
   <!-- ══ SECTION 7: 千人千面 ══ -->
   <section id="s-personalization">
     <div class="sec-hd">
       <div class="eyebrow">Section 07</div>
-      <h2 class="sec-title">千人千面 — 個人化推播邏輯</h2>
-      <p class="sec-desc">後端根據用戶的行為標籤（Tags）決定要不要送、送什麼內容。不是廣播，是「剛好在對的時刻說對的話」。</p>
+      <h2 class="sec-title">Personalised Push — Smart Targeting Logic</h2>
+      <p class="sec-desc">The backend uses user behaviour tags to decide whether to send and what content. Not a broadcast — "the right message at the right moment."</p>
     </div>
 
     <!-- Overview -->
     <div class="card cp" style="margin-bottom:24px">
       <div style="font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">🎯</span> 千人千面的核心邏輯
+        <span style="font-size:18px">🎯</span> Core Personalisation Logic
       </div>
       <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center">
         <div style="background:var(--bg);border-radius:5px;padding:14px;text-align:center">
           <div style="font-size:22px;margin-bottom:6px">🏷️</div>
-          <div style="font-size:12px;font-weight:700;margin-bottom:4px">用戶行為 Tags</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.5">投注紀錄<br>損益狀態<br>偏好運動<br>活躍程度</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">User Behaviour Tags</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Bet history<br>P&amp;L status<br>Fav sport<br>Activity level</div>
         </div>
         <div style="font-size:20px;color:#ccc;padding:0 12px">→</div>
         <div style="background:var(--bg);border-radius:5px;padding:14px;text-align:center">
           <div style="font-size:22px;margin-bottom:6px">⚙️</div>
-          <div style="font-size:12px;font-weight:700;margin-bottom:4px">後端判斷</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.5">符合條件？<br>選擇推播類型<br>組個人化文案</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">Backend Logic</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Match conditions?<br>Select push type<br>Build personalised copy</div>
         </div>
         <div style="font-size:20px;color:#ccc;padding:0 12px">→</div>
         <div style="background:var(--bg);border-radius:5px;padding:14px;text-align:center">
           <div style="font-size:22px;margin-bottom:6px">📲</div>
-          <div style="font-size:12px;font-weight:700;margin-bottom:4px">個人化通知</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.5">對的時機<br>對的理由<br>對的內容</div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:4px">Personalised Push</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5">Right timing<br>Right reason<br>Right content</div>
         </div>
       </div>
     </div>
@@ -1556,7 +1556,7 @@ section{scroll-margin-top:70px}
     <div style="margin-bottom:32px">
       <div style="font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px">
         <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">DATA SOURCES</span>
-        <span>用了千人千面的哪些資料</span>
+        <span>Data powering personalisation</span>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
@@ -1565,24 +1565,24 @@ section{scroll-margin-top:70px}
         <div class="card" style="overflow:hidden">
           <div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;
             background:var(--gbg);color:var(--green);display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">📋</span> 投注紀錄
+            <span style="font-size:14px">📋</span> Bet History
           </div>
           <div style="padding:11px 13px;display:flex;flex-direction:column;gap:7px">
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">preferredSport</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">歷史下注最多的運動</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Most bet sport historically</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">lastBetLeague</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">最近投注的聯賽</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Most recent bet league</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">consecutiveLosses</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">本局連輸幾次</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Consecutive losses this session</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">sessionLossAmount</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">本場損失金額</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Total loss amount this session</div>
             </div>
           </div>
         </div>
@@ -1591,16 +1591,16 @@ section{scroll-margin-top:70px}
         <div class="card" style="overflow:hidden">
           <div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;
             background:var(--bbg);color:var(--blue);display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">💳</span> 帳戶狀態
+            <span style="font-size:14px">💳</span> Account Status
           </div>
           <div style="padding:11px 13px;display:flex;flex-direction:column;gap:7px">
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">accountBalance</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">目前餘額</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Current balance</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">rebateEligible</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">是否達 rebate 領取資格</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Eligible to claim rebate</div>
             </div>
           </div>
         </div>
@@ -1609,20 +1609,20 @@ section{scroll-margin-top:70px}
         <div class="card" style="overflow:hidden">
           <div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;
             background:var(--abg);color:var(--amber);display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">⏱️</span> 活躍度
+            <span style="font-size:14px">⏱️</span> Activity
           </div>
           <div style="padding:11px 13px;display:flex;flex-direction:column;gap:7px">
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">lastLoginHours</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">距上次登入幾小時</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Hours since last login</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">lastActivityHours</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">距上次遊戲行為幾小時</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Hours since last game action</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">churnRiskScore</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">流失風險分數（由活躍度 + 損失行為計算）</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Churn risk score (from activity + loss behaviour)</div>
             </div>
           </div>
         </div>
@@ -1631,16 +1631,16 @@ section{scroll-margin-top:70px}
         <div class="card" style="overflow:hidden">
           <div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;
             background:var(--pbg);color:var(--purple);display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">⚙️</span> 系統 / 外部
+            <span style="font-size:14px">⚙️</span> System / External
           </div>
           <div style="padding:11px 13px;display:flex;flex-direction:column;gap:7px">
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">pushOptIn</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">已允許推播（推播系統）</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Push opt-in (push system)</div>
             </div>
             <div>
               <div style="font-family:var(--mono);font-size:10px;color:var(--blue)">kickoffTime</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:1px">比賽開賽時間（賽事資料 feed）</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px">Match kickoff time (fixture data feed)</div>
             </div>
           </div>
         </div>
@@ -1652,27 +1652,27 @@ section{scroll-margin-top:70px}
         <table style="width:100%;font-size:12px;border-collapse:collapse">
           <thead>
             <tr style="background:var(--bg)">
-              <td style="padding:9px 14px;font-weight:700;width:180px">推播情境</td>
-              <td style="padding:9px 14px;font-weight:600;color:var(--green)">📋 投注紀錄</td>
-              <td style="padding:9px 14px;font-weight:600;color:var(--blue)">💳 帳戶狀態</td>
-              <td style="padding:9px 14px;font-weight:600;color:var(--amber)">⏱️ 活躍度</td>
-              <td style="padding:9px 14px;font-weight:600;color:var(--purple)">⚙️ 系統/外部</td>
+              <td style="padding:9px 14px;font-weight:700;width:180px">Push Scenario</td>
+              <td style="padding:9px 14px;font-weight:600;color:var(--green)">📋 Bet History</td>
+              <td style="padding:9px 14px;font-weight:600;color:var(--blue)">💳 Account Status</td>
+              <td style="padding:9px 14px;font-weight:600;color:var(--amber)">⏱️ Activity</td>
+              <td style="padding:9px 14px;font-weight:600;color:var(--purple)">⚙️ System/External</td>
             </tr>
           </thead>
           <tbody>
             <tr style="border-top:1px solid var(--border)">
               <td style="padding:10px 14px;font-weight:600">⚽ Sports Push</td>
-              <td style="padding:10px 14px;color:var(--muted)">偏好運動、聯賽</td>
-              <td style="padding:10px 14px;color:var(--muted)">餘額</td>
-              <td style="padding:10px 14px;color:var(--muted)">登入時間</td>
-              <td style="padding:10px 14px;color:var(--muted)">推播授權、開賽時間</td>
+              <td style="padding:10px 14px;color:var(--muted)">Fav sport, league</td>
+              <td style="padding:10px 14px;color:var(--muted)">Balance</td>
+              <td style="padding:10px 14px;color:var(--muted)">Login time</td>
+              <td style="padding:10px 14px;color:var(--muted)">Push opt-in, kickoff</td>
             </tr>
             <tr style="border-top:1px solid var(--border)">
               <td style="padding:10px 14px;font-weight:600">🎰 Slot Push</td>
-              <td style="padding:10px 14px;color:var(--muted)">連輸局數、損失金額</td>
-              <td style="padding:10px 14px;color:var(--muted)">Rebate 資格</td>
-              <td style="padding:10px 14px;color:var(--muted)">離開時間、流失風險</td>
-              <td style="padding:10px 14px;color:var(--muted)">推播授權</td>
+              <td style="padding:10px 14px;color:var(--muted)">Consecutive losses, loss amount</td>
+              <td style="padding:10px 14px;color:var(--muted)">Rebate eligibility</td>
+              <td style="padding:10px 14px;color:var(--muted)">Time since exit, churn risk</td>
+              <td style="padding:10px 14px;color:var(--muted)">Push opt-in</td>
             </tr>
           </tbody>
         </table>
@@ -1684,7 +1684,7 @@ section{scroll-margin-top:70px}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="width:36px;height:36px;border-radius:5px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:18px">⚽</div>
         <div>
-          <div style="font-size:15px;font-weight:700">Sports Push · 類型 1 · 賽前期</div>
+          <div style="font-size:15px;font-weight:700">Sports Push · Type 1 · Pre-Match</div>
           <div style="font-size:12px;color:var(--muted)">Android Chrome Web Push</div>
         </div>
       </div>
@@ -1694,31 +1694,31 @@ section{scroll-margin-top:70px}
         <!-- Tags -->
         <div class="card" style="overflow:hidden">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;
-            background:var(--gbg);color:var(--green)">✅ 符合以下全部條件才推送</div>
+            background:var(--gbg);color:var(--green)">✅ Send only when ALL conditions match</div>
           <table style="width:100%;font-size:12px;border-collapse:collapse">
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue);width:200px">preferredSport</td>
-              <td style="padding:10px 14px">= <strong>football</strong>（曾主動下注足球）</td>
+              <td style="padding:10px 14px">= <strong>football</strong> (has actively bet on football)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastBetLeague</td>
-              <td style="padding:10px 14px">包含<strong>此場比賽所屬聯賽</strong>的投注紀錄</td>
+              <td style="padding:10px 14px">has bet on the <strong>league of this match</strong></td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">accountBalance</td>
-              <td style="padding:10px 14px">&gt; 0（<strong>有餘額</strong>，才有意義推）</td>
+              <td style="padding:10px 14px">&gt; 0 (<strong>has balance</strong> — push only when meaningful)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastLoginHours</td>
-              <td style="padding:10px 14px">&lt; 48h（<strong>近期活躍</strong>，非沈睡用戶）</td>
+              <td style="padding:10px 14px">&lt; 48h (<strong>recently active</strong> — not a dormant user)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">pushOptIn</td>
-              <td style="padding:10px 14px">= true（<strong>已授權推播</strong>）</td>
+              <td style="padding:10px 14px">= true (<strong>push opt-in granted</strong>)</td>
             </tr>
             <tr>
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">kickoffTime</td>
-              <td style="padding:10px 14px">距開賽 <strong>2 小時內</strong>（賽前黃金時段）</td>
+              <td style="padding:10px 14px">within <strong>2 hours</strong> of kickoff (pre-match golden window)</td>
             </tr>
           </table>
         </div>
@@ -1726,51 +1726,51 @@ section{scroll-margin-top:70px}
         <!-- Why + Notifications -->
         <div style="display:flex;flex-direction:column;gap:12px">
           <div class="card cp" style="border-color:var(--gbdr);background:var(--gbg)">
-            <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">為什麼推這個人</div>
+            <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px">Why target this user</div>
             <p style="font-size:12px;color:var(--fg);line-height:1.7">
-              他過去投注過這場比賽的相關聯賽 ＋ 目前有餘額 ＋ 比賽快開始了<br>
-              → <strong>「他有可能想押這場，只是還沒看到入口」</strong><br><br>
-              不是廣播給所有人，而是只推給「這場比賽對他有意義」的用戶。
+              He has bet on this league before + has balance + match is about to start<br>
+              → <strong>"He might want to bet — he just hasn't seen the entry point yet"</strong><br><br>
+              Not a broadcast to everyone — only pushed to users for whom this match is relevant.
             </p>
           </div>
 
           <!-- Normal notification preview -->
           <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ 一般模式通知</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ Normal Mode notification</div>
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
                 <span class="anc-app-name">Chrome · bj.com</span>
-                <span class="anc-time">剛才</span>
+                <span class="anc-time">just now</span>
                 <button class="anc-dismiss">✕</button>
               </div>
               <div class="anc-content">
                 <div class="anc-text-block">
-                  <div class="anc-title">⚽ BAN vs QAT 2 小時後開賽</div>
-                  <div class="anc-body">主隊賠率 1.85 · 你上次也押了亞洲盃</div>
+                  <div class="anc-title">⚽ BAN vs QAT kicks off in 2 hrs</div>
+                  <div class="anc-body">Home win 1.85 · You bet on the Asian Cup too</div>
                 </div>
                 <div class="anc-large-icon" style="background:#222424;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
               </div>
               <div class="anc-actions">
-                <button class="anc-action">立即投注</button>
-                <button class="anc-action">查看賠率</button>
+                <button class="anc-action">Bet Now</button>
+                <button class="anc-action">View Odds</button>
               </div>
             </div>
           </div>
 
           <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 隱私模式通知</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 Privacy Mode notification</div>
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
                 <span class="anc-app-name">Chrome · bj.com</span>
-                <span class="anc-time">剛才</span>
+                <span class="anc-time">just now</span>
                 <button class="anc-dismiss">✕</button>
               </div>
               <div class="anc-content">
                 <div class="anc-text-block">
-                  <div class="anc-title">您有一則新訊息</div>
-                  <div class="anc-body">點擊查看詳情</div>
+                  <div class="anc-title">You have a new message</div>
+                  <div class="anc-body">Tap to view details</div>
                 </div>
                 <div class="anc-large-icon" style="background:#454648;font-size:16px;border-radius:8px">🔔</div>
               </div>
@@ -1785,7 +1785,7 @@ section{scroll-margin-top:70px}
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
         <div style="width:36px;height:36px;border-radius:5px;background:var(--rbg);display:flex;align-items:center;justify-content:center;font-size:18px">🎰</div>
         <div>
-          <div style="font-size:15px;font-weight:700">Slot Push · 2b · 連輸保護 Loss Rebate</div>
+          <div style="font-size:15px;font-weight:700">Slot Push · 2b · Loss-Streak Protection</div>
           <div style="font-size:12px;color:var(--muted)">Android Chrome Web Push</div>
         </div>
       </div>
@@ -1795,31 +1795,31 @@ section{scroll-margin-top:70px}
         <!-- Tags -->
         <div class="card" style="overflow:hidden">
           <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;
-            background:var(--rbg);color:var(--red)">✅ 符合以下全部條件才推送</div>
+            background:var(--rbg);color:var(--red)">✅ Send only when ALL conditions match</div>
           <table style="width:100%;font-size:12px;border-collapse:collapse">
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue);width:200px">consecutiveLosses</td>
-              <td style="padding:10px 14px">&gt;= 5（<strong>連輸 5 局</strong>以上）</td>
+              <td style="padding:10px 14px">&gt;= 5 (<strong>5+ consecutive losses</strong>)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">sessionLossAmount</td>
-              <td style="padding:10px 14px">&gt; 設定閾值（<strong>本次損失達門檻</strong>）</td>
+              <td style="padding:10px 14px">&gt; configured threshold (<strong>loss hit the limit</strong>)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">lastActivityHours</td>
-              <td style="padding:10px 14px">&lt; 24h（<strong>剛輸完還沒走遠</strong>）</td>
+              <td style="padding:10px 14px">&lt; 24h (<strong>just lost — still reachable</strong>)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">churnRiskScore</td>
-              <td style="padding:10px 14px">= medium–high（<strong>流失風險高</strong>）</td>
+              <td style="padding:10px 14px">= medium–high (<strong>high churn risk</strong>)</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border)">
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">rebateEligible</td>
-              <td style="padding:10px 14px">= true（<strong>後端確認符合 Rebate 資格</strong>）</td>
+              <td style="padding:10px 14px">= true (<strong>backend confirmed rebate eligible</strong>)</td>
             </tr>
             <tr>
               <td style="padding:10px 14px;font-family:var(--mono);font-size:11px;color:var(--blue)">pushOptIn</td>
-              <td style="padding:10px 14px">= true（<strong>已授權推播</strong>）</td>
+              <td style="padding:10px 14px">= true (<strong>push opt-in granted</strong>)</td>
             </tr>
           </table>
         </div>
@@ -1827,51 +1827,51 @@ section{scroll-margin-top:70px}
         <!-- Why + Notifications -->
         <div style="display:flex;flex-direction:column;gap:12px">
           <div class="card cp" style="border-color:var(--rbdr);background:var(--rbg)">
-            <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">為什麼推這個人</div>
+            <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">Why target this user</div>
             <p style="font-size:12px;color:var(--fg);line-height:1.7">
-              他剛連輸，情緒低落，有流失傾向，但後端確認他符合 Loss Rebate 資格<br>
-              → <strong>「平台主動給補償，讓他覺得被照顧，而不是被榨乾」</strong><br><br>
-              關鍵：不是連輸就推，是「連輸 ＋ 有資格領」才推。否則是騷擾。
+              He just lost a streak, morale is low, churn risk is high — but the backend confirms he qualifies for Loss Rebate<br>
+              → <strong>"Platform steps in with a reward — he feels cared for, not exploited"</strong><br><br>
+              Key: don't push on every loss — only push when "loss streak + eligible to claim." Otherwise it's spam.
             </p>
           </div>
 
           <!-- Normal notification preview -->
           <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ 一般模式通知</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">☀️ Normal Mode notification</div>
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
                 <span class="anc-app-name">Chrome · bj.com</span>
-                <span class="anc-time">剛才</span>
+                <span class="anc-time">just now</span>
                 <button class="anc-dismiss">✕</button>
               </div>
               <div class="anc-content">
                 <div class="anc-text-block">
-                  <div class="anc-title">🎁 連輸保護啟動</div>
-                  <div class="anc-body">你有 ฿50 Loss Rebate 可以領取</div>
+                  <div class="anc-title">🎁 Loss Protection Activated</div>
+                  <div class="anc-body">You have ฿50 Loss Rebate ready to claim</div>
                 </div>
                 <div class="anc-large-icon" style="background:#222424;border-radius:8px;overflow:hidden;padding:2px"><img src="images/bj-logo.png" style="width:100%;height:100%;object-fit:contain"></div>
               </div>
               <div class="anc-actions">
-                <button class="anc-action">立即領取</button>
-                <button class="anc-action">查看詳情</button>
+                <button class="anc-action">Claim Now</button>
+                <button class="anc-action">View Details</button>
               </div>
             </div>
           </div>
 
           <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 隱私模式通知</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--mono)">🔒 Privacy Mode notification</div>
             <div class="anc" style="font-family:var(--roboto)">
               <div class="anc-src">
                 <div class="chrome-icon"></div>
                 <span class="anc-app-name">Chrome · bj.com</span>
-                <span class="anc-time">剛才</span>
+                <span class="anc-time">just now</span>
                 <button class="anc-dismiss">✕</button>
               </div>
               <div class="anc-content">
                 <div class="anc-text-block">
-                  <div class="anc-title">您有一則新訊息</div>
-                  <div class="anc-body">點擊查看詳情</div>
+                  <div class="anc-title">You have a new message</div>
+                  <div class="anc-body">Tap to view details</div>
                 </div>
                 <div class="anc-large-icon" style="background:#454648;font-size:16px;border-radius:8px">🔔</div>
               </div>
@@ -1884,46 +1884,46 @@ section{scroll-margin-top:70px}
     <!-- Permission sheet personalization -->
     <div>
       <div style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">📋</span> 申請推播時的說明 Sheet 也個人化
+        <span style="font-size:18px">📋</span> Permission Sheet copy is personalised too
       </div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px">
-        用戶看到的 Sheet 文案根據他的類型切換，不是一段通用文字。
+        The sheet copy adapts to the user's type — not a one-size-fits-all message.
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
 
         <div class="card" style="overflow:hidden">
-          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--gbg);color:var(--green)">⚽ 足球投注用戶</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--gbg);color:var(--green)">⚽ Football Bettor</div>
           <div style="padding:12px 14px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「不想錯過比賽結果嗎？」</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">"Don't want to miss match results?"</div>
             <div style="font-size:11px;color:var(--muted);line-height:1.65">
-              🏆 比賽開踢提醒<br>
-              📊 即時賠率變動<br>
-              ✅ 投注結果第一時間通知
+              🏆 Match kick-off alerts<br>
+              📊 Real-time odds changes<br>
+              ✅ Bet result notifications first
             </div>
           </div>
         </div>
 
         <div class="card" style="overflow:hidden">
-          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--rbg);color:var(--red)">🎰 Slot 連輸用戶</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--rbg);color:var(--red)">🎰 Slot Streak Loser</div>
           <div style="padding:12px 14px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「好消息讓我們第一時間通知你」</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">"Let us be the first to bring you good news"</div>
             <div style="font-size:11px;color:var(--muted);line-height:1.65">
-              🛡️ 連輸保護自動啟動通知<br>
-              🎁 專屬回饋優惠<br>
-              💰 紅利到帳提醒
+              🛡️ Loss protection auto-activation alerts<br>
+              🎁 Exclusive reward offers<br>
+              💰 Bonus arrival reminders
             </div>
           </div>
         </div>
 
         <div class="card" style="overflow:hidden">
-          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--abg);color:var(--amber)">💰 存款但未投注</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--abg);color:var(--amber)">💰 Deposited, Not Yet Bet</div>
           <div style="padding:12px 14px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">「你的優惠快截止了」</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">"Your bonus is about to expire"</div>
             <div style="font-size:11px;color:var(--muted);line-height:1.65">
-              ⏰ 首存獎勵到期提醒<br>
-              🎯 專屬限定優惠<br>
-              🔔 新活動上架通知
+              ⏰ First deposit reward expiry alert<br>
+              🎯 Exclusive limited-time offers<br>
+              🔔 New promotion notifications
             </div>
           </div>
         </div>
@@ -1931,7 +1931,7 @@ section{scroll-margin-top:70px}
       </div>
 
       <div class="tip tip-purple" style="margin-top:14px">
-        <strong>技術實作：</strong>前端呼叫 <code>GET /api/user/push-context</code>，後端回傳 <code>{ sheetVariant: 'sports' | 'loss' | 'deposit' | 'default' }</code>，前端依此選擇對應的 Sheet 文案版本。
+        <strong>Implementation:</strong> frontend calls <code>GET /api/user/push-context</code>, backend returns <code>{ sheetVariant: 'sports' | 'loss' | 'deposit' | 'default' }</code>, frontend selects the matching sheet copy variant.
       </div>
     </div>
 
