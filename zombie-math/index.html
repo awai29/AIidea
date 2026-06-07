@@ -239,6 +239,52 @@
   </div>
 
   <script>
+    // ── 數學題產生器 ──────────────────────────────────────
+    // 根據波數回傳 { question: '24 ÷ 6', answer: 4 }
+    function generateQuestion(wave) {
+      let type;
+      if (wave <= 3) {
+        type = Math.random() < 0.5 ? 'add' : 'sub';
+      } else if (wave <= 6) {
+        type = 'mul';
+      } else if (wave <= 9) {
+        type = 'div';
+      } else {
+        const types = ['add', 'sub', 'mul', 'div'];
+        type = types[Math.floor(Math.random() * types.length)];
+      }
+
+      let a, b, question, answer;
+
+      if (type === 'add') {
+        a = randInt(10, 99);
+        b = randInt(1, 99 - a);
+        question = `${a} + ${b}`;
+        answer = a + b;
+      } else if (type === 'sub') {
+        a = randInt(20, 99);
+        b = randInt(1, a - 1);
+        question = `${a} - ${b}`;
+        answer = a - b;
+      } else if (type === 'mul') {
+        a = randInt(2, 9);
+        b = randInt(2, 9);
+        question = `${a} × ${b}`;
+        answer = a * b;
+      } else { // div
+        b = randInt(2, 9);
+        answer = randInt(2, 9);
+        a = b * answer;
+        question = `${a} ÷ ${b}`;
+      }
+
+      return { question, answer };
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     // ── 佔位函式（Task 4、Task 5 會實作完整版本）──
     function startGame() { /* Task 5 實作 */ }
     function submitAnswer() { /* Task 4 實作 */ }
