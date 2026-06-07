@@ -310,6 +310,7 @@
       zombies: [],          // 目前畫面上的殭屍陣列
       gameRunning: false,
       waveClearing: false,  // 正在進行波次切換
+      waveSpawning: false,   // setInterval 仍在 spawn 殭屍中
       zombieIdCounter: 0,   // 產生唯一 ID 用
       gameLoopId: null,
     };
@@ -368,8 +369,8 @@
         }
       }
 
-      // 檢查是否全部殭屍清除
-      if (state.zombies.length === 0 && !state.waveClearing) {
+      // 檢查是否全部殭屍清除（需確認 spawn 也已結束）
+      if (state.zombies.length === 0 && !state.waveClearing && !state.waveSpawning) {
         state.waveClearing = true;
         showWaveClear();
       }
@@ -440,7 +441,7 @@
       Object.assign(state, {
         lives: 3, score: 0, wave: 1, combo: 0,
         comboActive: false, correctCount: 0, totalAnswers: 0,
-        zombies: [], gameRunning: true, waveClearing: false,
+        zombies: [], gameRunning: true, waveClearing: false, waveSpawning: false,
         zombieIdCounter: 0,
       });
 
@@ -459,9 +460,11 @@
       let spawned = 0;
       state.waveClearing = false; // 重置，防止 spawning 期間誤觸波次清除
 
+      state.waveSpawning = true;
       const interval = setInterval(() => {
         if (spawned >= count || !state.gameRunning) {
           clearInterval(interval);
+          state.waveSpawning = false;
           return;
         }
         spawnZombie();
