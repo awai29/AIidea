@@ -1957,6 +1957,47 @@ section{scroll-margin-top:70px}
         <span class="bdg br" style="margin-left:auto;flex-shrink:0">高流失風險</span>
       </div>
 
+      <!-- A/B Test 說明 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--gbg);color:var(--green);display:flex;align-items:center;gap:8px">
+            <span style="font-family:var(--mono);font-size:11px;background:#bbf7d0;padding:2px 8px;border-radius:4px;color:#166534">A 方案</span> 行為條件觸發
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">有效活躍條件</div>
+              近 7 日至少 1 天入金
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">高流失風險 — 條件 1</div>
+              近 3 天連續輸分，<strong>或</strong>今日輸分 &gt; 近 30 日平均入金 100%
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">高流失風險 — 條件 2</div>
+              近 3 日日均押注較前 7 日下降 &gt;30%
+            </div>
+          </div>
+        </div>
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--rbg);color:var(--red);display:flex;align-items:center;gap:8px">
+            <span style="font-family:var(--mono);font-size:11px;background:#fecaca;padding:2px 8px;border-radius:4px;color:#991b1b">B 方案</span> CRM 模型觸發
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">CRM 流失預測模型</div>
+              <strong>流失風險分數 &gt; 80</strong>（取代行為條件，由模型直接判斷）
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">其餘條件</div>
+              高貢獻、Bonus 依賴條件與 A 方案相同
+            </div>
+            <div class="tip tip-amber" style="margin-top:0">
+              🧪 測試重點：純行為規則 vs CRM 機器學習模型，哪個抓到的流失玩家再入金轉換率更高
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="phones-row">
 
         <!-- 觸發畫面 -->
@@ -2124,6 +2165,47 @@ section{scroll-margin-top:70px}
           <div style="font-size:12px;color:var(--muted)">觸發條件：累計存款 1–3 次、首儲 PR80↑、近 7 日有下注，48 小時未再入金　·　預估 130 人</div>
         </div>
         <span class="bdg bb" style="margin-left:auto;flex-shrink:0">潛力型</span>
+      </div>
+
+      <!-- A/B Test 說明 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--gbg);color:var(--green);display:flex;align-items:center;gap:8px">
+            <span style="font-family:var(--mono);font-size:11px;background:#bbf7d0;padding:2px 8px;border-radius:4px;color:#166534">A 方案</span> 嚴格篩選（高品質）
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">首儲金額條件</div>
+              達 <strong>PR80 以上</strong>
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">高流失風險條件</div>
+              無（不加模型分數）
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">預估人數</div>
+              加 Bonus 依賴條件：約 90 人　/　移除後：約 130 人
+            </div>
+          </div>
+        </div>
+        <div class="card" style="overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;background:var(--bbg);color:var(--blue);display:flex;align-items:center;gap:8px">
+            <span style="font-family:var(--mono);font-size:11px;background:#bfdbfe;padding:2px 8px;border-radius:4px;color:#1e40af">B 方案</span> 放寬入場 + 模型過濾
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">首儲金額條件</div>
+              達 <strong>PR70 以上</strong>（放寬條件，名單更大）
+            </div>
+            <div style="font-size:11px;line-height:1.65">
+              <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:2px">CRM 流失預測模型</div>
+              <strong>流失風險分數 &gt; 80</strong>（從較大名單中再過濾高風險者）
+            </div>
+            <div class="tip tip-blue" style="margin-top:0">
+              🧪 測試重點：高門檻直接篩 vs 低門檻 + 模型再過濾，哪個名單入金率更佳
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="phones-row">
