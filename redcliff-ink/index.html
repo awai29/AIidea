@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>水墨赤壁・三國赤壁之戰</title>
+
+  <!-- 網站小圖示：一方朱印（內嵌 SVG，不需額外檔案） -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23b3382c'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='%23f3eee2' font-family='serif'%3E赤%3C/text%3E%3C/svg%3E" />
+
+  <!-- 字體：Cactus Classical Serif（古典繁中明體）＋ Noto Serif TC（內文襯線） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cactus+Classical+Serif&family=Noto+Serif+TC:wght@400;600;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- importmap：告訴瀏覽器去哪裡載入 three.js（從 CDN） -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- 3D 畫布：整個水墨江景都畫在這裡 -->
+  <canvas id="scene"></canvas>
+
+  <!-- 開場封面（像翻開一卷畫軸） -->
+  <div id="intro">
+    <div class="ink-blot"></div>
+    <h1 class="intro-title">赤壁之戰</h1>
+    <p class="intro-sub">建安十三年・一場改寫天下的大火</p>
+    <button id="btn-start">開　卷</button>
+    <p class="intro-credit">水墨互動畫卷・取材自《三國志》《資治通鑑》</p>
+  </div>
+
+  <!-- 左上：直書標題與朱印 -->
+  <header id="masthead">
+    <div class="vertical-title">水墨赤壁</div>
+    <div class="seal">赤壁</div>
+  </header>
+
+  <!-- 右側：章節敘事面板 -->
+  <aside id="panel">
+    <div class="ch-head">
+      <span id="ch-num" class="ch-num">壹</span>
+      <div>
+        <h2 id="ch-title">烽煙南下</h2>
+        <div id="ch-sub" class="ch-sub">建安十三年・秋</div>
+      </div>
+    </div>
+    <p id="ch-text" class="ch-text"></p>
+    <div id="ch-action" class="ch-action hidden"></div>
+
+    <nav id="dots" class="dots" aria-label="章節導覽"></nav>
+    <button id="btn-next">下一章 →</button>
+  </aside>
+
+  <!-- 滑鼠 hover 戰船時跟隨的名稱小標籤 -->
+  <div id="tooltip" class="hidden"></div>
+
+  <!-- 點擊戰船後出現的史料小卡 -->
+  <div id="infocard" class="hidden">
+    <button id="infocard-close" aria-label="關閉">×</button>
+    <h3 id="infocard-title"></h3>
+    <p id="infocard-text"></p>
+  </div>
+
+  <!-- 底部操作提示 -->
+  <div id="hint">移動滑鼠暈染江面・點擊戰船探究史事</div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

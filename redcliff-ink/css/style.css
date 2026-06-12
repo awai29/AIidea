@@ -1,0 +1,351 @@
+/* ==========================================================
+   水墨赤壁 — 樣式表
+   美術方向：宣紙、墨色、一點朱紅（印章與火）
+   ========================================================== */
+
+:root {
+  --paper: #f3eee2;        /* 宣紙底色 */
+  --paper-deep: #e9e2d0;   /* 較深的紙色（卡片） */
+  --ink: #1c1a17;          /* 濃墨 */
+  --ink-soft: #4a453d;     /* 淡墨（內文） */
+  --cinnabar: #b3382c;     /* 朱砂紅（印章、強調） */
+  --font-display: "Cactus Classical Serif", "Noto Serif TC", serif;
+  --font-body: "Noto Serif TC", serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* 3D 畫布鋪滿整個視窗 */
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- 開場封面 ---------- */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(28, 26, 23, 0.06), transparent 50%),
+    radial-gradient(ellipse at 75% 80%, rgba(28, 26, 23, 0.08), transparent 45%),
+    var(--paper);
+  transition: opacity 1.4s ease, visibility 1.4s;
+}
+#intro.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* 封面背後緩緩暈開的大墨點 */
+.ink-blot {
+  position: absolute;
+  width: 70vmin;
+  height: 70vmin;
+  border-radius: 48% 52% 55% 45% / 50% 46% 54% 50%;
+  background: radial-gradient(circle, rgba(28,26,23,0.16) 0%, rgba(28,26,23,0.07) 45%, transparent 70%);
+  filter: blur(6px);
+  animation: blot-grow 4s ease-out forwards;
+  z-index: -1;
+}
+@keyframes blot-grow {
+  from { transform: scale(0.2) rotate(-8deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.intro-title {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 12vw, 130px);
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  animation: fade-up 1.6s ease both 0.3s;
+}
+.intro-sub {
+  font-size: clamp(14px, 2vw, 18px);
+  letter-spacing: 0.5em;
+  color: var(--ink-soft);
+  animation: fade-up 1.6s ease both 0.8s;
+}
+#btn-start {
+  margin-top: 24px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.4em;
+  padding: 14px 44px 14px 52px; /* 右側略窄補償字距 */
+  color: var(--paper);
+  background: var(--ink);
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.3s, transform 0.3s;
+  animation: fade-up 1.6s ease both 1.2s;
+}
+#btn-start:hover { background: var(--cinnabar); transform: translateY(-2px); }
+
+.intro-credit {
+  position: absolute;
+  bottom: 28px;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  animation: fade-up 1.6s ease both 1.6s;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 左上直書標題＋朱印 ---------- */
+#masthead {
+  position: fixed;
+  top: 34px;
+  left: 34px;
+  z-index: 10;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  opacity: 0;
+  transition: opacity 1.2s ease 0.6s;
+}
+body.started #masthead { opacity: 1; }
+
+.vertical-title {
+  writing-mode: vertical-rl; /* 直書，由右至左 */
+  font-family: var(--font-display);
+  font-size: 34px;
+  letter-spacing: 0.35em;
+  color: var(--ink);
+}
+.seal {
+  writing-mode: vertical-rl;
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: #f6f1e6;
+  background: var(--cinnabar);
+  padding: 7px 5px;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(28,26,23,0.25);
+  margin-top: 4px;
+}
+
+/* ---------- 右側章節面板 ---------- */
+#panel {
+  position: fixed;
+  top: 50%;
+  right: 34px;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: min(340px, calc(100vw - 48px));
+  padding: 26px 26px 20px;
+  background: linear-gradient(160deg, rgba(243,238,226,0.92), rgba(233,226,208,0.88));
+  backdrop-filter: blur(3px);
+  border: 1px solid rgba(28,26,23,0.25);
+  border-radius: 3px;
+  box-shadow: 6px 8px 0 rgba(28,26,23,0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+body.started #panel { opacity: 1; pointer-events: auto; }
+
+.ch-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.ch-num {
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: var(--paper);
+  background: var(--ink);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% 46% 52% 48%; /* 略不規則，像墨點 */
+  flex-shrink: 0;
+}
+#ch-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+.ch-sub {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--cinnabar);
+  margin-top: 2px;
+}
+.ch-text {
+  font-size: 14.5px;
+  line-height: 2;
+  color: var(--ink-soft);
+  text-align: justify;
+  min-height: 120px;
+  transition: opacity 0.4s ease;
+}
+.ch-text.fading { opacity: 0; }
+
+/* 第四章的互動指示（縱火提示） */
+.ch-action {
+  margin-top: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--cinnabar);
+  border: 1px dashed var(--cinnabar);
+  border-radius: 3px;
+  animation: pulse-red 1.8s ease-in-out infinite;
+}
+@keyframes pulse-red {
+  0%, 100% { background: rgba(179,56,44,0.04); }
+  50%      { background: rgba(179,56,44,0.14); }
+}
+
+/* 章節導覽圓點 */
+.dots {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0 14px;
+}
+.dots button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s, transform 0.3s;
+}
+.dots button:hover { transform: scale(1.3); }
+.dots button.active { background: var(--ink); }
+
+#btn-next {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.25em;
+  padding: 11px 0;
+  color: var(--paper);
+  background: var(--ink);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#btn-next:hover { background: var(--cinnabar); }
+#btn-next:disabled { opacity: 0.35; cursor: default; }
+
+/* ---------- hover 名稱標籤 ---------- */
+#tooltip {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  color: var(--paper);
+  background: rgba(28,26,23,0.88);
+  padding: 6px 12px;
+  border-radius: 2px;
+  transform: translate(14px, -30px);
+  white-space: nowrap;
+}
+
+/* ---------- 史料小卡 ---------- */
+#infocard {
+  position: fixed;
+  left: 34px;
+  bottom: 64px;
+  z-index: 15;
+  width: min(320px, calc(100vw - 48px));
+  padding: 20px 22px;
+  background: linear-gradient(150deg, rgba(243,238,226,0.95), rgba(233,226,208,0.92));
+  border: 1px solid rgba(28,26,23,0.3);
+  border-left: 4px solid var(--cinnabar);
+  border-radius: 3px;
+  box-shadow: 6px 8px 0 rgba(28,26,23,0.08);
+  animation: fade-up 0.5s ease both;
+}
+#infocard h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+#infocard p {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--ink-soft);
+  text-align: justify;
+}
+#infocard-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+#infocard-close:hover { color: var(--cinnabar); }
+
+/* ---------- 底部提示 ---------- */
+#hint {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 12.5px;
+  letter-spacing: 0.3em;
+  color: var(--ink-soft);
+  opacity: 0;
+  transition: opacity 1.2s ease 1.2s;
+  white-space: nowrap;
+}
+body.started #hint { opacity: 0.75; }
+
+.hidden { display: none !important; }
+
+/* ---------- 窄螢幕（手機）調整 ---------- */
+@media (max-width: 720px) {
+  #panel {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    transform: none;
+    padding: 18px 18px 14px;
+  }
+  .ch-text { min-height: 0; max-height: 26vh; overflow-y: auto; }
+  #masthead { top: 18px; left: 18px; }
+  .vertical-title { font-size: 24px; }
+  #hint { display: none; }
+  #infocard { bottom: auto; top: 80px; left: 16px; }
+}
