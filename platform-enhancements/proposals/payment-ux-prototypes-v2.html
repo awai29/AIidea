@@ -870,7 +870,9 @@
   <div class="state-switcher">
     <button class="state-btn s-red active" onclick="switchState('p2','s1',this)">狀態 1 · 現況問題（4 層決策）</button>
     <button class="state-btn s-green" onclick="switchState('p2','s2',this)">狀態 2 · 互動原型 ← 可操作</button>
-    <button class="state-btn s-teal" onclick="switchState('p2','s5',this)">狀態 5 · GA 優化：統一支付+優惠 ← 新</button>
+    <button class="state-btn s-teal" onclick="switchState('p2','s5',this)">狀態 5 · GA 優化：統一支付+優惠</button>
+    <button class="state-btn s-purple" onclick="switchState('p2','s6',this)">狀態 6 · 方案B：優惠卡驅動支付篩選 ← 新</button>
+    <button class="state-btn s-amber" onclick="switchState('p2','s7',this)">狀態 7 · 方案C：回流玩家記憶偏好 ← 新</button>
   </div>
 
   <div class="layout">
@@ -1039,6 +1041,76 @@
             </div>
             <div class="callout" style="background:rgba(13,148,136,.08);border-color:rgba(13,148,136,.3);color:#0d9488;">
               <span><strong>核心原則：</strong>不讓玩家有機會犯「選了不相容組合」的錯誤。系統只展示可用選項，自動推薦最佳組合，玩家按 Confirm 就好。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s6-info" style="display:none;">
+        <div class="card" style="border-color:#4c2d8a;">
+          <div class="card-header" style="background:rgba(124,58,237,.08);border-bottom:1px solid rgba(124,58,237,.2);">
+            <div class="cname">狀態 6 — 方案B：優惠卡驅動支付篩選</div>
+            <div class="csub">資料流正確：優惠 → 決定哪些支付方式可用。玩家先看優惠、再選支付，系統即時過濾不相容選項。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">設計思路</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>優惠卡片排在最上方（主要決策），每張卡顯示哪些支付方式相容</span></li>
+                <li><span class="pi pi-ok">✓</span><span>選完優惠後，下方支付格只顯示相容的選項，不相容的直接消失</span></li>
+                <li><span class="pi pi-ok">✓</span><span>預設套用 Welcome Bonus，大多數玩家不需要做任何選擇</span></li>
+                <li><span class="pi pi-ok">✓</span><span>符合後端資料流方向：促銷驅動支付篩選</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">操作提示</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>點主畫面的優惠列或支付列 → 開啟 Bonus &amp; Payment Sheet</span></li>
+                <li><span class="pi pi-tip">→</span><span>在 Sheet 切換優惠 → 下方相容支付方式即時更新</span></li>
+                <li><span class="pi pi-tip">→</span><span>選「不使用優惠」→ 所有支付方式都顯示</span></li>
+                <li><span class="pi pi-tip">→</span><span>確認選擇 → 主頁面同步更新，Toast 確認</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.3);color:#a78bfa;">
+              <span><strong>與方案 A 的差異：</strong>不只「不讓玩家選到不相容組合」，而是讓玩家一眼就看懂「這個優惠能配哪些錢包」，透明度更高。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s7-info" style="display:none;">
+        <div class="card" style="border-color:#7a5c1a;">
+          <div class="card-header" style="background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);">
+            <div class="cname">狀態 7 — 方案C：回流玩家記憶偏好</div>
+            <div class="csub">42% 玩家只存一次，但 58% 的回流玩家每次都做一樣的選擇。記住他們的偏好，讓他們一鍵完成。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">GA 數據支撐</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>GA 顯示已知用戶（舊客）在 Amount 頁停留 <strong>31 分鐘</strong>（新客 12 分鐘），說明他們反覆猶豫同樣的選擇</span></li>
+                <li><span class="pi pi-ok">✓</span><span>舊客完成率反而低於新客（76% vs 82%），代表「決策疲勞」在傷害最有價值的用戶</span></li>
+                <li><span class="pi pi-ok">✓</span><span>營運確認：大部份玩家都選預設優惠 + 同一個支付方式</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">設計思路</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>回流玩家進來直接看到「上次的設定」摘要，一鍵 Confirm</span></li>
+                <li><span class="pi pi-ok">✓</span><span>金額欄位預填上次存款金額（可直接修改）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>「修改設定」為次要入口，展開後顯示方案B的完整選擇流程</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">操作提示</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>直接點 Confirm → 一鍵完成（最少步驟）</span></li>
+                <li><span class="pi pi-tip">→</span><span>點金額 → 可修改存款金額</span></li>
+                <li><span class="pi pi-tip">→</span><span>點「修改設定」→ 展開完整優惠+支付選擇</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3);color:#f59e0b;">
+              <span><strong>適用對象：</strong>回流玩家（有過去存款記錄）。首次存款用戶仍走方案B的完整選擇流程。</span>
             </div>
           </div>
         </div>
@@ -1467,6 +1539,194 @@
             <div id="p5-toast" style="display:none;position:absolute;top:56px;left:50%;transform:translateX(-50%);background:#0d9488;color:#fff;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;white-space:nowrap;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s;pointer-events:none;"></div>
 
           </div><!-- end p2-s5 -->
+
+          <!-- STATE 6: 方案B — 優惠卡驅動支付篩選 -->
+          <div class="pstate" id="p2-s6" style="position:relative;overflow:hidden;padding-bottom:280px;transition:padding-bottom 0.35s cubic-bezier(.4,0,.2,1);">
+            <div class="app-bar" style="justify-content:space-between;">
+              <div class="app-bar-back" onclick="p6CloseSheet()">←</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Quick Deposit</div>
+              <div style="font-size:11px;color:#666;">BJ Casino</div>
+            </div>
+            <!-- Balance -->
+            <div style="margin:8px 12px 6px;background:linear-gradient(135deg,#0a1a10,#0d2a1a);border:1px solid #1a3a24;border-radius:10px;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:0.05em;text-transform:uppercase;">Account Balance</div>
+              <div style="font-size:14px;font-weight:700;color:#4ade80;">৳ 245.00</div>
+            </div>
+            <!-- Amount -->
+            <div style="padding:10px 16px 6px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">AMOUNT</div>
+              <div id="p6-amt" style="font-size:42px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;">৳0</div>
+              <div style="font-size:10px;color:#444;margin-top:2px;">Min ৳100 · Max ৳50,000</div>
+            </div>
+            <!-- Promo row (PRIMARY) -->
+            <div id="p6-promo-row" onclick="p6OpenSheet()" style="margin:6px 12px 2px;background:#1d2820;border:1px solid #1a3a24;border-radius:10px 10px 2px 2px;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;">
+              <div id="p6-promo-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0d5c42,#1db87c);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">100%</div>
+              <div style="flex:1;min-width:0;">
+                <div id="p6-promo-name" style="font-size:12px;font-weight:600;color:#e8e8e8;">100% Welcome Bonus</div>
+                <div id="p6-promo-sub" style="font-size:10px;color:#27b488;margin-top:1px;">Up to ৳3,000</div>
+              </div>
+              <span style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 6px;font-weight:700;flex-shrink:0;" id="p6-promo-badge">預設</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <!-- Pay row (SECONDARY, filtered by promo) -->
+            <div id="p6-pay-row" onclick="p6OpenSheet()" style="margin:0 12px 6px;background:#242424;border-radius:2px 2px 10px 10px;border-top:1px solid #1a1a1a;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;">
+              <div id="p6-pay-ico" style="width:28px;height:28px;border-radius:8px;background:#e2136e;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">bK</div>
+              <div style="flex:1;min-width:0;">
+                <div id="p6-pay-name" style="font-size:12px;font-weight:600;color:#e8e8e8;">bKash</div>
+                <div id="p6-pay-sub" style="font-size:10px;color:#666;margin-top:1px;">Personal · 017xxxxxxxx</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <!-- Quick chips -->
+            <div style="display:flex;gap:6px;padding:4px 12px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;">
+              <div onclick="p6SetAmt('500')"  style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳500</div>
+              <div onclick="p6SetAmt('1000')" style="flex-shrink:0;padding:5px 10px;background:#1a3a2a;border:1px solid #27b488;border-radius:20px;font-size:12px;color:#27b488;font-weight:600;cursor:pointer;">৳1,000 ↩</div>
+              <div onclick="p6SetAmt('2000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳2,000</div>
+              <div onclick="p6SetAmt('5000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳5,000</div>
+            </div>
+            <!-- Confirm + keyboard wrapper -->
+            <div id="p6-kb-wrapper" style="position:absolute;bottom:0;left:0;right:0;height:280px;display:flex;flex-direction:column;background:#1a1a1a;">
+              <div style="padding:4px 12px;flex-shrink:0;">
+                <button id="p6-confirm" class="big-btn primary" style="height:40px;font-size:13px;border-radius:12px;opacity:0.45;">Confirm</button>
+              </div>
+              <div id="p6-keyboard" style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;background:#111;">
+                <div onclick="p6Key('1')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">1</div>
+                <div onclick="p6Key('2')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">2</div>
+                <div onclick="p6Key('3')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">3</div>
+                <div onclick="p6Key('4')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">4</div>
+                <div onclick="p6Key('5')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">5</div>
+                <div onclick="p6Key('6')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">6</div>
+                <div onclick="p6Key('7')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">7</div>
+                <div onclick="p6Key('8')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">8</div>
+                <div onclick="p6Key('9')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">9</div>
+                <div onclick="p6Key('.')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:20px;color:#777;cursor:pointer;user-select:none;">.</div>
+                <div onclick="p6Key('0')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">0</div>
+                <div onclick="p6Key('⌫')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:16px;color:#777;cursor:pointer;user-select:none;">⌫</div>
+              </div>
+            </div>
+            <!-- Backdrop -->
+            <div id="p6-backdrop" onclick="p6CloseSheet()" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:15;"></div>
+            <!-- BONUS & PAYMENT SHEET -->
+            <div id="p6-sheet" style="position:absolute;bottom:0;left:0;right:0;height:95%;background:#141515;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
+              <div style="padding:14px 16px 0;flex-shrink:0;">
+                <div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 12px;"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:16px;font-weight:700;color:#fff;">Bonus &amp; Payment</div>
+                    <div style="font-size:11px;color:#666;margin-top:2px;">先選優惠，系統自動過濾相容支付方式</div>
+                  </div>
+                  <div onclick="p6CloseSheet()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;background:rgba(255,255,255,0.08);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:1;overflow-y:auto;padding:14px 16px 0;">
+                <!-- Step 1: Choose Bonus -->
+                <div style="font-size:10px;font-weight:700;color:#657381;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Step 1 · 選擇優惠</div>
+                <div id="p6-promo-cards" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+                <!-- Step 2: Compatible payments -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
+                  <div style="font-size:10px;font-weight:700;color:#657381;text-transform:uppercase;letter-spacing:0.1em;">Step 2 · 支付方式</div>
+                  <div id="p6-compat-label" style="font-size:10px;color:#a78bfa;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:4px;padding:1px 7px;font-weight:700;">Welcome Bonus 相容</div>
+                </div>
+                <div id="p6-payment-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;padding-bottom:14px;"></div>
+              </div>
+              <div style="padding:10px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom,12px));flex-shrink:0;background:#141515;border-top:1px solid rgba(255,255,255,0.06);">
+                <button id="p6-sheet-confirm" onclick="p6ConfirmSheet()" class="big-btn primary" style="height:50px;font-size:15px;border-radius:3px;">Confirm</button>
+              </div>
+            </div><!-- end p6-sheet -->
+            <!-- Toast -->
+            <div id="p6-toast" style="display:none;position:absolute;top:56px;left:50%;transform:translateX(-50%) translateY(8px);background:#7c3aed;color:#fff;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;white-space:nowrap;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;"></div>
+          </div><!-- end p2-s6 -->
+
+          <!-- STATE 7: 方案C — 回流玩家記憶偏好 -->
+          <div class="pstate" id="p2-s7" style="position:relative;overflow:hidden;background:#111;">
+            <div class="app-bar" style="justify-content:space-between;">
+              <div class="app-bar-back">←</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Quick Deposit</div>
+              <div style="font-size:11px;color:#666;">BJ Casino</div>
+            </div>
+            <!-- Welcome back banner -->
+            <div style="margin:8px 12px;background:linear-gradient(135deg,#0a1a10,#0d2a1a);border:1px solid #1a3a24;border-radius:12px;padding:12px 14px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:0.05em;margin-bottom:4px;">WELCOME BACK</div>
+              <div style="font-size:12px;color:#a0f0c8;line-height:1.5;">上次 <strong style="color:#fff;">৳1,000</strong> · bKash + Welcome Bonus<br><span style="font-size:10px;color:#4ade80;">今天仍然有效 ✓</span></div>
+            </div>
+            <!-- Amount display (editable) -->
+            <div style="padding:10px 16px 4px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">AMOUNT</div>
+              <div id="p7-amt" onclick="p7FocusAmt()" style="font-size:48px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;cursor:pointer;">৳1,000</div>
+              <div style="font-size:10px;color:#444;margin-top:2px;">點擊修改金額</div>
+            </div>
+            <!-- Quick chips -->
+            <div style="display:flex;gap:6px;padding:6px 12px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;">
+              <div onclick="p7SetAmt('500')"  style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳500</div>
+              <div onclick="p7SetAmt('1000')" style="flex-shrink:0;padding:5px 10px;background:#1a3a2a;border:1px solid #27b488;border-radius:20px;font-size:12px;color:#27b488;font-weight:700;cursor:pointer;">৳1,000 ↩</div>
+              <div onclick="p7SetAmt('2000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳2,000</div>
+              <div onclick="p7SetAmt('5000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳5,000</div>
+            </div>
+            <!-- Remembered settings card -->
+            <div style="margin:8px 12px 0;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;flex-shrink:0;">
+              <div style="background:#1a1a1a;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #222;">
+                <div style="width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#0d5c42,#1db87c);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;">100%</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:11px;font-weight:600;color:#e8e8e8;">100% Welcome Bonus</div>
+                  <div style="font-size:10px;color:#27b488;">Up to ৳3,000</div>
+                </div>
+                <span style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 6px;font-weight:700;">記憶</span>
+              </div>
+              <div style="background:#1e1e1e;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+                <div style="width:24px;height:24px;border-radius:7px;background:#e2136e;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">bK</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:11px;font-weight:600;color:#e8e8e8;">bKash</div>
+                  <div style="font-size:10px;color:#666;">Personal · 017xxxxxxxx</div>
+                </div>
+                <span style="font-size:9px;background:#1a1a1a;color:#555;border-radius:4px;padding:1px 6px;font-weight:700;border:1px solid #2a2a2a;">記憶</span>
+              </div>
+            </div>
+            <!-- Change settings link -->
+            <div onclick="p7ToggleChange()" style="margin:8px 12px 0;padding:8px 12px;background:transparent;border:1px dashed #2a2a2a;border-radius:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-shrink:0;">
+              <div style="font-size:11px;color:#555;">更換優惠或支付方式</div>
+              <svg id="p7-change-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <!-- Expandable change section -->
+            <div id="p7-change-section" style="display:none;margin:0 12px;border:1px solid #2a2a2a;border-top:none;border-radius:0 0 10px 10px;overflow:hidden;flex-shrink:0;">
+              <div style="padding:10px 12px;background:#1a1a1a;">
+                <div style="font-size:10px;color:#666;margin-bottom:8px;">選擇優惠</div>
+                <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;">
+                  <div onclick="p7SelectPromo('welcome')" id="p7-promo-welcome" style="flex-shrink:0;padding:6px 10px;background:#1a2e20;border:1.5px solid #27b488;border-radius:8px;cursor:pointer;min-width:80px;text-align:center;">
+                    <div style="font-size:10px;font-weight:700;color:#27b488;">100%</div>
+                    <div style="font-size:9px;color:#4ade80;margin-top:2px;">Welcome</div>
+                  </div>
+                  <div onclick="p7SelectPromo('daily')" id="p7-promo-daily" style="flex-shrink:0;padding:6px 10px;background:#1e1e1e;border:1.5px solid #2a2a2a;border-radius:8px;cursor:pointer;min-width:80px;text-align:center;">
+                    <div style="font-size:10px;font-weight:700;color:#aaa;">1.5%</div>
+                    <div style="font-size:9px;color:#666;margin-top:2px;">Daily</div>
+                  </div>
+                  <div onclick="p7SelectPromo('none')" id="p7-promo-none" style="flex-shrink:0;padding:6px 10px;background:#1e1e1e;border:1.5px solid #2a2a2a;border-radius:8px;cursor:pointer;min-width:80px;text-align:center;">
+                    <div style="font-size:10px;font-weight:700;color:#aaa;">—</div>
+                    <div style="font-size:9px;color:#666;margin-top:2px;">無優惠</div>
+                  </div>
+                </div>
+                <div style="font-size:10px;color:#666;margin:10px 0 8px;">選擇支付方式（相容此優惠）</div>
+                <div id="p7-pay-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;"></div>
+              </div>
+            </div>
+            <!-- MAIN CTA -->
+            <div style="padding:12px 12px 16px;flex-shrink:0;margin-top:auto;">
+              <button id="p7-confirm" onclick="p7Confirm()" class="big-btn primary" style="height:52px;font-size:15px;font-weight:700;border-radius:14px;">
+                Deposit ৳1,000
+              </button>
+              <div style="font-size:10px;color:#555;text-align:center;margin-top:6px;">bKash · 100% Welcome Bonus</div>
+            </div>
+            <!-- Success overlay -->
+            <div id="p7-success" style="display:none;position:absolute;inset:0;background:#111;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+              <div style="width:60px;height:60px;background:#0d2a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="font-size:18px;font-weight:700;color:#fff;">存款成功</div>
+              <div style="font-size:13px;color:#4ade80;">৳1,000 已提交</div>
+              <div style="font-size:11px;color:#555;">bKash · 100% Welcome Bonus</div>
+            </div>
+          </div><!-- end p2-s7 -->
 
         </div>
       </div>
@@ -4490,6 +4750,239 @@
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(8px)';
     }, 2500);
+  }
+  // ────────────────────────────────────────────────────
+
+  // ── P2-S6 方案B：優惠卡驅動支付篩選 ────────────────────
+  var p6Amt = '0';
+  var p6SelectedPromo = 'promo-welcome';
+  var p6SelectedPayment = null; // { name, bg, ico, sub }
+
+  // 優惠 → 支援的支付方式（正確資料流方向）
+  var p6PromoData = {
+    'promo-welcome': { name:'100% Welcome Bonus', sub:'Up to ৳3,000', gradient:'135deg,#0d5c42,#1db87c', label:'100%', isDefault:true,  payments:['bKash','Nagad','Rocket','Baji Pay'] },
+    'promo-daily':   { name:'Extra 1.5% Daily',   sub:'+1.5% every deposit', gradient:'135deg,#1a3a5c,#2563eb', label:'1.5%', isDefault:false, payments:['bKash','Nagad','Rocket','Upay','Baji Pay','Dutch Bangla','City Bank'] },
+    'promo-sports':  { name:'50% Sports Refund',  sub:'On sports losses',    gradient:'135deg,#4c1d95,#7c3aed', label:'50%', isDefault:false, payments:['Nagad','Rocket'] },
+    'promo-none':    { name:'不使用優惠',           sub:'全支付方式可用',       gradient:'135deg,#2a2a2a,#3a3a3a', label:'—',   isDefault:false, payments:['bKash','Nagad','Rocket','OKwallet','Upay','Baji Pay','Dutch Bangla','City Bank','USDT','Bitcoin','Ethereum'] }
+  };
+  var p6PayInfo = {
+    'bKash':        { bg:'#e2136e', ico:'bK', sub:'Personal · 017xxxxxxxx' },
+    'Nagad':        { bg:'#e8621a', ico:'Na',  sub:'Personal · 018xxxxxxxx' },
+    'Rocket':       { bg:'#8b2fc9', ico:'Ro',  sub:'Personal · 019xxxxxxxx' },
+    'OKwallet':     { bg:'#1a56db', ico:'OK',  sub:'Personal · 016xxxxxxxx' },
+    'Upay':         { bg:'#00a859', ico:'Up',  sub:'Personal · 014xxxxxxxx' },
+    'Baji Pay':     { bg:'#ff6b00', ico:'BJ',  sub:'Personal · 013xxxxxxxx' },
+    'Dutch Bangla': { bg:'#e83030', ico:'DB',  sub:'NPSB · BEFTN' },
+    'City Bank':    { bg:'#0a5fb4', ico:'CB',  sub:'NPSB · BEFTN' },
+    'USDT':         { bg:'#26a17b', ico:'₮',   sub:'TRC20' },
+    'Bitcoin':      { bg:'#f7931a', ico:'₿',   sub:'BEP20' },
+    'Ethereum':     { bg:'#627eea', ico:'Ξ',   sub:'ERC20' }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    p6SelectedPayment = 'bKash'; // 預選
+    p6BuildSheet();
+    // keyboard flash
+    var kb6 = document.getElementById('p6-keyboard');
+    if (kb6) kb6.addEventListener('pointerdown', function(e) {
+      var c = e.target.closest('#p6-keyboard > div');
+      if (c) { c.classList.add('p2-key-flash'); setTimeout(function(){ c.classList.remove('p2-key-flash'); }, 120); }
+    });
+  });
+
+  function p6Key(k) {
+    if (k==='⌫') { p6Amt = p6Amt.length>1 ? p6Amt.slice(0,-1) : '0'; }
+    else if (k==='.') { if (!p6Amt.includes('.')) p6Amt += '.'; }
+    else { if (p6Amt==='0') p6Amt=k; else p6Amt+=k; if(p6Amt.length>9){p6Amt=p6Amt.slice(0,-1);return;} }
+    var el=document.getElementById('p6-amt'); if(el) el.textContent='৳'+p6Amt;
+    var btn=document.getElementById('p6-confirm'); if(btn) btn.style.opacity=parseFloat(p6Amt)>0?'1':'0.45';
+  }
+  function p6SetAmt(v) { p6Amt=v; var el=document.getElementById('p6-amt'); if(el) el.textContent='৳'+v; var btn=document.getElementById('p6-confirm'); if(btn) btn.style.opacity='1'; }
+
+  function p6BuildSheet() {
+    // Build promo cards
+    var cards = document.getElementById('p6-promo-cards');
+    if (cards) {
+      cards.innerHTML = Object.keys(p6PromoData).map(function(id) {
+        var pr = p6PromoData[id];
+        var sel = id === p6SelectedPromo;
+        var compatIcos = pr.payments.slice(0,5).map(function(pname) {
+          var pi = p6PayInfo[pname];
+          return '<div title="' + pname + '" style="width:20px;height:20px;border-radius:5px;background:' + (pi?pi.bg:'#333') + ';display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;">' + (pi?pi.ico:'?') + '</div>';
+        }).join('');
+        var extraCount = pr.payments.length > 5 ? '+' + (pr.payments.length-5) : '';
+        return '<div onclick="p6SelectPromo(\'' + id + '\')" style="background:' + (sel?'#1a2e20':'#1a1a1a') + ';border:1.5px solid ' + (sel?'#27b488':'#2a2a2a') + ';border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .15s;">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(' + pr.gradient + ');display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">' + pr.label + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="display:flex;align-items:center;gap:5px;">' +
+                '<div style="font-size:12px;font-weight:600;color:#e8e8e8;">' + pr.name + '</div>' +
+                (pr.isDefault ? '<span style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 5px;font-weight:700;">預設</span>' : '') +
+              '</div>' +
+              '<div style="font-size:10px;color:#666;margin-top:1px;">' + pr.sub + '</div>' +
+            '</div>' +
+            (sel ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+          '</div>' +
+          '<div style="display:flex;align-items:center;gap:4px;margin-top:8px;">' +
+            '<div style="font-size:9px;color:#555;margin-right:2px;">相容：</div>' +
+            compatIcos +
+            (extraCount ? '<div style="font-size:9px;color:#555;margin-left:2px;">' + extraCount + '</div>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    p6BuildPayGrid();
+  }
+
+  function p6SelectPromo(id) {
+    p6SelectedPromo = id;
+    // if current payment not in new promo's list, reset
+    var pr = p6PromoData[id];
+    if (pr && p6SelectedPayment && pr.payments.indexOf(p6SelectedPayment) === -1) {
+      p6SelectedPayment = pr.payments.length > 0 ? pr.payments[0] : null;
+    }
+    p6BuildSheet();
+  }
+
+  function p6BuildPayGrid() {
+    var grid = document.getElementById('p6-payment-grid');
+    var label = document.getElementById('p6-compat-label');
+    if (!grid) return;
+    var pr = p6PromoData[p6SelectedPromo];
+    var payments = pr ? pr.payments : [];
+    if (label) label.textContent = (pr ? pr.name : '?') + ' 相容';
+    grid.innerHTML = payments.map(function(pname) {
+      var pi = p6PayInfo[pname];
+      var sel = pname === p6SelectedPayment;
+      return '<div onclick="p6SelectPayment(\'' + pname + '\')" style="background:' + (sel?'rgba(255,255,255,0.08)':'#1e1e1e') + ';border:1.5px solid ' + (sel?'#fff':'#2a2a2a') + ';border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;">' +
+        '<div style="width:32px;height:32px;border-radius:9px;background:' + (pi?pi.bg:'#333') + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">' + (pi?pi.ico:'?') + '</div>' +
+        '<div style="font-size:10px;color:#ccc;text-align:center;font-weight:' + (sel?'600':'400') + ';">' + pname + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function p6SelectPayment(name) {
+    p6SelectedPayment = name;
+    p6BuildPayGrid();
+  }
+
+  function p6OpenSheet() {
+    var sheet = document.getElementById('p6-sheet');
+    var bd = document.getElementById('p6-backdrop');
+    if (sheet) { sheet.style.transform = 'translateY(0)'; }
+    if (bd) bd.style.display = 'block';
+    p6BuildSheet();
+  }
+  function p6CloseSheet() {
+    var sheet = document.getElementById('p6-sheet');
+    var bd = document.getElementById('p6-backdrop');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    if (bd) bd.style.display = 'none';
+  }
+  function p6ConfirmSheet() {
+    p6CloseSheet();
+    // Update main rows
+    var pi = p6SelectedPayment ? p6PayInfo[p6SelectedPayment] : null;
+    var pr = p6PromoData[p6SelectedPromo];
+    var ico = document.getElementById('p6-pay-ico');
+    var nm  = document.getElementById('p6-pay-name');
+    var sb  = document.getElementById('p6-pay-sub');
+    if (ico && pi) { ico.style.background = pi.bg; ico.textContent = pi.ico; }
+    if (nm) nm.textContent = p6SelectedPayment || '選擇支付方式';
+    if (sb && pi) sb.textContent = pi.sub;
+    var pico = document.getElementById('p6-promo-icon');
+    var pnm  = document.getElementById('p6-promo-name');
+    var psb  = document.getElementById('p6-promo-sub');
+    var pbg  = document.getElementById('p6-promo-badge');
+    if (pr) {
+      if (pico) { pico.style.background='linear-gradient('+pr.gradient+')'; pico.textContent=pr.label; }
+      if (pnm)  pnm.textContent = pr.name;
+      if (psb)  psb.textContent = pr.sub;
+      if (pbg)  { pbg.textContent = pr.isDefault?'預設':'已選'; pbg.style.background=pr.isDefault?'#0f3d28':'#1a1a3a'; pbg.style.color=pr.isDefault?'#27b488':'#a78bfa'; }
+    }
+    // Toast
+    var msg = (p6SelectedPayment||'?') + ' + ' + (pr?pr.name:'?');
+    var t = document.getElementById('p6-toast');
+    if (t) { t.style.display='block'; t.textContent='已選：'+msg; t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)';
+      setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)'; setTimeout(function(){ t.style.display='none'; },200); }, 2500);
+    }
+  }
+
+  // ── P2-S7 方案C：回流玩家記憶偏好 ───────────────────────
+  var p7Amt = '1000';
+  var p7SelectedPromo = 'welcome';
+  var p7SelectedPay = 'bKash';
+  var p7ChangeOpen = false;
+
+  var p7PromoPayments = {
+    'welcome': ['bKash','Nagad','Rocket','Baji Pay'],
+    'daily':   ['bKash','Nagad','Rocket','Upay','Baji Pay','Dutch Bangla','City Bank'],
+    'none':    ['bKash','Nagad','Rocket','OKwallet','Upay','Baji Pay','Dutch Bangla','City Bank','USDT','Bitcoin','Ethereum']
+  };
+
+  function p7SetAmt(v) {
+    p7Amt = v;
+    var el = document.getElementById('p7-amt');
+    if (el) el.textContent = '৳' + parseInt(v).toLocaleString();
+    p7UpdateConfirmBtn();
+  }
+  function p7FocusAmt() {
+    var v = prompt('輸入存款金額：', p7Amt);
+    if (v && !isNaN(v) && parseInt(v) > 0) p7SetAmt(v);
+  }
+  function p7UpdateConfirmBtn() {
+    var btn = document.getElementById('p7-confirm');
+    if (!btn) return;
+    btn.textContent = 'Deposit ৳' + parseInt(p7Amt).toLocaleString();
+    var lbl = btn.nextElementSibling;
+    if (lbl) lbl.textContent = p7SelectedPay + ' · ' + (p7SelectedPromo==='welcome'?'100% Welcome Bonus':p7SelectedPromo==='daily'?'1.5% Daily':'無優惠');
+  }
+  function p7ToggleChange() {
+    p7ChangeOpen = !p7ChangeOpen;
+    var sec = document.getElementById('p7-change-section');
+    var arr = document.getElementById('p7-change-arrow');
+    if (sec) sec.style.display = p7ChangeOpen ? 'block' : 'none';
+    if (arr) arr.style.transform = p7ChangeOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+    if (p7ChangeOpen) p7BuildPayGrid();
+  }
+  function p7SelectPromo(id) {
+    p7SelectedPromo = id;
+    var ids = ['welcome','daily','none'];
+    ids.forEach(function(pid) {
+      var el = document.getElementById('p7-promo-' + pid);
+      if (!el) return;
+      var sel = pid === id;
+      el.style.background = sel ? '#1a2e20' : '#1e1e1e';
+      el.style.borderColor = sel ? '#27b488' : '#2a2a2a';
+      el.querySelector('div').style.color = sel ? '#27b488' : '#aaa';
+    });
+    // Reset payment if not compatible
+    var payList = p7PromoPayments[id] || [];
+    if (payList.indexOf(p7SelectedPay) === -1) p7SelectedPay = payList[0] || 'bKash';
+    p7BuildPayGrid();
+    p7UpdateConfirmBtn();
+  }
+  function p7BuildPayGrid() {
+    var grid = document.getElementById('p7-pay-grid');
+    if (!grid) return;
+    var payList = p7PromoPayments[p7SelectedPromo] || [];
+    grid.innerHTML = payList.map(function(pname) {
+      var pi = p6PayInfo[pname]; // reuse p6PayInfo data
+      var sel = pname === p7SelectedPay;
+      return '<div onclick="p7SelectPay(\'' + pname + '\')" style="background:' + (sel?'rgba(255,255,255,0.08)':'#1a1a1a') + ';border:1.5px solid ' + (sel?'#fff':'#222') + ';border-radius:8px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">' +
+        '<div style="width:24px;height:24px;border-radius:6px;background:' + (pi?pi.bg:'#333') + ';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">' + (pi?pi.ico:'?') + '</div>' +
+        '<div style="font-size:9px;color:#ccc;text-align:center;">' + pname + '</div>' +
+      '</div>';
+    }).join('');
+  }
+  function p7SelectPay(name) {
+    p7SelectedPay = name;
+    p7BuildPayGrid();
+    p7UpdateConfirmBtn();
+  }
+  function p7Confirm() {
+    var overlay = document.getElementById('p7-success');
+    if (overlay) { overlay.style.display='flex'; overlay.querySelector('div:nth-child(3)').textContent='৳'+parseInt(p7Amt).toLocaleString()+' 已提交'; overlay.querySelector('div:nth-child(4)').textContent=p7SelectedPay+' · '+(p7SelectedPromo==='welcome'?'100% Welcome Bonus':p7SelectedPromo==='daily'?'1.5% Daily':'無優惠'); setTimeout(function(){ overlay.style.display='none'; }, 2000); }
   }
   // ────────────────────────────────────────────────────
 
