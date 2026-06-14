@@ -2408,43 +2408,72 @@
               <div class="app-bar-title">存款</div>
             </div>
             <div class="scroll">
-              <div style="font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Previous deposits</div>
-
-              <!-- 最近存款記錄 1（最新）-->
-              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                  <div class="mico bk">bK</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:600;color:#fff;">bKash · ৳ 1,000</div>
-                    <div style="font-size:10px;color:#555;">Payment Gateway · AB 01</div>
-                    <div style="font-size:9px;color:#444;margin-top:2px;">Last deposit</div>
-                  </div>
+              <!-- 標題列 + 左右箭頭（Figma 卡片導覽樣式） -->
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div style="display:flex;flex:1;align-items:center;gap:8px;min-width:0;">
+                  <div style="width:4px;height:23px;background:#14805e;border-radius:999px;flex-shrink:0;"></div>
+                  <div style="font-size:14px;font-weight:600;color:#e2e6e9;white-space:nowrap;">Previous deposits</div>
                 </div>
-                <button class="big-btn primary" style="height:46px;">Re-deposit ৳1,000</button>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button onclick="p6Slide(-1)" style="width:34px;height:34px;background:#222424;border:none;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#e2e6e9;font-size:20px;line-height:1;padding:0;">‹</button>
+                  <button onclick="p6Slide(1)"  style="width:34px;height:34px;background:#222424;border:none;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#e2e6e9;font-size:20px;line-height:1;padding:0;">›</button>
+                </div>
               </div>
 
-              <!-- 最近存款記錄 2 -->
-              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                  <div style="width:36px;height:36px;background:#8b2fc9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">Ro</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:600;color:#fff;">Rocket · ৳ 500</div>
-                    <div style="font-size:10px;color:#555;">Payment Gateway · AB 01</div>
+              <!-- 卡片輪播容器 -->
+              <div style="overflow:hidden;border-radius:5px;margin-bottom:10px;">
+                <div id="p6-carousel" style="display:flex;transition:transform 0.3s ease;">
+
+                  <!-- 卡片 1: bKash -->
+                  <div style="flex:0 0 100%;background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:5px;padding:16px;box-sizing:border-box;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                      <div class="mico bk" style="flex-shrink:0;">bK</div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:600;color:#fff;">bKash · ৳ 1,000</div>
+                        <div style="font-size:10px;color:#8d9aa5;">Payment Gateway · AB 01</div>
+                        <div style="font-size:10px;color:#27b488;margin-top:2px;">Last deposit · Yesterday 14:32</div>
+                      </div>
+                      <div style="flex-shrink:0;font-size:10px;color:#8d9aa5;background:#222424;border-radius:3px;padding:3px 8px;">1 / 3</div>
+                    </div>
+                    <button class="big-btn primary" style="height:46px;">Re-deposit ৳1,000</button>
                   </div>
+
+                  <!-- 卡片 2: Rocket -->
+                  <div style="flex:0 0 100%;background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:5px;padding:16px;box-sizing:border-box;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                      <div style="width:36px;height:36px;background:#8b2fc9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">Ro</div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:600;color:#fff;">Rocket · ৳ 500</div>
+                        <div style="font-size:10px;color:#8d9aa5;">Payment Gateway · AB 01</div>
+                        <div style="font-size:10px;color:#8d9aa5;margin-top:2px;">2 days ago · 09:15</div>
+                      </div>
+                      <div style="flex-shrink:0;font-size:10px;color:#8d9aa5;background:#222424;border-radius:3px;padding:3px 8px;">2 / 3</div>
+                    </div>
+                    <button class="big-btn primary" style="height:46px;">Re-deposit ৳500</button>
+                  </div>
+
+                  <!-- 卡片 3: USDT -->
+                  <div style="flex:0 0 100%;background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:5px;padding:16px;box-sizing:border-box;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                      <div style="width:36px;height:36px;background:#26a17b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">₮</div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:600;color:#fff;">USDT TRC20 · ৳ 3,000</div>
+                        <div style="font-size:10px;color:#8d9aa5;">TRC20 · Wallet 01</div>
+                        <div style="font-size:10px;color:#8d9aa5;margin-top:2px;">3 days ago · 22:07</div>
+                      </div>
+                      <div style="flex-shrink:0;font-size:10px;color:#8d9aa5;background:#222424;border-radius:3px;padding:3px 8px;">3 / 3</div>
+                    </div>
+                    <button class="big-btn primary" style="height:46px;">Re-deposit ৳3,000</button>
+                  </div>
+
                 </div>
-                <button class="big-btn primary" style="height:46px;">Re-deposit ৳500</button>
               </div>
 
-              <!-- 最近存款記錄 3 -->
-              <div style="background:linear-gradient(135deg,#1a3a2a,#1a2a1a);border:1.5px solid rgba(39,180,136,0.4);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                  <div style="width:36px;height:36px;background:#26a17b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">₮</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:600;color:#fff;">USDT · ৳ 3,000</div>
-                    <div style="font-size:10px;color:#555;">TRC20 · Wallet 01</div>
-                  </div>
-                </div>
-                <button class="big-btn primary" style="height:46px;">Re-deposit ৳3,000</button>
+              <!-- 進度指示點 -->
+              <div style="display:flex;justify-content:center;gap:6px;margin-bottom:14px;">
+                <div id="p6-dot-0" style="height:4px;border-radius:2px;background:#14805e;transition:all 0.3s ease;width:20px;"></div>
+                <div id="p6-dot-1" style="height:4px;border-radius:2px;background:#303232;transition:all 0.3s ease;width:8px;"></div>
+                <div id="p6-dot-2" style="height:4px;border-radius:2px;background:#303232;transition:all 0.3s ease;width:8px;"></div>
               </div>
 
               <div style="text-align:center;font-size:11px;color:#555;margin:0 0 6px;">Or choose another method</div>
@@ -4994,6 +5023,22 @@
   document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p8-info, .p9-info, .p10-info').forEach(el => {
     if (el.style.display !== 'none') el.style.display = 'block';
   });
+
+  // ── 狀態 1 一鍵重複存款輪播 ──
+  let p6SlideIdx = 0;
+  function p6Slide(dir) {
+    const total = 3;
+    p6SlideIdx = Math.max(0, Math.min(total - 1, p6SlideIdx + dir));
+    const carousel = document.getElementById('p6-carousel');
+    if (carousel) carousel.style.transform = 'translateX(-' + (p6SlideIdx * 100) + '%)';
+    for (let i = 0; i < total; i++) {
+      const dot = document.getElementById('p6-dot-' + i);
+      if (dot) {
+        dot.style.background = i === p6SlideIdx ? '#14805e' : '#303232';
+        dot.style.width = i === p6SlideIdx ? '20px' : '8px';
+      }
+    }
+  }
 </script>
 </body>
 </html>
