@@ -122,6 +122,7 @@
   .state-btn.s-red.active    { border-color: var(--red);    background: var(--red);    color: #fff; }
   .state-btn.s-purple.active { border-color: var(--purple); background: var(--purple); color: #fff; }
   .state-btn.s-blue.active   { border-color: var(--blue);   background: var(--blue);   color: #fff; }
+  .state-btn.s-teal.active   { border-color: var(--teal);   background: var(--teal);   color: #fff; }
 
   /* PHONE */
   .phone-wrap { position: sticky; top: 72px; }
@@ -869,6 +870,7 @@
   <div class="state-switcher">
     <button class="state-btn s-red active" onclick="switchState('p2','s1',this)">狀態 1 · 現況問題（4 層決策）</button>
     <button class="state-btn s-green" onclick="switchState('p2','s2',this)">狀態 2 · 互動原型 ← 可操作</button>
+    <button class="state-btn s-teal" onclick="switchState('p2','s5',this)">狀態 5 · GA 優化：統一支付+優惠 ← 新</button>
   </div>
 
   <div class="layout">
@@ -987,6 +989,56 @@
             </div>
             <div class="callout blue">
               <span>原則：主動幫玩家做好選擇，而非要求玩家主動理解所有選項。「你已獲得最佳優惠」比「請選擇優惠」轉換率更高。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s5-info" style="display:none;">
+        <div class="card" style="border-color:var(--teal-border);">
+          <div class="card-header" style="background:rgba(13,148,136,.08);border-bottom:1px solid rgba(13,148,136,.2);">
+            <div class="cname">狀態 5 — GA 優化：統一支付+優惠流程</div>
+            <div class="csub">根據 GA 行為數據與後端業務限制，重新設計支付方式與優惠的選擇邏輯。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">GA 數據問題</div>
+              <ul class="pl">
+                <li><span class="pi pi-warn">!</span><span><strong>36.6%</strong> 放棄用戶陷入「換方式循環」，不斷切換支付方式卻只有 0.2% 完成 — 代表換方式的體驗讓人沮喪</span></li>
+                <li><span class="pi pi-warn">!</span><span>舊客在金額頁停留 <strong>31 分鐘</strong>（新客 12 分鐘），決策阻力在「不知道選哪個方式搭配什麼優惠」</span></li>
+                <li><span class="pi pi-warn">!</span><span>6.4% 用戶反覆查餘額循環 — 餘額焦慮，不確定「這個方式能不能用、能用多少」</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">後端業務限制 → 設計問題</div>
+              <ul class="pl">
+                <li><span class="pi pi-warn">!</span><span><strong>現況問題：</strong>玩家選完支付方式 → 再選優惠 → 發現優惠不支援此支付方式 → 被迫回頭改支付方式 → 流失</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>業務數據：</strong>營運方確認大部分玩家都選預設優惠（default promotion）</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>解法原則：</strong>「選支付方式」的同時就決定好優惠，兩個動作合一，不讓玩家發現不相容</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">State 5 設計改善</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span><strong>顯示餘額</strong> — 主表單上方顯示當前帳戶餘額，解決 6.4% 的「查餘額焦慮」循環</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>優惠預設套用</strong> — 進入時已自動套用 Default Promotion，顯示「AUTO」標籤，不需要玩家主動選</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>統一 Sheet（Payment &amp; Bonus）</strong> — 點「支付方式列」開啟一個 Sheet，選完支付方式後 <em>下方即時更新</em> 相容的優惠清單，在同一個 Sheet 內完成兩個決定</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>智能預選</strong> — 每次切換支付方式，系統自動選最佳相容優惠（通常就是 default），玩家只需確認即可</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>上次金額記憶</strong> — ৳1,000 ↩ chip 標示上次金額，回頭玩家一眼就知道慣用金額</span></li>
+                <li><span class="pi pi-ok">✓</span><span><strong>Toast 確認</strong> — 確認後頁面顯示「已套用 100% 優惠」提示，讓玩家知道系統做了什麼</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">互動說明（點手機試試看）</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>點「bKash 列」或「優惠列」→ 開啟 Payment &amp; Bonus Sheet</span></li>
+                <li><span class="pi pi-tip">→</span><span>在 Sheet 中切換支付方式 → 下方相容優惠即時更新</span></li>
+                <li><span class="pi pi-tip">→</span><span>選 OKwallet 或 Crypto → 顯示「此方式無可用優惠」</span></li>
+                <li><span class="pi pi-tip">→</span><span>點「Confirm」→ 主頁面支付列+優惠列同步更新，出現 Toast 提示</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:rgba(13,148,136,.08);border-color:rgba(13,148,136,.3);color:#0d9488;">
+              <span><strong>核心原則：</strong>不讓玩家有機會犯「選了不相容組合」的錯誤。系統只展示可用選項，自動推薦最佳組合，玩家按 Confirm 就好。</span>
             </div>
           </div>
         </div>
@@ -1287,6 +1339,134 @@
             </div>
             <div style="font-size:11px;color:#555;text-align:center;padding:0 20px;line-height:1.6;">Switch to<br><span style="color:#27b488;font-weight:600;">State 2 interactive prototype</span><br>tap the promotion row</div>
           </div>
+
+          <!-- STATE 5: GA 優化 — 統一支付+優惠流程（可操作） -->
+          <div class="pstate" id="p2-s5" style="position:relative;overflow:hidden;padding-bottom:280px;transition:padding-bottom 0.35s cubic-bezier(.4,0,.2,1);">
+
+            <!-- App bar -->
+            <div class="app-bar" style="justify-content:space-between;">
+              <div class="app-bar-back" onclick="p5CloseSheet()">←</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Quick Deposit</div>
+              <div style="width:30px;"></div>
+            </div>
+
+            <!-- Balance row -->
+            <div style="margin:6px 12px 0;background:#1a2a1a;border:1px solid #2a3d2a;border-radius:8px;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+              <span style="font-size:11px;color:#8D9AA5;">Account Balance</span>
+              <span style="font-size:13px;font-weight:700;color:#27b488;">৳ 0.00</span>
+            </div>
+
+            <!-- Amount input -->
+            <div style="padding:12px 18px 6px;flex-shrink:0;">
+              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Amount</div>
+              <div style="font-size:50px;font-weight:300;color:#fff;letter-spacing:-0.03em;line-height:1;" id="p5-amt">0</div>
+              <div style="font-size:10px;color:#444;margin-top:3px;">Min ৳100 · Max ৳50,000</div>
+            </div>
+
+            <!-- Payment row → opens unified sheet -->
+            <div id="p5-pay-row" onclick="p5OpenSheet()" style="margin:0 12px;background:#242424;border-radius:10px 10px 2px 2px;border-bottom:1px solid #111;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;">
+              <div id="p5-pay-ico" style="width:26px;height:26px;background:#e2136e;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:600;color:#fff;" id="p5-pay-name">bKash</div>
+                <div style="font-size:10px;color:#555;margin-top:1px;" id="p5-pay-sub">Personal · 017xxxxxxxx</div>
+              </div>
+              <div style="font-size:15px;color:#444;">›</div>
+            </div>
+
+            <!-- Promo row (auto-applied, driven by payment selection) -->
+            <div id="p5-promo-row" onclick="p5OpenSheet()" style="margin:0 12px 6px;background:#1d2820;border-radius:2px 2px 10px 10px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;cursor:pointer;border-top:1px solid #111;">
+              <div style="display:flex;align-items:center;gap:7px;flex:1;min-width:0;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#27b488;flex-shrink:0;"></div>
+                <div style="font-size:12px;color:#E2E6E9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="p5-promo-name">100% Welcome Bonus</div>
+                <div id="p5-auto-tag" style="background:rgba(13,148,136,0.2);border:1px solid rgba(13,148,136,0.4);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;color:#0d9488;white-space:nowrap;flex-shrink:0;">AUTO</div>
+              </div>
+              <div style="font-size:11px;color:#8D9AA5;white-space:nowrap;margin-left:8px;" id="p5-promo-sub">Up to ৳3,000</div>
+            </div>
+
+            <!-- Spacer -->
+            <div style="flex:1;min-height:8px;"></div>
+
+            <!-- Quick chips -->
+            <div style="padding:0 12px 4px;display:flex;align-items:center;gap:4px;flex-shrink:0;">
+              <div class="p5-chip" onclick="p5SetAmt('clear')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Clear</div>
+              <div class="p5-chip" onclick="p5SetAmt('min')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Min</div>
+              <div id="p5-chip-last" class="p5-chip" onclick="p5SetAmt('1000')" style="padding:5px 7px;background:rgba(39,180,136,0.1);border:1.5px solid #27b488;border-radius:7px;font-size:10px;color:#27b488;font-weight:600;cursor:pointer;white-space:nowrap;">৳1,000 ↩</div>
+              <div class="p5-chip" onclick="p5SetAmt('max')" style="padding:5px 7px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:10px;color:#777;cursor:pointer;white-space:nowrap;">Max</div>
+              <div style="flex:1;"></div>
+              <div onclick="p5ToggleKb()" style="padding:5px 9px;background:#2a2a2a;border:1.5px solid #333;border-radius:7px;font-size:13px;color:#555;cursor:pointer;" id="p5-kb-arrow">▾</div>
+            </div>
+
+            <!-- Confirm + keyboard -->
+            <div id="p5-kb-wrapper" style="position:absolute;bottom:0;left:0;right:0;height:280px;display:flex;flex-direction:column;background:#1a1a1a;transform:translateY(0);transition:transform 0.35s cubic-bezier(.4,0,.2,1);">
+              <div style="padding:4px 12px;flex-shrink:0;">
+                <button id="p5-confirm" class="big-btn primary" style="height:40px;font-size:13px;border-radius:12px;">Confirm</button>
+              </div>
+              <div id="p5-keyboard" style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;background:#111;">
+                <div onclick="p5Key('1')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">1</div>
+                <div onclick="p5Key('2')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">2</div>
+                <div onclick="p5Key('3')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">3</div>
+                <div onclick="p5Key('4')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">4</div>
+                <div onclick="p5Key('5')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">5</div>
+                <div onclick="p5Key('6')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">6</div>
+                <div onclick="p5Key('7')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">7</div>
+                <div onclick="p5Key('8')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">8</div>
+                <div onclick="p5Key('9')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">9</div>
+                <div onclick="p5Key('.')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:20px;color:#777;cursor:pointer;user-select:none;">.</div>
+                <div onclick="p5Key('0')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">0</div>
+                <div onclick="p5Key('⌫')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:16px;color:#777;cursor:pointer;user-select:none;">⌫</div>
+              </div>
+            </div>
+
+            <!-- Backdrop -->
+            <div id="p5-backdrop" onclick="p5CloseSheet()" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:15;"></div>
+
+            <!-- UNIFIED PAYMENT + BONUS SHEET -->
+            <div id="p5-sheet" style="position:absolute;bottom:0;left:0;right:0;height:96%;background:#141515;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
+
+              <!-- Sheet header -->
+              <div style="padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                <div>
+                  <div style="font-size:16px;font-weight:600;color:#E2E6E9;">Payment &amp; Bonus</div>
+                  <div style="font-size:11px;color:#657381;margin-top:2px;">選支付方式，系統自動匹配可用優惠</div>
+                </div>
+                <div onclick="p5CloseSheet()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;background:rgba(255,255,255,0.08);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </div>
+              </div>
+
+              <!-- Type tabs -->
+              <div style="display:flex;padding:0 16px;margin-top:12px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+                <div onclick="p5SwitchType('ewallet')" id="p5-tab-ewallet" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid #0d9488;color:#E2E6E9;transition:all 0.18s;margin-bottom:-1px;">E-wallet</div>
+                <div onclick="p5SwitchType('localbank')" id="p5-tab-localbank" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;margin-bottom:-1px;">Local Bank</div>
+                <div onclick="p5SwitchType('crypto')" id="p5-tab-crypto" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;margin-bottom:-1px;">Crypto</div>
+              </div>
+
+              <!-- Scrollable body -->
+              <div style="flex:1;overflow-y:auto;padding:14px 16px 0;">
+
+                <!-- Payment section -->
+                <div style="font-size:10px;font-weight:700;color:#657381;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Select payment</div>
+                <div id="p5-payment-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
+
+                <!-- Divider with label -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
+                  <div style="font-size:10px;font-weight:700;color:#657381;text-transform:uppercase;letter-spacing:0.1em;">Compatible bonuses for</div>
+                  <div id="p5-compat-tag" style="font-size:10px;color:#0d9488;background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.25);border-radius:4px;padding:1px 7px;font-weight:700;">bKash</div>
+                </div>
+                <div id="p5-bonus-list" style="display:flex;flex-direction:column;gap:8px;padding-bottom:14px;"></div>
+
+              </div>
+
+              <!-- Confirm button -->
+              <div style="padding:10px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom,12px));flex-shrink:0;background:#141515;border-top:1px solid rgba(255,255,255,0.06);">
+                <button id="p5-sheet-confirm" onclick="p5ConfirmSheet()" class="big-btn primary" style="height:50px;font-size:15px;border-radius:3px;">Confirm</button>
+              </div>
+            </div>
+
+            <!-- Toast -->
+            <div id="p5-toast" style="display:none;position:absolute;top:56px;left:50%;transform:translateX(-50%);background:#0d9488;color:#fff;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;white-space:nowrap;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s;pointer-events:none;"></div>
+
+          </div><!-- end p2-s5 -->
 
         </div>
       </div>
@@ -4002,6 +4182,314 @@
     var subEl = document.getElementById('p2-promo-sub');
     if (nameEl) nameEl.textContent = name || '不使用優惠';
     if (subEl) { subEl.textContent = sub; subEl.style.color = sub ? '#27b488' : '#555'; }
+  }
+  // ────────────────────────────────────────────────────
+
+  // ── P2-S5 統一支付+優惠 State ────────────────────────
+  var p5Amt = '0';
+  var p5KbVisible = true;
+  var p5SelectedType = 'ewallet';
+  var p5SelectedPayment = null; // { name, bg, ico, sub, promos }
+  var p5SelectedPromo = 'promo-welcome'; // default promo
+
+  var p5PaymentData = {
+    ewallet: {
+      payments: [
+        { name:'bKash',   bg:'#e2136e', ico:'bK', sub:'Personal · 017xxxxxxxx', promos:['promo-welcome','promo-daily'] },
+        { name:'Nagad',   bg:'#e8621a', ico:'Na',  sub:'Personal · 018xxxxxxxx', promos:['promo-daily','promo-sports'] },
+        { name:'Rocket',  bg:'#8b2fc9', ico:'Ro',  sub:'Personal · 019xxxxxxxx', promos:['promo-daily'] },
+        { name:'OKwallet',bg:'#1a56db', ico:'OK',  sub:'Personal · 016xxxxxxxx', promos:[] },
+        { name:'Upay',    bg:'#00a859', ico:'Up',  sub:'Personal · 014xxxxxxxx', promos:['promo-daily'] },
+        { name:'Baji Pay',bg:'#ff6b00', ico:'BJ',  sub:'Personal · 013xxxxxxxx', promos:['promo-welcome','promo-daily'] }
+      ]
+    },
+    localbank: {
+      payments: [
+        { name:'Dutch Bangla', bg:'#e83030', ico:'DB', sub:'NPSB · BEFTN', promos:['promo-daily'] },
+        { name:'City Bank',    bg:'#0a5fb4', ico:'CB', sub:'NPSB · BEFTN', promos:['promo-daily'] }
+      ]
+    },
+    crypto: {
+      payments: [
+        { name:'USDT',    bg:'#26a17b', ico:'₮', sub:'TRC20 · 0x7f···3a2b', promos:[] },
+        { name:'Bitcoin', bg:'#f7931a', ico:'₿', sub:'BEP20 · bc1q···f4k2', promos:[] },
+        { name:'Ethereum',bg:'#627eea', ico:'Ξ', sub:'ERC20 · 0x3d···9c1a', promos:[] }
+      ]
+    }
+  };
+
+  var p5PromoList = {
+    'promo-welcome': { name:'100% Welcome Bonus',    sub:'Up to ৳3,000',      gradient:'135deg,#0d5c42,#1db87c', label:'100%', isDefault:true },
+    'promo-daily':   { name:'Extra 1.5% Daily Bonus',sub:'+1.5% every deposit',gradient:'135deg,#1a3a5c,#2563eb', label:'1.5%' },
+    'promo-sports':  { name:'50% Sports Refund',     sub:'On sports losses',   gradient:'135deg,#4c1d95,#7c3aed', label:'50%' }
+  };
+
+  // 初始化：預選 bKash（最常用）
+  document.addEventListener('DOMContentLoaded', function() {
+    p5SelectedPayment = p5PaymentData.ewallet.payments[0]; // bKash
+    p5UpdatePayRow();
+    p5UpdatePromoRow();
+
+    // 鍵盤 flash 回饋
+    var kb5 = document.getElementById('p5-keyboard');
+    if (kb5) {
+      kb5.addEventListener('pointerdown', function(e) {
+        var cell = e.target.closest('#p5-keyboard > div');
+        if (!cell) return;
+        cell.classList.add('p2-key-flash'); // 重用相同 flash class
+        setTimeout(function() { cell.classList.remove('p2-key-flash'); }, 120);
+      });
+    }
+  });
+
+  function p5Key(k) {
+    if (k === '⌫') {
+      p5Amt = p5Amt.length > 1 ? p5Amt.slice(0,-1) : '0';
+    } else if (k === '.') {
+      if (!p5Amt.includes('.')) p5Amt += '.';
+    } else {
+      if (p5Amt === '0') p5Amt = k; else p5Amt += k;
+      if (p5Amt.length > 9) { p5Amt = p5Amt.slice(0,-1); return; }
+    }
+    p5UpdateAmt();
+  }
+
+  function p5SetAmt(v) {
+    p5Amt = String(v);
+    p5UpdateAmt();
+  }
+
+  function p5UpdateAmt() {
+    var el = document.getElementById('p5-amt');
+    if (el) el.textContent = '৳' + p5Amt;
+    var btn = document.getElementById('p5-confirm');
+    if (btn) {
+      var n = parseFloat(p5Amt);
+      btn.style.opacity = (n > 0) ? '1' : '0.45';
+    }
+  }
+
+  function p5ToggleKb() {
+    p5KbVisible = !p5KbVisible;
+    var kb = document.getElementById('p5-keyboard');
+    if (kb) kb.style.display = p5KbVisible ? 'grid' : 'none';
+  }
+
+  // ── 更新主畫面支付列 ──
+  function p5UpdatePayRow() {
+    if (!p5SelectedPayment) return;
+    var p = p5SelectedPayment;
+    var row = document.getElementById('p5-pay-row');
+    if (!row) return;
+    row.innerHTML =
+      '<div style="width:28px;height:28px;border-radius:8px;background:' + p.bg + ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">' + p.ico + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:12px;font-weight:600;color:#e8e8e8">' + p.name + '</div>' +
+        '<div style="font-size:10px;color:#666;margin-top:1px">' + p.sub + '</div>' +
+      '</div>' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+  }
+
+  // ── 更新主畫面優惠列 ──
+  function p5UpdatePromoRow() {
+    var row = document.getElementById('p5-promo-row');
+    if (!row) return;
+    var p = p5SelectedPayment;
+    var promoId = p5SelectedPromo;
+    var promo = promoId && p5PromoList[promoId];
+
+    // check compatibility
+    var compatible = promo && p && p.promos.indexOf(promoId) !== -1;
+    var noPromo = !p || p.promos.length === 0;
+
+    if (noPromo) {
+      // 無可用優惠（e.g. crypto）
+      row.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px;flex:1">' +
+          '<div style="font-size:11px;color:#555">優惠</div>' +
+          '<div style="font-size:11px;color:#444;font-style:italic">此支付方式無可用優惠</div>' +
+        '</div>';
+    } else if (!promo || !compatible) {
+      // 重新選一個可用的
+      var availId = p ? (p.promos[0] || null) : null;
+      p5SelectedPromo = availId;
+      promo = availId ? p5PromoList[availId] : null;
+      p5UpdatePromoRow();
+      return;
+    } else {
+      row.innerHTML =
+        '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">' +
+          '<div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(' + promo.gradient + ');display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">' + promo.label + '</div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="display:flex;align-items:center;gap:5px">' +
+              '<div style="font-size:12px;font-weight:600;color:#e8e8e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + promo.name + '</div>' +
+              (promo.isDefault ? '<span style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 5px;flex-shrink:0">AUTO</span>' : '') +
+            '</div>' +
+            '<div style="font-size:10px;color:#666;margin-top:1px">' + promo.sub + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+    }
+  }
+
+  // ── Sheet：切換 Tab ──
+  function p5SwitchType(type) {
+    p5SelectedType = type;
+    var tabs = ['ewallet','localbank','crypto'];
+    tabs.forEach(function(t) {
+      var el = document.getElementById('p5-tab-' + t);
+      if (el) {
+        el.style.borderBottom = (t === type) ? '2px solid #0d9488' : '2px solid transparent';
+        el.style.color = (t === type) ? '#E2E6E9' : '#657381';
+        el.style.fontWeight = (t === type) ? '600' : '400';
+      }
+    });
+    p5BuildPaymentGrid();
+  }
+
+  // ── Sheet：建立支付方格 ──
+  function p5BuildPaymentGrid() {
+    var grid = document.getElementById('p5-payment-grid');
+    if (!grid) return;
+    var payments = (p5PaymentData[p5SelectedType] || { payments:[] }).payments;
+    grid.innerHTML = payments.map(function(p) {
+      var sel = p5SelectedPayment && p5SelectedPayment.name === p.name;
+      return '<div onclick="p5SelectPayment(\'' + p.name + '\')" style="' +
+        'background:' + (sel ? 'rgba(255,255,255,0.08)' : '#1e1e1e') + ';' +
+        'border:1.5px solid ' + (sel ? '#fff' : '#2a2a2a') + ';' +
+        'border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s">' +
+        '<div style="width:32px;height:32px;border-radius:9px;background:' + p.bg + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">' + p.ico + '</div>' +
+        '<div style="font-size:10px;color:#ccc;text-align:center;font-weight:' + (sel?'600':'400') + '">' + p.name + '</div>' +
+      '</div>';
+    }).join('');
+    p5BuildBonusList();
+  }
+
+  // ── Sheet：建立相容優惠列表 ──
+  function p5BuildBonusList() {
+    var header = document.getElementById('p5-compat-tag');
+    var list = document.getElementById('p5-bonus-list');
+    var btn = document.getElementById('p5-sheet-confirm');
+    if (!list) return;
+
+    var p = p5SelectedPayment;
+    // 找到當前 tab 中選的 payment
+    if (p5PaymentData[p5SelectedType]) {
+      var found = p5PaymentData[p5SelectedType].payments.find(function(x) {
+        return p5SelectedPayment && x.name === p5SelectedPayment.name;
+      });
+      if (!found && p5PaymentData[p5SelectedType].payments.length > 0) {
+        // tab 切換後 payment 在不同 tab，顯示 hint
+        list.innerHTML = '<div style="color:#555;font-size:11px;padding:4px 0">← 請從上方選擇支付方式</div>';
+        if (header) header.textContent = '可用優惠';
+        if (btn) { btn.style.opacity='0.45'; btn.disabled=true; }
+        return;
+      }
+    }
+
+    if (!p) {
+      list.innerHTML = '<div style="color:#555;font-size:11px;padding:4px 0">← 請從上方選擇支付方式</div>';
+      if (header) header.textContent = '可用優惠';
+      if (btn) { btn.style.opacity='0.45'; btn.disabled=true; }
+      return;
+    }
+
+    if (header) header.textContent = p.name + ' 可用優惠';
+
+    if (p.promos.length === 0) {
+      list.innerHTML = '<div style="background:#1a1a1a;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+        '<span style="font-size:11px;color:#555">此支付方式無可用優惠，將以無優惠進行存款</span></div>';
+      p5SelectedPromo = null;
+      if (btn) { btn.style.opacity='1'; btn.disabled=false; }
+      return;
+    }
+
+    // 自動選擇：優先 default，否則第一個
+    if (!p5SelectedPromo || p.promos.indexOf(p5SelectedPromo) === -1) {
+      var def = p.promos.find(function(id) { return p5PromoList[id] && p5PromoList[id].isDefault; });
+      p5SelectedPromo = def || p.promos[0];
+    }
+
+    list.innerHTML = p.promos.map(function(id) {
+      var pr = p5PromoList[id];
+      if (!pr) return '';
+      var sel = id === p5SelectedPromo;
+      return '<div onclick="p5SelectPromo(\'' + id + '\')" style="' +
+        'background:' + (sel ? '#1a2e20' : '#1a1a1a') + ';' +
+        'border:1.5px solid ' + (sel ? '#27b488' : '#2a2a2a') + ';' +
+        'border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;transition:all .15s">' +
+        '<div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(' + pr.gradient + ');display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">' + pr.label + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;align-items:center;gap:5px">' +
+            '<div style="font-size:12px;font-weight:600;color:#e8e8e8">' + pr.name + '</div>' +
+            (pr.isDefault ? '<span style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 5px;flex-shrink:0">預設</span>' : '') +
+          '</div>' +
+          '<div style="font-size:10px;color:#666;margin-top:1px">' + pr.sub + '</div>' +
+        '</div>' +
+        (sel ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#27b488" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+      '</div>';
+    }).join('');
+
+    if (btn) { btn.style.opacity='1'; btn.disabled=false; }
+  }
+
+  // ── Sheet：選支付方式 ──
+  function p5SelectPayment(name) {
+    var payments = (p5PaymentData[p5SelectedType] || { payments:[] }).payments;
+    var found = payments.find(function(p) { return p.name === name; });
+    if (found) {
+      p5SelectedPayment = found;
+      p5BuildPaymentGrid(); // 重新 render（含 bonus list）
+    }
+  }
+
+  // ── Sheet：選優惠 ──
+  function p5SelectPromo(id) {
+    p5SelectedPromo = id;
+    p5BuildBonusList(); // 重新 render bonus list
+  }
+
+  // ── Sheet：開啟 ──
+  function p5OpenSheet() {
+    var sheet = document.getElementById('p5-sheet');
+    if (!sheet) return;
+    p5SwitchType(p5SelectedType); // build grid
+    sheet.style.transform = 'translateY(0)';
+  }
+
+  // ── Sheet：關閉 ──
+  function p5CloseSheet() {
+    var sheet = document.getElementById('p5-sheet');
+    if (!sheet) return;
+    sheet.style.transform = 'translateY(100%)';
+  }
+
+  // ── Sheet：確認選擇 ──
+  function p5ConfirmSheet() {
+    p5CloseSheet();
+    p5UpdatePayRow();
+    p5UpdatePromoRow();
+    // 顯示 toast
+    var p = p5SelectedPayment;
+    var pr = p5SelectedPromo ? p5PromoList[p5SelectedPromo] : null;
+    var msg = p ? p.name : '支付方式';
+    if (pr) msg += ' + ' + pr.name;
+    else msg += '（無優惠）';
+    p5ShowToast('已選：' + msg);
+  }
+
+  // ── Toast ──
+  function p5ShowToast(msg) {
+    var toast = document.getElementById('p5-toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(8px)';
+    }, 2500);
   }
   // ────────────────────────────────────────────────────
 
