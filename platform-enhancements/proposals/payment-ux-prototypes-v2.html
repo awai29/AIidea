@@ -872,7 +872,8 @@
     <button class="state-btn s-green" onclick="switchState('p2','s2',this)">狀態 2 · 互動原型 ← 可操作</button>
     <button class="state-btn s-teal" onclick="switchState('p2','s5',this)">狀態 5 · GA 優化：統一支付+優惠</button>
     <button class="state-btn s-purple" onclick="switchState('p2','s6',this)">狀態 6 · 方案B：優惠卡驅動支付篩選 ← 新</button>
-    <button class="state-btn s-amber" onclick="switchState('p2','s7',this)">狀態 7 · 方案C：回流玩家記憶偏好 ← 新</button>
+    <button class="state-btn s-amber" onclick="switchState('p2','s7',this)">狀態 7 · 方案C：回流玩家記憶偏好</button>
+    <button class="state-btn" style="border-color:#e11d48;color:#e11d48;" onclick="switchState('p2','s8',this)">狀態 8 · 不相容衝突引導 ← 新</button>
   </div>
 
   <div class="layout">
@@ -1111,6 +1112,46 @@
             </div>
             <div class="callout" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.3);color:#f59e0b;">
               <span><strong>適用對象：</strong>回流玩家（有過去存款記錄）。首次存款用戶仍走方案B的完整選擇流程。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p2-info" id="p2-s8-info" style="display:none;">
+        <div class="card" style="border-color:#9f1239;">
+          <div class="card-header" style="background:rgba(225,29,72,.08);border-bottom:1px solid rgba(225,29,72,.2);">
+            <div class="cname">狀態 8 — 不相容衝突引導</div>
+            <div class="csub">不改流程順序，專注解決「選到不相容組合時」的體驗斷裂。系統即時偵測衝突，給出清楚的原因說明與兩條出路。</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">問題根源</div>
+              <ul class="pl">
+                <li><span class="pi pi-warn">!</span><span>現有流程：支付 → 優惠，兩步分開選，選完才知道不相容</span></li>
+                <li><span class="pi pi-warn">!</span><span>不相容時只顯示錯誤訊息，玩家不知道該改什麼、怎麼改</span></li>
+                <li><span class="pi pi-warn">!</span><span>GA：36.6% 放棄用戶反覆切換支付方式，就是卡在這個時刻</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">解法：衝突當下給出路</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>玩家選到不相容支付方式，立刻彈出衝突引導 Sheet</span></li>
+                <li><span class="pi pi-ok">✓</span><span>清楚說明：「[支付] 不支援 [優惠]」+ 視覺呈現衝突點</span></li>
+                <li><span class="pi pi-ok">✓</span><span>出路 A：換成此支付相容的優惠（系統推薦，一鍵套用）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>出路 B：換回支援現有優惠的支付方式（顯示可選清單）</span></li>
+                <li><span class="pi pi-ok">✓</span><span>不強迫選擇，玩家也可以取消回去</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">操作提示</div>
+              <ul class="pl">
+                <li><span class="pi pi-tip">→</span><span>點支付列 → 開啟支付選擇 Sheet，選 Type 與 Channel</span></li>
+                <li><span class="pi pi-tip">→</span><span>選擇與目前優惠<strong>不相容</strong>的支付方式（如：Sports Refund 選 bKash）→ 觸發衝突引導</span></li>
+                <li><span class="pi pi-tip">→</span><span>在衝突 Sheet 選「換相容優惠」或「換支付方式」</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:rgba(225,29,72,.08);border-color:rgba(225,29,72,.3);color:#fb7185;">
+              <span><strong>核心原則：</strong>不阻止玩家做選擇，但在衝突發生的那一刻給出清楚說明與最短出路，不讓他們自己猜。</span>
             </div>
           </div>
         </div>
@@ -1727,6 +1768,159 @@
               <div style="font-size:11px;color:#555;">bKash · 100% Welcome Bonus</div>
             </div>
           </div><!-- end p2-s7 -->
+
+          <!-- STATE 8: 不相容衝突引導 -->
+          <div class="pstate" id="p2-s8" style="position:relative;overflow:hidden;padding-bottom:280px;">
+
+            <!-- App bar -->
+            <div class="app-bar" style="justify-content:space-between;">
+              <div class="app-bar-back">←</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;">Quick Deposit</div>
+              <div style="font-size:11px;color:#666;">BJ Casino</div>
+            </div>
+
+            <!-- Balance -->
+            <div style="margin:8px 12px 6px;background:linear-gradient(135deg,#0a1a10,#0d2a1a);border:1px solid #1a3a24;border-radius:10px;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:0.05em;text-transform:uppercase;">Account Balance</div>
+              <div style="font-size:14px;font-weight:700;color:#4ade80;">৳ 245.00</div>
+            </div>
+
+            <!-- Amount -->
+            <div style="padding:10px 16px 6px;flex-shrink:0;">
+              <div style="font-size:10px;font-weight:700;color:#555;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">AMOUNT</div>
+              <div id="p8-amt" style="font-size:42px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;">৳0</div>
+              <div style="font-size:10px;color:#444;margin-top:2px;">Min ৳100 · Max ৳50,000</div>
+            </div>
+
+            <!-- Promo row -->
+            <div style="margin:6px 12px 2px;background:#1d2820;border:1px solid #1a3a24;border-radius:10px 10px 2px 2px;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;">
+              <div id="p8-promo-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0d5c42,#1db87c);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">100%</div>
+              <div style="flex:1;min-width:0;">
+                <div id="p8-promo-name" style="font-size:12px;font-weight:600;color:#e8e8e8;">100% Welcome Bonus</div>
+                <div id="p8-promo-sub" style="font-size:10px;color:#27b488;margin-top:1px;">Up to ৳3,000</div>
+              </div>
+              <span id="p8-promo-badge" style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:1px 6px;font-weight:700;flex-shrink:0;">預設</span>
+            </div>
+
+            <!-- Payment row -->
+            <div id="p8-pay-row" onclick="p8OpenPaySheet()" style="margin:0 12px 6px;background:#242424;border-radius:2px 2px 10px 10px;border-top:1px solid #1a1a1a;padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;">
+              <div id="p8-pay-ico" style="width:28px;height:28px;border-radius:8px;background:#e2136e;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">bK</div>
+              <div style="flex:1;min-width:0;">
+                <div id="p8-pay-name" style="font-size:12px;font-weight:600;color:#e8e8e8;">bKash</div>
+                <div id="p8-pay-sub" style="font-size:10px;color:#666;margin-top:1px;">Personal · 017xxxxxxxx</div>
+              </div>
+              <!-- compat status badge -->
+              <div id="p8-compat-badge" style="font-size:9px;background:#0f3d28;color:#27b488;border-radius:4px;padding:2px 7px;font-weight:700;flex-shrink:0;">✓ 相容</div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <!-- Quick chips -->
+            <div style="display:flex;gap:6px;padding:4px 12px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;">
+              <div onclick="p8SetAmt('500')"  style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳500</div>
+              <div onclick="p8SetAmt('1000')" style="flex-shrink:0;padding:5px 10px;background:#1a3a2a;border:1px solid #27b488;border-radius:20px;font-size:12px;color:#27b488;font-weight:600;cursor:pointer;">৳1,000 ↩</div>
+              <div onclick="p8SetAmt('2000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳2,000</div>
+              <div onclick="p8SetAmt('5000')" style="flex-shrink:0;padding:5px 10px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;cursor:pointer;">৳5,000</div>
+            </div>
+
+            <!-- Confirm + keyboard -->
+            <div style="position:absolute;bottom:0;left:0;right:0;height:280px;display:flex;flex-direction:column;background:#1a1a1a;">
+              <div style="padding:4px 12px;flex-shrink:0;">
+                <button id="p8-confirm" class="big-btn primary" style="height:40px;font-size:13px;border-radius:12px;opacity:0.45;">Confirm</button>
+              </div>
+              <div id="p8-keyboard" style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:1px;background:#111;">
+                <div onclick="p8Key('1')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">1</div>
+                <div onclick="p8Key('2')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">2</div>
+                <div onclick="p8Key('3')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">3</div>
+                <div onclick="p8Key('4')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">4</div>
+                <div onclick="p8Key('5')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">5</div>
+                <div onclick="p8Key('6')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">6</div>
+                <div onclick="p8Key('7')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">7</div>
+                <div onclick="p8Key('8')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">8</div>
+                <div onclick="p8Key('9')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">9</div>
+                <div onclick="p8Key('.')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:20px;color:#777;cursor:pointer;user-select:none;">.</div>
+                <div onclick="p8Key('0')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:300;color:#fff;cursor:pointer;user-select:none;">0</div>
+                <div onclick="p8Key('⌫')" style="background:#1c1c1c;display:flex;align-items:center;justify-content:center;font-size:16px;color:#777;cursor:pointer;user-select:none;">⌫</div>
+              </div>
+            </div>
+
+            <!-- Backdrop -->
+            <div id="p8-backdrop" onclick="p8CloseAll()" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:15;"></div>
+
+            <!-- ① 支付選擇 Sheet -->
+            <div id="p8-pay-sheet" style="position:absolute;bottom:0;left:0;right:0;height:88%;background:#141515;border-radius:14px 14px 0 0;transform:translateY(100%);transition:transform 0.28s cubic-bezier(.32,.72,0,1);z-index:20;display:flex;flex-direction:column;overflow:hidden;">
+              <!-- header -->
+              <div style="padding:14px 16px 0;flex-shrink:0;">
+                <div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 12px;"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-size:16px;font-weight:700;color:#fff;">選擇支付方式</div>
+                    <div id="p8-sheet-sub" style="font-size:11px;color:#666;margin-top:2px;">目前優惠：100% Welcome Bonus</div>
+                  </div>
+                  <div onclick="p8ClosePaySheet()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;background:rgba(255,255,255,0.08);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </div>
+                </div>
+              </div>
+              <!-- type tabs -->
+              <div style="display:flex;padding:0 16px;margin-top:12px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+                <div onclick="p8SwitchType('ewallet')"  id="p8-tab-ewallet"   style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid #e11d48;color:#E2E6E9;transition:all 0.18s;margin-bottom:-1px;">E-wallet</div>
+                <div onclick="p8SwitchType('localbank')" id="p8-tab-localbank" style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;margin-bottom:-1px;">Local Bank</div>
+                <div onclick="p8SwitchType('crypto')"   id="p8-tab-crypto"    style="flex:1;text-align:center;padding:8px 4px 10px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:#657381;transition:all 0.18s;margin-bottom:-1px;">Crypto</div>
+              </div>
+              <!-- channel grid -->
+              <div style="flex:1;overflow-y:auto;padding:14px 16px;">
+                <div id="p8-channel-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+              </div>
+            </div>
+
+            <!-- ② 衝突引導 Sheet（核心） -->
+            <div id="p8-conflict-sheet" style="position:absolute;bottom:0;left:0;right:0;background:#141515;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform 0.3s cubic-bezier(.32,.72,0,1);z-index:25;display:flex;flex-direction:column;overflow:hidden;">
+              <div style="padding:16px 16px 0;flex-shrink:0;">
+                <div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 16px;"></div>
+                <!-- Conflict visual -->
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;">
+                  <div id="p8-conflict-promo-ico" style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#0d5c42,#1db87c);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">100%</div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  </div>
+                  <div id="p8-conflict-pay-ico" style="width:40px;height:40px;border-radius:12px;background:#e2136e;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">bK</div>
+                </div>
+                <!-- Conflict message -->
+                <div style="text-align:center;margin-bottom:6px;">
+                  <div style="font-size:15px;font-weight:700;color:#fff;" id="p8-conflict-title">支付方式與優惠不相容</div>
+                  <div style="font-size:12px;color:#999;margin-top:4px;line-height:1.5;" id="p8-conflict-desc">bKash 不支援「50% Sports Refund」<br>請選擇以下其中一個方案</div>
+                </div>
+              </div>
+              <!-- Options -->
+              <div style="padding:14px 16px 20px;display:flex;flex-direction:column;gap:10px;">
+                <!-- Option A: switch promo -->
+                <div id="p8-opt-a" onclick="p8ChooseOptA()" style="background:#1a1a2e;border:1.5px solid #3730a3;border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;active:background:#1e1e3f;">
+                  <div style="font-size:10px;font-weight:700;color:#818cf8;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">方案 A · 換相容的優惠</div>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div id="p8-opt-a-icon" style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#1a3a5c,#2563eb);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">1.5%</div>
+                    <div>
+                      <div id="p8-opt-a-name" style="font-size:13px;font-weight:600;color:#e8e8e8;">Extra 1.5% Daily Bonus</div>
+                      <div id="p8-opt-a-sub"  style="font-size:11px;color:#818cf8;margin-top:1px;">此優惠支援 bKash ✓</div>
+                    </div>
+                    <div style="margin-left:auto;font-size:12px;color:#818cf8;font-weight:600;">套用 →</div>
+                  </div>
+                </div>
+                <!-- Option B: switch payment -->
+                <div id="p8-opt-b" style="background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:14px;padding:14px;">
+                  <div style="font-size:10px;font-weight:700;color:#f87171;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">方案 B · 換支援此優惠的支付</div>
+                  <div id="p8-opt-b-list" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+                </div>
+                <!-- Cancel -->
+                <div onclick="p8CancelConflict()" style="text-align:center;padding:6px;cursor:pointer;">
+                  <span style="font-size:12px;color:#555;">取消，回到上一步</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Toast -->
+            <div id="p8-toast" style="display:none;position:absolute;top:56px;left:50%;transform:translateX(-50%) translateY(8px);background:#27b488;color:#fff;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;white-space:nowrap;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;"></div>
+
+          </div><!-- end p2-s8 -->
 
         </div>
       </div>
@@ -5078,6 +5272,255 @@
   function p7Confirm() {
     var overlay = document.getElementById('p7-success');
     if (overlay) { overlay.style.display='flex'; overlay.querySelector('div:nth-child(3)').textContent='৳'+parseInt(p7Amt).toLocaleString()+' 已提交'; overlay.querySelector('div:nth-child(4)').textContent=p7SelectedPay+' · '+(p7SelectedPromo==='welcome'?'100% Welcome Bonus':p7SelectedPromo==='daily'?'1.5% Daily':'無優惠'); setTimeout(function(){ overlay.style.display='none'; }, 2000); }
+  }
+  // ────────────────────────────────────────────────────
+
+  // ── P2-S8 不相容衝突引導 ────────────────────────────
+  var p8Amt = '0';
+  var p8CurPromo = 'promo-welcome';  // 目前選的優惠
+  var p8CurPay   = 'bKash';          // 目前選的支付
+  var p8CurType  = 'ewallet';
+  var p8PendingPay = null; // 玩家剛選的、待確認的支付方式
+
+  // 正確資料流：優惠 → 相容支付清單
+  var p8PromoData = {
+    'promo-welcome': { name:'100% Welcome Bonus', sub:'Up to ৳3,000',       gradient:'135deg,#0d5c42,#1db87c', label:'100%', payments:['bKash','Nagad','Rocket','Baji Pay'] },
+    'promo-daily':   { name:'Extra 1.5% Daily',   sub:'+1.5% every deposit', gradient:'135deg,#1a3a5c,#2563eb', label:'1.5%', payments:['bKash','Nagad','Rocket','Upay','Baji Pay','Dutch Bangla','City Bank'] },
+    'promo-sports':  { name:'50% Sports Refund',  sub:'On sports losses',    gradient:'135deg,#4c1d95,#7c3aed', label:'50%', payments:['Nagad','Rocket'] },
+    'promo-none':    { name:'不使用優惠',           sub:'全支付方式可用',       gradient:'135deg,#2a2a2a,#3a3a3a', label:'—',   payments:['bKash','Nagad','Rocket','OKwallet','Upay','Baji Pay','Dutch Bangla','City Bank','USDT','Bitcoin','Ethereum'] }
+  };
+  var p8PayInfo = {
+    'bKash':        { bg:'#e2136e', ico:'bK', sub:'Personal · 017xxxxxxxx', type:'ewallet' },
+    'Nagad':        { bg:'#e8621a', ico:'Na',  sub:'Personal · 018xxxxxxxx', type:'ewallet' },
+    'Rocket':       { bg:'#8b2fc9', ico:'Ro',  sub:'Personal · 019xxxxxxxx', type:'ewallet' },
+    'OKwallet':     { bg:'#1a56db', ico:'OK',  sub:'Personal · 016xxxxxxxx', type:'ewallet' },
+    'Upay':         { bg:'#00a859', ico:'Up',  sub:'Personal · 014xxxxxxxx', type:'ewallet' },
+    'Baji Pay':     { bg:'#ff6b00', ico:'BJ',  sub:'Personal · 013xxxxxxxx', type:'ewallet' },
+    'Dutch Bangla': { bg:'#e83030', ico:'DB',  sub:'NPSB · BEFTN',           type:'localbank' },
+    'City Bank':    { bg:'#0a5fb4', ico:'CB',  sub:'NPSB · BEFTN',           type:'localbank' },
+    'USDT':         { bg:'#26a17b', ico:'₮',   sub:'TRC20',                  type:'crypto' },
+    'Bitcoin':      { bg:'#f7931a', ico:'₿',   sub:'BEP20',                  type:'crypto' },
+    'Ethereum':     { bg:'#627eea', ico:'Ξ',   sub:'ERC20',                  type:'crypto' }
+  };
+  var p8TypeChannels = {
+    ewallet:   ['bKash','Nagad','Rocket','OKwallet','Upay','Baji Pay'],
+    localbank: ['Dutch Bangla','City Bank'],
+    crypto:    ['USDT','Bitcoin','Ethereum']
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var kb = document.getElementById('p8-keyboard');
+    if (kb) kb.addEventListener('pointerdown', function(e) {
+      var c = e.target.closest('#p8-keyboard > div');
+      if (c) { c.classList.add('p2-key-flash'); setTimeout(function(){ c.classList.remove('p2-key-flash'); }, 120); }
+    });
+  });
+
+  function p8Key(k) {
+    if (k==='⌫') { p8Amt = p8Amt.length>1 ? p8Amt.slice(0,-1) : '0'; }
+    else if (k==='.') { if (!p8Amt.includes('.')) p8Amt += '.'; }
+    else { if (p8Amt==='0') p8Amt=k; else p8Amt+=k; if(p8Amt.length>9){p8Amt=p8Amt.slice(0,-1);return;} }
+    var el=document.getElementById('p8-amt'); if(el) el.textContent='৳'+p8Amt;
+    var btn=document.getElementById('p8-confirm'); if(btn) btn.style.opacity=parseFloat(p8Amt)>0?'1':'0.45';
+  }
+  function p8SetAmt(v) {
+    p8Amt=v;
+    var el=document.getElementById('p8-amt'); if(el) el.textContent='৳'+v;
+    var btn=document.getElementById('p8-confirm'); if(btn) btn.style.opacity='1';
+  }
+
+  // ── 支付選擇 Sheet ──
+  function p8OpenPaySheet() {
+    var sh = document.getElementById('p8-pay-sheet');
+    var bd = document.getElementById('p8-backdrop');
+    if (sh) sh.style.transform = 'translateY(0)';
+    if (bd) bd.style.display = 'block';
+    // update subtitle with current promo
+    var sub = document.getElementById('p8-sheet-sub');
+    var pr = p8PromoData[p8CurPromo];
+    if (sub && pr) sub.textContent = '目前優惠：' + pr.name;
+    p8SwitchType(p8CurType);
+  }
+  function p8ClosePaySheet() {
+    var sh = document.getElementById('p8-pay-sheet');
+    var bd = document.getElementById('p8-backdrop');
+    if (sh) sh.style.transform = 'translateY(100%)';
+    if (bd) bd.style.display = 'none';
+  }
+  function p8CloseAll() {
+    p8ClosePaySheet();
+    p8CloseConflictSheet();
+  }
+
+  function p8SwitchType(type) {
+    p8CurType = type;
+    var tabs = ['ewallet','localbank','crypto'];
+    tabs.forEach(function(t) {
+      var el = document.getElementById('p8-tab-' + t);
+      if (!el) return;
+      el.style.borderBottom = t===type ? '2px solid #e11d48' : '2px solid transparent';
+      el.style.color = t===type ? '#E2E6E9' : '#657381';
+      el.style.fontWeight = t===type ? '600' : '400';
+    });
+    p8BuildChannelGrid();
+  }
+
+  function p8BuildChannelGrid() {
+    var grid = document.getElementById('p8-channel-grid');
+    if (!grid) return;
+    var channels = p8TypeChannels[p8CurType] || [];
+    var curPromoPayments = (p8PromoData[p8CurPromo] || {}).payments || [];
+    grid.innerHTML = channels.map(function(name) {
+      var pi = p8PayInfo[name];
+      var sel = name === p8CurPay;
+      var compatible = curPromoPayments.indexOf(name) !== -1 || p8CurPromo === 'promo-none';
+      return '<div onclick="p8SelectChannel(\'' + name + '\')" style="' +
+        'background:' + (sel ? 'rgba(255,255,255,0.08)' : '#1e1e1e') + ';' +
+        'border:1.5px solid ' + (sel ? '#fff' : '#2a2a2a') + ';' +
+        'border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;position:relative;">' +
+        '<div style="width:32px;height:32px;border-radius:9px;background:' + pi.bg + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">' + pi.ico + '</div>' +
+        '<div style="font-size:10px;color:#ccc;text-align:center;font-weight:' + (sel?'600':'400') + ';">' + name + '</div>' +
+        (!compatible ? '<div style="position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#e11d48;" title="與目前優惠不相容"></div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function p8SelectChannel(name) {
+    var curPromoPayments = (p8PromoData[p8CurPromo] || {}).payments || [];
+    var compatible = curPromoPayments.indexOf(name) !== -1 || p8CurPromo === 'promo-none';
+    if (!compatible) {
+      // 不相容 → 先關閉支付 Sheet，然後顯示衝突 Sheet
+      p8PendingPay = name;
+      p8ClosePaySheet();
+      setTimeout(function() { p8ShowConflict(name); }, 300);
+    } else {
+      // 相容 → 直接套用
+      p8ApplyPayment(name);
+      p8ClosePaySheet();
+    }
+  }
+
+  function p8ApplyPayment(name) {
+    p8CurPay = name;
+    var pi = p8PayInfo[name];
+    if (!pi) return;
+    var ico  = document.getElementById('p8-pay-ico');
+    var nm   = document.getElementById('p8-pay-name');
+    var sub  = document.getElementById('p8-pay-sub');
+    var badge = document.getElementById('p8-compat-badge');
+    if (ico)  { ico.style.background = pi.bg; ico.textContent = pi.ico; }
+    if (nm)   nm.textContent = name;
+    if (sub)  sub.textContent = pi.sub;
+    if (badge){ badge.textContent = '✓ 相容'; badge.style.background='#0f3d28'; badge.style.color='#27b488'; }
+  }
+
+  // ── 衝突引導 Sheet ──
+  function p8ShowConflict(payName) {
+    var bd = document.getElementById('p8-backdrop');
+    if (bd) bd.style.display = 'block';
+
+    var pi = p8PayInfo[payName];
+    var pr = p8PromoData[p8CurPromo];
+
+    // Update conflict visuals
+    var cpi = document.getElementById('p8-conflict-pay-ico');
+    var cpr = document.getElementById('p8-conflict-promo-ico');
+    var ttl = document.getElementById('p8-conflict-title');
+    var dsc = document.getElementById('p8-conflict-desc');
+    if (cpi && pi) { cpi.style.background = pi.bg; cpi.textContent = pi.ico; }
+    if (cpr && pr) { cpr.style.background = 'linear-gradient(' + pr.gradient + ')'; cpr.textContent = pr.label; }
+    if (ttl) ttl.textContent = '支付方式與優惠不相容';
+    if (dsc && pi && pr) dsc.innerHTML = '<strong style="color:#fff;">' + payName + '</strong> 不支援「<strong style="color:#fff;">' + pr.name + '</strong>」<br><span style="color:#888;">請選擇以下其中一個方案</span>';
+
+    // Option A: find best compatible promo for this payment
+    var compatPromo = null;
+    Object.keys(p8PromoData).forEach(function(pid) {
+      if (pid === p8CurPromo || pid === 'promo-none') return;
+      if (p8PromoData[pid].payments.indexOf(payName) !== -1 && !compatPromo) compatPromo = pid;
+    });
+    var optAEl = document.getElementById('p8-opt-a');
+    var optAIco = document.getElementById('p8-opt-a-icon');
+    var optAName = document.getElementById('p8-opt-a-name');
+    var optASub  = document.getElementById('p8-opt-a-sub');
+    if (compatPromo) {
+      var cp = p8PromoData[compatPromo];
+      if (optAEl)  { optAEl.style.display='block'; optAEl.setAttribute('data-promo', compatPromo); }
+      if (optAIco) { optAIco.style.background='linear-gradient('+cp.gradient+')'; optAIco.textContent=cp.label; }
+      if (optAName) optAName.textContent = cp.name;
+      if (optASub)  optASub.textContent = '此優惠支援 ' + payName + ' ✓';
+    } else {
+      // No compatible promo → show "continue without bonus"
+      if (optAEl)  { optAEl.style.display='block'; optAEl.setAttribute('data-promo', 'promo-none'); }
+      if (optAIco) { optAIco.style.background='#2a2a2a'; optAIco.textContent='—'; }
+      if (optAName) optAName.textContent = '不使用優惠繼續';
+      if (optASub)  optASub.textContent = payName + ' 無可用優惠';
+    }
+
+    // Option B: list payments compatible with current promo
+    var optBList = document.getElementById('p8-opt-b-list');
+    if (optBList && pr) {
+      optBList.innerHTML = pr.payments.map(function(pname) {
+        var ppi = p8PayInfo[pname];
+        return '<div onclick="p8ChooseOptB(\'' + pname + '\')" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 8px;background:#222;border:1px solid #333;border-radius:10px;min-width:52px;">' +
+          '<div style="width:28px;height:28px;border-radius:8px;background:' + (ppi?ppi.bg:'#333') + ';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">' + (ppi?ppi.ico:'?') + '</div>' +
+          '<div style="font-size:9px;color:#ccc;text-align:center;">' + pname + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Show the sheet
+    var sheet = document.getElementById('p8-conflict-sheet');
+    if (sheet) sheet.style.transform = 'translateY(0)';
+  }
+
+  function p8CloseConflictSheet() {
+    var sheet = document.getElementById('p8-conflict-sheet');
+    var bd = document.getElementById('p8-backdrop');
+    if (sheet) sheet.style.transform = 'translateY(100%)';
+    if (bd) bd.style.display = 'none';
+    p8PendingPay = null;
+  }
+
+  function p8ChooseOptA() {
+    // 換相容優惠，保留玩家選的支付方式
+    var optAEl = document.getElementById('p8-opt-a');
+    var newPromo = optAEl ? optAEl.getAttribute('data-promo') : 'promo-none';
+    p8CurPromo = newPromo;
+    var pr = p8PromoData[newPromo];
+    // Update promo row
+    var pico  = document.getElementById('p8-promo-icon');
+    var pnm   = document.getElementById('p8-promo-name');
+    var psub  = document.getElementById('p8-promo-sub');
+    var pbadge= document.getElementById('p8-promo-badge');
+    if (pr) {
+      if (pico)   { pico.style.background='linear-gradient('+pr.gradient+')'; pico.textContent=pr.label; }
+      if (pnm)    pnm.textContent = pr.name;
+      if (psub)   psub.textContent = pr.sub;
+      if (pbadge) { pbadge.textContent='已換'; pbadge.style.background='#1a1a3a'; pbadge.style.color='#818cf8'; }
+    }
+    // Apply the pending payment
+    if (p8PendingPay) p8ApplyPayment(p8PendingPay);
+    p8CloseConflictSheet();
+    p8ShowToast('已換為「' + (pr?pr.name:'無優惠') + '」，繼續使用 ' + (p8PendingPay||''));
+  }
+
+  function p8ChooseOptB(payName) {
+    // 換支付方式，保留目前優惠
+    p8ApplyPayment(payName);
+    p8CloseConflictSheet();
+    var pr = p8PromoData[p8CurPromo];
+    p8ShowToast('已換為 ' + payName + '，優惠保留：' + (pr?pr.name:''));
+  }
+
+  function p8CancelConflict() {
+    p8CloseConflictSheet();
+  }
+
+  function p8ShowToast(msg) {
+    var t = document.getElementById('p8-toast');
+    if (!t) return;
+    t.textContent = msg; t.style.display='block'; t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)';
+    setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)'; setTimeout(function(){ t.style.display='none'; }, 200); }, 2500);
   }
   // ────────────────────────────────────────────────────
 
