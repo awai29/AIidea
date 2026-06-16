@@ -4245,6 +4245,156 @@
     <div class="proto-title">讓對的用戶，在對的時機，發現 Quick Deposit</div>
     <p class="proto-desc">Quick deposit 整體 CTR 低，不是功能有問題，而是入口被錯誤的用戶稀釋。42% 一次性用戶對它沒有需求，真正的目標是有存款歷史的回訪用戶。三種輕量曝光策略，在不改動 popup 結構的前提下提升正確用戶的認知與使用率。</p>
   </div>
+
+  <!-- ── 關係圖 ── -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:28px 32px;margin-bottom:28px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;">系統關係圖 · 三個分群 × 三條路徑 × 同一個目的地</div>
+
+    <!-- 三欄 layout: 分群 → 曝光策略 → 目的地 -->
+    <div style="display:grid;grid-template-columns:200px 1fr 180px;gap:0;align-items:start;">
+
+      <!-- 欄標題 -->
+      <div style="font-size:11px;font-weight:600;color:var(--muted);padding-bottom:12px;border-bottom:2px solid var(--border);">用戶分群</div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);padding-bottom:12px;border-bottom:2px solid var(--border);padding-left:24px;">曝光路徑 / 原型</div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);padding-bottom:12px;border-bottom:2px solid var(--border);padding-left:24px;">目的地</div>
+
+      <!-- ── 分群 A ── -->
+      <div style="padding-top:24px;padding-right:16px;">
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#16a34a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">A</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#15803d;">回訪用戶</div>
+              <div style="font-size:10px;color:#16a34a;">2+ 次存款記錄</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#166534;line-height:1.5;">存款意願強，只是找不到快速入口</div>
+        </div>
+      </div>
+
+      <!-- A 的路徑 -->
+      <div style="padding-top:24px;padding-left:24px;display:flex;flex-direction:column;gap:8px;">
+        <!-- 想法 5 -->
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:2px;"></div>
+          <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;cursor:pointer;" onclick="document.querySelector('[onclick*=\'pqd\'][onclick*=\'s2\']').click()">
+            <div style="font-size:11px;font-weight:700;color:#15803d;">想法 5 · Login 觸發列</div>
+            <div style="font-size:10px;color:#16a34a;margin-top:2px;">登入事件觸發，顯示上次存款快捷，當天一次</div>
+          </div>
+          <div style="color:#8d9aa5;font-size:12px;">→</div>
+        </div>
+        <!-- 想法 6 -->
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#16a34a;flex-shrink:0;margin-left:2px;"></div>
+          <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;cursor:pointer;" onclick="document.querySelector('[onclick*=\'pqd\'][onclick*=\'s3\']').click()">
+            <div style="font-size:11px;font-weight:700;color:#15803d;">想法 6 · Popup 快捷列</div>
+            <div style="font-size:10px;color:#16a34a;margin-top:2px;">Wallet popup 內加一條快捷，利用現有習慣路徑</div>
+          </div>
+          <div style="color:#8d9aa5;font-size:12px;">→</div>
+        </div>
+      </div>
+
+      <!-- A 的目的地 -->
+      <div style="padding-top:24px;padding-left:24px;">
+        <div style="background:#141515;border:1.5px solid #27b488;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;font-weight:700;color:#27b488;margin-bottom:4px;">⚡ 一鍵重複存款</div>
+          <div style="font-size:10px;color:#657381;line-height:1.5;">顯示上次渠道 + 金額，一鍵確認</div>
+          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="switchProto('p6',document.querySelector('[onclick*=\'p6\']'))">查看 p6 原型 →</div>
+        </div>
+      </div>
+
+      <!-- ── 分群 B ── -->
+      <div style="padding-top:16px;padding-right:16px;">
+        <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:10px;padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">B</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#1d4ed8;">首次存款用戶</div>
+              <div style="font-size:10px;color:#2563eb;">剛完成第 1 次存款</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#1e40af;line-height:1.5;">42% 存款後即流失，黃金教育視窗</div>
+        </div>
+      </div>
+
+      <!-- B 的路徑 -->
+      <div style="padding-top:16px;padding-left:24px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#2563eb;flex-shrink:0;margin-left:2px;"></div>
+          <div style="flex:1;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;cursor:pointer;" onclick="document.querySelector('[onclick*=\'pqd\'][onclick*=\'s1\']').click()">
+            <div style="font-size:11px;font-weight:700;color:#1d4ed8;">想法 4 · 首存教學 Coachmark</div>
+            <div style="font-size:10px;color:#2563eb;margin-top:2px;">deposit_success 事件觸發，僅一次，指向 Quick deposit icon</div>
+          </div>
+          <div style="color:#8d9aa5;font-size:12px;">→</div>
+        </div>
+      </div>
+
+      <!-- B 的目的地 -->
+      <div style="padding-top:16px;padding-left:24px;">
+        <div style="background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">認識 ⚡ icon</div>
+          <div style="font-size:10px;color:#64748b;line-height:1.5;">下次登入時自動升級為分群 A，開始使用 Quick deposit</div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:4px;">
+            <div style="font-size:9px;color:#94a3b8;">→ 成為</div>
+            <div style="font-size:9px;font-weight:700;color:#16a34a;background:#f0fdf4;border-radius:4px;padding:2px 6px;">分群 A</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 分群 C ── -->
+      <div style="padding-top:16px;padding-right:16px;padding-bottom:4px;">
+        <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:12px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#dc2626;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">C</div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#b91c1c;">流失用戶</div>
+              <div style="font-size:10px;color:#dc2626;">30+ 天未存款</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:#991b1b;line-height:1.5;">有歷史記錄，需要主動召回</div>
+        </div>
+      </div>
+
+      <!-- C 的路徑 -->
+      <div style="padding-top:16px;padding-left:24px;display:flex;flex-direction:column;gap:8px;padding-bottom:4px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-left:2px;"></div>
+          <div style="flex:1;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;">
+            <div style="font-size:11px;font-weight:700;color:#b91c1c;">Round 3 · Push Notification</div>
+            <div style="font-size:10px;color:#dc2626;margin-top:2px;">個人化推播，點通知直接 deep link 到 Quick deposit 頁</div>
+          </div>
+          <div style="color:#8d9aa5;font-size:12px;">→</div>
+        </div>
+      </div>
+
+      <!-- C 的目的地 -->
+      <div style="padding-top:16px;padding-left:24px;padding-bottom:4px;">
+        <div style="background:#141515;border:1.5px solid #27b488;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;font-weight:700;color:#27b488;margin-bottom:4px;">⚡ 一鍵重複存款</div>
+          <div style="font-size:10px;color:#657381;line-height:1.5;">跳過所有選擇步驟，直達確認頁</div>
+          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="switchProto('p6',document.querySelector('[onclick*=\'p6\']'))">查看 p6 原型 →</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部說明 -->
+    <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <div style="padding:12px;background:#f8fafc;border-radius:8px;border-left:3px solid #16a34a;">
+        <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">分群 A · 優先級最高</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.5;">這群人有意圖、有記錄，只差一個曝光機會。Login 觸發列 + Popup 快捷列可同時部署，成本最低，效果最直接。</div>
+      </div>
+      <div style="padding:12px;background:#f8fafc;border-radius:8px;border-left:3px solid #2563eb;">
+        <div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px;">分群 B · 播種期</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.5;">現在教育他們，下次回訪就成為分群 A。首存 Coachmark 只觸發一次，不打擾，長期複利效應強。</div>
+      </div>
+      <div style="padding:12px;background:#f8fafc;border-radius:8px;border-left:3px solid #dc2626;">
+        <div style="font-size:11px;font-weight:700;color:#b91c1c;margin-bottom:4px;">分群 C · 推播召回</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.5;">不依賴用戶主動發現，系統主動出擊。Push notification + deep link 是目前 ROI 最高的召回手段。</div>
+      </div>
+    </div>
+  </div>
+
   <div class="state-switcher">
     <button class="state-btn s-green active" onclick="switchState('pqd','s1',this)">想法 4 · 首存教學 Coachmark</button>
     <button class="state-btn s-blue"         onclick="switchState('pqd','s2',this)">想法 5 · Login 觸發列</button>
