@@ -4299,7 +4299,7 @@
         <div style="background:#141515;border:1.5px solid #27b488;border-radius:10px;padding:12px 14px;">
           <div style="font-size:11px;font-weight:700;color:#27b488;margin-bottom:4px;">⚡ 一鍵重複存款</div>
           <div style="font-size:10px;color:#657381;line-height:1.5;">顯示上次渠道 + 金額，一鍵確認</div>
-          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="switchProto('p6',document.querySelector('[onclick*=\'p6\']'))">查看 p6 原型 →</div>
+          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="goToP6()">查看 p6 原型 →</div>
         </div>
       </div>
 
@@ -4372,7 +4372,7 @@
         <div style="background:#141515;border:1.5px solid #27b488;border-radius:10px;padding:12px 14px;">
           <div style="font-size:11px;font-weight:700;color:#27b488;margin-bottom:4px;">⚡ 一鍵重複存款</div>
           <div style="font-size:10px;color:#657381;line-height:1.5;">跳過所有選擇步驟，直達確認頁</div>
-          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="switchProto('p6',document.querySelector('[onclick*=\'p6\']'))">查看 p6 原型 →</div>
+          <div style="margin-top:8px;font-size:9px;background:rgba(39,180,136,0.1);color:#27b488;border-radius:4px;padding:3px 7px;display:inline-block;cursor:pointer;" onclick="goToP6()">查看 p6 原型 →</div>
         </div>
       </div>
 
@@ -6002,6 +6002,16 @@
   document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p8-info, .p9-info, .p10-info, .pqd-info').forEach(el => {
     if (el.style.display !== 'none') el.style.display = 'block';
   });
+
+  function goToP6() {
+    var tabs = document.querySelectorAll('.ptab');
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].textContent.trim() === '一鍵重複存款') {
+        switchProto('p6', tabs[i]);
+        return;
+      }
+    }
+  }
 
   // ── Quick Deposit 曝光策略 ──
   function pqdDismissStrip() {
