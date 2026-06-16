@@ -348,6 +348,7 @@
     <button class="ptab" onclick="switchProto('p2',this)">快速存款</button>
     <button class="ptab" onclick="switchProto('p4',this)">流失後問卷</button>
     <button class="ptab" onclick="switchProto('p6',this)">一鍵重複存款</button>
+    <button class="ptab" onclick="switchProto('pqd',this)">Quick Deposit 曝光策略</button>
     <span style="width:1px;height:18px;background:var(--border);display:inline-block;margin:0 4px;flex-shrink:0;align-self:center;"></span>
     <button class="ptab" id="archive-tab" onclick="switchProto('archive',this)" style="opacity:0.55;">歸檔</button>
   </div>
@@ -4235,6 +4236,324 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+     Quick Deposit 曝光策略
+═══════════════════════════════════════ -->
+<div id="pqd" class="proto">
+  <div class="proto-head">
+    <div class="proto-num">Quick Deposit 曝光策略</div>
+    <div class="proto-title">讓對的用戶，在對的時機，發現 Quick Deposit</div>
+    <p class="proto-desc">Quick deposit 整體 CTR 低，不是功能有問題，而是入口被錯誤的用戶稀釋。42% 一次性用戶對它沒有需求，真正的目標是有存款歷史的回訪用戶。三種輕量曝光策略，在不改動 popup 結構的前提下提升正確用戶的認知與使用率。</p>
+  </div>
+  <div class="state-switcher">
+    <button class="state-btn s-green active" onclick="switchState('pqd','s1',this)">想法 4 · 首存教學 Coachmark</button>
+    <button class="state-btn s-blue"         onclick="switchState('pqd','s2',this)">想法 5 · Login 觸發列</button>
+    <button class="state-btn s-purple"       onclick="switchState('pqd','s3',this)">想法 6 · Popup 快捷列</button>
+  </div>
+  <div class="layout">
+
+    <!-- ── INFO PANEL ── -->
+    <div class="info">
+
+      <!-- S1 info -->
+      <div class="pqd-info" id="pqd-s1-info">
+        <div class="card" style="border-color:var(--green-border);">
+          <div class="card-header green-bg">
+            <div class="cname">想法 4 — 首次存款成功後教學</div>
+            <div class="csub">觸發點：deposit_success 事件 → 僅對「第一次存款」的用戶觸發一次</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這樣做</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>Quick deposit CTR 低的根本原因是<strong>玩家不知道那個 icon 是什麼</strong>，而不是入口位置錯誤</span></li>
+                <li><span class="pi pi-ok">✓</span><span>首次存款成功的瞬間是玩家<strong>情緒最好、記憶最深</strong>的時機，此刻的教學留存率遠高於登入提示</span></li>
+                <li><span class="pi pi-ok">✓</span><span>不需要任何 API 輪詢，由 deposit_success 事件觸發，只執行一次</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">這麼做的好處</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>零改動現有 header、popup、存款流程，風險極低</span></li>
+                <li><span class="pi pi-ok">✓</span><span>只對有意義的用戶觸發：剛完成首存，代表他們是真實意圖用戶</span></li>
+                <li><span class="pi pi-ok">✓</span><span>為 Quick deposit 建立「肌肉記憶」— 下次看到 icon 知道點</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：前端 0.5 天（底部 sheet + 箭頭動畫）+ 觸發邏輯 0.5 天</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:var(--green-bg);border-color:var(--green-border);color:#166534;">
+              <span>教育用戶在「剛完成行動」的時機效果最佳，因為他們剛剛體驗了這個行動帶來的結果，對相關功能最有認知動力。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2 info -->
+      <div class="pqd-info" id="pqd-s2-info" style="display:none;">
+        <div class="card" style="border-color:var(--blue-border);">
+          <div class="card-header" style="background:var(--blue-bg);">
+            <div class="cname">想法 5 — Login 觸發提示列</div>
+            <div class="csub">觸發點：登入事件（已有 API call）→ 有上次存款記錄者才顯示 → 每次登入一次，可關閉</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這樣做</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>登入時系統已取得玩家資料，<strong>不需要額外 API，零效能成本</strong></span></li>
+                <li><span class="pi pi-ok">✓</span><span>回訪玩家登入後的前幾秒是「決定今天做什麼」的關鍵時機，此時曝光 Quick deposit 意圖最強</span></li>
+                <li><span class="pi pi-ok">✓</span><span>只顯示給有存款歷史的用戶，對新用戶不打擾</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">這麼做的好處</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>提示列設計輕量，不遮擋任何內容，不強迫，可一鍵關閉</span></li>
+                <li><span class="pi pi-ok">✓</span><span>顯示具體資訊（渠道 + 金額），用戶看到的是自己熟悉的內容，而非陌生功能</span></li>
+                <li><span class="pi pi-ok">✓</span><span>讓 Quick deposit icon 從「不知道做什麼」變成「我知道點了會發生什麼」</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：前端 1 天（提示列元件 + 顯示邏輯 + 關閉動畫）</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:var(--blue-bg);border-color:var(--blue-border);color:#1e40af;">
+              <span>情境化資訊（「你上次用 bKash 存 ৳1,000」）比功能說明（「Quick Deposit 讓你存款更快」）的點擊率高 3–5 倍，因為前者讓用戶立刻理解對自己的價值。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 info -->
+      <div class="pqd-info" id="pqd-s3-info" style="display:none;">
+        <div class="card" style="border-color:var(--purple-border);">
+          <div class="card-header" style="background:var(--purple-bg);">
+            <div class="cname">想法 6 — Wallet Popup 快捷列</div>
+            <div class="csub">在現有 popup 的 Withdraw / Deposit 按鈕上方，加入一條輕量快捷資訊列</div>
+          </div>
+          <div class="card-body">
+            <div class="panel">
+              <div class="panel-title">為什麼這樣做</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>玩家已有<strong>打開 wallet popup 的習慣</strong>，不需要建立新的行為路徑</span></li>
+                <li><span class="pi pi-ok">✓</span><span>Popup 裡已有 Main wallet、Bonus wallet、Promotion card — 玩家打開 popup 時注意力最集中</span></li>
+                <li><span class="pi pi-ok">✓</span><span>不是第三個按鈕（會顯得擠），而是一條資訊列，視覺權重低，不破壞現有版型</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <div class="panel-title">這麼做的好處</div>
+              <ul class="pl">
+                <li><span class="pi pi-ok">✓</span><span>對玩家來說，存款意圖最強的時機就是打開 wallet popup 的時候，此刻的快捷列轉換率最高</span></li>
+                <li><span class="pi pi-ok">✓</span><span>只需改動 popup 內的一個小元件，不影響其他頁面和流程</span></li>
+                <li><span class="pi pi-ok">✓</span><span>Quick → 按鈕直接跳到 Quick deposit 頁，而綠色 Deposit 按鈕仍保留完整流程，兩條路並存</span></li>
+                <li><span class="pi pi-tip">→</span><span>預估開發：前端 0.5 天（加一個有條件顯示的 row）</span></li>
+              </ul>
+            </div>
+            <div class="callout" style="background:var(--purple-bg);border-color:var(--purple-border);color:#5b21b6;">
+              <span>利用「現有習慣路徑」是提升功能使用率最低成本的方式 — 不需要用戶學習新行為，只需要在他們已經做的事情旁邊，放一個更快的捷徑。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end info -->
+
+    <!-- ── PHONE ── -->
+    <div class="phone-wrap">
+      <div class="phone-label" id="pqd-phone-label">想法 4 — 首存教學 Coachmark</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" style="background:#141515;overflow:hidden;">
+
+          <!-- ── S1: 首存教學 Coachmark ── -->
+          <div class="pstate active" id="pqd-s1" style="display:flex;flex-direction:column;position:relative;">
+
+            <!-- App bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#141515;flex-shrink:0;border-bottom:1px solid #222;">
+              <span style="font-size:13px;color:#e2e6e9;font-weight:600;">存款</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div id="pqd-coach-target" style="width:28px;height:28px;background:#1a2a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#27b488;position:relative;">⚡
+                  <!-- Pulse ring (教學時高亮） -->
+                  <div id="pqd-pulse" style="position:absolute;inset:-4px;border-radius:10px;border:2px solid #27b488;animation:pqdPulse 1.2s ease-in-out infinite;opacity:0;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Deposit success content -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;gap:12px;">
+              <div style="width:64px;height:64px;border-radius:50%;background:rgba(39,180,136,0.15);border:2px solid #27b488;display:flex;align-items:center;justify-content:center;font-size:28px;color:#27b488;">✓</div>
+              <div style="font-size:18px;font-weight:700;color:#e2e6e9;text-align:center;">Deposit Successful!</div>
+              <div style="font-size:28px;font-weight:700;color:#27b488;">৳ 1,000</div>
+              <div style="font-size:11px;color:#8d9aa5;">bKash · Payment Gateway · AB 01</div>
+              <div style="font-size:11px;color:#657381;margin-top:4px;">Credited to Main Wallet</div>
+            </div>
+
+            <!-- Coachmark overlay -->
+            <div id="pqd-coach" style="position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;opacity:0;transition:opacity 0.25s;">
+              <!-- Arrow pointing to Quick deposit icon -->
+              <div style="flex-shrink:0;height:52px;display:flex;align-items:flex-end;justify-content:flex-end;padding:0 24px 4px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                  <div style="font-size:18px;color:#27b488;animation:pqdBounce 1s ease-in-out infinite;">↑</div>
+                  <div style="font-size:9px;color:#27b488;font-weight:600;white-space:nowrap;">Quick deposit</div>
+                </div>
+              </div>
+              <!-- Coach sheet -->
+              <div style="flex:1;display:flex;align-items:flex-end;">
+                <div style="background:#1c1e1e;border-radius:16px 16px 0 0;padding:20px 20px 24px;width:100%;">
+                  <div style="width:36px;height:4px;background:#303232;border-radius:2px;margin:0 auto 16px;"></div>
+                  <div style="font-size:15px;font-weight:700;color:#e2e6e9;margin-bottom:8px;">下次更快！⚡</div>
+                  <div style="font-size:12px;color:#8d9aa5;line-height:1.6;margin-bottom:16px;">
+                    右上角的 <span style="color:#27b488;font-weight:600;">⚡ 圖示</span> 就是 Quick deposit。<br>
+                    下次只需點一下，就能直接用 <span style="color:#e2e6e9;">bKash 存 ৳1,000</span>，不需要重新選渠道和金額。
+                  </div>
+                  <button onclick="pqdDismissCoach()" style="width:100%;height:46px;background:#14805e;border:none;border-radius:5px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">知道了</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trigger button (demo用) -->
+            <div style="padding:12px 16px;background:#141515;flex-shrink:0;border-top:1px solid #1e1e1e;">
+              <button onclick="pqdShowCoach()" style="width:100%;height:44px;background:#222424;border:1px solid #303232;border-radius:5px;color:#8d9aa5;font-size:12px;cursor:pointer;">▶ 點此觸發 Coachmark 教學</button>
+            </div>
+
+          </div>
+
+          <!-- ── S2: Login 觸發列 ── -->
+          <div class="pstate" id="pqd-s2" style="display:none;flex-direction:column;">
+
+            <!-- App bar (home) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 10px;background:#141515;flex-shrink:0;">
+              <div style="font-size:16px;font-weight:700;color:#27b488;">BJ</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="font-size:11px;color:#e2e6e9;background:#222424;border-radius:12px;padding:4px 10px;">₹ 2,008.00 ▾</div>
+                <div style="width:28px;height:28px;background:#1a2a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#27b488;">⚡</div>
+              </div>
+            </div>
+
+            <!-- Login 觸發提示列 -->
+            <div id="pqd-login-strip" style="background:#1a2e1a;border-bottom:1px solid rgba(39,180,136,0.3);padding:8px 14px;display:flex;align-items:center;gap:8px;transition:all 0.3s;overflow:hidden;max-height:60px;flex-shrink:0;">
+              <span style="font-size:14px;color:#27b488;flex-shrink:0;">⚡</span>
+              <div style="flex:1;min-width:0;">
+                <span style="font-size:11px;color:#8d9aa5;">上次存款：</span>
+                <span style="font-size:11px;color:#e2e6e9;font-weight:600;">bKash · ৳1,000</span>
+              </div>
+              <button style="background:#14805e;border:none;border-radius:4px;color:#fff;font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0;">Quick In →</button>
+              <button onclick="pqdDismissStrip()" style="background:none;border:none;color:#657381;font-size:16px;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;">✕</button>
+            </div>
+
+            <!-- Home content (simplified) -->
+            <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+              <!-- Hero banner placeholder -->
+              <div style="width:100%;height:120px;background:linear-gradient(135deg,#1a3a2a,#0d1f14);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #1e3a28;">
+                <span style="font-size:11px;color:#27b488;font-weight:600;">100% Welcome Bonus · Expires 23:09:36</span>
+              </div>
+              <!-- Game grid -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                <div style="background:#1a1a1a;border-radius:6px;height:70px;"></div>
+                <div style="background:#1e1e1e;border-radius:6px;height:70px;"></div>
+                <div style="background:#1a1a1a;border-radius:6px;height:70px;"></div>
+                <div style="background:#1e1e1e;border-radius:6px;height:70px;"></div>
+                <div style="background:#1a1a1a;border-radius:6px;height:70px;"></div>
+                <div style="background:#1e1e1e;border-radius:6px;height:70px;"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── S3: Popup 快捷列 ── -->
+          <div class="pstate" id="pqd-s3" style="display:none;flex-direction:column;">
+
+            <!-- App bar (home) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#141515;flex-shrink:0;">
+              <div style="font-size:16px;font-weight:700;color:#27b488;">BJ</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="font-size:11px;color:#e2e6e9;background:#222424;border-radius:12px;padding:4px 10px;">₹ 2,008.00 ▾</div>
+                <div style="width:28px;height:28px;background:#1a2a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#27b488;">⚡</div>
+              </div>
+            </div>
+
+            <!-- Home content (dimmed, popup on top) -->
+            <div style="flex:1;background:#141515;position:relative;overflow:hidden;">
+              <div style="padding:14px;opacity:0.3;filter:blur(1px);">
+                <div style="width:100%;height:110px;background:#1a3a2a;border-radius:8px;margin-bottom:10px;"></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                  <div style="background:#1a1a1a;border-radius:6px;height:65px;"></div>
+                  <div style="background:#1e1e1e;border-radius:6px;height:65px;"></div>
+                  <div style="background:#1a1a1a;border-radius:6px;height:65px;"></div>
+                </div>
+              </div>
+
+              <!-- Modal mask -->
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);"></div>
+
+              <!-- Popup -->
+              <div style="position:absolute;bottom:0;left:0;right:0;background:#141515;border-radius:16px 16px 0 0;padding:16px;">
+                <div style="width:36px;height:4px;background:#303232;border-radius:2px;margin:0 auto 14px;"></div>
+
+                <!-- Main wallet -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                  <span style="font-size:13px;color:#e2e6e9;">Main wallet</span>
+                  <span style="font-size:15px;font-weight:700;color:#e2e6e9;">₹ 2,008,000.00 ↻</span>
+                </div>
+
+                <div style="height:1px;background:rgba(255,255,255,0.08);margin-bottom:10px;"></div>
+
+                <!-- Bonus wallet -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                  <span style="font-size:13px;color:#e2e6e9;">Bonus wallet</span>
+                  <span style="font-size:13px;color:#8d9aa5;">B 0.00 ↻</span>
+                </div>
+
+                <!-- Promotion card -->
+                <div style="background:#222424;border:1px solid #14805e;border-radius:8px;padding:10px 12px;margin-bottom:12px;position:relative;">
+                  <div style="font-size:9px;color:#8d9aa5;margin-bottom:4px;">Joined promotions  3 ›</div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#0d5c42,#1db87c);flex-shrink:0;"></div>
+                    <div>
+                      <div style="font-size:10px;color:#e2e6e9;font-weight:600;">100% bonus on all games ›</div>
+                      <div style="font-size:14px;font-weight:700;color:#e2e6e9;">₹ 50.00</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:8px;">
+                    <div style="height:5px;background:#222;border-radius:3px;overflow:hidden;">
+                      <div style="width:70%;height:100%;background:linear-gradient(90deg,#10654b,#219772);border-radius:3px;"></div>
+                    </div>
+                    <div style="font-size:9px;color:#27b488;margin-top:3px;">3,500.00 / 5,000.00</div>
+                  </div>
+                </div>
+
+                <!-- ★ Quick 快捷列 -->
+                <div style="background:#1a2e1a;border:1px solid rgba(39,180,136,0.3);border-radius:5px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:#27b488;flex-shrink:0;">⚡</span>
+                  <div style="flex:1;min-width:0;">
+                    <span style="font-size:11px;color:#8d9aa5;">上次：</span>
+                    <span style="font-size:11px;color:#e2e6e9;font-weight:600;">bKash · ৳1,000</span>
+                  </div>
+                  <button style="background:#14805e;border:none;border-radius:4px;color:#fff;font-size:11px;font-weight:600;padding:5px 10px;cursor:pointer;white-space:nowrap;">Quick →</button>
+                </div>
+
+                <!-- Withdraw / Deposit buttons -->
+                <div style="display:flex;gap:8px;">
+                  <button style="flex:1;height:46px;background:transparent;border:1px solid #454647;border-radius:5px;color:#8d9aa5;font-size:14px;font-weight:600;cursor:pointer;">Withdraw</button>
+                  <button style="flex:1;height:46px;background:#14805e;border:none;border-radius:5px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Deposit</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div><!-- end phone-wrap -->
+  </div>
+</div>
+
+<style>
+  @keyframes pqdPulse {
+    0%,100% { opacity:0; transform:scale(1); }
+    50% { opacity:1; transform:scale(1.15); }
+  }
+  @keyframes pqdBounce {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-4px); }
+  }
+</style>
+
 </div><!-- end main -->
 
 <div class="footer">
@@ -4271,7 +4590,8 @@
           el.classList.contains('p4-info') || el.classList.contains('p5-info') ||
           el.classList.contains('p6-info') ||
           el.classList.contains('p8-info') || el.classList.contains('p9-info') ||
-          el.classList.contains('p10-info')) {
+          el.classList.contains('p10-info') || el.classList.contains('pqd-info') ||
+          el.classList.contains('ppush-info')) {
         el.style.display = 'none';
         el.classList.remove('active');
       }
@@ -5529,9 +5849,23 @@
     if (!el.classList.contains('active')) el.style.display = 'none';
     else el.style.display = 'flex';
   });
-  document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p8-info, .p9-info, .p10-info').forEach(el => {
+  document.querySelectorAll('.p1-info, .p2-info, .p3-info, .p4-info, .p5-info, .p6-info, .p8-info, .p9-info, .p10-info, .pqd-info').forEach(el => {
     if (el.style.display !== 'none') el.style.display = 'block';
   });
+
+  // ── Quick Deposit 曝光策略 ──
+  function pqdDismissStrip() {
+    var strip = document.getElementById('pqd-login-strip');
+    if (strip) { strip.style.opacity='0'; strip.style.maxHeight='0'; strip.style.padding='0 16px'; setTimeout(function(){ strip.style.display='none'; },300); }
+  }
+  function pqdDismissCoach() {
+    var coach = document.getElementById('pqd-coach');
+    if (coach) { coach.style.opacity='0'; setTimeout(function(){ coach.style.display='none'; },250); }
+  }
+  function pqdShowCoach() {
+    var coach = document.getElementById('pqd-coach');
+    if (coach) { coach.style.display='flex'; setTimeout(function(){ coach.style.opacity='1'; },10); }
+  }
 
   // ── 狀態 1 一鍵重複存款輪播 ──
   let p6SlideIdx = 0;
