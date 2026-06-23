@@ -228,6 +228,58 @@ export class WebGLRenderer {
   }
 
   /**
+   * 讀取縮小版渲染結果（供即時預覽使用）
+   * maxSize：最長邊不超過此像素數，大幅減少 GPU→CPU 傳輸量
+   */
+  readPixelsScaled(maxSize: number): { pixels: Uint8Array; width: number; height: number } {
+    const { gl } = this;
+    const ow = this.imageWidth;
+    const oh = this.imageHeight;
+    if (ow === 0 || oh === 0) throw new Error('尚未載入圖片');
+
+    const scale = Math.min(1, maxSize / Math.max(ow, oh));
+    const w = Math.round(ow * scale);
+    const h = Math.round(oh * scale);
+
+    const fb = gl.createFramebuffer()!;
+    const tex = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.deleteFramebuffer(fb);
+      gl.deleteTexture(tex);
+      this.render();
+      throw new Error('離屏 Framebuffer 建立失敗');
+    }
+
+    this.render(w, h);
+
+    const raw = new Uint8Array(w * h * 4);
+    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, raw);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.deleteFramebuffer(fb);
+    gl.deleteTexture(tex);
+    this.render();
+
+    // Y-flip（WebGL Y=0 在底部，Canvas 2D 相反）
+    const rowBytes = w * 4;
+    const pixels = new Uint8Array(raw.length);
+    for (let row = 0; row < h; row++) {
+      pixels.set(raw.subarray((h - 1 - row) * rowBytes, (h - row) * rowBytes), row * rowBytes);
+    }
+
+    return { pixels, width: w, height: h };
+  }
+
+  /**
    * 讀取目前渲染結果的像素（RGBA Uint8Array）
    * 在 Apply 時呼叫，回傳圖片 bytes 傳給 plugin code
    */

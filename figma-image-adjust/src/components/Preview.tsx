@@ -5,6 +5,7 @@ export interface PreviewHandle {
   loadImage: (bytes: Uint8Array, width: number, height: number) => Promise<void>;
   updateLut: (lutData: Uint8Array) => void;
   readPixels: () => { pixels: Uint8Array; width: number; height: number };
+  readPixelsScaled: (maxSize: number) => { pixels: Uint8Array; width: number; height: number };
   readViewportPixels: () => Uint8Array;
   setSplit: (x: number) => void;
   getDisplaySize: () => { width: number; height: number };
@@ -86,6 +87,10 @@ export const Preview = forwardRef<PreviewHandle, PreviewProps>(
       readPixels: () => {
         if (!rendererRef.current) throw new Error('WebGL 未初始化')
         return rendererRef.current.readPixels()
+      },
+      readPixelsScaled: (maxSize) => {
+        if (!rendererRef.current) throw new Error('WebGL 未初始化')
+        return rendererRef.current.readPixelsScaled(maxSize)
       },
       readViewportPixels: () => {
         if (!rendererRef.current) throw new Error('WebGL 未初始化')
