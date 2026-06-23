@@ -4,6 +4,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const OpenAI = require('openai');
+const { toFile } = require('openai');
 
 // ── Daily request counter (resets at midnight) ──────────────────────────────
 let dailyCount = 0;
@@ -51,6 +52,7 @@ const upload = multer({
 // ── Parse PNG dimensions from base64 (reads IHDR chunk) ─────────────────────
 function getPNGDimensions(base64) {
   const buf = Buffer.from(base64, 'base64');
+  if (buf.length < 24) throw new Error('Invalid PNG response: buffer too short');
   const width = buf.readUInt32BE(16);
   const height = buf.readUInt32BE(20);
   return { width, height };
@@ -119,7 +121,6 @@ function createApp() {
         return res.status(400).json({ error: { code: 'INVALID_MASK', message: '缺少遮罩' } });
       }
       try {
-        const { toFile } = await import('openai');
         const openai = getOpenAI();
         const imageFile = await toFile(req.files.image[0].buffer, 'image.png', { type: 'image/png' });
         const maskFile = await toFile(req.files.mask[0].buffer, 'mask.png', { type: 'image/png' });

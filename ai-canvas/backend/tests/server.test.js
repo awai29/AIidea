@@ -21,9 +21,29 @@ describe('daily limit middleware', () => {
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
+
+  it('returns 429 when daily limit is exceeded', () => {
+    const { checkDailyLimit, resetDailyCount } = require('../server');
+    resetDailyCount();
+    const next = jest.fn();
+    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+    // Exhaust the limit
+    for (let i = 0; i < 100; i++) {
+      checkDailyLimit({}, { status: jest.fn().mockReturnThis(), json: jest.fn() }, jest.fn());
+    }
+    // 101st request should be blocked
+    checkDailyLimit({}, res, next);
+    expect(res.status).toHaveBeenCalledWith(429);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: expect.objectContaining({ code: 'DAILY_LIMIT_EXCEEDED' }) })
+    );
+    expect(next).not.toHaveBeenCalled();
+  });
 });
 
 describe('POST /api/generate', () => {
+  beforeEach(() => { require('../server').resetDailyCount(); });
+
   it('returns 400 when prompt is missing', async () => {
     const app = createApp();
     const res = await request(app).post('/api/generate').send({});
@@ -40,6 +60,8 @@ describe('POST /api/generate', () => {
 });
 
 describe('POST /api/edit', () => {
+  beforeEach(() => { require('../server').resetDailyCount(); });
+
   it('returns 400 when prompt is missing', async () => {
     const app = createApp();
     const res = await request(app)
