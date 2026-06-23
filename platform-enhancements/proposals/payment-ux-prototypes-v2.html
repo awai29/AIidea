@@ -1236,30 +1236,37 @@
 
           <!-- STATE 2: Interactive prototype -->
           <div class="pstate" id="p2-s2" style="position:relative;overflow:hidden;padding-bottom:280px;transition:padding-bottom 0.35s cubic-bezier(.4,0,.2,1);">
-            <!-- App bar: header 下拉選單 -->
+            <!-- App bar -->
             <div class="app-bar" style="position:relative;justify-content:space-between;">
-              <div class="app-bar-back" onclick="p2CloseAll()">←</div>
-              <div onclick="p2OpenPayment()" style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,0.06);">
-                <span id="p2-type-label" style="font-size:13px;font-weight:600;color:#fff;">E-wallet</span>
-                <span style="font-size:9px;color:#888;">▼</span>
-              </div>
+              <div class="app-bar-back" onclick="p2GoBackToP6()">←</div>
+              <div style="font-size:14px;font-weight:600;color:#fff;">Deposit</div>
               <div style="width:30px;"></div>
-              <!-- Type dropdown -->
-              <div id="p2-type-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#2a2a2a;border:1px solid #444;border-radius:12px;overflow:hidden;min-width:160px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
-                <div id="p2-menu-localbank" onclick="p2SelectType('localbank')" style="padding:11px 16px;font-size:12px;color:#ccc;border-bottom:1px solid #333;cursor:pointer;display:flex;justify-content:space-between;">Local Bank <span id="p2-chk-localbank"></span></div>
-                <div id="p2-menu-ewallet" onclick="p2SelectType('ewallet')" style="padding:11px 16px;font-size:12px;color:#27b488;border-bottom:1px solid #333;cursor:pointer;display:flex;justify-content:space-between;">E-wallet <span id="p2-chk-ewallet">✓</span></div>
-                <div id="p2-menu-crypto" onclick="p2SelectType('crypto')" style="padding:11px 16px;font-size:12px;color:#ccc;cursor:pointer;display:flex;justify-content:space-between;">Crypto <span id="p2-chk-crypto"></span></div>
-              </div>
+              <!-- Type menu (hidden, kept for backward compat) -->
+              <div id="p2-type-menu" style="display:none;"><span id="p2-type-label"></span><span id="p2-chk-ewallet"></span><span id="p2-chk-localbank"></span><span id="p2-chk-crypto"></span><span id="p2-menu-ewallet"></span><span id="p2-menu-localbank"></span><span id="p2-menu-crypto"></span></div>
             </div>
+
+            <!-- 4 Tabs: Quick / E-wallet / Local Bank / Crypto -->
+            <div id="p2-tab-row" style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+              <div id="p2-tab-quick"     onclick="p2SwitchMainTab('quick')"     style="flex:1;text-align:center;padding:10px 2px;font-size:11px;font-weight:600;color:#27b488;border-bottom:2px solid #27b488;cursor:pointer;transition:all 0.15s;">Quick</div>
+              <div id="p2-tab-ewallet"   onclick="p2SwitchMainTab('ewallet')"   style="flex:1;text-align:center;padding:10px 2px;font-size:11px;font-weight:600;color:#657381;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.15s;">E-wallet</div>
+              <div id="p2-tab-localbank" onclick="p2SwitchMainTab('localbank')" style="flex:1;text-align:center;padding:10px 2px;font-size:11px;font-weight:600;color:#657381;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.15s;">Local Bank</div>
+              <div id="p2-tab-crypto"    onclick="p2SwitchMainTab('crypto')"    style="flex:1;text-align:center;padding:10px 2px;font-size:11px;font-weight:600;color:#657381;border-bottom:2px solid transparent;cursor:pointer;transition:all 0.15s;">Crypto</div>
+            </div>
+
+            <!-- Quick tab 內容 wrapper（切換到其他 tab 時整個隱藏）-->
+            <div id="p2-quick-wrapper">
 
             <!-- 千人千面 Context Banner（依玩家身份顯示，預設隱藏）-->
             <div id="p2-persona-banner" style="display:none;margin:8px 12px 0;border-radius:8px;padding:9px 12px;font-size:11px;line-height:1.4;flex-shrink:0;"></div>
 
             <!-- 金額輸入框 -->
             <div style="padding:12px 18px 8px;flex-shrink:0;">
-              <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Amount</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Amount</div>
+                <div><span style="font-size:10px;color:#555;">Balance </span><span style="font-size:11px;font-weight:600;color:#aaa;">৳2,450</span></div>
+              </div>
               <div style="font-size:50px;font-weight:300;color:#fff;letter-spacing:-0.03em;line-height:1;" id="p2-amt">0</div>
-              <div id="p2-limit" style="font-size:10px;color:#444;margin-top:3px;">限額 ৳100 – ৳50,000</div>
+              <div id="p2-limit" style="font-size:10px;color:#444;margin-top:3px;">Min ৳100 – Max ৳50,000</div>
             </div>
 
             <!-- 支付方式 row -->
@@ -1283,6 +1290,18 @@
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                 <div style="font-size:12px;color:#E2E6E9;white-space:nowrap;" id="p2-promo-sub">Up to ৳3,000 bonus</div>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+            <!-- 優惠不相容提示（預設隱藏，JS 控制顯示） -->
+            <div id="p2-promo-conflict" style="display:none;margin:-4px 12px 6px;background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.28);border-top:none;border-radius:0 0 8px 8px;padding:8px 12px;flex-direction:column;gap:7px;flex-shrink:0;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="p2-promo-conflict-msg" style="font-size:11px;color:#ea580c;line-height:1.5;flex:1;"></span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-left:21px;">
+                <button id="p2-conflict-switch-btn" onclick="p2SwitchToCompatProvider()" style="padding:5px 12px;background:#27b488;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;"></button>
+                <span onclick="p2SelectPromo('','','none')" style="font-size:10px;color:#ea580c;opacity:0.7;text-decoration:underline;cursor:pointer;">Remove</span>
               </div>
             </div>
 
@@ -1325,7 +1344,217 @@
 
             </div><!-- end p2-kb-wrapper -->
 
-            <!-- Backdrop -->
+            </div><!-- end p2-quick-wrapper -->
+
+            <!-- Tab overlay：Local Bank / E-wallet / Crypto -->
+            <div id="p2-tab-overlay" style="display:none;position:absolute;top:88px;left:0;right:0;bottom:0;z-index:14;flex-direction:column;background:#111;">
+
+              <!-- scrollable content -->
+              <div id="p2-tab-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+
+                <!-- ── LOCAL BANK ── -->
+                <div id="p2-tab-localbank-content" style="display:none;padding-bottom:4px;">
+                  <div style="padding:12px 16px 0;display:flex;align-items:center;justify-content:flex-end;">
+                    <span style="font-size:10px;color:#555;">Balance </span><span style="font-size:11px;font-weight:600;color:#aaa;margin-left:4px;">৳2,450</span>
+                  </div>
+                  <div style="padding:6px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select promotion</div>
+                  <div id="lb-promo-row" onclick="tabOpenPromo('localbank')" style="margin:0 12px 0;background:#1e1e1e;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="1.5"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    <div id="lb-promo-name" style="flex:1;font-size:13px;font-weight:600;color:#E2E6E9;">Promotion</div>
+                    <div id="lb-promo-sub" style="font-size:12px;color:#8D9AA5;">Sign up bonus</div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
+                  <div id="lb-promo-conflict" style="display:none;margin:0 12px 2px;background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.28);border-top:none;border-radius:0 0 8px 8px;padding:8px 12px;flex-direction:column;gap:7px;">
+                    <div style="display:flex;align-items:flex-start;gap:8px;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span id="lb-promo-conflict-msg" style="font-size:11px;color:#ea580c;line-height:1.5;flex:1;"></span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;padding-left:21px;">
+                      <span onclick="tabRemovePromo('localbank')" style="font-size:10px;color:#ea580c;opacity:0.7;text-decoration:underline;cursor:pointer;">Remove</span>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select payment</div>
+                  <div style="margin:0 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                    <div onclick="lbSelectPay('Bank card',this)" style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;">
+                      <div style="width:40px;height:40px;background:#d97706;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                      </div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">Bank card</div>
+                      <div style="position:absolute;top:4px;right:4px;background:#27b488;border-radius:4px;font-size:8px;font-weight:700;color:#fff;padding:1px 4px;">+7%</div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select type</div>
+                  <div style="margin:0 12px;display:flex;flex-direction:column;gap:4px;">
+                    <div id="lb-row-pg" onclick="lbSelectType('pg')" style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">Payment Gateway</div>
+                      <div id="lb-radio-pg" style="width:20px;height:20px;border-radius:50%;border:2px solid #27b488;display:flex;align-items:center;justify-content:center;"><div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div></div>
+                    </div>
+                    <div id="lb-row-bt" onclick="lbSelectType('bt')" style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">Bank Transfer</div>
+                      <div id="lb-radio-bt" style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;"></div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Deposit channel</div>
+                  <div style="margin:0 12px;background:#1e1e1e;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <span style="font-size:14px;color:#E2E6E9;">AB 01</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select bank</div>
+                  <div style="margin:0 12px;background:#1e1e1e;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <div style="width:28px;height:28px;background:#c0392b;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;">AB</div>
+                    <div style="flex:1;font-size:14px;color:#E2E6E9;">AB Bank PLC.</div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div style="height:80px;"></div>
+                </div>
+
+                <!-- ── E-WALLET ── -->
+                <div id="p2-tab-ewallet-content" style="display:none;padding-bottom:4px;">
+                  <div style="padding:12px 16px 0;display:flex;align-items:center;justify-content:flex-end;">
+                    <span style="font-size:10px;color:#555;">Balance </span><span style="font-size:11px;font-weight:600;color:#aaa;margin-left:4px;">৳2,450</span>
+                  </div>
+                  <div style="padding:6px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select promotion</div>
+                  <div id="ew-promo-row" onclick="tabOpenPromo('ewallet')" style="margin:0 12px 0;background:#1e1e1e;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="1.5"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    <div id="ew-promo-name" style="flex:1;font-size:13px;font-weight:600;color:#E2E6E9;">Promotion</div>
+                    <div id="ew-promo-sub" style="font-size:12px;color:#8D9AA5;">Sign up bonus</div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
+                  <div id="ew-promo-conflict" style="display:none;margin:0 12px 2px;background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.28);border-top:none;border-radius:0 0 8px 8px;padding:8px 12px;flex-direction:column;gap:7px;">
+                    <div style="display:flex;align-items:flex-start;gap:8px;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span id="ew-promo-conflict-msg" style="font-size:11px;color:#ea580c;line-height:1.5;flex:1;"></span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding-left:21px;">
+                      <button id="ew-conflict-switch-btn" onclick="tabSwitchProvider('ewallet')" style="padding:5px 12px;background:#27b488;border:none;border-radius:6px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;"></button>
+                      <span onclick="tabRemovePromo('ewallet')" style="font-size:10px;color:#ea580c;opacity:0.7;text-decoration:underline;cursor:pointer;">Remove</span>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select payment</div>
+                  <div id="ew-pay-grid" style="margin:0 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                    <div onclick="ewSelectPay('bKash',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;">
+                      <div style="width:40px;height:40px;background:#e2136e;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">bK</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">bKash</div>
+                      <div style="position:absolute;top:4px;right:4px;background:#27b488;border-radius:4px;font-size:8px;font-weight:700;color:#fff;padding:1px 4px;">+7%</div>
+                    </div>
+                    <div onclick="ewSelectPay('Rocket',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;">
+                      <div style="width:40px;height:40px;background:#8b2fc9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">Ro</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">Rocket</div>
+                      <div style="position:absolute;top:4px;right:4px;background:#27b488;border-radius:4px;font-size:8px;font-weight:700;color:#fff;padding:1px 4px;">+7%</div>
+                    </div>
+                    <div onclick="ewSelectPay('OKwallet',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;">
+                      <div style="width:40px;height:40px;background:#1a56db;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">OK</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">OKwallet</div>
+                      <div style="position:absolute;top:4px;right:4px;background:#27b488;border-radius:4px;font-size:8px;font-weight:700;color:#fff;padding:1px 4px;">+7%</div>
+                    </div>
+                    <div onclick="ewSelectPay('Upay',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#00a859;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">Up</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">Upay</div>
+                    </div>
+                    <div onclick="ewSelectPay('Nagad',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative;">
+                      <div style="width:40px;height:40px;background:#e8621a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">Na</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">Nagad</div>
+                      <div style="position:absolute;bottom:28px;left:0;right:0;background:#1a1a1a;border-radius:4px;margin:0 4px;font-size:8px;color:#e8621a;text-align:center;padding:1px 2px;display:none;" id="ew-nagad-maint">Maintenance</div>
+                    </div>
+                    <div onclick="ewSelectPay('SureCash',this)" data-ew-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#1565c0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">SC</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">SureCash</div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select type</div>
+                  <div style="margin:0 12px;display:flex;flex-direction:column;gap:4px;">
+                    <div id="ew-row-pg" onclick="ewSelectType('pg')" style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">Payment Gateway</div>
+                      <div id="ew-radio-pg" style="width:20px;height:20px;border-radius:50%;border:2px solid #27b488;display:flex;align-items:center;justify-content:center;"><div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div></div>
+                    </div>
+                    <div id="ew-row-bt" onclick="ewSelectType('bt')" style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">Bank Transfer</div>
+                      <div id="ew-radio-bt" style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;"></div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Deposit channel</div>
+                  <div style="margin:0 12px;background:#1e1e1e;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <span style="font-size:14px;color:#E2E6E9;">AB 01</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div style="height:80px;"></div>
+                </div>
+
+                <!-- ── CRYPTO ── -->
+                <div id="p2-tab-crypto-content" style="display:none;padding-bottom:4px;">
+                  <div style="padding:12px 16px 0;display:flex;align-items:center;justify-content:flex-end;">
+                    <span style="font-size:10px;color:#555;">Balance </span><span style="font-size:11px;font-weight:600;color:#aaa;margin-left:4px;">৳2,450</span>
+                  </div>
+                  <div style="padding:6px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select promotion</div>
+                  <div id="cr-promo-row" onclick="tabOpenPromo('crypto')" style="margin:0 12px 0;background:#1e1e1e;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8D9AA5" stroke-width="1.5"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+                    <div id="cr-promo-name" style="flex:1;font-size:13px;font-weight:600;color:#E2E6E9;">Promotion</div>
+                    <div id="cr-promo-sub" style="font-size:12px;color:#8D9AA5;">Sign up bonus</div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
+                  <div id="cr-promo-conflict" style="display:none;margin:0 12px 2px;background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.28);border-top:none;border-radius:0 0 8px 8px;padding:8px 12px;flex-direction:column;gap:7px;">
+                    <div style="display:flex;align-items:flex-start;gap:8px;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span id="cr-promo-conflict-msg" style="font-size:11px;color:#ea580c;line-height:1.5;flex:1;"></span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;padding-left:21px;">
+                      <span onclick="tabRemovePromo('crypto')" style="font-size:10px;color:#ea580c;opacity:0.7;text-decoration:underline;cursor:pointer;">Remove</span>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select payment</div>
+                  <div id="cr-pay-grid" style="margin:0 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                    <div onclick="crSelectPay('USDT TRC20',this)" data-cr-pay style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#26a17b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">₮</div>
+                      <div style="font-size:10px;font-weight:500;color:#E2E6E9;text-align:center;line-height:1.3;">USDT TRC20</div>
+                    </div>
+                    <div onclick="crSelectPay('USDT OMNI',this)" data-cr-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#1d6fa4;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">₮</div>
+                      <div style="font-size:10px;font-weight:500;color:#E2E6E9;text-align:center;line-height:1.3;">USDT OMNI</div>
+                    </div>
+                    <div onclick="crSelectPay('USDT ERC20',this)" data-cr-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#627eea;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;">₮</div>
+                      <div style="font-size:10px;font-weight:500;color:#E2E6E9;text-align:center;line-height:1.3;">USDT ERC20</div>
+                    </div>
+                    <div onclick="crSelectPay('BTC',this)" data-cr-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#f7931a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;">₿</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">BTC</div>
+                    </div>
+                    <div onclick="crSelectPay('ETH',this)" data-cr-pay style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
+                      <div style="width:40px;height:40px;background:#627eea;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;">Ξ</div>
+                      <div style="font-size:11px;font-weight:500;color:#E2E6E9;">ETH</div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Select type</div>
+                  <div style="margin:0 12px;display:flex;flex-direction:column;gap:4px;">
+                    <div id="cr-row-trc20" onclick="crSelectType('trc20')" style="background:#1e1e1e;border:1.5px solid rgba(255,255,255,.06);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">TRC20</div>
+                      <div id="cr-radio-trc20" style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;"></div>
+                    </div>
+                    <div id="cr-row-trc20t" onclick="crSelectType('trc20t')" style="background:#1e1e1e;border:1.5px solid #27b488;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+                      <div style="font-size:14px;font-weight:600;color:#E2E6E9;">TRC20 Transfer</div>
+                      <div id="cr-radio-trc20t" style="width:20px;height:20px;border-radius:50%;border:2px solid #27b488;display:flex;align-items:center;justify-content:center;"><div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div></div>
+                    </div>
+                  </div>
+                  <div style="padding:14px 16px 6px;font-size:11px;color:#657381;letter-spacing:.06em;text-transform:uppercase;">Deposit channel</div>
+                  <div style="margin:0 12px;background:#1e1e1e;border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid rgba(255,255,255,.06);">
+                    <span style="font-size:14px;color:#E2E6E9;">IPay-Crypto</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#657381" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  <div style="height:80px;"></div>
+                </div>
+
+              </div><!-- end scroll -->
+
+              <!-- Continue button (fixed bottom) -->
+              <div style="padding:10px 16px 20px;background:#111;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;">
+                <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+                  <span style="font-size:10px;color:#555;">Balance </span><span style="font-size:11px;font-weight:600;color:#aaa;margin-left:4px;">৳2,450</span>
+                </div>
+                <button onclick="p2SwitchMainTab('quick')" style="width:100%;height:50px;background:#27b488;border:none;border-radius:8px;font-size:16px;font-weight:600;color:#fff;cursor:pointer;letter-spacing:.01em;">Continue</button>
+              </div>
+
+            </div><!-- end p2-tab-overlay -->
+
             <div id="p2-backdrop" onclick="p2CloseAll()" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:15;"></div>
 
             <!-- PAYMENT SHEET -->
@@ -1389,7 +1618,7 @@
               <!-- Card list -->
               <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
                 <!-- Card 1 - selected -->
-                <div onclick="p2SelectPromo('100% bonus on all games','Get an extra 7% INR');p2CloseAll();" style="background:#222424;border:1.5px solid #14805e;border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                <div onclick="promoSheetSelect('100% bonus on all games','Get an extra 7% INR','welcome');p2CloseAll();" style="background:#222424;border:1.5px solid #14805e;border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
                   <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#0d5c42,#1db87c);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;letter-spacing:-1px;">%</div>
                   <div style="flex:1;min-width:0;">
                     <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
@@ -1404,7 +1633,7 @@
                   </div>
                 </div>
                 <!-- Card 2 -->
-                <div onclick="p2SelectPromo('Extra 1.5% deposit bonus','');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                <div onclick="promoSheetSelect('Extra 1.5% deposit bonus','','daily');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
                   <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#1a3a5c,#2563eb);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">1.5%</div>
                   <div style="flex:1;min-width:0;">
                     <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
@@ -1417,7 +1646,7 @@
                   <div style="width:20px;height:20px;border-radius:50%;border:2px solid #454647;flex-shrink:0;margin-top:2px;"></div>
                 </div>
                 <!-- Card 3 -->
-                <div onclick="p2SelectPromo('50% sports refund bonus','');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+                <div onclick="promoSheetSelect('50% sports refund bonus','','sports');p2CloseAll();" style="background:#222424;border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
                   <div style="width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,#4c1d95,#7c3aed);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">50%</div>
                   <div style="flex:1;min-width:0;">
                     <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
@@ -1433,7 +1662,7 @@
               <!-- Bottom bar -->
               <div style="padding:12px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom,16px));border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;background:#141515;">
                 <div style="font-size:12px;color:#8D9AA5;margin-bottom:10px;">Get an extra <span style="font-weight:700;color:#E2E6E9;">7% INR</span></div>
-                <button onclick="p2SelectPromo('100% bonus on all games','Get an extra 7% INR');p2CloseAll();" class="big-btn primary" style="height:44px;font-size:14px;border-radius:10px;">Confirm</button>
+                <button onclick="promoSheetSelect('100% bonus on all games','Get an extra 7% INR','welcome');p2CloseAll();" class="big-btn primary" style="height:44px;font-size:14px;border-radius:10px;">Confirm</button>
               </div>
             </div>
           </div>
@@ -2607,7 +2836,7 @@
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
 
                 <!-- Quick In -->
-                <div style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
+                <div onclick="p6GoToDeposit('quick')" style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
                   <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#e2e6e9;font-size:15px;line-height:1;">⟳</div>
                     <span style="font-size:14px;font-weight:600;color:#e2e6e9;font-family:'Poppins',sans-serif;">Quick In</span>
@@ -2623,7 +2852,7 @@
                 </div>
 
                 <!-- Local bank -->
-                <div style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
+                <div onclick="p6GoToDeposit('localbank')" style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
                   <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#e2e6e9;font-size:14px;line-height:1;">⊟</div>
                     <span style="font-size:14px;font-weight:600;color:#e2e6e9;font-family:'Poppins',sans-serif;">Local bank</span>
@@ -2639,7 +2868,7 @@
                 </div>
 
                 <!-- E-wallet -->
-                <div style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
+                <div onclick="p6GoToDeposit('ewallet')" style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
                   <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#e2e6e9;font-size:13px;line-height:1;">◫</div>
                     <span style="font-size:14px;font-weight:600;color:#e2e6e9;font-family:'Poppins',sans-serif;">E-wallet</span>
@@ -2656,7 +2885,7 @@
                 </div>
 
                 <!-- Crypto -->
-                <div style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
+                <div onclick="p6GoToDeposit('crypto')" style="background:#222424;border-radius:3px;padding:16px;display:flex;align-items:center;justify-content:space-between;min-height:60px;box-sizing:border-box;cursor:pointer;">
                   <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#e2e6e9;font-size:14px;line-height:1;">◈</div>
                     <span style="font-size:14px;font-weight:600;color:#e2e6e9;font-family:'Poppins',sans-serif;">Crypto</span>
@@ -4763,6 +4992,85 @@
     if (switcher) switcher.style.display = (proto === 'p2' && stateId === 's2') ? 'block' : 'none';
   }
 
+  // ── 跨 proto 導航：p6 一鍵重複存款 ↔ p2 互動原型 ──────
+  function p6GoToDeposit(tab) {
+    // 1. 切換到 p2 proto
+    document.querySelectorAll('.proto').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.ptab').forEach(function(t) { t.classList.remove('active'); });
+    var p2Proto = document.getElementById('p2');
+    if (p2Proto) p2Proto.classList.add('active');
+    document.querySelectorAll('.ptab').forEach(function(t) {
+      var oc = t.getAttribute('onclick') || '';
+      if (oc.indexOf("'p2'") !== -1) t.classList.add('active');
+    });
+
+    // 2. 切換 p2 到 s2
+    document.querySelectorAll('[id^="p2-s"]').forEach(function(el) {
+      if (el.classList.contains('pstate') || el.classList.contains('p2-info')) {
+        el.style.display = 'none';
+        el.classList.remove('active');
+      }
+    });
+    var s2 = document.getElementById('p2-s2');
+    if (s2) { s2.style.display = 'flex'; s2.classList.add('active'); }
+    var s2info = document.getElementById('p2-s2-info');
+    if (s2info) s2info.style.display = 'block';
+    var label = document.getElementById('p2-phone-label');
+    if (label) label.textContent = '狀態 2 · 互動原型 ← 可操作';
+    var stateSwitcher = document.querySelector('#p2 .state-switcher');
+    if (stateSwitcher) {
+      stateSwitcher.querySelectorAll('.state-btn').forEach(function(b) { b.classList.remove('active'); });
+      stateSwitcher.querySelectorAll('.state-btn').forEach(function(b) {
+        var oc = b.getAttribute('onclick') || '';
+        if (oc.indexOf("'s2'") !== -1) b.classList.add('active');
+      });
+    }
+    var switcher = document.getElementById('p2-persona-switcher');
+    if (switcher) switcher.style.display = 'block';
+
+    // 3. 切換到指定 tab
+    p2SwitchMainTab(tab);
+    // 捲動到 p2 手機畫面
+    var phone = document.querySelector('#p2 .phone-wrap');
+    if (phone) phone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function p2GoBackToP6() {
+    // 切換回 p6 proto，並顯示 s2（一鍵重複存款）
+    document.querySelectorAll('.proto').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.ptab').forEach(function(t) { t.classList.remove('active'); });
+    var p6Proto = document.getElementById('p6');
+    if (p6Proto) p6Proto.classList.add('active');
+    document.querySelectorAll('.ptab').forEach(function(t) {
+      var oc = t.getAttribute('onclick') || '';
+      if (oc.indexOf("'p6'") !== -1) t.classList.add('active');
+    });
+    // 切換 p6 到 s2（一鍵重複存款）
+    document.querySelectorAll('[id^="p6-s"]').forEach(function(el) {
+      if (el.classList.contains('pstate') || el.classList.contains('p6-info')) {
+        el.style.display = 'none';
+        el.classList.remove('active');
+      }
+    });
+    var s2 = document.getElementById('p6-s2');
+    if (s2) { s2.style.display = 'flex'; s2.classList.add('active'); }
+    var s2info = document.getElementById('p6-s2-info');
+    if (s2info) s2info.style.display = 'block';
+    var label = document.getElementById('p6-phone-label');
+    if (label) label.textContent = '狀態 1 · 一鍵重複存款';
+    var stateSwitcher = document.querySelector('#p6 .state-switcher');
+    if (stateSwitcher) {
+      stateSwitcher.querySelectorAll('.state-btn').forEach(function(b) { b.classList.remove('active'); });
+      stateSwitcher.querySelectorAll('.state-btn').forEach(function(b) {
+        var oc = b.getAttribute('onclick') || '';
+        if (oc.indexOf("'s2'") !== -1) b.classList.add('active');
+      });
+    }
+    // 捲動到 p6 手機畫面
+    var phone = document.querySelector('#p6 .phone-wrap');
+    if (phone) phone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   // ── P2 Interactive State ────────────────────────────
   var p2Amt = '0';
   var p2KbVisible = true;
@@ -5053,6 +5361,10 @@
     // 更新 payment row（名稱、icon、sub 顯示 type + channel）
     p2SelectPayment(pay.name, pay.bg, pay.ico, typeName + ' · ' + cfg.channel);
 
+    // 記錄當前支付商名稱，並重新檢查優惠相容性
+    p2CurrentPaymentName = pay.name;
+    p2CheckPromoConflict();
+
     // 更新最上方下拉標題
     var typeCfg = p2TypeConfigs[p2CurrentType];
     if (typeCfg) {
@@ -5146,6 +5458,8 @@
       // fade in
       if (payRow)   { payRow.classList.remove('p2-row-loading');   payRow.classList.add('p2-row-ready'); }
       if (promoRow) { promoRow.classList.remove('p2-row-loading'); promoRow.classList.add('p2-row-ready'); }
+
+      // 注意：切換支付類型後尚未確認支付商，衝突檢查在 p2ConfirmPayment() 觸發
     }, 160);
   }
 
@@ -5158,6 +5472,115 @@
     if (s) s.style.transform = 'translateY(0)';
     if (b) b.style.display = 'block';
   }
+
+  // ── Tab Promo System（E-wallet / Local Bank / Crypto 共用）──
+  var tabPromoContext = 'quick'; // 記錄從哪個 tab 開啟 promo sheet
+  var tabSelectedPromoKey = { ewallet: 'none', localbank: 'none', crypto: 'none' };
+  var tabSelectedPromoData = {
+    ewallet:   { name: 'Promotion', sub: 'Sign up bonus' },
+    localbank: { name: 'Promotion', sub: 'Sign up bonus' },
+    crypto:    { name: 'Promotion', sub: 'Sign up bonus' }
+  };
+  var tabCurrentPayment = { ewallet: 'bKash', localbank: 'Bank card', crypto: 'USDT TRC20' };
+
+  // E-wallet 的 compat（基於已有的 p2PromoCompat）
+  // Local Bank 和 Crypto 的 provider 不在 compat 清單，所以 welcome/sports 都會衝突
+
+  function tabOpenPromo(ctx) {
+    tabPromoContext = ctx;
+    var s = document.getElementById('p2-promo-sheet');
+    var b = document.getElementById('p2-backdrop');
+    if (s) s.style.transform = 'translateY(0)';
+    if (b) b.style.display = 'block';
+  }
+
+  function promoSheetSelect(name, sub, key) {
+    if (tabPromoContext === 'quick') {
+      p2SelectPromo(name, sub, key);
+    } else {
+      tabSelectPromo(name, sub, key);
+    }
+  }
+
+  function tabSelectPromo(name, sub, key) {
+    var ctx = tabPromoContext;
+    tabSelectedPromoKey[ctx] = key || 'none';
+    tabSelectedPromoData[ctx] = { name: name || 'Promotion', sub: sub || '' };
+    tabUpdatePromoUI(ctx);
+    tabCheckPromoConflict(ctx);
+  }
+
+  function tabUpdatePromoUI(ctx) {
+    var prefix = ctx === 'localbank' ? 'lb' : ctx === 'ewallet' ? 'ew' : 'cr';
+    var nameEl = document.getElementById(prefix + '-promo-name');
+    var subEl  = document.getElementById(prefix + '-promo-sub');
+    var data   = tabSelectedPromoData[ctx];
+    if (nameEl) nameEl.textContent = data.name;
+    if (subEl) { subEl.textContent = data.sub; subEl.style.color = data.sub ? '#27b488' : '#8D9AA5'; }
+  }
+
+  function tabCheckPromoConflict(ctx) {
+    var prefix      = ctx === 'localbank' ? 'lb' : ctx === 'ewallet' ? 'ew' : 'cr';
+    var conflictEl  = document.getElementById(prefix + '-promo-conflict');
+    var msgEl       = document.getElementById(prefix + '-promo-conflict-msg');
+    var switchBtn   = document.getElementById(prefix + '-conflict-switch-btn'); // only exists for ew
+    var rowEl       = document.getElementById(prefix + '-promo-row');
+    if (!conflictEl) return;
+
+    var key   = tabSelectedPromoKey[ctx];
+    var compat = p2PromoCompat[key];
+    var paymentName = tabCurrentPayment[ctx];
+    var compatible = !compat || !compat.providers || compat.providers.indexOf(paymentName) !== -1;
+
+    if (!compatible) {
+      conflictEl.style.display = 'flex';
+      if (msgEl) msgEl.textContent = 'This promotion doesn\'t support ' + paymentName + '.';
+      if (rowEl) rowEl.style.borderRadius = '8px 8px 0 0';
+      // E-wallet 才有 Switch to 按鈕，指向第一個相容的 provider
+      if (switchBtn && compat.providers) {
+        // 找出 compat 裡 E-wallet 支援的 provider
+        var ewProviders = ['bKash','Rocket','OKwallet','Upay','Nagad','SureCash'];
+        var switchTarget = compat.providers.find(function(p) { return ewProviders.indexOf(p) !== -1; });
+        if (switchTarget) {
+          switchBtn.textContent = 'Switch to ' + switchTarget;
+          switchBtn.style.display = 'inline-block';
+        } else {
+          switchBtn.style.display = 'none';
+        }
+      }
+    } else {
+      conflictEl.style.display = 'none';
+      if (rowEl) rowEl.style.borderRadius = '8px';
+    }
+  }
+
+  function tabRemovePromo(ctx) {
+    tabSelectedPromoKey[ctx] = 'none';
+    tabSelectedPromoData[ctx] = { name: 'Promotion', sub: 'Sign up bonus' };
+    tabUpdatePromoUI(ctx);
+    tabCheckPromoConflict(ctx);
+  }
+
+  function tabSwitchProvider(ctx) {
+    // E-wallet: 切換到第一個相容的 provider
+    var key = tabSelectedPromoKey[ctx];
+    var compat = p2PromoCompat[key];
+    if (!compat || !compat.providers) return;
+    var ewProviders = ['bKash','Rocket','OKwallet','Upay','Nagad','SureCash'];
+    var target = compat.providers.find(function(p) { return ewProviders.indexOf(p) !== -1; });
+    if (!target) return;
+    tabCurrentPayment[ctx] = target;
+    // 更新 E-wallet grid 的選取狀態
+    document.querySelectorAll('[data-ew-pay]').forEach(function(e) {
+      e.style.borderColor = 'rgba(255,255,255,.06)';
+    });
+    document.querySelectorAll('[data-ew-pay]').forEach(function(e) {
+      var label = e.querySelector('div:last-child');
+      if (label && label.textContent.trim() === target) e.style.borderColor = '#27b488';
+    });
+    tabCheckPromoConflict(ctx);
+  }
+  // ─────────────────────────────────────────────────────────
 
   function p2OpenPromo() {
     var s = document.getElementById('p2-promo-sheet');
@@ -5196,11 +5619,177 @@
     if (subEl) subEl.textContent = sub;
   }
 
-  function p2SelectPromo(name, sub) {
+  var p2SelectedPromoKey = 'welcome'; // 預設選中第一個
+  var p2CurrentPaymentName = 'bKash'; // 預設支付商
+
+  // 每個 promo 適用的支付商名稱清單
+  var p2PromoCompat = {
+    welcome: { providers: ['bKash', 'Nagad', 'Baji'] },
+    daily:   { providers: ['bKash', 'Nagad', 'Rocket', 'Upay', 'Bangkok Pay', 'Dutch Bangla', 'City Bank'] },
+    sports:  { providers: ['bKash', 'Nagad'] },
+    none:    { providers: null } // null = 全部支援
+  };
+
+  function p2CheckPromoConflict() {
+    var conflictEl = document.getElementById('p2-promo-conflict');
+    var msgEl      = document.getElementById('p2-promo-conflict-msg');
+    var switchBtn  = document.getElementById('p2-conflict-switch-btn');
+    var promoRow   = document.getElementById('p2-promo-row');
+    if (!conflictEl) return;
+
+    var compat = p2PromoCompat[p2SelectedPromoKey];
+    var compatible = !compat || !compat.providers || compat.providers.indexOf(p2CurrentPaymentName) !== -1;
+
+    if (!compatible) {
+      var firstProvider = compat.providers[0];
+      conflictEl.style.display = 'flex';
+      if (msgEl) msgEl.textContent = 'This promotion doesn\'t support ' + p2CurrentPaymentName + '.';
+      if (switchBtn) switchBtn.textContent = 'Switch to ' + firstProvider;
+      if (promoRow) promoRow.style.borderRadius = '3px 3px 0 0';
+    } else {
+      conflictEl.style.display = 'none';
+      if (promoRow) promoRow.style.borderRadius = '3px';
+    }
+  }
+
+  function p2SwitchToCompatProvider() {
+    var compat = p2PromoCompat[p2SelectedPromoKey];
+    if (!compat || !compat.providers || !compat.providers.length) return;
+    var targetName = compat.providers[0];
+    // 找出該支付商在哪個 type
+    var targetType = 'ewallet';
+    var targetIdx  = 0;
+    ['ewallet','localbank','crypto'].forEach(function(t) {
+      var cfg = p2PaymentData[t];
+      if (!cfg) return;
+      cfg.payments.forEach(function(p, i) {
+        if (p.name === targetName) { targetType = t; targetIdx = i; }
+      });
+    });
+    // 切換 tab + type
+    p2SwitchMainTab(targetType);
+    // 更新 payment row
+    var cfg = p2PaymentData[targetType];
+    var pay = cfg.payments[targetIdx];
+    p2SelectedPaymentIdx = targetIdx;
+    p2SelectPayment(pay.name, pay.bg, pay.ico, cfg.types[0] + ' · ' + cfg.channel);
+    p2CurrentPaymentName = pay.name;
+    p2CheckPromoConflict();
+  }
+
+  function p2SwitchMainTab(tab) {
+    // 更新 tab 樣式
+    ['quick','ewallet','localbank','crypto'].forEach(function(t) {
+      var el = document.getElementById('p2-tab-' + t);
+      if (!el) return;
+      var active = t === tab;
+      el.style.color = active ? '#27b488' : '#657381';
+      el.style.borderBottomColor = active ? '#27b488' : 'transparent';
+    });
+
+    var quickWrapper = document.getElementById('p2-quick-wrapper');
+    var overlay = document.getElementById('p2-tab-overlay');
+
+    if (tab === 'quick') {
+      if (quickWrapper) quickWrapper.style.display = 'block';
+      if (overlay) overlay.style.display = 'none';
+    } else {
+      // 動態計算 overlay 的 top（app-bar + tab 列的實際高度）
+      var tabRow = document.getElementById('p2-tab-row');
+      if (overlay && tabRow) {
+        overlay.style.top = (tabRow.offsetTop + tabRow.offsetHeight) + 'px';
+      }
+      // 隱藏 Quick 內容，顯示對應 tab 的 overlay
+      if (quickWrapper) quickWrapper.style.display = 'none';
+      ['localbank','ewallet','crypto'].forEach(function(t) {
+        var c = document.getElementById('p2-tab-' + t + '-content');
+        if (c) c.style.display = 'none';
+      });
+      var active = document.getElementById('p2-tab-' + tab + '-content');
+      if (active) active.style.display = 'block';
+      if (overlay) overlay.style.display = 'flex';
+      // scroll 回頂部
+      var scroll = document.getElementById('p2-tab-scroll');
+      if (scroll) scroll.scrollTop = 0;
+    }
+  }
+
+  // Local Bank 互動
+  function lbSelectPay(name, el) {
+    document.querySelectorAll('#p2-tab-localbank-content [onclick^="lbSelectPay"]').forEach(function(e) {
+      e.style.borderColor = 'rgba(255,255,255,.06)';
+    });
+    el.style.borderColor = '#27b488';
+    tabCurrentPayment['localbank'] = name;
+    tabCheckPromoConflict('localbank');
+  }
+  function lbSelectType(type) {
+    var rows = { pg: 'lb-row-pg', bt: 'lb-row-bt' };
+    var radios = { pg: 'lb-radio-pg', bt: 'lb-radio-bt' };
+    Object.keys(rows).forEach(function(k) {
+      var row = document.getElementById(rows[k]);
+      var radio = document.getElementById(radios[k]);
+      if (!row || !radio) return;
+      var active = k === type;
+      row.style.borderColor = active ? '#27b488' : 'rgba(255,255,255,.06)';
+      radio.style.borderColor = active ? '#27b488' : '#454647';
+      radio.innerHTML = active ? '<div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div>' : '';
+    });
+  }
+
+  // E-wallet 互動
+  function ewSelectPay(name, el) {
+    document.querySelectorAll('[data-ew-pay]').forEach(function(e) {
+      e.style.borderColor = 'rgba(255,255,255,.06)';
+    });
+    el.style.borderColor = '#27b488';
+    tabCurrentPayment['ewallet'] = name;
+    tabCheckPromoConflict('ewallet');
+  }
+  function ewSelectType(type) {
+    var rows = { pg: 'ew-row-pg', bt: 'ew-row-bt' };
+    var radios = { pg: 'ew-radio-pg', bt: 'ew-radio-bt' };
+    Object.keys(rows).forEach(function(k) {
+      var row = document.getElementById(rows[k]);
+      var radio = document.getElementById(radios[k]);
+      if (!row || !radio) return;
+      var active = k === type;
+      row.style.borderColor = active ? '#27b488' : 'rgba(255,255,255,.06)';
+      radio.style.borderColor = active ? '#27b488' : '#454647';
+      radio.innerHTML = active ? '<div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div>' : '';
+    });
+  }
+
+  // Crypto 互動
+  function crSelectPay(name, el) {
+    document.querySelectorAll('[data-cr-pay]').forEach(function(e) {
+      e.style.borderColor = 'rgba(255,255,255,.06)';
+    });
+    el.style.borderColor = '#27b488';
+    tabCurrentPayment['crypto'] = name;
+    tabCheckPromoConflict('crypto');
+  }
+  function crSelectType(type) {
+    var rows = { trc20: 'cr-row-trc20', trc20t: 'cr-row-trc20t' };
+    var radios = { trc20: 'cr-radio-trc20', trc20t: 'cr-radio-trc20t' };
+    Object.keys(rows).forEach(function(k) {
+      var row = document.getElementById(rows[k]);
+      var radio = document.getElementById(radios[k]);
+      if (!row || !radio) return;
+      var active = k === type;
+      row.style.borderColor = active ? '#27b488' : 'rgba(255,255,255,.06)';
+      radio.style.borderColor = active ? '#27b488' : '#454647';
+      radio.innerHTML = active ? '<div style="width:10px;height:10px;border-radius:50%;background:#27b488;"></div>' : '';
+    });
+  }
+
+  function p2SelectPromo(name, sub, key) {
+    p2SelectedPromoKey = key || 'none';
     var nameEl = document.getElementById('p2-promo-name');
-    var subEl = document.getElementById('p2-promo-sub');
+    var subEl  = document.getElementById('p2-promo-sub');
     if (nameEl) nameEl.textContent = name || '不使用優惠';
-    if (subEl) { subEl.textContent = sub; subEl.style.color = sub ? '#27b488' : '#555'; }
+    if (subEl)  { subEl.textContent = sub; subEl.style.color = sub ? '#27b488' : '#555'; }
+    p2CheckPromoConflict();
   }
   // ────────────────────────────────────────────────────
 
