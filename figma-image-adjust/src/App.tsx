@@ -49,6 +49,7 @@ export default function App() {
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 })
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const isLoadedRef = useRef(false)  // 與 isLoaded 同步的 ref（async handler 可即時讀取）
   const [isApplying, setIsApplying] = useState(false)
   const [histogram, setHistogram] = useState<HistogramData | null>(null)
   // 預設跟隨系統主題，使用者可手動切換覆蓋
@@ -93,13 +94,13 @@ export default function App() {
   // 複製/貼上調整參數
   const [copiedParams, setCopiedParams] = useState<AdjustmentParams | null>(null)
 
-  // 即時預覽（debounce + throttle，取代 setInterval）
-  const [livePreview, setLivePreview] = useState(false)
+  // 即時預覽（永遠開啟，debounce + throttle）
   const dirtyRef = useRef(false)                    // 有未套用的修改
-  const isApplyingRef = useRef(false)               // 手動套用鎖
+  const isApplyingRef = useRef(false)               // 手動套用鎖（供內部防止重疊使用）
   const liveEncodingRef = useRef(false)             // 即時預覽編碼鎖（postMessage 後立刻解鎖，實現 pipeline）
   const liveDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const liveLastSentRef = useRef<number>(0)         // 上次送出的時間戳
+  const liveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)  // ACK 超時保護（防止永久卡死）
   const handleApplyRef = useRef<() => Promise<void>>(async () => {})
 
   // Eyedropper 模式（null = 關閉, 'black' | 'white' = 設定黑/白點）
@@ -173,6 +174,19 @@ export default function App() {
             }
           }
         }
+
+        // ── 即時預覽觸發（在 LUT 確實套用後才觸發，避免讀到舊像素）──
+        // 原本在 handleParamsChange 的 setTimeout 可能比 RAF 先跑，造成競態
+        dirtyRef.current = true
+        if (liveDebounceTimerRef.current) clearTimeout(liveDebounceTimerRef.current)
+        const elapsed = Date.now() - liveLastSentRef.current
+        const delay = elapsed >= 1000 ? 0 : Math.max(0, 200 - elapsed)
+        liveDebounceTimerRef.current = setTimeout(() => {
+          if (dirtyRef.current && !liveEncodingRef.current && !isApplyingRef.current) {
+            dirtyRef.current = false
+            handleLiveApplyRef.current()
+          }
+        }, delay)
       }
 
       const worker = workerRef.current
@@ -220,24 +234,9 @@ export default function App() {
     setParams(prev => {
       const next = updater(prev)
       if (isLoaded) {
-        scheduleLutUpdate(next)
-        dirtyRef.current = true
+        scheduleLutUpdate(next)  // LUT 套用後，applyLut 內部會觸發 live preview
         if (currentNodeIdRef.current) {
           imageParamsMap.current.set(currentNodeIdRef.current, next)
-        }
-        // 即時預覽：debounce + throttle
-        // - 拖曳中：節流，至少間隔 400ms 才送一次
-        // - 停止後：150ms 防抖，確保最後狀態也被送出
-        if (livePreview) {
-          if (liveDebounceTimerRef.current) clearTimeout(liveDebounceTimerRef.current)
-          const elapsed = Date.now() - liveLastSentRef.current
-          const delay = elapsed >= 400 ? 150 : 400 - elapsed
-          liveDebounceTimerRef.current = setTimeout(() => {
-            if (dirtyRef.current && !liveEncodingRef.current && !isApplyingRef.current) {
-              dirtyRef.current = false
-              handleLiveApplyRef.current()
-            }
-          }, delay)
         }
       }
       return next
@@ -374,6 +373,17 @@ export default function App() {
         return
       }
 
+      // 即時預覽 ACK：plugin 處理完畢，解鎖並觸發下一次（若有待發的修改）
+      if (msg.type === 'applied') {
+        if (liveTimeoutRef.current) { clearTimeout(liveTimeoutRef.current); liveTimeoutRef.current = null }
+        liveEncodingRef.current = false
+        if (dirtyRef.current && !isApplyingRef.current) {
+          dirtyRef.current = false
+          handleLiveApplyRef.current()
+        }
+        return
+      }
+
       if (msg.type === 'image') {
         setErrorMessage(null)
         setImageSize({ width: msg.width, height: msg.height })
@@ -422,7 +432,12 @@ export default function App() {
 
           // 同步 React 狀態（讓面板顯示正確數值）
           setParams(savedParams)
+          isLoadedRef.current = true
           setIsLoaded(true)
+
+          // 圖片載入後立刻觸發一次 live update，讓 Figma 與插件預覽同步
+          // 不等 React 重繪，直接用 isLoadedRef 繞過 state closure 問題
+          handleLiveApplyRef.current()
         } catch (error) {
           setErrorMessage(error instanceof Error ? error.message : 'Preview 初始化失敗')
         }
@@ -475,24 +490,41 @@ export default function App() {
   // 永遠指向最新版 handleApply（避免 interval 拿到舊閉包）
   handleApplyRef.current = handleApply
 
-  // 即時預覽專用：512px 無壓縮 PNG + pipeline 架構
-  // postMessage 後「立刻」解鎖 liveEncodingRef，讓我們的下一次準備與 Figma 的渲染重疊進行
+  // 即時預覽專用：256px + 持久化 Framebuffer + flipY 內嵌翻轉 + pipeline
   const handleLiveApply = async () => {
-    if (!isLoaded || liveEncodingRef.current || isApplyingRef.current) return
+    if (!isLoadedRef.current || liveEncodingRef.current || isApplyingRef.current) return
     liveEncodingRef.current = true
+
+    // 超時保護：3秒內若未收到 ACK，強制解鎖並觸發下一次更新
+    if (liveTimeoutRef.current) clearTimeout(liveTimeoutRef.current)
+    liveTimeoutRef.current = setTimeout(() => {
+      liveTimeoutRef.current = null
+      liveEncodingRef.current = false
+      if (dirtyRef.current && !isApplyingRef.current) {
+        dirtyRef.current = false
+        handleLiveApplyRef.current()
+      }
+    }, 3000)
+
     try {
       const preview = await waitForPreview()
-      const { pixels, width, height } = preview.readPixelsScaled(512)
-      const pngBytes = encodePNGFast(pixels, width, height)
+      // readPixelsLive：重用持久化 Framebuffer，回傳 Y-inverted 原始像素
+      // 256px 比 512px 傳輸量少 4 倍，大幅降低 round-trip 延遲
+      const { pixels, width, height } = preview.readPixelsLive(256)
+      // flipY=true：在編碼時翻轉，省掉獨立的 row copy 步驟
+      const pngBytes = encodePNGFast(pixels, width, height, true)
       liveLastSentRef.current = Date.now()
       parent.postMessage(
-        { pluginMessage: { type: 'apply', bytes: pngBytes, width, height } },
+        { pluginMessage: { type: 'apply', bytes: pngBytes, width, height, live: true } },
         '*',
         [pngBytes.buffer]
       )
-    } finally {
-      // 故意在 postMessage 後立刻解鎖（不等 Figma 處理完）
-      // 讓下一次 readPixels + encode 可以與 Figma 渲染同時進行（pipeline）
+      // 注意：liveEncodingRef 在這裡「不解鎖」
+      // 等待 plugin 回傳 { type: 'applied' } ACK 後才解鎖
+      // 確保 Figma 完全處理完當前更新，才發下一次，避免佇列堆積落後問題
+    } catch {
+      // 發生錯誤時立刻清除超時並解鎖，避免永久卡住
+      if (liveTimeoutRef.current) { clearTimeout(liveTimeoutRef.current); liveTimeoutRef.current = null }
       liveEncodingRef.current = false
     }
   }
@@ -500,13 +532,13 @@ export default function App() {
   const handleLiveApplyRef = useRef<() => Promise<void>>(async () => {})
   handleLiveApplyRef.current = handleLiveApply
 
-  // livePreview 關閉時，清除待執行的 debounce timer
+  // 元件卸載時清除 debounce timer 與 ACK 超時
   useEffect(() => {
-    if (!livePreview && liveDebounceTimerRef.current) {
-      clearTimeout(liveDebounceTimerRef.current)
-      liveDebounceTimerRef.current = null
+    return () => {
+      if (liveDebounceTimerRef.current) clearTimeout(liveDebounceTimerRef.current)
+      if (liveTimeoutRef.current) clearTimeout(liveTimeoutRef.current)
     }
-  }, [livePreview])
+  }, [])
 
   const resetHsl = () => handleParamsChange(prev => ({ ...prev, hsl: defaultHslParams() }))
   const resetColorBalance = () => handleParamsChange(prev => ({ ...prev, colorBalance: defaultColorBalanceParams() }))
@@ -655,38 +687,6 @@ export default function App() {
             對比
           </button>
 
-          {/* 即時預覽 toggle */}
-          <button
-            onClick={() => setLivePreview(v => !v)}
-            title="開啟後每 1 秒自動更新 Figma 畫布"
-            style={{
-              flex: 1, padding: '6px 4px',
-              border: '1px solid',
-              borderColor: livePreview ? '#F24822' : 'var(--btn-border)',
-              borderRadius: 6, fontSize: 11, cursor: 'pointer',
-              background: livePreview ? '#F24822' : 'var(--btn-bg)',
-              color: livePreview ? '#fff' : 'var(--text-dim)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3,
-            }}
-          >
-            <svg width="9" height="9" viewBox="0 0 12 12" fill="currentColor">
-              <circle cx="6" cy="6" r="5"/>
-            </svg>
-            即時
-          </button>
-
-          {/* 套用 */}
-          <button
-            onClick={handleApply}
-            disabled={isApplying}
-            style={{
-              flex: 2, padding: '6px 0', border: 'none',
-              borderRadius: 6, fontSize: 12, cursor: isApplying ? 'wait' : 'pointer',
-              background: '#18A0FB', color: '#fff', fontWeight: 600,
-            }}
-          >
-            {isApplying ? '套用中…' : '套用'}
-          </button>
         </div>
       )}
     </div>

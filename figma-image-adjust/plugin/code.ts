@@ -6,7 +6,7 @@ type FillableNode = SceneNode & {
 
 type PluginMessage =
   | { type: 'ready' }
-  | { type: 'apply'; bytes: Uint8Array | ArrayBuffer; width: number; height: number };
+  | { type: 'apply'; bytes: Uint8Array | ArrayBuffer; width: number; height: number; live?: boolean };
 
 function isFillableNode(node: SceneNode): node is FillableNode {
   return 'fills' in node;
@@ -111,6 +111,11 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
     };
     node.fills = fills;
 
-    figma.notify('✓ 套用成功');
+    if (msg.live) {
+      // 即時預覽：靜默更新，回傳 ACK 讓 UI 知道可以發送下一次
+      figma.ui.postMessage({ type: 'applied' });
+    } else {
+      figma.notify('✓ 套用成功');
+    }
   }
 };
