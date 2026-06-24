@@ -1,23 +1,16 @@
 import { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 
-const btn = (bg) => ({
-  padding: '8px 20px', background: bg, color: '#fff',
-  border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14,
-});
+const btnBase = {
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  height: 36, padding: '0 16px', borderRadius: 6,
+  fontSize: 13, fontWeight: 500, cursor: 'pointer',
+  transition: 'background 0.15s',
+};
 
-/**
- * 右側結果面板
- *
- * Props:
- *   resultBlob   Blob  — AI 生成的結果圖片
- *   onAdopt      fn    — 使用者點「採用這張」
- *   onRegenerate fn    — 使用者點「重新生成」
- *   isEditing    bool  — 是否正在呼叫 AI（顯示 loading）
- */
 export default function ResultPanel({ resultBlob, onAdopt, onRegenerate, isEditing }) {
   const [url, setUrl] = useState(null);
 
-  // resultBlob 更換時，建立 object URL（並在清除時釋放記憶體）
   useEffect(() => {
     if (!resultBlob) { setUrl(null); return; }
     const u = URL.createObjectURL(resultBlob);
@@ -27,52 +20,85 @@ export default function ResultPanel({ resultBlob, onAdopt, onRegenerate, isEditi
 
   return (
     <div style={{
-      position: 'relative', flex: 1, background: '#efefef',
-      overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flex: 1, display: 'flex', flexDirection: 'column',
+      background: '#fafafa', overflow: 'hidden', position: 'relative',
     }}>
-      {/* Loading 覆蓋層 */}
-      {isEditing && (
-        <div style={{
-          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', background: 'rgba(255,255,255,0.85)', zIndex: 10,
-          fontSize: 15, color: '#555', flexDirection: 'column', gap: 12,
-        }}>
+      {/* Header */}
+      <div style={{
+        height: 44, padding: '0 16px',
+        borderBottom: '1px solid #e4e4e7',
+        display: 'flex', alignItems: 'center',
+        background: '#fff', flexShrink: 0,
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          修改結果
+        </span>
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+
+        {/* Loading overlay */}
+        {isEditing && (
           <div style={{
-            width: 32, height: 32, border: '3px solid #ccc',
-            borderTopColor: '#2563eb', borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite',
-          }} />
-          AI 處理中…
-        </div>
-      )}
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(250,250,250,0.9)', zIndex: 10, gap: 12,
+          }}>
+            <div style={{
+              width: 28, height: 28,
+              border: '2.5px solid #e4e4e7',
+              borderTopColor: '#18181b',
+              borderRadius: '50%',
+              animation: 'spin 0.7s linear infinite',
+            }} />
+            <span style={{ fontSize: 13, color: '#71717a', fontWeight: 500 }}>AI 處理中…</span>
+          </div>
+        )}
 
-      {/* 尚無結果的提示 */}
-      {!url && !isEditing && (
-        <div style={{ color: '#bbb', fontSize: 14, textAlign: 'center' }}>
-          修改結果會顯示在這裡
-        </div>
-      )}
+        {/* Placeholder */}
+        {!url && !isEditing && (
+          <div style={{ textAlign: 'center', color: '#a1a1aa' }}>
+            <Sparkles size={28} style={{ marginBottom: 8 }} />
+            <div style={{ fontSize: 13 }}>修改結果會顯示在這裡</div>
+          </div>
+        )}
 
-      {/* 結果圖片 */}
-      {url && (
-        <img
-          src={url} alt="AI result"
-          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
-        />
-      )}
+        {/* Result image */}
+        {url && (
+          <img
+            src={url} alt="AI result"
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
+          />
+        )}
+      </div>
 
-      {/* 操作按鈕 */}
+      {/* Action bar */}
       {url && !isEditing && (
         <div style={{
-          position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', gap: 10,
+          height: 56, padding: '0 16px',
+          borderTop: '1px solid #e4e4e7',
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8,
+          background: '#fff', flexShrink: 0,
         }}>
-          <button onClick={onAdopt} style={btn('#16a34a')}>採用這張</button>
-          <button onClick={onRegenerate} style={btn('#6b7280')}>重新生成</button>
+          <button
+            onClick={onRegenerate}
+            style={{ ...btnBase, background: '#f4f4f5', color: '#18181b' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#e4e4e7'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#f4f4f5'}
+          >
+            重新生成
+          </button>
+          <button
+            onClick={onAdopt}
+            style={{ ...btnBase, background: '#18181b', color: '#fafafa' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#27272a'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#18181b'}
+          >
+            採用這張
+          </button>
         </div>
       )}
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
