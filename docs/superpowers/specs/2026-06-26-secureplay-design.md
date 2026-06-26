@@ -41,20 +41,75 @@ SecurePlay Design System
 
 所有 Variable 建立於 Foundation Page，並在 Figma 的 Local Variables 面板中統一管理。
 
+### 明暗模式架構（重要）
+
+SecurePlay 支援**亮色模式（Light）**與**暗色模式（Dark）**切換。
+
+在 Figma 中的實作方式：
+- 建立兩個 Variable Collection：
+  - **Primitives**（基礎色票）：存放所有原始顏色 hex 值，**不分 Mode**，例如 `blue/500 = #2563EB`
+  - **Semantic**（語意顏色）：存放有語意的 Token，設定**兩個 Mode（Light / Dark）**，值引用 Primitives 中的顏色
+- 只有 `Semantic` Collection 需要兩個 Mode，其他 Variable（spacing、radius、border 等）不受模式影響
+
+```
+Variable Collections:
+├── Primitives（無 Mode）
+│   ├── blue/500 = #2563EB
+│   ├── neutral/0 = #FFFFFF
+│   ├── neutral/900 = #111827
+│   └── ...（所有原始色票）
+│
+└── Semantic（兩個 Mode：Light / Dark）
+    ├── color/primary/default
+    │   ├── Light → blue/500
+    │   └── Dark  → blue/400
+    ├── color/background/base
+    │   ├── Light → neutral/0
+    │   └── Dark  → neutral/900
+    └── ...（所有語意顏色 Token）
+```
+
+元件的顏色屬性**只綁定 Semantic 層**，切換 Mode 時整個設計系統自動變色。
+
+---
+
 ### 3.1 顏色 `color/`
 
-從截圖中提取以下顏色類別：
+**Step A — Primitives Collection（原始色票，無 Mode）**
 
-| 群組 | 範例 Token 名稱 | 說明 |
-|------|----------------|------|
-| `color/primary` | `color/primary/500`（main）、`color/primary/100`（light） | 主品牌色 |
-| `color/neutral` | `color/neutral/0`（白）、`color/neutral/900`（深灰/黑） | 中性色 |
-| `color/background` | `color/bg/base`、`color/bg/surface` | 背景層次 |
-| `color/text` | `color/text/primary`、`color/text/secondary`、`color/text/disabled` | 文字顏色 |
-| `color/border` | `color/border/default`、`color/border/strong` | 線條/框線 |
-| `color/status` | `color/status/success`、`color/status/warning`、`color/status/error`、`color/status/info` | 狀態顏色 |
+從截圖中提取所有原始顏色，存入 Primitives：
 
-> 實際 hex 值從截圖分析後填入。
+| 群組 | 範例 | 說明 |
+|------|------|------|
+| `blue/` | `blue/50`～`blue/900` | 主色系 |
+| `neutral/` | `neutral/0`（白）～`neutral/900`（黑） | 中性灰階 |
+| `green/` | `green/50`～`green/700` | 成功色系 |
+| `red/` | `red/50`～`red/700` | 錯誤色系 |
+| `yellow/` | `yellow/50`～`yellow/700` | 警告色系 |
+
+> 實際色票以截圖識別的顏色為準。
+
+**Step B — Semantic Collection（語意顏色，Light / Dark 兩個 Mode）**
+
+| Token 名稱 | Light 值 | Dark 值 | 說明 |
+|-----------|----------|---------|------|
+| `color/primary/default` | blue/500 | blue/400 | 主要操作色 |
+| `color/primary/subtle` | blue/50 | blue/900 | 主色淡底 |
+| `color/bg/base` | neutral/0 | neutral/900 | 頁面底色 |
+| `color/bg/surface` | neutral/50 | neutral/800 | 卡片、浮層背景 |
+| `color/bg/elevated` | neutral/100 | neutral/700 | 更高層次背景 |
+| `color/text/primary` | neutral/900 | neutral/0 | 主要文字 |
+| `color/text/secondary` | neutral/500 | neutral/400 | 次要文字 |
+| `color/text/disabled` | neutral/300 | neutral/600 | 停用文字 |
+| `color/text/inverse` | neutral/0 | neutral/900 | 反色文字 |
+| `color/border/default` | neutral/200 | neutral/700 | 一般邊框 |
+| `color/border/strong` | neutral/400 | neutral/500 | 強調邊框 |
+| `color/status/success` | green/600 | green/400 | 成功 |
+| `color/status/warning` | yellow/600 | yellow/400 | 警告 |
+| `color/status/error` | red/600 | red/400 | 錯誤 |
+| `color/status/info` | blue/600 | blue/400 | 資訊 |
+
+> 實際 hex 值與引用的 Primitive Token 從截圖分析後填入。
 
 ---
 
@@ -266,6 +321,7 @@ Component 建立於 Components Page，每個元件的所有屬性（顏色、間
 | 字體 | 若非系統字體，需用戶在 Figma 帳號中預先安裝 |
 | Figma MCP 限制 | 複雜元件可能需分多次操作建立 |
 | 動畫 Variable | 本次不建立（duration / easing），後續有需要再補充 |
+| 明暗模式截圖 | 需同時提供亮色和暗色模式截圖，才能正確識別 Dark Mode 的顏色值 |
 
 ---
 
