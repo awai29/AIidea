@@ -479,7 +479,7 @@ section{scroll-margin-top:70px}
       <a class="nl" href="#s-trigger">觸發時機</a>
       <a class="nl" href="#s-flow">授權流程</a>
       <a class="nl" href="#s-scenarios">場景展示</a>
-      <a class="nl" href="#s-privacy">隱私模式</a>
+      <a class="nl" href="#s-privacy">通知設定</a>
       <a class="nl" href="#s-compare">樣式對比</a>
       <a class="nl" href="#s-reengage">再觸發</a>
       <a class="nl" href="#s-payload">Payload</a>
@@ -584,92 +584,48 @@ section{scroll-margin-top:70px}
     <div class="sec-hd">
       <div class="eyebrow">Section 02</div>
       <h2 class="sec-title">授權流程 — 畫面設計</h2>
-      <p class="sec-desc">以「首次存款」為例，共 4 個步驟。<span class="chip chip-android" style="vertical-align:middle;margin-left:4px">🤖 Android Native UI</span> = Android/Chrome 真實介面；<span class="chip chip-platform" style="vertical-align:middle;margin-left:4px">◈ Custom UI</span> = 我們自製的平台畫面。</p>
+      <p class="sec-desc">授權由<strong style="color:var(--fg)">個人設定頁的「通知」開關</strong>使用者主動觸發（Phase 1）；新功能上線時以<strong style="color:var(--fg)">首頁 banner 軟性引導</strong>用戶前往設定頁（Phase 2）。進站不再自動跳系統授權窗 — 回訪已授權者由 bootstrap 靜默取 token。<span class="chip chip-android" style="vertical-align:middle;margin-left:4px">🤖 Android Native UI</span> = Android/Chrome 真實介面；<span class="chip chip-platform" style="vertical-align:middle;margin-left:4px">◈ Custom UI</span> = 我們自製的平台畫面。</p>
     </div>
 
     <!-- Flow diagram -->
-    <div class="flow-diagram" style="margin-bottom:28px">
+    <div class="flow-diagram" style="margin-bottom:20px">
       <div class="flow-node">
-        <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">💰</div>
-        <div class="flow-label" style="color:var(--green)">觸發點</div>
-        <div class="flow-sub">存款成功</div>
+        <div class="flow-circle" style="background:#fffbeb;border:2px solid #fde68a">🔔</div>
+        <div class="flow-label">首頁 banner 引導</div>
+        <div class="flow-sub" style="color:var(--amber)">Phase 2 · ◈ Custom UI</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-node">
-        <div class="flow-circle" style="background:var(--pbg);border:2px solid var(--pbdr)">📋</div>
-        <div class="flow-label">自製預授權彈窗</div>
-        <div class="flow-sub" style="color:var(--purple)">◈ Custom UI</div>
+        <div class="flow-circle" style="background:var(--pbg);border:2px solid var(--pbdr)">⚙️</div>
+        <div class="flow-label">通知設定頁 · 點開關</div>
+        <div class="flow-sub" style="color:var(--purple)">Phase 1 · 使用者主動</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-node">
         <div class="flow-circle" style="background:#e8f5e9;border:2px solid #a5d6a7">🌐</div>
-        <div class="flow-label">Chrome 授權對話框</div>
+        <div class="flow-label">Chrome 系統授權對話框</div>
         <div class="flow-sub" style="color:#2e7d32">🤖 Android Native</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-branch">
-        <div style="display:flex;align-items:center;gap:4px;margin-bottom:8px">
-          <div class="flow-node">
-            <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">✅</div>
-            <div class="flow-label" style="color:var(--green)">允許</div>
-          </div>
+        <div class="flow-node">
+          <div class="flow-circle" style="background:#f0fdf4;border:2px solid #bbf7d0">✅</div>
+          <div class="flow-label" style="color:var(--green)">允許 → 開關 ON</div>
         </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <div class="flow-node">
-            <div class="flow-circle" style="background:var(--rbg);border:2px solid var(--rbdr)">⏭️</div>
-            <div class="flow-label" style="color:var(--red)">稍後 / 封鎖</div>
-          </div>
+        <div class="flow-node">
+          <div class="flow-circle" style="background:var(--rbg);border:2px solid var(--rbdr)">🚫</div>
+          <div class="flow-label" style="color:var(--red)">封鎖 → 開關鎖定</div>
         </div>
       </div>
     </div>
 
+    <div class="tip tip-blue" style="margin-bottom:28px">ℹ️ 進站<strong>不</strong>自動請求授權（移除 bootstrap 自動 <code>getToken</code> 反模式）。回訪<strong>已授權</strong>者 bootstrap 靜默取 token、行為不變，<strong>不會</strong>再經過下方流程。</div>
+
     <div class="phones-row">
 
-      <!-- STEP 1: Our app — deposit success (home page + BJ toast) -->
+      <!-- STEP 1: Phase 2 soft-guidance banner -->
       <div class="phone-col">
-        <div class="phone-step">STEP 01 · <span style="color:var(--purple)">◈ Custom UI</span></div>
-        <div class="android-phone">
-          <div class="android-camera"></div>
-          <div class="android-screen">
-            <div class="asb" style="background:#141515;color:#e2e6e9">
-              <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#e2e6e9">
-                <span style="font-size:10px">▲ WiFi 🔋</span>
-              </div>
-            </div>
-            <!-- Home page background + toast overlay -->
-            <div style="position:relative;overflow:hidden">
-              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
-              <!-- BJ Platform Toast -->
-              <div style="position:absolute;top:10px;left:10px;right:10px;z-index:10">
-                <div class="bj-toast">
-                  <div class="bj-toast-bar"></div>
-                  <div class="bj-toast-content">
-                    <div class="bj-toast-icon">✓</div>
-                    <div class="bj-toast-text">
-                      <div class="bj-toast-title">Approved in</div>
-                      <div class="bj-toast-body">In amount <span class="bj-toast-amount">+฿ 1,000.00</span> has been approved.</div>
-                    </div>
-                    <button class="bj-toast-close">✕</button>
-                  </div>
-                  <div class="bj-toast-progress">
-                    <div class="bj-toast-progress-fill"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Android nav bar -->
-            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="phone-label">存款成功 — BJ 首頁 + Toast<br><span style="color:var(--purple)">我們的平台設計</span></div>
-      </div>
-
-      <!-- STEP 2: Our app — pre-prompt sheet -->
-      <div class="phone-col">
-        <div class="phone-step">STEP 02 · <span style="color:var(--purple)">◈ Custom UI</span></div>
+        <div class="phone-step">STEP 01 · 軟性引導 · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -679,19 +635,15 @@ section{scroll-margin-top:70px}
             </div>
             <div style="position:relative;overflow:hidden">
               <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
-              <div class="platform-overlay"></div>
-              <div class="platform-sheet">
-                <div class="sheet-handle"></div>
-                <div class="sheet-ico">🔔</div>
-                <div class="sheet-ttl">Don't want to miss out?</div>
-                <div class="sheet-sub">Enable notifications to get updates in real-time</div>
-                <div class="sheet-benefits">
-                  <div class="sb-row"><div class="sb-icon">🎁</div><div class="sb-text">Bonus &amp; rebate credit alerts</div></div>
-                  <div class="sb-row"><div class="sb-icon">⚽</div><div class="sb-text">Match results &amp; odds alerts</div></div>
-                  <div class="sb-row"><div class="sb-icon">🔒</div><div class="sb-text">Privacy mode: no platform info shown</div></div>
+              <div style="position:absolute;bottom:12px;left:10px;right:10px;z-index:10">
+                <div style="background:#222424;border-radius:8px;padding:14px;box-shadow:0 4px 16px rgba(0,0,0,.6);border:1px solid rgba(20,128,94,.4)">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                    <div style="font-size:18px">🔔</div>
+                    <div style="font-size:13px;font-weight:700;color:#fff">第一個收到賽果與優惠</div>
+                  </div>
+                  <div style="font-size:11px;color:#8d9aa5;margin-bottom:12px">前往「設定 → 通知」開啟，再也不錯過好康。</div>
+                  <button style="width:100%;background:#14805e;color:#fff;border:none;border-radius:6px;padding:10px;font-size:13px;font-weight:600">去設定看看 →</button>
                 </div>
-                <button class="sheet-primary">Enable Notifications</button>
-                <button class="sheet-secondary">Maybe Later</button>
               </div>
             </div>
             <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -699,12 +651,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">自製預授權彈窗<br><span style="color:var(--purple)">我們的平台設計</span></div>
+        <div class="phone-label">首頁 banner 軟性引導<br><span style="color:var(--purple)">建立期待，不直接叫系統窗</span></div>
       </div>
 
-      <!-- STEP 3: Chrome permission — Android native -->
+      <!-- STEP 2: Notification settings page, toggle OFF (permission=default) -->
       <div class="phone-col">
-        <div class="phone-step">STEP 03 · <span style="color:#2e7d32">🤖 Android Native</span></div>
+        <div class="phone-step">STEP 02 · 通知設定頁 · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -712,12 +664,63 @@ section{scroll-margin-top:70px}
               <span class="asb-time" style="font-size:11px">9:41</span>
               <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div style="position:relative;overflow:hidden">
-              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
-              <!-- Semi-transparent overlay -->
+            <div class="platform-settings" style="min-height:490px">
+              <div class="ps-topbar">
+                <div class="ps-topbar-back">←</div>
+                <div class="ps-topbar-title">Notifications</div>
+                <div style="width:24px"></div>
+              </div>
+              <div class="ps-section-label">Push Notifications</div>
+              <div class="ps-group">
+                <div class="ps-row">
+                  <div class="ps-row-icon">🔔</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Receive Notifications</div>
+                    <div class="ps-row-sub">Tap to enable — we'll request permission</div>
+                  </div>
+                  <div class="ps-toggle off"><div class="ps-toggle-thumb"></div></div>
+                </div>
+              </div>
+              <div style="padding:0 16px;margin-top:16px;font-size:11px;color:#8d9aa5;line-height:1.7">
+                狀態：<span style="color:#e2e6e9;font-family:var(--mono)">permission = default</span><br>點開關 → 觸發 Chrome 系統授權對話框。
+              </div>
+            </div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">個人設定 → 通知 · 開關 OFF<br><span style="color:var(--purple)">使用者主動點才請求 · 完整設定頁見 Section 03</span></div>
+      </div>
+
+      <!-- STEP 3: Chrome native permission dialog (triggered by toggle) -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 03 · 系統授權 · <span style="color:#2e7d32">🤖 Android Native</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
+            </div>
+            <div style="position:relative;overflow:hidden;background:#141515;height:490px">
+              <div class="platform-settings" style="opacity:.5">
+                <div class="ps-topbar">
+                  <div class="ps-topbar-back">←</div>
+                  <div class="ps-topbar-title">Notifications</div>
+                  <div style="width:24px"></div>
+                </div>
+                <div class="ps-section-label">Push Notifications</div>
+                <div class="ps-group">
+                  <div class="ps-row">
+                    <div class="ps-row-icon">🔔</div>
+                    <div class="ps-row-text"><div class="ps-row-label">Receive Notifications</div></div>
+                    <div class="ps-toggle off"><div class="ps-toggle-thumb"></div></div>
+                  </div>
+                </div>
+              </div>
               <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:10"></div>
-              <!-- Chrome native permission dialog -->
-              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30;background:rgba(0,0,0,.2)">
+              <div style="position:absolute;bottom:0;left:0;right:0;z-index:30">
                 <div class="chrome-permission">
                   <div class="cp-header">
                     <div class="cp-site-icon" style="background:#222424;overflow:hidden;padding:2px">
@@ -742,12 +745,12 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">Chrome 授權對話框<br><span style="color:#2e7d32">Android Chrome 原生介面</span></div>
+        <div class="phone-label">Chrome 授權對話框<br><span style="color:#2e7d32">由開關觸發 · 僅此一次機會</span></div>
       </div>
 
-      <!-- STEP 4a: Success -->
+      <!-- STEP 4a: Allow -> granted, toggle ON -->
       <div class="phone-col">
-        <div class="phone-step">STEP 04a · Allow · <span style="color:var(--purple)">◈ Custom UI</span></div>
+        <div class="phone-step">STEP 04a · 允許 · <span style="color:var(--purple)">◈ Custom UI</span></div>
         <div class="android-phone">
           <div class="android-camera"></div>
           <div class="android-screen">
@@ -755,50 +758,25 @@ section{scroll-margin-top:70px}
               <span class="asb-time" style="font-size:11px">9:41</span>
               <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
             </div>
-            <div style="position:relative;overflow:hidden">
-              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
-              <!-- BJ Toast top -->
-              <div style="position:absolute;top:10px;left:10px;right:10px;z-index:30">
-                <div class="bj-toast">
-                  <div class="bj-toast-bar"></div>
-                  <div class="bj-toast-content">
-                    <div class="bj-toast-icon">🔔</div>
-                    <div class="bj-toast-text">
-                      <div class="bj-toast-title">Notifications enabled</div>
-                      <div class="bj-toast-body">You'll receive personalised alerts.</div>
-                    </div>
-                    <button class="bj-toast-close">✕</button>
+            <div class="platform-settings" style="min-height:490px">
+              <div class="ps-topbar">
+                <div class="ps-topbar-back">←</div>
+                <div class="ps-topbar-title">Notifications</div>
+                <div style="width:24px"></div>
+              </div>
+              <div class="ps-section-label">Push Notifications</div>
+              <div class="ps-group">
+                <div class="ps-row">
+                  <div class="ps-row-icon">🔔</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Receive Notifications</div>
+                    <div class="ps-row-sub" style="color:#27b488">On · Real-time alerts enabled</div>
                   </div>
-                  <div class="bj-toast-progress">
-                    <div class="bj-toast-progress-fill"></div>
-                  </div>
+                  <div class="ps-toggle on"><div class="ps-toggle-thumb"></div></div>
                 </div>
               </div>
-            </div>
-            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
-              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="phone-label">授權成功<br><span style="color:var(--purple)">BJ 平台 Toast</span></div>
-      </div>
-
-      <!-- STEP 4b: Snackbar after deny -->
-      <div class="phone-col">
-        <div class="phone-step">STEP 04b · Later</div>
-        <div class="android-phone">
-          <div class="android-camera"></div>
-          <div class="android-screen">
-            <div class="asb" style="background:#141515;color:#e2e6e9">
-              <span class="asb-time" style="font-size:11px">9:41</span>
-              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
-            </div>
-            <div style="position:relative;overflow:hidden">
-              <img src="assets/home.jpg" style="width:100%;height:490px;object-fit:cover;object-position:top;display:block">
-              <!-- Android Snackbar -->
-              <div class="android-snackbar">
-                <div class="snack-text">You can enable notifications in Account Settings</div>
-                <div class="snack-action">Go to Settings</div>
+              <div style="padding:0 16px;margin-top:16px;font-size:11px;color:#8d9aa5;line-height:1.7">
+                <span style="color:#27b488">✓ granted</span> → 送出 token（<span style="font-family:var(--mono)">setFireBaseToken</span>）並寫入偏好 <span style="font-family:var(--mono)">enabled = true</span>。
               </div>
             </div>
             <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
@@ -806,10 +784,98 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
-        <div class="phone-label">稍後 / 拒絕<br><span style="color:#2e7d32">Android Snackbar</span></div>
+        <div class="phone-label">授權成功 — 開關 ON<br><span style="color:var(--green)">granted · enabled=true</span></div>
+      </div>
+
+      <!-- STEP 4b: Block -> denied, toggle locked -->
+      <div class="phone-col">
+        <div class="phone-step">STEP 04b · 封鎖 · <span style="color:var(--purple)">◈ Custom UI</span></div>
+        <div class="android-phone">
+          <div class="android-camera"></div>
+          <div class="android-screen">
+            <div class="asb" style="background:#141515;color:#e2e6e9">
+              <span class="asb-time" style="font-size:11px">9:41</span>
+              <div class="asb-icons" style="color:#e2e6e9"><span style="font-size:10px">▲ WiFi 🔋</span></div>
+            </div>
+            <div class="platform-settings" style="min-height:490px">
+              <div class="ps-topbar">
+                <div class="ps-topbar-back">←</div>
+                <div class="ps-topbar-title">Notifications</div>
+                <div style="width:24px"></div>
+              </div>
+              <div class="ps-section-label">Push Notifications</div>
+              <div class="ps-group">
+                <div class="ps-row" style="opacity:.6">
+                  <div class="ps-row-icon">🔕</div>
+                  <div class="ps-row-text">
+                    <div class="ps-row-label">Receive Notifications <span style="font-size:12px">🔒</span></div>
+                    <div class="ps-row-sub" style="color:#f87171">Blocked — enable in browser settings</div>
+                  </div>
+                  <div class="ps-toggle off" style="filter:grayscale(1)"><div class="ps-toggle-thumb"></div></div>
+                </div>
+              </div>
+              <div style="padding:0 16px;margin-top:16px;font-size:11px;color:#8d9aa5;line-height:1.7">
+                <span style="color:#f87171;font-family:var(--mono)">permission = denied</span> — App 無法再程式詢問。<br>引導：Chrome ⋮ → Site settings → Notifications。
+              </div>
+            </div>
+            <div style="height:20px;background:#141515;display:flex;align-items:center;justify-content:center">
+              <div style="width:80px;height:3px;background:rgba(255,255,255,.2);border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">封鎖 — 開關鎖定<br><span style="color:var(--red)">denied · 只能去瀏覽器設定</span></div>
       </div>
 
     </div>
+
+    <!-- State machine (spec 8.3) -->
+    <div style="margin-top:32px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--purple)">設定頁開關狀態機</span>
+        <span>對應 Notification.permission + 後端旗標</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">完整涵蓋五種狀態（含「稍後」、軟性關閉、不支援環境）— 對齊工程 spec §8.3。</div>
+      <div class="card" style="overflow:hidden">
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--bg);border-bottom:1px solid var(--border)">
+              <th style="text-align:left;padding:10px 14px;font-weight:700">狀態</th>
+              <th style="text-align:left;padding:10px 14px;font-weight:700">開關顯示</th>
+              <th style="text-align:left;padding:10px 14px;font-weight:700">行為</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;white-space:nowrap"><span class="bdg bp">default · 稍後</span></td>
+              <td style="padding:10px 14px;white-space:nowrap">關（可點）</td>
+              <td style="padding:10px 14px;color:var(--muted)">未請求過。dismiss banner 不影響 — 隨時可回設定頁點開關觸發授權。</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;white-space:nowrap"><span class="bdg bg">granted · on</span></td>
+              <td style="padding:10px 14px;white-space:nowrap">開</td>
+              <td style="padding:10px 14px;color:var(--muted)">已授權且啟用。可關（<span style="font-family:var(--mono)">disable()</span>）。</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;white-space:nowrap"><span class="bdg bb">granted · off</span></td>
+              <td style="padding:10px 14px;white-space:nowrap">關（軟性關閉）</td>
+              <td style="padding:10px 14px;color:var(--muted)">已授權但暫時關閉。再開<strong>只寫後端旗標</strong>，不需再 getToken。</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:10px 14px;white-space:nowrap"><span class="bdg br">denied</span></td>
+              <td style="padding:10px 14px;white-space:nowrap">關且<strong>鎖定</strong></td>
+              <td style="padding:10px 14px;color:var(--muted)">瀏覽器已封鎖，<strong>無法程式化再詢問</strong>。文案引導至瀏覽器設定。</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 14px;white-space:nowrap"><span class="bdg" style="background:var(--bg);color:var(--muted);border:1px solid var(--border)">unsupported</span></td>
+              <td style="padding:10px 14px;white-space:nowrap">隱藏 / 禁用 + 說明</td>
+              <td style="padding:10px 14px;color:var(--muted)">iOS Chrome、非 PWA 等不支援環境 — 不放點了沒反應的開關。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip tip-amber" style="margin-top:14px">⚠️ <strong>denied 是永久的</strong>：使用者在系統對話框按「Block」後，瀏覽器鎖為 <code>denied</code>，App 端再也叫不出系統窗 — 所以 STEP 03 的系統對話框<strong>只有一次機會</strong>，務必先用 banner／設定頁鋪陳好再觸發。</div>
+    </div>
+
   </section>
 
   <!-- ══ SECTION 2b: 場景展示 ══ -->
@@ -1156,8 +1222,8 @@ section{scroll-margin-top:70px}
   <section id="s-privacy">
     <div class="sec-hd">
       <div class="eyebrow">Section 03</div>
-      <h2 class="sec-title">隱私模式設定</h2>
-      <p class="sec-desc">用戶直接在 BJ 網站上設定通知模式 — 不需要進入 Android 系統設定。介面使用平台 Figma 設計系統製作（深色主題 · Poppins · 品牌綠）。</p>
+      <h2 class="sec-title">通知設定頁 — 授權主入口 + 隱私模式</h2>
+      <p class="sec-desc">這就是 <strong style="color:var(--fg)">Section 02 授權流程裡的同一個「通知設定頁」</strong>。最上方的 <strong style="color:var(--fg)">Receive Notifications 主開關</strong>就是觸發系統授權的那個開關（OFF→ON）；授權成功（granted）後，下方的隱私模式與通知類型才生效。全程在 BJ 網站內完成、不需進 Android 系統設定，介面使用平台 Figma 設計系統（深色主題 · Poppins · 品牌綠）。</p>
     </div>
 
     <div style="display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start">
@@ -1180,12 +1246,12 @@ section{scroll-margin-top:70px}
               </div>
 
               <div class="ps-section-label">Push Notifications</div>
-              <div class="ps-group">
+              <div class="ps-group" style="box-shadow:0 0 0 1.5px rgba(20,128,94,.7)">
                 <div class="ps-row">
                   <div class="ps-row-icon">🔔</div>
                   <div class="ps-row-text">
                     <div class="ps-row-label">Receive Notifications</div>
-                    <div class="ps-row-sub">Disable to stop all alerts</div>
+                    <div class="ps-row-sub">Master switch · turning on requests permission</div>
                   </div>
                   <div class="ps-toggle on"><div class="ps-toggle-thumb"></div></div>
                 </div>
@@ -1236,10 +1302,19 @@ section{scroll-margin-top:70px}
             </div>
           </div>
         </div>
+        <div class="phone-label" style="max-width:230px">最上方主開關 = Section 02 的授權開關<br><span style="color:var(--purple)">此處為 granted · on 狀態的完整設定頁</span></div>
       </div>
 
       <!-- Mode explanation -->
       <div style="display:flex;flex-direction:column;gap:14px;padding-top:8px">
+        <div class="card cp" style="border-color:var(--gbdr);background:var(--gbg)">
+          <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">🔑 資訊層級：主開關 = 授權</div>
+          <div style="font-size:12px;color:var(--fg);line-height:1.75">
+            <strong>① Receive Notifications（主開關）</strong> ＝ Section 02 的授權開關，OFF→ON 觸發系統授權；關掉 ＝ 停收全部推播。<br>
+            <strong>② 下方的「模式 / 類型」</strong>只有在主開關 ON（granted）後才生效。<br>
+            <span style="color:var(--muted);font-size:11px">denied（鎖定）與 unsupported（iOS Chrome）狀態見 Section 02 開關狀態機。</span>
+          </div>
+        </div>
         <div class="card cp">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
             <div style="width:36px;height:36px;border-radius:5px;background:var(--bbg);display:flex;align-items:center;justify-content:center;font-size:18px">☀️</div>
@@ -1301,8 +1376,8 @@ section{scroll-margin-top:70px}
             <div class="rf-row">
               <div class="rf-dot" style="background:var(--pbg);color:var(--purple);border:1px solid var(--pbdr)">2</div>
               <div>
-                <div class="rf-title">開啟「通知」</div>
-                <div class="rf-body">在設定列表中找到通知 → 點擊開啟</div>
+                <div class="rf-title">開啟「通知」主開關</div>
+                <div class="rf-body">找到通知設定 → 點主開關。<strong>第一次開啟會跳出系統授權請求</strong>（即 Section 02 的流程）；允許後即訂閱成功。</div>
               </div>
             </div>
             <div class="rf-row">

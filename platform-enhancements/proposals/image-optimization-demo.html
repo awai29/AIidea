@@ -36,6 +36,25 @@ code{font-family:var(--mono);font-size:.9em}
   padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:20px}
 .notice code{background:rgba(37,99,235,.08);padding:1px 5px;border-radius:3px}
 
+/* ── backend upload spec card ── */
+.up-spec{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);
+  padding:14px 16px;margin-bottom:18px;box-shadow:var(--sh)}
+.up-spec-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.up-spec-t{font-size:13px;font-weight:700}
+.up-spec-sub{font-size:11px;color:var(--muted)}
+.up-spec-rows{display:flex;flex-direction:column;gap:8px}
+.up-spec-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:8px 11px;background:var(--bg);border:1px solid var(--border);border-radius:6px}
+.up-no{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);
+  background:var(--card);border:1px solid var(--border);border-radius:9999px;flex:none}
+.up-f{display:flex;align-items:baseline;gap:5px}
+.up-fl{font-size:10px;color:var(--muted)}
+.up-fv{font-family:var(--mono);font-size:12px;font-weight:600}
+.up-sep{width:1px;height:14px;background:var(--border)}
+.up-note{font-family:var(--mono);font-size:9px;color:var(--amber);
+  background:var(--abg);border:1px solid var(--abdr);padding:1px 7px;border-radius:9999px;margin-left:auto}
+
 /* ── layout ── */
 main{max-width:1140px;margin:0 auto;padding:36px 24px 80px;display:flex;flex-direction:column;gap:52px}
 section{scroll-margin-top:70px}
@@ -496,6 +515,31 @@ export class CdnImagePipe implements PipeTransform {
     <div>
       <div class="sec-title">格式轉換 — PNG → 設計師批轉 JPG (q70) / WebP</div>
       <div class="sec-desc">載入設計師實際轉換的 6 張圖（PNG 原始 / JPG quality 70 / WebP），實測合計檔案大小與壓縮率。下方附色差熱力圖，逐像素比對顏色偏移量。</div>
+    </div>
+  </div>
+  <div class="up-spec">
+    <div class="up-spec-hd">
+      <span class="up-spec-t">📤 後端目前上圖規格</span>
+      <span class="up-spec-sub">實際上傳限制（兩個上圖位）— 設計師批轉需在此前提下進行</span>
+    </div>
+    <div class="up-spec-rows">
+      <div class="up-spec-row">
+        <span class="up-no">1</span>
+        <span class="up-f"><span class="up-fl">尺寸</span><span class="up-fv">348 × 462</span></span>
+        <span class="up-sep"></span>
+        <span class="up-f"><span class="up-fl">容量上限</span><span class="up-fv">≤ 500 KB</span></span>
+        <span class="up-sep"></span>
+        <span class="up-f"><span class="up-fl">格式</span><span class="up-fv">不限</span></span>
+      </div>
+      <div class="up-spec-row">
+        <span class="up-no">2</span>
+        <span class="up-f"><span class="up-fl">尺寸</span><span class="up-fv">500 × 376</span></span>
+        <span class="up-sep"></span>
+        <span class="up-f"><span class="up-fl">容量上限</span><span class="up-fv">≤ 80 KB</span></span>
+        <span class="up-sep"></span>
+        <span class="up-f"><span class="up-fl">格式</span><span class="up-fv">不限</span></span>
+        <span class="up-note">不限尺寸</span>
+      </div>
     </div>
   </div>
   <div class="card cp">
@@ -1075,41 +1119,45 @@ function s3LoadImg(url) {
 // ─────────────────────────────────────────────
 async function initS4combo() {
   const sizes = [
-    { tier:'1x', w:100,  label:'1x 縮圖 100px' },
-    { tier:'2x', w:200,  label:'2x 縮圖 200px' },
-    { tier:'3x', w:9999, label:'3x 原始 348px'  },
+    { tier:'1x', dir:'100', label:'1x 縮圖 100px' },
+    { tier:'2x', dir:'200', label:'2x 縮圖 200px' },
+    { tier:'3x', dir:'',    label:'3x 原始 348px'  },
   ];
   const fmts = [
-    { key:'png',  mime:'image/png',  q:1,    label:'PNG',  color:'#3b82f6' },
-    { key:'jpg',  mime:'image/jpeg', q:0.85, label:'JPG',  color:'#f59e0b' },
-    { key:'webp', mime:'image/webp', q:0.85, label:'WebP', color:'#16a34a' },
+    { key:'png',  label:'PNG',  color:'#3b82f6' },
+    { key:'jpg',  label:'JPG',  color:'#f59e0b' },
+    { key:'webp', label:'WebP', color:'#16a34a' },
   ];
+
+  // 量測真實檔案下載量（與 S2/S3 同一套來源），不用 canvas 重新編碼。
+  // 實體檔：PNG 在 images/{,200/,100/}；JPG/WebP 在 images/jpg|webp 下同樣結構。
+  const fmtPath = (id, dir, key) => {
+    const seg = dir ? dir + '/' : '';
+    if (key === 'png') return `images/${seg}${id}.png`;
+    if (key === 'jpg') return `images/jpg/${seg}${id}.jpg`;
+    return `images/webp/${seg}${id}.webp`;
+  };
 
   const totals = {}; // totals[tier][fmt] = bytes
   sizes.forEach(sz => { totals[sz.tier]={}; fmts.forEach(ft=>{ totals[sz.tier][ft.key]=0; }); });
 
   let done = 0;
-  const total = IMG_IDS.length * sizes.length;
+  const total = IMG_IDS.length * sizes.length * fmts.length;
   const prog = document.getElementById('combo-prog');
 
   for (const sz of sizes) {
-    for (const id of IMG_IDS) {
-      try {
-        const si = new Image();
-        const url = PICSUM(id, sz.w);
-        await new Promise((res,rej)=>{ si.onload=res; si.onerror=rej; si.src=url; });
-        const cv = document.createElement('canvas');
-        cv.width = si.naturalWidth; cv.height = si.naturalHeight;
-        cv.getContext('2d').drawImage(si,0,0);
-        for (const ft of fmts) {
-          const blob = await new Promise(r => cv.toBlob(r, ft.mime, ft.q));
-          if (blob && (ft.key!=='webp' || blob.type==='image/webp')) {
+    for (const ft of fmts) {
+      for (const id of IMG_IDS) {
+        try {
+          const resp = await fetch(fmtPath(id, sz.dir, ft.key));
+          if (resp.ok) {
+            const blob = await resp.blob();
             totals[sz.tier][ft.key] += blob.size;
           }
-        }
-      } catch(e) {}
-      done++;
-      prog.textContent = `正在分析 ${done} / ${total}…`;
+        } catch(e) {}
+        done++;
+        prog.textContent = `正在量測 ${done} / ${total}…`;
+      }
     }
   }
 
