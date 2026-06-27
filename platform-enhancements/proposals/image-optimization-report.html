@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圖片載入優化 — 技術提案簡報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:10px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 10px 40px rgba(0,0,0,.10);
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6;overflow:hidden}
+code{font-family:var(--mono);font-size:.88em;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+
+/* ── deck shell ── */
+.deck{position:fixed;inset:0;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,5vw,80px) clamp(24px,7vw,120px) clamp(70px,8vh,90px);
+  opacity:0;transform:translateX(50px);transition:opacity .42s ease,transform .42s ease;
+  pointer-events:none;overflow-y:auto;cursor:pointer}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.prev{transform:translateX(-50px)}
+.inner{width:100%;max-width:1020px;margin:0 auto}
+
+/* ── typography ── */
+.eyebrow{font-family:var(--mono);font-size:clamp(11px,1.2vw,13px);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
+h1{font-size:clamp(36px,6.6vw,78px);font-weight:800;line-height:1.03;letter-spacing:-.025em}
+h2{font-size:clamp(23px,4vw,44px);font-weight:800;line-height:1.14;letter-spacing:-.015em;margin-bottom:clamp(16px,2.6vh,26px)}
+.sub{font-size:clamp(15px,1.9vw,21px);color:var(--muted);line-height:1.6;}
+.body-t{font-size:clamp(14px,1.6vw,18px);line-height:1.8;color:#3f3f46}
+.body-t+.body-t{margin-top:12px}
+.hl{background:linear-gradient(transparent 58%,#fde68a 58%);font-weight:600;padding:0 2px}
+.hl-g{color:var(--green);font-weight:700}
+strong{font-weight:700;color:var(--fg)}
+
+/* ── cover ── */
+.slide.cover{justify-content:center}
+.cover-rule{width:54px;height:5px;border-radius:9px;background:var(--fg);margin-bottom:24px}
+.prop-num{font-family:var(--mono);font-size:clamp(56px,11vw,120px);font-weight:800;color:var(--bbdr);line-height:.85;letter-spacing:-.02em;margin-bottom:6px}
+.slide.cover h1{margin-bottom:20px}
+.cover-tag{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:30px}
+.cover-tag span{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--border);
+  background:var(--card);padding:7px 14px;border-radius:9999px;box-shadow:var(--sh)}
+.agenda{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.agenda b{color:var(--fg)}.agenda .arr{color:#c4c4c8}
+
+/* ── chips ── */
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;font-weight:700;
+  padding:5px 12px;border-radius:9999px;border:1px solid;vertical-align:middle}
+.c-adopt{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.c-reject{color:var(--muted);background:var(--card);border-color:var(--border)}
+.c-exist{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+
+/* ── stat callout ── */
+.stat-call{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:8px}
+.stat-call .v{font-family:var(--mono);font-size:clamp(34px,6vw,60px);font-weight:700;line-height:1;color:var(--red)}
+.stat-call .t{font-size:14px;color:var(--muted);line-height:1.5}
+
+/* ── thumb grid (preamble / demos) ── */
+.thumb-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:6px}
+.thumb{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#e4e4e7;box-shadow:var(--sh)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-kb{position:absolute;bottom:5px;right:5px;font-family:var(--mono);font-size:11px;font-weight:600;
+  color:#fff;background:rgba(0,0,0,.7);padding:2px 7px;border-radius:5px}
+.tstats{display:flex;gap:28px;margin-top:18px;flex-wrap:wrap}
+.tstat .l{font-size:11px;color:var(--muted)}
+.tstat .v{font-family:var(--mono);font-size:22px;font-weight:700}
+@media(max-width:760px){.thumb-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── 格式肉眼比較（18 張）── */
+.bb{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.fmtcmp{display:flex;flex-direction:column;gap:12px;margin-top:2px}
+.fmtcmp-row{display:grid;grid-template-columns:70px 1fr;gap:14px;align-items:center}
+.fmtcmp-lbl{display:flex;flex-direction:column;gap:5px;align-items:flex-start;font-size:12px;color:var(--muted)}
+.fmtcmp .thumb-grid{margin-top:0;gap:8px}
+.fmtcmp .thumb-kb{font-size:10px;padding:1px 6px;bottom:4px;right:4px}
+
+/* ── homepage mockup slide ── */
+.home-wrap{display:grid;grid-template-columns:auto 1fr;gap:44px;align-items:center;margin-top:6px}
+.phone{flex:none;max-height:64vh;width:auto;border-radius:26px;box-shadow:var(--sh-lg);border:1px solid var(--border)}
+@media(max-width:760px){.home-wrap{grid-template-columns:1fr}.phone{max-height:46vh;margin:0 auto}}
+
+/* ── backend upload spec ── */
+.up-spec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);margin-top:22px}
+.up-spec-hd{font-size:13px;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.up-spec-hd .s{font-size:11px;color:var(--muted);font-weight:400}
+.up-rows{display:flex;flex-direction:column;gap:9px}
+.up-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px}
+.up-no{width:20px;height:20px;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted);
+  background:var(--card);border:1px solid var(--border);border-radius:9999px;display:flex;align-items:center;justify-content:center;flex:none}
+.up-f{display:flex;align-items:baseline;gap:6px}
+.up-f .fl{font-size:11px;color:var(--muted)}
+.up-f .fv{font-family:var(--mono);font-size:13px;font-weight:600}
+.up-sep{width:1px;height:15px;background:var(--border)}
+
+/* ── network speed bars ── */
+.netbars{margin-top:6px;display:flex;flex-direction:column;gap:16px}
+.netgroup{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:-6px}
+.netgroup.mkt{color:var(--fg)}
+.netrow .top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+.netrow .nm{font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px}
+.netrow .nm .rk{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--border);background:var(--card);padding:2px 8px;border-radius:9999px}
+.netrow .mb{font-family:var(--mono);font-size:17px;font-weight:700}
+.net-track{height:28px;background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.net-fill{height:100%;border-radius:7px;width:0;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.net-src{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:16px}
+
+/* ── DPR device data ── */
+.dpr-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;background:var(--card);border-radius:var(--rsm);overflow:hidden;box-shadow:var(--sh)}
+.dpr-tbl th{background:var(--fg);color:#fff;text-align:left;padding:9px 14px;font-size:11px;font-weight:600}
+.dpr-tbl td{padding:9px 14px;border-top:1px solid var(--border)}
+.dpr-tbl td code{font-size:11px}
+/* page06 動畫 hero */
+.dpr-hero{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:4px 0 18px}
+.phones{display:flex;gap:6px}
+.phones .ph{width:20px;height:32px;border-radius:5px;background:var(--green);opacity:0;transform:translateY(10px) scale(.55);transition:opacity .3s ease,transform .4s cubic-bezier(.2,1.4,.4,1)}
+.phones .ph.muted{background:#d4d4d8}
+.phones .ph.in{opacity:1;transform:none}
+.dpr-big{display:flex;align-items:baseline;gap:11px;opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease}
+.dpr-big.in{opacity:1;transform:none}
+.dpr-big .n{font-family:var(--mono);font-size:clamp(38px,5.5vw,58px);font-weight:800;color:var(--green);line-height:1}
+.dpr-big .t{font-size:15px;color:var(--muted)}.dpr-big .t b{color:var(--fg)}
+.reject-stamp{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:800;
+  font-size:clamp(16px,2.2vw,24px);color:var(--red);border:3px solid var(--red);border-radius:12px;padding:7px 16px;
+  opacity:0;transform:scale(1.7) rotate(-10deg);transition:opacity .2s ease,transform .35s cubic-bezier(.2,1.5,.4,1)}
+.reject-stamp.in{opacity:1;transform:scale(1) rotate(-5deg)}
+@media(max-width:760px){.reject-stamp{margin-left:0}}
+/* page06 播放鈕 + 彈窗 */
+.play-btn{position:absolute;right:clamp(20px,7vw,120px);bottom:76px;z-index:30;
+  width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding-left:3px;
+  font-size:16px;color:#fff;background:var(--fg);border:none;cursor:pointer;box-shadow:var(--sh-lg);transition:transform .15s,box-shadow .15s}
+.play-btn:hover{transform:translateY(-2px) scale(1.06)}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:rgba(9,9,11,.55);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-card{background:var(--card);border-radius:22px;box-shadow:var(--sh-lg);padding:44px 52px 48px;max-width:660px;width:90%;
+  text-align:center;position:relative;transform:scale(.93);transition:transform .3s cubic-bezier(.2,1.2,.4,1)}
+.modal.open .modal-card{transform:none}
+.modal-card h3{font-size:21px;font-weight:800;margin-bottom:26px}
+.modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
+  background:var(--bg);cursor:pointer;font-size:15px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--fg);color:#fff}
+.bdg{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;border:1px solid}
+.bg{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.ba{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+
+/* ── flow ── */
+.flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:24px;margin-top:18px}
+.fstep{flex:1;min-width:175px;background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:16px 18px;position:relative;box-shadow:var(--sh)}
+.fstep:not(:first-child)::before{content:"→";position:absolute;left:-20px;top:50%;transform:translateY(-50%);color:#a1a1aa;font-size:18px}
+.fstep.reject{background:var(--bg);box-shadow:none}
+.fstep .k{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.fstep .tt{font-size:15px;font-weight:700;margin-bottom:4px}
+.fstep .dd{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── two solution cards ── */
+.sol2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px}
+.sol{background:var(--card);border:1px solid var(--gbdr);border-radius:var(--radius);box-shadow:var(--sh);padding:26px 28px;display:flex;flex-direction:column;gap:11px}
+.sol .num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green)}
+.sol .t{font-size:21px;font-weight:800}
+.sol .d{font-size:14px;color:var(--muted);line-height:1.75}
+
+/* ── mini cards ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-top:24px}
+.mcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 22px;border-top:3px solid var(--border)}
+.mcard.r{border-top-color:var(--red)}.mcard.a{border-top-color:var(--amber)}
+.mcard.g{border-top-color:var(--green)}.mcard.b{border-top-color:var(--blue)}
+.mcard .ic{font-size:22px;margin-bottom:10px}
+.mcard .t{font-size:15px;font-weight:700;margin-bottom:6px}
+.mcard .d{font-size:12.5px;color:var(--muted);line-height:1.7}
+.mcard .d strong{color:var(--fg)}
+
+/* ── format / live bars ── */
+.barchart{margin-top:6px;background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:24px 28px}
+.bc-row{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:14px;margin-bottom:15px}
+.bc-row:last-child{margin-bottom:0}
+.bc-lbl .nm{font-size:14px;font-weight:700}
+.bc-lbl .tg{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.bc-wrap{display:flex;align-items:center;gap:12px}
+.bc-track{flex:1;height:38px;background:var(--bg);border-radius:8px;overflow:hidden}
+.bc-fill{height:100%;border-radius:8px;width:0;transition:width 1s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:flex-end;padding-right:12px}
+.bc-fill .kb{font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;white-space:nowrap;opacity:0;transition:opacity .4s .5s}
+.bc-fill.show .kb{opacity:1}
+.bc-save{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green);white-space:nowrap;min-width:78px}
+.bc-payoff{margin-top:20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.bc-payoff .big{font-family:var(--mono);font-size:clamp(28px,4.5vw,42px);font-weight:700;color:var(--green);line-height:1}
+.bc-payoff .txt{font-size:13.5px;color:var(--muted);line-height:1.5}
+.bc-status{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px}
+.bc-group{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 9px}
+.bc-group:first-child{margin-top:0}
+@media(max-width:760px){.bc-row{grid-template-columns:1fr;gap:5px}.bc-lbl{display:flex;justify-content:space-between;align-items:baseline}}
+
+/* ── color diff heatmap ── */
+.diff-pair{margin-bottom:20px}
+.diff-pair-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.diff-pair-hd .bdg2{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 9px;border-radius:9999px;border:1px solid}
+.diff-pair-hd .de{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto}
+.diffgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.diffcell{position:relative;aspect-ratio:3/4;border-radius:7px;overflow:hidden;background:#0a0a0a}
+.diffcell canvas{width:100%;height:100%;display:block}
+.diff-scale{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:14px}
+.diff-scale-bar{flex:1;max-width:280px;height:7px;border-radius:4px;background:linear-gradient(to right,#1d4ed8,#16a34a,#f59e0b,#dc2626)}
+@media(max-width:760px){.diffgrid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── network demo ── */
+.net-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.net-top .lab{font-size:13px;font-weight:700;margin-right:4px}
+.simbtn{font-family:var(--mono);font-size:12px;font-weight:600;padding:7px 15px;border-radius:9px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .15s}
+.simbtn:hover{background:var(--bg)}
+.simbtn.on{border-color:var(--bbdr);background:var(--bbg);color:var(--blue)}
+.netgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.netcell{position:relative;aspect-ratio:3/4;border-radius:7px;overflow:hidden;background:#e4e4e7}
+.netcell img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .3s}
+.netcell .kb{position:absolute;bottom:4px;right:5px;font-family:var(--mono);font-size:10px;color:#fff;background:rgba(0,0,0,.7);padding:1px 6px;border-radius:4px}
+.net-read{display:flex;gap:28px;margin-top:16px;flex-wrap:wrap}
+.net-read .l{font-size:11px;color:var(--muted)}
+.net-read .v{font-family:var(--mono);font-size:18px;font-weight:700}
+@media(max-width:760px){.netgrid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── feasibility table ── */
+.feas-tbl{width:100%;border-collapse:collapse;margin-top:4px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh);font-size:13.5px}
+.feas-tbl th{background:var(--fg);color:#fff;text-align:left;padding:13px 18px;font-weight:600;font-size:12.5px}
+.feas-tbl td{padding:13px 18px;border-top:1px solid var(--border);vertical-align:top;line-height:1.5}
+.feas-tbl tr td:first-child{font-weight:700;width:28%}
+.feas-tbl .sub{font-size:11px;color:var(--muted);font-weight:400;margin-top:3px}
+.eff{display:inline-flex;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px}
+.eff-s{color:var(--green);background:var(--gbg)}.eff-m{color:var(--amber);background:var(--abg)}
+.phase{display:inline-flex;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 9px;border-radius:9999px;border:1px solid var(--bbdr);background:var(--bbg);color:var(--blue)}
+.note{margin-top:18px;background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);padding:14px 18px;font-size:12.5px;color:#92400e;line-height:1.7}
+
+/* ── conclusion ── */
+.concl{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px}
+.phase-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:24px 26px;border-left:4px solid var(--green)}
+.phase-card.p2{border-left-color:var(--blue)}
+.phase-card .ph{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green);margin-bottom:8px}
+.phase-card.p2 .ph{color:var(--blue)}
+.phase-card .t{font-size:18px;font-weight:800;margin-bottom:8px}
+.phase-card .d{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* ── demo link ── */
+.demo-link{display:inline-flex;align-items:center;gap:9px;margin-top:22px;text-decoration:none;font-size:13.5px;font-weight:600;color:#fff;background:var(--fg);padding:11px 19px;border-radius:9999px;box-shadow:var(--sh);transition:transform .15s,box-shadow .15s}
+.demo-link:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
+.demo-link .arr{font-family:var(--mono)}
+
+/* ── nav chrome ── */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;transition:width .4s ease;z-index:50}
+.nav{position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);z-index:40;background:linear-gradient(transparent,rgba(239,239,239,.92) 45%)}
+.dots{display:flex;gap:6px;align-items:center}
+.dot-btn{width:8px;height:8px;border-radius:50%;border:none;background:#c4c4c8;cursor:pointer;padding:0;transition:all .2s}
+.dot-btn:hover{background:var(--muted)}.dot-btn.on{background:var(--fg);transform:scale(1.35)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.counter{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:54px;text-align:right}
+.arrow{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--fg);transition:all .15s;box-shadow:var(--sh)}
+.arrow:hover{background:var(--fg);color:#fff}
+.arrow:disabled{opacity:.35;cursor:default;background:var(--card);color:var(--fg)}
+.kbd-hint{position:fixed;bottom:68px;right:clamp(16px,4vw,40px);font-family:var(--mono);font-size:11px;color:var(--muted);z-index:40;opacity:.8}
+@media(max-width:760px){.sol2,.concl{grid-template-columns:1fr}.feas-tbl{font-size:12px}.feas-tbl th,.feas-tbl td{padding:10px 12px}.kbd-hint{display:none}.fstep:not(:first-child)::before{left:50%;top:-20px;transform:translateX(-50%) rotate(90deg)}}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ═══ 封面 ═══ -->
+  <section class="slide cover active">
+    <div class="inner">
+      <!-- <div class="cover-rule"></div> -->
+      <div class="eyebrow"><span class="dot"></span>技術提案 · Image Loading</div>
+      <h1>圖片載入優化</h1>
+      <p class="sub">用 WebP / JPG 格式轉換與網路自適應載入，為主流 3x 用戶與孟加拉／巴基斯坦／越南市場，降低圖片下載量、加快載入。</p>
+      <div class="cover-tag">
+        <span>🟢 Lazy 現況</span><span>⚪ Responsive 不採用</span><span>✅ 格式轉換</span><span>✅ 網路自適應</span>
+      </div>
+      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>發現問題</b><span class="arr">→</span><b>提出改善</b><span class="arr">→</span><b>可行評估</b><span class="arr">→</span><b>落地比較</b></div>
+    </div>
+  </section>
+
+  <!-- ═══ 01 前期提要 ═══ -->
+  <section class="slide" id="slide-preamble">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>前期提要</div>
+      <h2>目前網站載入的圖片太大</h2>
+      <p class="body-t" style="margin-bottom:22px">從首頁隨手挑 6 張遊戲封面，實際量測下載量（瀏覽器 <code>blob.size</code>）：</p>
+      <div class="thumb-grid" id="pre-grid"></div>
+      <div class="tstats">
+        <div class="tstat"><div class="l">6 張合計下載</div><div class="v" id="pre-total" style="color:var(--red)">量測中…</div></div>
+        <div class="tstat"><div class="l">平均 / 張</div><div class="v" id="pre-avg">—</div></div>
+        <div class="tstat"><div class="l">格式</div><div class="v">PNG</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 02 現況 Lazy ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>現況</div>
+      <div class="home-wrap">
+        <img class="phone" src="images/homepage-mockup.png" alt="目前首頁">
+        <div>
+          <h2>已經做了 Lazy Load<br>但圖還是大</h2>
+          <p class="body-t"><span class="chip c-exist">🟢 首頁已用 Lazy Load</span></p>
+          <p class="body-t" style="margin-top:14px">圖片進入視窗才載入，解決了「一開頁就把整頁圖全抓下來」。</p>
+          <p class="body-t">但<span class="hl">真正被下載的每一張圖，體積仍然過大</span>。Lazy 只改變「何時下載」，沒改變「下載什麼」——治標不治本。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 03 原因① PNG ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>發現問題</div>
+      <h2>客戶在乎遊戲畫面呈現 → 大量使用 PNG</h2>
+      <p class="body-t">為了保留遊戲封面的清晰度與呈現品質，輸出時採用 <strong>PNG</strong>；加上後台檔案規範，目前上圖以 PNG 為主——無損、未壓縮、體積偏大。</p>
+      <div class="up-spec">
+        <div class="up-spec-hd">📤 後端目前上圖規格 <span class="s">實際上傳限制（兩個上圖位）— 設計師批轉需在此前提下進行</span></div>
+        <div class="up-rows">
+          <div class="up-row">
+            <span class="up-no">1</span>
+            <span class="up-f"><span class="fl">尺寸</span><span class="fv">348 × 462</span></span><span class="up-sep"></span>
+            <span class="up-f"><span class="fl">容量上限</span><span class="fv">≤ 500 KB</span></span><span class="up-sep"></span>
+            <span class="up-f"><span class="fl">格式</span><span class="fv">不限</span></span>
+          </div>
+          <div class="up-row">
+            <span class="up-no">2</span>
+            <span class="up-f"><span class="fl">尺寸</span><span class="fv">500 × 376</span></span><span class="up-sep"></span>
+            <span class="up-f"><span class="fl">容量上限</span><span class="fv">≤ 80 KB</span></span><span class="up-sep"></span>
+            <span class="up-f"><span class="fl">格式</span><span class="fv">不限</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 提出改善 · Responsive Images（討論方向）═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善 · 討論方向</div>
+      <h2>我們討論過 Responsive Images（1x / 2x / 3x）</h2>
+      <p class="body-t">為了解決圖片太大，第一個想到的是 <strong>Responsive Images</strong>——依裝置 DPR 給不同解析度版本。同樣 6 張圖，切換 1x / 2x / 3x，觀察 6 張合計流量差距；理論上弱裝置拿小圖、省流量。</p>
+      <div class="cards">
+        <div class="mcard b"><div class="ic">1x</div><div class="t">100 × 133</div><div class="d">低密度 / 桌機——檔最小，但在高密度螢幕會糊。</div></div>
+        <div class="mcard a"><div class="ic">2x</div><div class="t">200 × 266</div><div class="d">中密度裝置——折衷尺寸。</div></div>
+        <div class="mcard g"><div class="ic">3x</div><div class="t">348 × 462</div><div class="d">高密度螢幕（Samsung / iPhone）——最清楚、檔最大。</div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">瀏覽器會依螢幕 DPR 自動選版本。<span class="hl">但要先確認——我們的用戶實際上是什麼裝置？</span></p>
+    </div>
+  </section>
+
+  <!-- ═══ 05 提出改善：Responsive + 裝置比 ═══ -->
+  <section class="slide" id="slide-dpr">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善 · 用戶實際裝置</div>
+      <h2>用戶實際 DPR 分布</h2>
+
+      <button class="play-btn" id="dpr-play" aria-label="看用戶裝置分析">▶</button>
+
+      <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px 20px">
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px">
+          <div>
+            <div style="font-size:13px;font-weight:700">用戶實際 DPR 分布</div>
+            <div style="font-size:11px;color:var(--muted)">來源：GA4 · N = 3,560,322（排除 other）· 依解析度推算裝置 DPR</div>
+          </div>
+          <div style="display:flex;gap:7px">
+            <span class="bdg bg">3x ~90%</span><span class="bdg ba">2x ~8%</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:1px 7px;border-radius:9999px;border:1px solid var(--border)">1x ~2%</span>
+          </div>
+        </div>
+
+        <table class="dpr-tbl" style="box-shadow:none">
+          <thead><tr><th>解析度</th><th>佔比</th><th>裝置</th><th style="text-align:center">DPR</th><th style="text-align:center">倍速圖</th></tr></thead>
+          <tbody>
+            <tr><td><code>360×800</code></td><td><strong>38.22%</strong></td><td>Samsung Galaxy A / S 系列</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>385×854</code></td><td>12.93%</td><td>Samsung Galaxy A54 / A55</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>393×873</code></td><td>10.82%</td><td>iPhone 14 / 15</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>360×806</code></td><td>10.30%</td><td>Samsung Galaxy</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>412×915</code></td><td>9.19%</td><td>Google Pixel 6 / 7</td><td style="text-align:center;color:var(--muted)">2.625</td><td style="text-align:center"><span class="bdg bg">3x</span><sup style="color:var(--muted);font-size:8px">※</sup></td></tr>
+            <tr><td><code>375×812</code></td><td style="color:var(--muted)">8.03% <sup>†</sup></td><td>iPhone X / 11 / 12</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>414×896</code></td><td style="color:var(--muted)">1.70% <sup>†</sup></td><td>iPhone XR / 11</td><td style="text-align:center">2</td><td style="text-align:center"><span class="bdg ba">2x</span></td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:8px">※ Pixel 2.625x → srcset 選 3x　·　† StatCounter 來源</div>
+
+        <div style="margin-top:14px;background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);padding:12px 15px;font-size:12.5px;color:var(--blue);line-height:1.7">
+          💡 <strong>主流（~90%）用戶吃的就是 3x 圖。</strong>BO 現在全部上傳 3x 對這些用戶是正確的。優化重點不是降到 2x（= Responsive），而是用 <strong>WebP 壓縮</strong> 縮小 3x 圖的實際體積（本專案實測省 ~79%）。<strong>→ Responsive ⚪ 不採用。</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 06 採用兩案 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善</div>
+      <h2>改提兩項真正有效的方案</h2>
+      <div class="sol2">
+        <div class="sol">
+          <div class="num">① 採用 · 本次落地</div>
+          <div class="t">✅ 格式轉換　PNG → JPG / WebP</div>
+          <div class="d">同尺寸換更省的格式，壓縮 3x 圖體積。主流 90% 用戶直接受益，且兼顧客戶要求的呈現品質。</div>
+        </div>
+        <div class="sol">
+          <div class="num">② 採用 · 本次落地</div>
+          <div class="t">✅ 網路自適應載入</div>
+          <div class="d">依網路品質給圖。快的網路（如越南）拿好圖，慢的（孟加拉、巴基斯坦、城鄉、尖峰）拿輕量圖。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 07 格式比較 PNG/JPG/WebP（live）═══ -->
+  <section class="slide" id="slide-fmt">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
+      <h2>PNG vs JPG vs WebP — 6 張實測</h2>
+      <div class="thumb-grid" id="fmt-thumbs" style="margin-bottom:20px">
+        <div class="thumb"><img src="images/exclusive-aviator.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-aztec-gems.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-baji-of-olympus-1000.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-bj-fortune-gems.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-bj-super-ace-plus.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-boxing-king.png" alt=""><span class="thumb-kb">…</span></div>
+      </div>
+      <div class="barchart">
+        <div id="fmt-rows"></div>
+        <div class="bc-status" id="fmt-status">點進此頁開始即時量測…</div>
+      </div>
+      <a class="demo-link" href="image-optimization-demo.html#s3" target="_blank" rel="noopener">開啟完整互動 Demo <span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <!-- ═══ 格式 · 肉眼比較（18 張）═══ -->
+  <section class="slide" id="slide-fmtcompare">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
+      <h2>同一批圖 × 三種格式 — 肉眼分得出來嗎？</h2>
+      <div class="fmtcmp">
+        <div class="fmtcmp-row">
+          <div class="fmtcmp-lbl"><span class="bdg bb">PNG</span><span>原始</span></div>
+          <div class="thumb-grid" id="fc-png"></div>
+        </div>
+        <div class="fmtcmp-row">
+          <div class="fmtcmp-lbl"><span class="bdg ba">JPG</span><span>q95</span></div>
+          <div class="thumb-grid" id="fc-jpg"></div>
+        </div>
+        <div class="fmtcmp-row">
+          <div class="fmtcmp-lbl"><span class="bdg bg">WebP</span><span>視覺無損</span></div>
+          <div class="thumb-grid" id="fc-webp"></div>
+        </div>
+      </div>
+      <p class="body-t" style="margin-top:16px">檔案大小差很多，但肉眼幾乎一樣——下一頁用<strong>色差熱力圖</strong>看「差在哪、差多少」。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 08 色差熱力圖（live）═══ -->
+  <section class="slide" id="slide-diff">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
+      <h2>色差熱力圖 — 轉檔後差異有多小？</h2>
+      <p class="body-t" style="margin-bottom:18px">逐像素比對轉檔版與原始 PNG 的顏色差（×5 放大）。<span style="color:#1d4ed8;font-weight:600">藍</span>=幾乎無差異、<span style="color:#dc2626;font-weight:600">紅</span>=差距大。ΔE 越小代表越接近原圖。</p>
+      <div id="diff-wrap"></div>
+      <div class="diff-scale"><span>無差異</span><div class="diff-scale-bar"></div><span>差異最大</span><span id="diff-status" style="margin-left:auto">點進此頁開始計算…</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ 第二提案 · 開場 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="prop-num">02</div>
+      <div class="eyebrow"><span class="dot"></span>第二提案</div>
+      <h1>網路自適應載入</h1>
+      <p class="sub">看網路給圖——好網給高品質、弱網給輕量圖，服務孟加拉／巴基斯坦的網速落差。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 網路自適應 — 概念介紹 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應</div>
+      <h2>什麼是網路自適應載入？</h2>
+      <p class="body-t">偵測使用者<strong>當下的網路品質</strong>，動態給對應的圖：<span class="hl">好網路給高解析、高品質；弱網路給輕量小圖</span>——讓每個人都先看得到、不卡在大檔上。</p>
+      <div class="cards">
+        <div class="mcard b"><div class="ic">📡</div><div class="t">① 偵測網路</div><div class="d">用 <code>navigator.connection</code> 的 effectiveType（2G/3G/4G）或 HTTP Client Hints，判斷當下連線品質。</div></div>
+        <div class="mcard a"><div class="ic">🎚️</div><div class="t">② 選圖策略</div><div class="d">依網速對應一組參數——<strong>尺寸 × 品質 × 格式</strong>；弱網就降尺寸、降品質。</div></div>
+        <div class="mcard g"><div class="ic">⚡</div><div class="t">③ 漸進體驗</div><div class="d">弱網先給「看得到」的輕量圖，網路好再給高品質。先快、再清楚。</div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">對前面提到的<strong>孟加拉、巴基斯坦弱端用戶</strong>尤其有感——同一張圖，不必所有人都扛 3x 大檔。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 網路自適應 · 為什麼（主要市場網速）═══ -->
+  <section class="slide" id="slide-netspeed">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應 · 為什麼</div>
+      <h2>主要市場行動網速落差懸殊</h2>
+      <div class="netbars" id="netbars">
+
+        <div class="netgroup"></div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇹🇼 台灣 <span class="rk">全球第 39</span> <span class="rk" style="color:var(--blue);background:var(--bbg);border-color:var(--bbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--blue)">~114 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="71" style="background:var(--blue)"></div></div>
+        </div>
+
+        <div class="netgroup mkt" style="margin-top:12px">主要市場</div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇧🇩 孟加拉 <span class="rk">全球第 86</span> <span class="rk" style="color:var(--amber);background:var(--abg);border-color:var(--abdr)">≈ 一般 4G</span></div><div class="mb" style="color:var(--amber)">~42 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="26" style="background:var(--amber)"></div></div>
+        </div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇻🇳 越南 <span class="rk">全球第 17</span> <span class="rk" style="color:var(--green);background:var(--gbg);border-color:var(--gbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--green)">~160 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="100" style="background:var(--green)"></div></div>
+        </div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇵🇰 巴基斯坦 <span class="rk">全球後段（~100）</span> <span class="rk" style="color:var(--red);background:var(--rbg);border-color:var(--rbdr)">≈ 3G～入門 4G</span></div><div class="mb" style="color:var(--red)">~20 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="13" style="background:var(--red)"></div></div>
+        </div>
+
+      </div>
+      <div class="net-src">行動下載「中位數」（非平均）· Ookla Speedtest Global Index 2025 · 🇹🇼 對照 · 換算 3G≈1–10 / 4G≈10–50+ / 5G≈100+ Mbps</div>
+      <p class="body-t" style="margin-top:18px">落差懸殊——對照台灣（~114 Mbps），<span class="hl">巴基斯坦、孟加拉只到 3G～入門 4G 等級</span>，正是自適應要服務的對象。</p>
+      <div class="note" style="margin-top:16px">⚠️ <strong>這是全國中位數，且取樣偏都會與新裝置</strong>（資料來自自願測速者）——鄉村、尖峰、舊機、廉價方案用戶<strong>實際遠低於此</strong>。中位數看來還行，但這群弱端用戶吃大圖最痛，正是網路自適應要保護的對象。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 網路自適應 Demo（live, switchable）═══ -->
+  <section class="slide" id="slide-netdemo">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應</div>
+      <h2>看網路給圖 — 現場切換比較</h2>
+      <div class="net-top">
+        <span class="lab">模擬網路：</span>
+        <button class="simbtn" data-net="slow-2g">slow-2g</button>
+        <button class="simbtn" data-net="2g">2G</button>
+        <button class="simbtn" data-net="3g">3G</button>
+        <button class="simbtn on" data-net="4g">4G</button>
+      </div>
+      <div class="netgrid" id="netgrid"></div>
+      <div class="net-read">
+        <div><div class="l">6 張實際下載</div><div class="v" id="nd-total">—</div></div>
+        <div><div class="l">平均 / 張</div><div class="v" id="nd-avg">—</div></div>
+        <div><div class="l">當前品質</div><div class="v" id="nd-q" style="font-size:14px">—</div></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:14px;line-height:1.7">
+        策略：弱網只降尺寸、格式維持 PNG（pngquant 優化）—
+        <span style="color:var(--red)">slow-2g 25%</span> ·
+        <span style="color:#ef4444">2G 50%</span> ·
+        <span style="color:var(--amber)">3G 75%</span> ·
+        <span style="color:var(--green)">4G 原圖（現況 893 KB）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 10 可行評估 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>實作方面可行評估</div>
+      <h2>落地評估 — 各組工作分工</h2>
+      <table class="feas-tbl">
+        <thead><tr><th>角色／組</th><th>① 格式轉換 PNG→WebP</th><th>② 網路自適應載入</th></tr></thead>
+        <tbody>
+          <tr><td>🎨 設計</td><td>訂視覺無損標準（<code>q≥95</code>/lossless）、色差驗收、透明背景規則</td><td>訂各網路階尺寸／可接受畫質、弱網可視性把關</td></tr>
+          <tr><td>💻 前端</td><td><code>&lt;picture&gt;</code> ＋ WebP/JPG fallback，封裝共用元件</td><td><code>navigator.connection</code> 偵測選圖、監聽 change、Safari fallback</td></tr>
+          <tr><td>⚙️ 後端</td><td>批量轉檔 <code>Sharp</code>/<code>pngquant</code>，上稿自動產 WebP+JPG</td><td>預生成各尺寸圖／CDN on-the-fly resize，回對應 URL</td></tr>
+          <tr><td>🌐 網路組</td><td>CDN <code>format=auto</code>／Polish、快取與儲存</td><td>CDN Image Resizing、邊緣快取、Client Hints（<code>Accept-CH</code>）</td></tr>
+          <tr><td>📊 工作預期</td><td><span class="eff eff-m">M 中</span> · 風險低 · <span class="phase">Phase 1</span><div class="sub">後端＋前端主責，主流即受益</div></td><td><span class="eff eff-m">M 中</span> · 風險中 · <span class="phase">Phase 2</span><div class="sub">前端＋網路組主責，Safari／CDN 需留意</div></td></tr>
+        </tbody>
+      </table>
+      <div class="note"><strong>決策紀錄：</strong>Responsive 因 9 成用戶為 3x 裝置、投報率低而不採用；資源集中於格式轉換與網路自適應。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 12 總結 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>結語 · 建議</div>
+      <h2>分兩階段落地</h2>
+      <div class="concl">
+        <div class="phase-card">
+          <div class="ph">PHASE 1 · 先做</div>
+          <div class="t">格式轉換 PNG → JPG / WebP</div>
+          <div class="d">批量轉檔 + <code>&lt;picture&gt;</code> fallback。風險低、效益明確，<strong>主流 90% 用戶立即受益</strong>。</div>
+        </div>
+        <div class="phase-card p2">
+          <div class="ph">PHASE 2 · 接續</div>
+          <div class="t">網路自適應載入</div>
+          <div class="d">前端偵測（生產上 CDN），<strong>服務孟加拉／巴基斯坦／越南的網速落差</strong>，提升弱連線體驗。</div>
+        </div>
+      </div>
+      <p class="body-t" style="margin-top:26px">預期成果（實測）：<span class="hl-g">主流 3x 用戶下載量降 ~79%</span>、<span class="hl-g">弱網自適應 ~92%</span>，同時維持客戶要求的呈現品質。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 11 落地比較（live）═══ -->
+  <section class="slide" id="slide-cmp">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>落地後 vs 目前</div>
+      <h2>6 張圖實際下載量比較</h2>
+      <div class="barchart">
+        <div id="cmp-rows"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ END ═══ -->
+  <section class="slide cover">
+    <div class="inner">
+      <!-- <div class="cover-rule"></div> -->
+      <div class="eyebrow"><span class="dot"></span>END · Thank you</div>
+      <h1>Q &amp; A</h1>
+      <div class="cover-tag"><span>✅ 格式轉換</span><span>✅ 網路自適應</span><span>Q &amp; A</span></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 06 頁彈窗 -->
+<div class="modal" id="dpr-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="dpr-close" aria-label="關閉">✕</button>
+    <h3>用戶裝置分析</h3>
+    <div class="phones" id="dpr-phones" style="justify-content:center;margin-bottom:24px"></div>
+    <div class="dpr-big" id="dpr-big" style="justify-content:center;margin-bottom:26px"><span class="n">~90%</span><span class="t">用戶是 <b>3x</b> 高密度裝置，投報率低</span></div>
+    <div class="reject-stamp" id="dpr-stamp" style="margin:0">不採用</div>
+  </div>
+</div>
+
+<!-- <div class="kbd-hint">← → 翻頁　·　點投影片亦可</div> -->
+<nav class="nav">
+  <div class="dots" id="dots"></div>
+  <div class="nav-right">
+    <span class="counter" id="counter">01 / 18</span>
+    <button class="arrow" id="prev" aria-label="上一頁">←</button>
+    <button class="arrow" id="next" aria-label="下一頁">→</button>
+  </div>
+</nav>
+
+<script>
+// ─────────────────────────────────────────────
+// 共用：圖片清單 + fetch 量測
+// ─────────────────────────────────────────────
+const IMG_IDS = ['exclusive-aviator','exclusive-aztec-gems','exclusive-baji-of-olympus-1000','exclusive-bj-fortune-gems','exclusive-bj-super-ace-plus','exclusive-boxing-king'];
+async function fetchSize(url){ try{ const r=await fetch(url); if(r.ok) return (await r.blob()).size; }catch(e){} return 0; }
+async function fetchObj(url){ try{ const r=await fetch(url); if(r.ok){ const b=await r.blob(); return {size:b.size,url:URL.createObjectURL(b)}; } }catch(e){} return null; }
+
+// ─────────────────────────────────────────────
+// 投影片導覽
+// ─────────────────────────────────────────────
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let cur = 0;
+const dotsWrap = document.getElementById('dots');
+slides.forEach((_, i) => {
+  const b = document.createElement('button');
+  b.className = 'dot-btn' + (i === 0 ? ' on' : '');
+  b.addEventListener('click', e => { e.stopPropagation(); go(i); });
+  dotsWrap.appendChild(b);
+});
+const dotBtns = Array.from(dotsWrap.children);
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const progress = document.getElementById('progress');
+
+function go(i) {
+  i = Math.max(0, Math.min(N - 1, i));
+  cur = i;
+  slides.forEach((s, idx) => { s.classList.toggle('active', idx === i); s.classList.toggle('prev', idx < i); });
+  dotBtns.forEach((d, idx) => d.classList.toggle('on', idx === i));
+  counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+  progress.style.width = (i / (N - 1) * 100) + '%';
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === N - 1;
+  const id = slides[i].id;
+  if (id === 'slide-preamble') initPreamble();
+  if (id === 'slide-netspeed') animateNetSpeed();
+  if (id === 'slide-fmt') initFmt();
+  if (id === 'slide-fmtcompare') initFmtCompare();
+  if (id === 'slide-diff') initDiff();
+  if (id === 'slide-netdemo') initNetDemo();
+  if (id === 'slide-cmp') runComparison();
+}
+prevBtn.addEventListener('click', () => go(cur - 1));
+nextBtn.addEventListener('click', () => go(cur + 1));
+document.addEventListener('keydown', e => {
+  if (dprModal && dprModal.classList.contains('open')) { if (e.key === 'Escape') closeDprModal(); return; }
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0); else if (e.key === 'End') go(N - 1);
+});
+document.getElementById('deck').addEventListener('click', e => {
+  if (e.target.closest('a, button')) return;
+  if (e.clientX > window.innerWidth * 0.42) go(cur + 1); else go(cur - 1);
+});
+
+// ─────────────────────────────────────────────
+// 01 前期提要 — 6 張 PNG 實測
+// ─────────────────────────────────────────────
+let preDone = false;
+async function initPreamble(){
+  if(preDone) return; preDone = true;
+  const grid = document.getElementById('pre-grid');
+  let total = 0;
+  for(const id of IMG_IDS){
+    const cell = document.createElement('div'); cell.className = 'thumb';
+    const img = document.createElement('img'); img.src = `images/${id}.png`; img.alt = '';
+    const tag = document.createElement('span'); tag.className = 'thumb-kb'; tag.textContent = '…';
+    cell.append(img, tag); grid.appendChild(cell);
+    const sz = await fetchSize(`images/${id}.png`); total += sz;
+    tag.textContent = (sz/1024).toFixed(0) + ' KB';
+  }
+  document.getElementById('pre-total').textContent = (total/1024).toFixed(0) + ' KB';
+  document.getElementById('pre-avg').textContent = (total/IMG_IDS.length/1024).toFixed(0) + ' KB';
+}
+
+// ─────────────────────────────────────────────
+// 04 網速 bar 動畫
+// ─────────────────────────────────────────────
+function animateNetSpeed(){ document.querySelectorAll('#netbars .net-fill').forEach(f => f.style.width = f.dataset.pct + '%'); }
+
+// 06 頁：9/10 用戶是 3x 動畫 → 不採用 stamp（每次切到該頁重播）
+let dprTimers = [];
+function initDprAnim(){
+  const wrap = document.getElementById('dpr-phones');
+  const big = document.getElementById('dpr-big');
+  const stamp = document.getElementById('dpr-stamp');
+  if(!wrap || !big || !stamp) return;
+  if(!wrap.children.length){
+    for(let i=0;i<10;i++){ const p=document.createElement('span'); p.className='ph'+(i===9?' muted':''); wrap.appendChild(p); }
+  }
+  const phones = Array.from(wrap.children);
+  dprTimers.forEach(t=>clearTimeout(t)); dprTimers=[];
+  phones.forEach(p=>p.classList.remove('in'));
+  big.classList.remove('in'); stamp.classList.remove('in');
+  phones.forEach((p,i)=> dprTimers.push(setTimeout(()=>p.classList.add('in'), 150 + i*70)));
+  dprTimers.push(setTimeout(()=> big.classList.add('in'), 150 + 10*70 + 200));
+  dprTimers.push(setTimeout(()=> stamp.classList.add('in'), 150 + 10*70 + 800));
+}
+
+// 06 頁彈窗開關（點播放鈕觸發動畫）
+const dprModal = document.getElementById('dpr-modal');
+function openDprModal(){ if(!dprModal) return; dprModal.classList.add('open'); initDprAnim(); }
+function closeDprModal(){ if(!dprModal) return; dprModal.classList.remove('open'); dprTimers.forEach(t=>clearTimeout(t)); dprTimers=[]; }
+const dprPlayBtn = document.getElementById('dpr-play');
+if(dprPlayBtn) dprPlayBtn.addEventListener('click', e=>{ e.stopPropagation(); openDprModal(); });
+if(dprModal){
+  const dprCloseBtn = document.getElementById('dpr-close');
+  if(dprCloseBtn) dprCloseBtn.addEventListener('click', e=>{ e.stopPropagation(); closeDprModal(); });
+  dprModal.addEventListener('click', e=>{ if(e.target===dprModal) closeDprModal(); });
+}
+
+// ─────────────────────────────────────────────
+// 07 格式比較 PNG / JPG / WebP（3x，6 張合計）
+// ─────────────────────────────────────────────
+let fmtDone = false;
+async function initFmt(){
+  if(fmtDone) return; fmtDone = true;
+  const status = document.getElementById('fmt-status');
+  const defs = [
+    {k:'png', l:'PNG', tg:'原始', c:'var(--blue)', p:id=>`images/${id}.png`},
+    {k:'jpg', l:'JPG', tg:'quality 95', c:'var(--amber)', p:id=>`images/jpg/${id}.jpg`},
+    {k:'webp',l:'WebP',tg:'視覺無損', c:'var(--green)', p:id=>`images/webp/${id}.webp`},
+  ];
+  const totals = {};
+  const fmtThumbs = document.getElementById('fmt-thumbs');
+  for(const d of defs){
+    status.textContent = `量測中… ${d.l}`;
+    let t=0, i=0;
+    for(const id of IMG_IDS){
+      const sz = await fetchSize(d.p(id)); t += sz;
+      if(d.k==='png' && fmtThumbs){ const tag = fmtThumbs.children[i] && fmtThumbs.children[i].querySelector('.thumb-kb'); if(tag) tag.textContent = (sz/1024).toFixed(0)+' KB'; }
+      i++;
+    }
+    totals[d.k]=t;
+  }
+  const max = Math.max(...Object.values(totals));
+  const rows = document.getElementById('fmt-rows');
+  rows.innerHTML = '';
+  defs.forEach(d => {
+    const t = totals[d.k]; const pct = Math.max(3, Math.round(t/max*100));
+    const save = d.k!=='png' && totals.png>0 ? Math.round((1 - t/totals.png)*100) : null;
+    const row = document.createElement('div'); row.className = 'bc-row';
+    row.innerHTML = `<div class="bc-lbl"><div class="nm" style="color:${d.c}">${d.l}</div><div class="tg">${d.tg}</div></div>
+      <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:${d.c};width:0"><span class="kb" style="opacity:1">${(t/1024).toFixed(0)} KB</span></div></div>
+      <span class="bc-save">${save!==null?'▼ 省 '+save+'%':'baseline'}</span></div>`;
+    rows.appendChild(row);
+    const fill = row.querySelector('.bc-fill');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.width = pct + '%'; }));
+  });
+  status.textContent = `量測完成 · 6 張合計：PNG ${(totals.png/1024).toFixed(0)} KB → WebP ${(totals.webp/1024).toFixed(0)} KB`;
+}
+
+// 09 頁：6 張 × PNG/JPG/WebP = 18 張肉眼比較（每張標 KB）
+let fcDone = false;
+async function initFmtCompare(){
+  if(fcDone) return; fcDone = true;
+  const rows = [
+    {gid:'fc-png',  p:id=>`images/${id}.png`},
+    {gid:'fc-jpg',  p:id=>`images/jpg/${id}.jpg`},
+    {gid:'fc-webp', p:id=>`images/webp/${id}.webp`},
+  ];
+  for(const r of rows){
+    const grid = document.getElementById(r.gid); if(!grid) continue;
+    for(const id of IMG_IDS){
+      const cell=document.createElement('div'); cell.className='thumb';
+      const img=document.createElement('img'); img.src=r.p(id); img.alt='';
+      const kb=document.createElement('span'); kb.className='thumb-kb'; kb.textContent='…';
+      cell.append(img,kb); grid.appendChild(cell);
+      fetchSize(r.p(id)).then(sz=>{ kb.textContent=(sz/1024).toFixed(0)+' KB'; });
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// 08 色差熱力圖（PNG vs JPG / WebP）
+// ─────────────────────────────────────────────
+let diffDone = false;
+function loadImg(url){ return new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=url; }); }
+async function drawDiff(canvas, urlA, urlB){
+  const [a,b] = await Promise.all([loadImg(urlA), loadImg(urlB)]);
+  const W=a.naturalWidth, H=a.naturalHeight;
+  canvas.width=W; canvas.height=H;
+  const ca=Object.assign(document.createElement('canvas'),{width:W,height:H});
+  const cb=Object.assign(document.createElement('canvas'),{width:W,height:H});
+  ca.getContext('2d').drawImage(a,0,0);
+  cb.getContext('2d').drawImage(b,0,0,W,H);
+  const da=ca.getContext('2d').getImageData(0,0,W,H).data;
+  const db=cb.getContext('2d').getImageData(0,0,W,H).data;
+  const ctx=canvas.getContext('2d'); const out=ctx.createImageData(W,H);
+  let sum=0; const n=W*H;
+  for(let p=0;p<n;p++){ const i=p*4;
+    const dr=da[i]-db[i], dg=da[i+1]-db[i+1], dbl=da[i+2]-db[i+2];
+    const delta=Math.sqrt(dr*dr+dg*dg+dbl*dbl)/Math.sqrt(3)/255*100; sum+=delta;
+    const t=Math.min(delta*5,100)/100;
+    out.data[i]=t<.5?0:Math.round((t-.5)*2*220);
+    out.data[i+1]=t<.5?Math.round(t*2*160):Math.round((1-t)*2*160);
+    out.data[i+2]=t<.5?Math.round((1-t*2)*220):0;
+    out.data[i+3]=255;
+  }
+  ctx.putImageData(out,0,0);
+  return sum/n;
+}
+async function initDiff(){
+  if(diffDone) return; diffDone = true;
+  const status = document.getElementById('diff-status');
+  const wrap = document.getElementById('diff-wrap');
+  const pngObjs = [];
+  for(const id of IMG_IDS) pngObjs.push(await fetchObj(`images/${id}.png`));
+  const pairs = [
+    {key:'jpg', label:'JPG vs PNG', col:'var(--amber)', bg:'var(--abg)', bd:'var(--abdr)', p:id=>`images/jpg/${id}.jpg`},
+    {key:'webp',label:'WebP vs PNG',col:'var(--green)', bg:'var(--gbg)', bd:'var(--gbdr)', p:id=>`images/webp/${id}.webp`},
+  ];
+  for(const pair of pairs){
+    const div=document.createElement('div'); div.className='diff-pair';
+    const hd=document.createElement('div'); hd.className='diff-pair-hd';
+    hd.innerHTML=`<span class="bdg2" style="color:${pair.col};background:${pair.bg};border-color:${pair.bd}">${pair.label} 色差熱力圖</span><span class="de"></span>`;
+    div.appendChild(hd);
+    const grid=document.createElement('div'); grid.className='diffgrid';
+    div.appendChild(grid); wrap.appendChild(div);
+    let sum=0, cnt=0;
+    for(let i=0;i<IMG_IDS.length;i++){
+      status.textContent = `計算中… ${pair.label} ${i+1}/6`;
+      const cell=document.createElement('div'); cell.className='diffcell';
+      const cv=document.createElement('canvas'); cell.appendChild(cv); grid.appendChild(cell);
+      const cmp = await fetchObj(pair.p(IMG_IDS[i]));
+      if(pngObjs[i] && cmp){ try{ const d=await drawDiff(cv, pngObjs[i].url, cmp.url); sum+=d; cnt++; hd.querySelector('.de').textContent=`平均 ΔE ${(sum/cnt).toFixed(1)}`; }catch(e){} }
+    }
+  }
+  status.textContent = 'ΔE 越小越接近原圖';
+}
+
+// ─────────────────────────────────────────────
+// 09 網路自適應 Demo（可切換）
+// ─────────────────────────────────────────────
+// 依網路給圖：弱網用「縮尺寸 + pngquant 優化的 PNG」實體檔（後端預生成於 images/net/）
+const NET = {
+  'slow-2g':{dir:'net/25', blur:3, label:'slow-2g · 尺寸 25%（PNG）', color:'var(--red)'},
+  '2g':     {dir:'net/50', blur:0, label:'2G · 尺寸 50%（PNG）',      color:'#ef4444'},
+  '3g':     {dir:'net/75', blur:0, label:'3G · 尺寸 75%（PNG）',      color:'var(--amber)'},
+  '4g':     {dir:'',       blur:0, label:'4G / WiFi · 原圖 PNG（現況）', color:'var(--green)'},
+};
+const netPath = (id, dir) => dir ? `images/${dir}/${id}.png` : `images/${id}.png`;
+let netInited = false, netToken = 0;
+function initNetDemo(){
+  if(netInited) return; netInited = true;
+  document.querySelectorAll('#slide-netdemo .simbtn').forEach(btn=>{
+    btn.addEventListener('click', e=>{ e.stopPropagation(); loadNetGrid(btn.dataset.net); });
+  });
+  loadNetGrid('4g');
+}
+async function loadNetGrid(tier){
+  const cfg = NET[tier] || NET['4g'];
+  const token = ++netToken;   // 防止快速切換造成 KB 互相蓋寫
+  document.querySelectorAll('#slide-netdemo .simbtn').forEach(b=>b.classList.toggle('on', b.dataset.net===tier));
+  document.getElementById('nd-q').textContent = cfg.label;
+  document.getElementById('nd-q').style.color = cfg.color;
+  document.getElementById('nd-total').textContent = '…';
+  document.getElementById('nd-avg').textContent = '…';
+  const grid = document.getElementById('netgrid'); grid.innerHTML = '';
+  const cells = IMG_IDS.map(()=>{
+    const cell=document.createElement('div'); cell.className='netcell';
+    const img=document.createElement('img'); img.style.filter=`blur(${cfg.blur}px)`; img.alt='';
+    const tag=document.createElement('span'); tag.className='kb'; tag.textContent='…';
+    cell.append(img, tag); grid.appendChild(cell); return {img, tag};
+  });
+  let total=0, n=0;
+  for(let i=0;i<IMG_IDS.length;i++){
+    const r = (await fetchObj(netPath(IMG_IDS[i], cfg.dir))) || {size:0,url:''};
+    if(token !== netToken) return;   // 已有更新的切換，放棄這次
+    cells[i].img.src = r.url;
+    cells[i].tag.textContent = (r.size/1024).toFixed(0)+' KB';
+    total += r.size; n++;
+    document.getElementById('nd-total').textContent = (total/1024).toFixed(0)+' KB';
+    document.getElementById('nd-avg').textContent = (total/n/1024).toFixed(0)+' KB';
+  }
+}
+
+// ─────────────────────────────────────────────
+// 11 落地比較 — 即時量測
+// ─────────────────────────────────────────────
+let cmpDone = false, cmpRunning = false;
+async function sumFmt(pathFn){ let t=0; for(const id of IMG_IDS) t += await fetchSize(pathFn(id)); return t; }
+async function sumNet(dir){ let t=0; for(const id of IMG_IDS) t += await fetchSize(netPath(id, dir)); return t; }
+async function runComparison(){
+  if(cmpDone || cmpRunning) return; cmpRunning = true;
+  const png  = await sumFmt(id=>`images/${id}.png`);
+  const jpg  = await sumFmt(id=>`images/jpg/${id}.jpg`);
+  const webp = await sumFmt(id=>`images/webp/${id}.webp`);
+  const net3 = await sumNet('net/75');
+  const net2 = await sumNet('net/50');
+  const netS = await sumNet('net/25');
+  const base = png || 1;
+  const groups = [
+    { title:'現況 vs 換格式（全員 3x）', rows:[
+      { label:'現況 · 3x PNG', tg:'目前全員都拿這個',  bytes:png,  color:'var(--red)',   base:true },
+      { label:'3x JPG',        tg:'同尺寸換 JPG',       bytes:jpg,  color:'var(--amber)' },
+      { label:'3x WebP',       tg:'主流 90% 用戶落地',  bytes:webp, color:'var(--green)' },
+    ]},
+    { title:'網路自適應（依網路給圖）', rows:[
+      { label:'4G / WiFi · 原圖', tg:'原圖 PNG（現況）',   bytes:png,  color:'#16a34a' },
+      { label:'3G',               tg:'尺寸 75%（PNG）', bytes:net3, color:'var(--amber)' },
+      { label:'2G',               tg:'尺寸 50%（PNG）', bytes:net2, color:'#ef4444' },
+      { label:'slow-2g',          tg:'尺寸 25%（PNG）', bytes:netS, color:'var(--red)' },
+    ]},
+  ];
+  const rowsEl = document.getElementById('cmp-rows'); rowsEl.innerHTML = '';
+  groups.forEach(g => {
+    const lbl = document.createElement('div'); lbl.className='bc-group'; lbl.textContent=g.title; rowsEl.appendChild(lbl);
+    g.rows.forEach(r => {
+      const pct = Math.max(2, Math.round(r.bytes/base*100));
+      const save = r.base ? null : Math.round((1 - r.bytes/base)*100);
+      const saveTxt = save===null ? 'baseline' : (save<=0 ? '原圖 100%' : '▼ 省 '+save+'%');
+      const row = document.createElement('div'); row.className='bc-row';
+      row.innerHTML = `<div class="bc-lbl"><div class="nm" style="color:${r.color}">${r.label}</div><div class="tg">${r.tg}</div></div>
+        <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:${r.color};width:0"><span class="kb" style="opacity:1">${(r.bytes/1024).toFixed(0)} KB</span></div></div>
+        <span class="bc-save">${saveTxt}</span></div>`;
+      rowsEl.appendChild(row);
+      const fill = row.querySelector('.bc-fill');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.width = pct+'%'; }));
+    });
+  });
+  cmpDone = true; cmpRunning = false;
+}
+
+go(0);
+</script>
+</body>
+</html>
