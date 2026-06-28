@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款放棄行為分析 — BJ V3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:10px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --purple:#7c3aed;--pbg:#f5f3ff;--pbdr:#ddd6fe;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 10px 40px rgba(0,0,0,.10);
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6;overflow:hidden}
+code{font-family:var(--mono);font-size:.88em;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+
+/* ── deck shell ── */
+.deck{position:fixed;inset:0;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,5vw,72px) clamp(24px,7vw,120px) clamp(60px,8vh,80px);
+  opacity:0;transform:translateX(50px);transition:opacity .42s ease,transform .42s ease;
+  pointer-events:none;overflow-y:auto;cursor:pointer}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.prev{transform:translateX(-50px)}
+.inner{width:100%;max-width:1020px;margin:0 auto}
+
+/* ── typography ── */
+.eyebrow{font-family:var(--mono);font-size:clamp(11px,1.2vw,13px);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
+h1{font-size:clamp(36px,6.6vw,78px);font-weight:800;line-height:1.03;letter-spacing:-.025em}
+h2{font-size:clamp(22px,3.8vw,42px);font-weight:800;line-height:1.14;letter-spacing:-.015em;margin-bottom:clamp(14px,2.2vh,22px)}
+.sub{font-size:clamp(15px,1.9vw,21px);color:var(--muted);line-height:1.6}
+.body-t{font-size:clamp(13px,1.5vw,17px);line-height:1.8;color:#3f3f46}
+.body-t+.body-t{margin-top:10px}
+.hl{background:linear-gradient(transparent 58%,#fde68a 58%);font-weight:600;padding:0 2px}
+strong{font-weight:700;color:var(--fg)}
+
+/* ── cover ── */
+.slide.cover{justify-content:center}
+.cover-tag{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:28px}
+.cover-tag span{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--border);
+  background:var(--card);padding:7px 14px;border-radius:9999px;box-shadow:var(--sh)}
+.agenda{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.agenda b{color:var(--fg)}.agenda .arr{color:#c4c4c8}
+
+/* ── stat callout ── */
+.stat-call{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:10px}
+.stat-call .v{font-family:var(--mono);font-size:clamp(32px,5.5vw,56px);font-weight:700;line-height:1}
+.stat-call .t{font-size:13px;color:var(--muted);line-height:1.5}
+.v-red{color:var(--red)}.v-blue{color:var(--blue)}.v-green{color:var(--green)}.v-amber{color:var(--amber)}
+
+/* ── two column ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.sol{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--sh);padding:22px 26px;display:flex;flex-direction:column;gap:10px}
+.sol.green{border-color:var(--gbdr);border-top:3px solid var(--green)}
+.sol.blue{border-color:var(--bbdr);border-top:3px solid var(--blue)}
+.sol .stag{font-family:var(--mono);font-size:11px;font-weight:700}
+.sol .stag.g{color:var(--green)}.sol .stag.b{color:var(--blue)}
+.sol .st{font-size:18px;font-weight:800}
+.sol .sd{font-size:13px;color:var(--muted);line-height:1.75}
+.sol .snums{display:flex;gap:20px;flex-wrap:wrap;margin-top:4px}
+.sol .snum .sl{font-size:11px;color:var(--muted)}
+.sol .snum .sv{font-family:var(--mono);font-size:20px;font-weight:700}
+
+/* ── track table ── */
+.track-tbl{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh);font-size:13.5px;margin-top:18px}
+.track-tbl th{background:var(--fg);color:#fff;text-align:left;padding:10px 16px;font-weight:600;font-size:12px}
+.track-tbl td{padding:10px 16px;border-top:1px solid var(--border);vertical-align:middle;line-height:1.45}
+.track-tbl td:first-child{width:80px}
+.tbadge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 11px;border-radius:9999px;border:1px solid}
+.tb-a{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.tb-b{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.tb-c{color:var(--muted);background:#f4f4f5;border-color:var(--border)}
+.tb-d{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+
+/* ── big finding ── */
+.big-find{margin:14px 0;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.big-find .n{font-family:var(--mono);font-size:clamp(48px,8vw,86px);font-weight:800;line-height:.9;letter-spacing:-.02em}
+.big-find .unit{font-size:clamp(17px,2.5vw,26px);font-weight:700;color:var(--muted)}
+
+/* ── evidence card ── */
+.evidence{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;margin-top:14px;box-shadow:var(--sh)}
+.evidence .hd{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.ev-row{display:flex;align-items:flex-start;gap:10px;font-size:13px}
+.ev-row+.ev-row{margin-top:8px}
+.ev-num{font-family:var(--mono);font-weight:700;font-size:13px;flex:none;min-width:52px}
+.ev-desc{color:#3f3f46;line-height:1.55;flex:1}
+.tpill{display:inline-flex;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 9px;border-radius:9999px;border:1px solid;flex:none}
+.tp-r{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.tp-g{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.tp-b{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.tp-a{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.tp-m{color:var(--muted);background:#f4f4f5;border-color:var(--border)}
+
+/* ── compare row ── */
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.cbox{background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh)}
+.cbox .chead{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.cbox .cv{font-family:var(--mono);font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1;margin-bottom:6px}
+.cbox .cd{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── funnel ── */
+.funnel{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.frow{display:grid;grid-template-columns:150px 1fr 68px;align-items:center;gap:10px}
+.frow .lbl{font-size:11.5px;color:var(--muted);line-height:1.35}
+.frow .lbl .ev{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--fg);display:block}
+.frow .lbl .hint{font-size:10px;color:var(--green);font-weight:600;margin-top:1px;display:block}
+.frow .bar-wrap{height:28px;background:var(--bg);border-radius:7px;overflow:hidden}
+.frow .bar-fill{height:100%;border-radius:7px;width:0;transition:width 1.1s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;padding-left:10px}
+.frow .bar-fill .bv{font-family:var(--mono);font-size:11.5px;font-weight:700;color:#fff;opacity:0;transition:opacity .35s .6s;white-space:nowrap}
+.frow .bar-fill.show .bv{opacity:1}
+.frow .pct{font-family:var(--mono);font-size:12.5px;font-weight:700;text-align:right}
+.loop-lbl{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+  display:flex;align-items:center;gap:8px;margin:6px 0 3px}
+.loop-lbl::before,.loop-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── conclusion 3-col ── */
+.concl3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:18px}
+.pcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 22px;border-left:4px solid}
+.pcard.r{border-left-color:var(--red)}.pcard.b{border-left-color:var(--blue)}.pcard.a{border-left-color:var(--amber)}
+.pcard .ph{font-family:var(--mono);font-size:11px;font-weight:700;margin-bottom:7px}
+.pcard.r .ph{color:var(--red)}.pcard.b .ph{color:var(--blue)}.pcard.a .ph{color:var(--amber)}
+.pcard .pt{font-size:15px;font-weight:800;line-height:1.3;margin-bottom:7px}
+.pcard .pd{font-size:12.5px;color:var(--muted);line-height:1.65}
+
+/* ── solution cards ── */
+.sol4{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.scard{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px 22px;border-top:3px solid}
+.scard.b{border-top-color:var(--blue)}.scard.g{border-top-color:var(--green)}
+.scard.a{border-top-color:var(--amber)}.scard.r{border-top-color:var(--red)}
+.scard .snum{font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:6px}
+.scard.b .snum{color:var(--blue)}.scard.g .snum{color:var(--green)}
+.scard.a .snum{color:var(--amber)}.scard.r .snum{color:var(--red)}
+.scard .st{font-size:15px;font-weight:800;margin-bottom:6px;line-height:1.3}
+.scard .sd{font-size:12.5px;color:var(--muted);line-height:1.65}
+
+/* ── proto slide ── */
+.slide.proto-slide{padding:0 !important;cursor:default}
+.proto-wrap{display:grid;grid-template-columns:380px 1fr;height:100%;width:100%}
+.proto-left{padding:clamp(24px,4vw,60px) 32px clamp(60px,7vh,80px) clamp(24px,6vw,80px);
+  display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
+.proto-left .eyebrow{margin-bottom:12px}
+.proto-left h2{font-size:clamp(20px,2.8vw,32px);margin-bottom:14px}
+.proto-left .body-t{font-size:13px;color:var(--muted);margin-bottom:20px}
+.sol-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.sol-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.proto-right{background:#0c0c14;overflow:hidden;position:relative}
+.proto-right iframe{width:100%;height:100%;border:none;display:block}
+
+/* ── nav chrome ── */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;transition:width .4s ease;z-index:50}
+.nav{position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 clamp(16px,4vw,40px);z-index:40;
+  background:linear-gradient(transparent,rgba(239,239,239,.92) 45%)}
+.dots{display:flex;gap:6px;align-items:center}
+.dot-btn{width:8px;height:8px;border-radius:50%;border:none;background:#c4c4c8;cursor:pointer;padding:0;transition:all .2s}
+.dot-btn:hover{background:var(--muted)}.dot-btn.on{background:var(--fg);transform:scale(1.35)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.counter{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:54px;text-align:right}
+.arrow{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;
+  font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--fg);transition:all .15s;box-shadow:var(--sh)}
+.arrow:hover{background:var(--fg);color:#fff}
+.arrow:disabled{opacity:.35;cursor:default;background:var(--card);color:var(--fg)}
+.kbd-hint{position:fixed;bottom:68px;right:clamp(16px,4vw,40px);font-family:var(--mono);font-size:11px;color:var(--muted);z-index:40;opacity:.8}
+@media(max-width:760px){
+  .two-col,.compare-row,.concl3,.sol4{grid-template-columns:1fr}
+  .proto-wrap{grid-template-columns:1fr}
+  .proto-right{display:none}
+  .kbd-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ══════════════════════════════ 封面 ══════════════════════════════ -->
+  <section class="slide cover active">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>行為數據分析 · BJ V3</div>
+      <h1>存款放棄<br>行為分析</h1>
+      <p class="sub">從 GA4 兩份路徑探索，找出放棄關鍵原因，鎖定解決方向。</p>
+      <div class="cover-tag">
+        <span>GA4 · Path Exploration</span>
+        <span>Session_v3_form_abandoned</span>
+        <span>2026.05.28 — 05.29</span>
+        <span>BJ V3 · ALL-CURRENCY</span>
+      </div>
+      <div class="agenda">
+        <b>分析設計</b><span class="arr">→</span>
+        <b>數據總覽</b><span class="arr">→</span>
+        <b>關鍵發現</b><span class="arr">→</span>
+        <b>結論</b><span class="arr">→</span>
+        <b>解決方向</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 01 分析設計 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>分析設計</div>
+      <h2>兩份 GA4 分析，互補覆蓋</h2>
+      <p class="body-t">單一起點事件只能看到部分放棄族群。以<strong>兩個起點</strong>分別追蹤，完整覆蓋不同入口路徑的使用者。</p>
+      <div class="two-col" style="margin-top:20px">
+        <div class="sol green">
+          <div class="stag g">分析一 · 廣角覆蓋</div>
+          <div class="st">deposit_form_viewed</div>
+          <div class="sd">所有看過存款表單的放棄 session，<strong>包含</strong>透過首頁捷徑、促銷 banner 等快速入口直接進入表單的使用者。起點同時混含 Step 1 與 Step 2 的觸發。</div>
+          <div class="snums">
+            <div class="snum"><div class="sl">起點 session</div><div class="sv" style="color:var(--red)">47,719</div></div>
+            <div class="snum"><div class="sl">展開步驟</div><div class="sv">6 步</div></div>
+          </div>
+        </div>
+        <div class="sol blue">
+          <div class="stag b">分析二 · 深度路徑</div>
+          <div class="st">deposit_entry_click</div>
+          <div class="sd">透過 deposit-entry 頁<strong>主動選擇存款方式</strong>的使用者。快速入口使用者繞過此頁，不觸發此事件，<strong>不在本分析範圍</strong>。</div>
+          <div class="snums">
+            <div class="snum"><div class="sl">起點 session</div><div class="sv" style="color:var(--blue)">19,075</div></div>
+            <div class="snum"><div class="sl">展開步驟</div><div class="sv">9 步</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="evidence" style="margin-top:18px">
+        <div class="hd">Segment 定義（兩份分析相同）</div>
+        <div class="ev-row">
+          <span class="tpill tp-b" style="flex:none">Session_v3_form_abandoned</span>
+          <span class="ev-desc">session 內曾觸發 <code>deposit_form_viewed</code>，且同一 session 內<strong>從未觸發</strong> <code>deposit_submit_clicked</code>（永久排除）</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 02 數據總覽 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>數據總覽</div>
+      <h2>放棄行為分成四條路徑</h2>
+      <div class="stat-call">
+        <div>
+          <div class="v v-red">47,719</div>
+          <div class="t">看過表單的放棄 session<br>（deposit_form_viewed 起點）</div>
+        </div>
+        <div style="width:1px;height:44px;background:var(--border);align-self:center;flex:none"></div>
+        <div>
+          <div class="v v-blue">19,075</div>
+          <div class="t">選過方式的放棄 session<br>（deposit_entry_click 起點）</div>
+        </div>
+      </div>
+      <table class="track-tbl">
+        <thead>
+          <tr>
+            <th>Track</th>
+            <th>入口事件</th>
+            <th>人數（抽樣）</th>
+            <th>佔起點</th>
+            <th>行為特徵</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tbadge tb-a">A</span></td>
+            <td><code>page_visited</code></td>
+            <td>21,735</td>
+            <td><strong>45.5%</strong></td>
+            <td>導頁後持續嘗試；12.3% 已確認返回首頁</td>
+          </tr>
+          <tr>
+            <td><span class="tbadge tb-b">B</span></td>
+            <td><code>deposit_entry_click</code></td>
+            <td>12,488</td>
+            <td><strong>26.2%</strong></td>
+            <td>換方式循環，三步留存率 98.4%</td>
+          </tr>
+          <tr>
+            <td><span class="tbadge tb-c">C</span></td>
+            <td><code>page_view</code></td>
+            <td>4,227</td>
+            <td><strong>8.9%</strong></td>
+            <td>路徑高度分散，存款意圖最弱</td>
+          </tr>
+          <tr>
+            <td><span class="tbadge tb-d">D</span></td>
+            <td><code>quick_wallet</code></td>
+            <td>4,034</td>
+            <td><strong>8.5%</strong></td>
+            <td>查錢包循環，留存率接近 100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 03 發現① 12.3% 確認離開 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 01 · Track A</div>
+      <h2>12.3% 已確認離開存款流程</h2>
+      <div class="big-find">
+        <div class="n v-red">5,879</div>
+        <div class="unit">人 &nbsp;/&nbsp; 12.3%</div>
+      </div>
+      <p class="body-t">Track A（45.5%）看起來最大，但 step +2 的事件分布，能直接<span class="hl">推導出兩種截然不同的使用者</span>。</p>
+      <div class="evidence">
+        <div class="hd">step +2 事件推導（父節點：page_visited，21,735）</div>
+        <div class="ev-row">
+          <span class="ev-num" style="color:var(--muted)">29.4%</span>
+          <span class="ev-desc"><code>deposit_form_viewed</code> — 仍在存款流程，看到另一個表單（Step 1 或 Step 2）</span>
+          <span class="tpill tp-g">仍在流程</span>
+        </div>
+        <div class="ev-row" style="margin-top:10px">
+          <span class="ev-num v-red">12.3%</span>
+          <span class="ev-desc"><code>version_view_v3</code> — Angular V3 應用重新初始化 → <strong>已返回首頁，確定離開</strong></span>
+          <span class="tpill tp-r">確認離開</span>
+        </div>
+      </div>
+      <p class="body-t" style="margin-top:14px"><code>version_view_v3</code> 是 V3 首頁重新初始化的<strong>確定性信號</strong>。這 5,879 人是 Track A 中可被明確量化的存款流失。</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 04 發現② 換方式循環 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 02 · Track B + 分析二交叉驗證</div>
+      <h2>換方式循環：留存率 99% 的障礙</h2>
+      <p class="body-t">Track B 呈現「看表單 → 換方式 → 看表單」的<span class="hl">固定三段循環</span>，且每一步幾乎不流失。</p>
+      <div class="compare-row">
+        <div class="cbox">
+          <div class="chead">Track B · 三步留存率（分析一）</div>
+          <div class="cv" style="color:var(--red)">98.4%</div>
+          <div class="cd" style="margin-top:6px">從 12,488 入口，三步後仍有 12,294 人在循環。<br>使用者不是猶豫放棄，而是帶著<strong>明確目的</strong>持續切換方式。</div>
+        </div>
+        <div class="cbox">
+          <div class="chead">換方式留存率（分析二，19,075 起點）</div>
+          <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px">
+            <div>
+              <div class="cv" style="color:var(--blue);font-size:clamp(22px,3.2vw,36px)">79.1%</div>
+              <div class="cd">第 1 輪後換方式</div>
+            </div>
+            <div style="font-size:20px;color:var(--muted)">→</div>
+            <div>
+              <div class="cv" style="color:var(--blue);font-size:clamp(22px,3.2vw,36px)">82.4%</div>
+              <div class="cd">第 2 輪後換方式</div>
+            </div>
+          </div>
+          <div class="cd">第 2 輪換方式率<strong>高於</strong>第 1 輪——越到後期，留下的人<strong>越找不到合適方式</strong>。</div>
+        </div>
+      </div>
+      <div class="evidence">
+        <div class="hd">兩份分析交叉驗證</div>
+        <div class="ev-row">
+          <span class="tpill tp-g">強力支持</span>
+          <span class="ev-desc">Track B（分析一）與 deposit_entry_click 主路（分析二）的路徑結構完全一致，互為驗證，主因確認為<strong>方式可用性問題</strong>，而非使用者意圖不足。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 05 換方式循環深入 ══════════════════════════════ -->
+  <section class="slide" id="slide-funnel">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 02 · 深入</div>
+      <h2 style="margin-bottom:10px">三輪循環，超過一半的人持續嘗試</h2>
+      <p class="body-t" style="margin-bottom:4px">資料來源：分析二（deposit_entry_click 起點，19,075）</p>
+      <div class="funnel" id="funnel-bars">
+
+        <div class="loop-lbl">起點</div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_entry_click</span>第 1 次選方式</div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="100" style="background:#09090b"><span class="bv">19,075</span></div></div>
+          <div class="pct">100%</div>
+        </div>
+
+        <div class="loop-lbl">第 1 輪</div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_form_viewed</span>看第 1 次方式表單</div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="83.4" style="background:var(--blue)"><span class="bv">15,899</span></div></div>
+          <div class="pct" style="color:var(--blue)">83.4%</div>
+        </div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_entry_click</span><span class="hint">↑ 79.1% 選擇換方式</span></div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="65.9" style="background:rgba(37,99,235,.5)"><span class="bv">12,573</span></div></div>
+          <div class="pct" style="color:var(--blue)">65.9%</div>
+        </div>
+
+        <div class="loop-lbl">第 2 輪</div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_form_viewed</span>看第 2 次方式表單</div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="65.2" style="background:var(--amber)"><span class="bv">12,445</span></div></div>
+          <div class="pct" style="color:var(--amber)">65.2%</div>
+        </div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_entry_click</span><span class="hint">↑ 82.4% 再次換方式（高於第 1 輪）</span></div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="53.8" style="background:rgba(217,119,6,.5)"><span class="bv">10,256</span></div></div>
+          <div class="pct" style="color:var(--amber)">53.8%</div>
+        </div>
+
+        <div class="loop-lbl">第 3 輪（step +9 仍在循環）</div>
+        <div class="frow">
+          <div class="lbl"><span class="ev">deposit_form_viewed</span>看第 3 次方式表單</div>
+          <div class="bar-wrap"><div class="bar-fill" data-pct="53.1" style="background:var(--red)"><span class="bv">10,127</span></div></div>
+          <div class="pct" style="color:var(--red)">53.1%</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 06 發現③ Track D ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 03 · Track D</div>
+      <h2>8.5% 的人：查錢包後反覆循環</h2>
+      <p class="body-t">Track D 是<span class="hl">快速入口使用者特有</span>的行為——他們繞過 deposit-entry 頁直接進入表單，看到表單後才去確認錢包餘額，並持續在「看表單 → 查錢包」之間循環。</p>
+      <div class="compare-row">
+        <div class="cbox" style="border-top:3px solid var(--amber)">
+          <div class="chead">分析一（form_viewed 起點）</div>
+          <div class="cv" style="color:var(--amber)">8.5%</div>
+          <div class="cd">4,034 session — 快速入口使用者<br>查錢包循環留存率 ~100%</div>
+        </div>
+        <div class="cbox" style="border-top:3px solid var(--muted)">
+          <div class="chead">分析二（entry_click 起點）</div>
+          <div class="cv" style="color:var(--muted)">0.3%</div>
+          <div class="cd">64 session — 兩份分析的<strong>25 倍差距</strong>，直接說明查錢包行為<strong>集中在快速入口</strong>，透過選方式頁進入的人幾乎不出現此行為。</div>
+        </div>
+      </div>
+      <div class="evidence" style="margin-top:18px">
+        <div class="hd">行為解讀</div>
+        <div class="ev-row">
+          <span class="tpill tp-a">留存率 ~100%</span>
+          <span class="ev-desc">使用者<strong>有明確存款意願</strong>，但可能受限於餘額不足或需確認後才做決策，與方式選擇無關。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 07 結論 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>結論</div>
+      <h2>問題不在意願，在方式可用性</h2>
+      <p class="body-t">三組高留存族群（Track B 98.4%、Track D ~100%、換方式三輪 79%→82%）共同指向同一結論：<span class="hl">使用者想存款，卻找不到能用的方式</span>。</p>
+      <div class="concl3">
+        <div class="pcard r">
+          <div class="ph">Track A · 12.3%</div>
+          <div class="pt">5,879 人確認離開</div>
+          <div class="pd"><code>version_view_v3</code> 確定性信號——已返回首頁。存款流失的<strong>可量化損失</strong>，優先介入對象。</div>
+        </div>
+        <div class="pcard b">
+          <div class="ph">Track B · 26.2%</div>
+          <div class="pt">換方式循環，問題在方式本身</div>
+          <div class="pd">98.4% 三步留存、79%→82% 換方式率——使用者<strong>不是放棄</strong>，是在找不到合適方式的情況下持續嘗試。</div>
+        </div>
+        <div class="pcard a">
+          <div class="ph">Track D · 8.5%</div>
+          <div class="pt">快速入口，查錢包後未完成</div>
+          <div class="pd">循環留存接近 100%，行為集中在快速入口使用者——有意願，但可能受限於<strong>餘額或資訊缺口</strong>。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 08 解決方向 ══════════════════════════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方向</div>
+      <h2>針對行為根因的四個設計方向</h2>
+      <div class="sol4">
+        <div class="scard b">
+          <div class="snum">01 · 快速存款</div>
+          <div class="st">自動帶入上次設定</div>
+          <div class="sd">省去重複選方式的摩擦，針對 Track B 換方式循環設計。精簡流程，自動填入上次的方式與金額，讓有存款記錄的使用者快速完成。</div>
+        </div>
+        <div class="scard g">
+          <div class="snum">02 · 一鍵重複存款</div>
+          <div class="st">不用重新選方式</div>
+          <div class="sd">讓有過成功存款記錄的使用者，以一鍵完成再次存款。直接對抗「換方式循環」——因為根本不需要選方式。</div>
+        </div>
+        <div class="scard a">
+          <div class="snum">03 · Quick Deposit 曝光策略</div>
+          <div class="st">在對的時機點觸達</div>
+          <div class="sd">在使用者最容易看到的時機提供快速存款入口，針對 Track D 快速入口使用者優化觸達，縮短從意願到行動的路徑。</div>
+        </div>
+        <div class="scard r">
+          <div class="snum">04 · 流失後問卷</div>
+          <div class="st">收集放棄真正原因</div>
+          <div class="sd">使用者離開前詢問放棄原因（方式失敗、餘額不足、改變心意等），為後續優先序與方式可用性改善提供直接數據。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ 09 互動原型 ══════════════════════════════ -->
+  <section class="slide proto-slide" id="slide-proto">
+    <div class="proto-wrap">
+      <div class="proto-left">
+        <div class="eyebrow"><span class="dot"></span>互動原型</div>
+        <h2>四個解法的<br>可互動原型</h2>
+        <p class="body-t">右側原型可直接操作，切換 Tab 瀏覽各情境。</p>
+        <div class="sol-list">
+          <div class="sol-item">
+            <span class="tpill tp-b" style="flex:none;min-width:28px;justify-content:center">01</span>
+            <span>快速存款 — 自動帶入上次設定</span>
+          </div>
+          <div class="sol-item">
+            <span class="tpill tp-g" style="flex:none;min-width:28px;justify-content:center">02</span>
+            <span>一鍵重複存款</span>
+          </div>
+          <div class="sol-item">
+            <span class="tpill tp-a" style="flex:none;min-width:28px;justify-content:center">03</span>
+            <span>Quick Deposit 曝光策略</span>
+          </div>
+          <div class="sol-item">
+            <span class="tpill tp-r" style="flex:none;min-width:28px;justify-content:center">04</span>
+            <span>流失後問卷</span>
+          </div>
+        </div>
+      </div>
+      <div class="proto-right">
+        <iframe src="payment-ux-prototypes-v3.html" loading="lazy" title="互動原型"></iframe>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ── nav ── -->
+<nav class="nav">
+  <div class="dots" id="dots"></div>
+  <div class="nav-right">
+    <span class="counter" id="counter">01 / 09</span>
+    <button class="arrow" id="prev" aria-label="上一頁" disabled>←</button>
+    <button class="arrow" id="next" aria-label="下一頁">→</button>
+  </div>
+</nav>
+<div class="kbd-hint">← / → 切換</div>
+
+<script>
+// ── 投影片導覽 ──
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let cur = 0;
+
+const dotsWrap = document.getElementById('dots');
+slides.forEach((_, i) => {
+  const b = document.createElement('button');
+  b.className = 'dot-btn' + (i === 0 ? ' on' : '');
+  b.addEventListener('click', e => { e.stopPropagation(); go(i); });
+  dotsWrap.appendChild(b);
+});
+const dotBtns = Array.from(dotsWrap.children);
+const counter  = document.getElementById('counter');
+const prevBtn  = document.getElementById('prev');
+const nextBtn  = document.getElementById('next');
+const progress = document.getElementById('progress');
+
+function go(i) {
+  i = Math.max(0, Math.min(N - 1, i));
+  cur = i;
+  slides.forEach((s, idx) => {
+    s.classList.toggle('active', idx === i);
+    s.classList.toggle('prev', idx < i);
+  });
+  dotBtns.forEach((d, idx) => d.classList.toggle('on', idx === i));
+  counter.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+  progress.style.width = (N > 1 ? i / (N - 1) * 100 : 100) + '%';
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === N - 1;
+  if (slides[i].id === 'slide-funnel') initFunnel();
+}
+
+prevBtn.addEventListener('click', () => go(cur - 1));
+nextBtn.addEventListener('click', () => go(cur + 1));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End')  go(N - 1);
+});
+
+document.getElementById('deck').addEventListener('click', e => {
+  if (e.target.closest('a, button')) return;
+  if (slides[cur].classList.contains('proto-slide')) return;
+  go(e.clientX > window.innerWidth * 0.42 ? cur + 1 : cur - 1);
+});
+
+// ── 漏斗動畫（只執行一次）──
+let funnelDone = false;
+function initFunnel() {
+  if (funnelDone) return;
+  funnelDone = true;
+  document.querySelectorAll('#funnel-bars .bar-fill').forEach((f, idx) => {
+    const pct = parseFloat(f.dataset.pct);
+    setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        f.style.width = pct + '%';
+        f.classList.add('show');
+      }));
+    }, idx * 80);
+  });
+}
+</script>
+</body>
+</html>
