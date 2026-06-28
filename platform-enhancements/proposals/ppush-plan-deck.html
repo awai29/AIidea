@@ -213,6 +213,22 @@ strong{font-weight:700;color:var(--fg)}
 .end-slide .sub{margin-top:18px;max-width:580px}
 .end-tags{margin-top:30px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
 
+/* ── 機會 / 影響試算 ── */
+.opp{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin-top:16px}
+.opp-card{flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);box-shadow:var(--sh);padding:16px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.opp-card.hl{border-color:var(--gbdr);background:var(--gbg)}
+.opp-k{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:9px}
+.opp-v{font-family:var(--mono);font-size:clamp(20px,2.6vw,30px);font-weight:800;line-height:1}
+.opp-card.hl .opp-v{color:var(--green)}
+.opp-fill{color:var(--amber)}
+.opp-sub{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.45}
+.opp-op{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:20px;font-weight:700;color:#a1a1aa;padding:0 10px}
+.opp-rev{margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,#0f2240,#0d1f3c);color:#fff;border-radius:var(--radius);padding:18px 24px;box-shadow:var(--sh-lg)}
+.opp-rev .eq{font-size:13.5px;color:rgba(255,255,255,.72);line-height:1.5}
+.opp-rev .eq b{color:#fff}
+.opp-rev .big{margin-left:auto;font-family:var(--mono);font-size:clamp(20px,2.6vw,30px);font-weight:800;color:#5fd0a6;white-space:nowrap}
+@media(max-width:760px){.opp{flex-direction:column}.opp-op{transform:rotate(90deg);padding:6px 0}.opp-rev{flex-direction:column;align-items:flex-start}.opp-rev .big{margin-left:0}}
+
 /* ── CRM 差異化推播：左欄文字(可截斷)，右欄 S24 手機 ── */
 .crm-slide{padding-top:clamp(14px,3vh,38px);padding-bottom:clamp(44px,5vh,60px)}
 .crm-inner{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start;max-width:1120px;height:100%}
@@ -353,7 +369,7 @@ strong{font-weight:700;color:var(--fg)}
       <div class="cover-tag">
         <span>🟢 站台已具備</span><span>✅ 軟性授權引導</span><span>🔒 隱私模式</span><span>🤝 CRM 分群</span>
       </div>
-      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>CRM 分群</b><span class="arr">→</span><b>平台可行</b><span class="arr">→</span><b>對的時機</b><span class="arr">→</span><b>隱私模式</b><span class="arr">→</span><b>技術實施</b><span class="arr">→</span><b>時程</b><span class="arr">→</span><b>結語</b></div>
+      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>機會</b><span class="arr">→</span><b>CRM 分群</b><span class="arr">→</span><b>平台可行</b><span class="arr">→</span><b>對的時機</b><span class="arr">→</span><b>隱私模式</b><span class="arr">→</span><b>技術實施</b><span class="arr">→</span><b>時程</b><span class="arr">→</span><b>結語</b></div>
     </div>
   </section>
 
@@ -373,6 +389,29 @@ strong{font-weight:700;color:var(--fg)}
         <div class="v">近 7 日</div>
         <div class="t">流失發生在「離站」那一刻——站內任何 banner、彈窗都已觸及不到他。<br><strong>推播是離站後，唯一能主動把玩家喚回的觸點。</strong></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ═══ 機會 / 影響量化 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>機會 · 影響量化</div>
+      <h2>能喚回多少玩家、回收多少？</h2>
+      <p class="body-t">用「喚回漏斗」估算上行空間 —— <span class="hl">商業數字（流失人數、ARPU）待填入實際值</span>，轉換率附產業參考。即使保守假設，回收空間都相當可觀。</p>
+      <div class="opp">
+        <div class="opp-card"><div class="opp-k">每月流失玩家</div><div class="opp-v opp-fill">____</div><div class="opp-sub">輸後未回 ＋ 首存後 42% 流失</div></div>
+        <div class="opp-op">×</div>
+        <div class="opp-card"><div class="opp-k">推播訂閱率</div><div class="opp-v">~30%</div><div class="opp-sub">可觸及 77.5% × soft-ask 同意</div></div>
+        <div class="opp-op">×</div>
+        <div class="opp-card"><div class="opp-k">喚回率</div><div class="opp-v">~15%</div><div class="opp-sub">推播點擊回站（待驗證）</div></div>
+        <div class="opp-op">=</div>
+        <div class="opp-card hl"><div class="opp-k">每月喚回</div><div class="opp-v">~XXX</div><div class="opp-sub">推估回流玩家</div></div>
+      </div>
+      <div class="opp-rev">
+        <div class="eq">每月喚回 <b>~XXX 人</b> × 人均回收 ARPU <b style="color:#fde68a">____</b> ＝</div>
+        <div class="big">每月回收 ~৳___（推估）</div>
+      </div>
+      <div class="note">⚑ 一般瀏覽器「原生」推播同意率僅 5–15%；<strong>soft-ask（對的時機軟詢問）可拉高到 25–40%</strong>（產業參考）。黃色 <span class="opp-fill" style="font-family:var(--mono)">____</span> 為待填實際數據，轉換率為參考區間、非承諾值，最終以站內 A/B 驗證。</div>
     </div>
   </section>
 
