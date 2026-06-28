@@ -205,6 +205,14 @@ strong{font-weight:700;color:var(--fg)}
 .ms-p3{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
 @media(max-width:760px){.gantt-row,.gantt-weeks{grid-template-columns:104px 1fr}}
 
+/* ── End 收尾頁 ── */
+.slide.end-slide{justify-content:center}
+.end-slide .inner{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:760px}
+.end-slide .eyebrow{justify-content:center}
+.end-slide h1{margin:18px 0 0}
+.end-slide .sub{margin-top:18px;max-width:580px}
+.end-tags{margin-top:30px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+
 /* ── CRM 差異化推播：左欄文字(可截斷)，右欄 S24 手機 ── */
 .crm-slide{padding-top:clamp(14px,3vh,38px);padding-bottom:clamp(44px,5vh,60px)}
 .crm-inner{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start;max-width:1120px;height:100%}
@@ -663,6 +671,19 @@ strong{font-weight:700;color:var(--fg)}
         <span class="chip c-exist">03 存款推播首發上線</span>
       </div>
       <a class="demo-link" href="ppush-permission-flow.html">看完整授權流程與隱私模式設計 <span class="arr">→</span></a>
+    </div>
+  </section>
+
+  <!-- ═══ End 收尾頁 ═══ -->
+  <section class="slide end-slide">
+    <div class="inner">
+      <span class="cover-logo"><img src="images/bj-logo.png" alt="BJ"></span>
+      <div class="eyebrow"><span class="dot"></span>Thank You · 簡報結束</div>
+      <h1>謝謝聆聽</h1>
+      <p class="sub">運用推播，在對的時機喚回流失玩家 —— 期待與前端、後端、設計一起把它落地。</p>
+      <div class="end-tags">
+        <span class="chip c-exist">Q &amp; A · 歡迎討論</span>
+      </div>
     </div>
   </section>
 
