@@ -181,6 +181,30 @@ strong{font-weight:700;color:var(--fg)}
 .impl-foot b{color:#7c2d12}
 @media(max-width:760px){.impl-grid{grid-template-columns:1fr}}
 
+/* ── 時程 / 里程碑 Gantt ── */
+.gantt{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 24px}
+.gantt-weeks{display:grid;grid-template-columns:152px 1fr;gap:14px;margin-bottom:9px}
+.gantt-weeks .wlbl{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em;align-self:center}
+.gantt-weeks .wgrid{display:grid;grid-template-columns:repeat(8,1fr);font-family:var(--mono);font-size:10px;color:var(--muted)}
+.gantt-weeks .wgrid span{text-align:center}
+.gantt-row{display:grid;grid-template-columns:152px 1fr;gap:14px;align-items:center;margin-bottom:10px}
+.gantt-row:last-of-type{margin-bottom:0}
+.gantt-name{font-size:13px;font-weight:700;line-height:1.25}
+.gantt-name .sub{font-family:var(--mono);font-size:9.5px;color:var(--muted);font-weight:400;display:block;margin-top:3px;letter-spacing:.01em}
+.gantt-track{position:relative;height:30px;background:var(--bg);border:1px solid var(--border);border-radius:7px}
+.gantt-bar{position:absolute;top:-1px;bottom:-1px;border-radius:7px;display:flex;align-items:center;padding:0 11px;color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;white-space:nowrap;box-shadow:var(--sh)}
+.gb-p0{background:#71717a}
+.gb-p1{background:linear-gradient(135deg,#16a34a,#15803d)}
+.gb-p2{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.gb-p3{background:linear-gradient(135deg,#7c3aed,#6d28d9)}
+.gantt-ms{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center;border-top:1px solid var(--border);padding-top:16px}
+.gantt-ms .lbl{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted)}
+.ms-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:6px 13px;border-radius:9999px;border:1px solid}
+.ms-p1{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.ms-p2{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.ms-p3{color:var(--purple);background:var(--pbg);border-color:var(--pbdr)}
+@media(max-width:760px){.gantt-row,.gantt-weeks{grid-template-columns:104px 1fr}}
+
 /* ── CRM 差異化推播：左欄文字(可截斷)，右欄 S24 手機 ── */
 .crm-slide{padding-top:clamp(14px,3vh,38px);padding-bottom:clamp(44px,5vh,60px)}
 .crm-inner{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start;max-width:1120px;height:100%}
@@ -321,7 +345,7 @@ strong{font-weight:700;color:var(--fg)}
       <div class="cover-tag">
         <span>🟢 站台已具備</span><span>✅ 軟性授權引導</span><span>🔒 隱私模式</span><span>🤝 CRM 分群</span>
       </div>
-      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>CRM 分群</b><span class="arr">→</span><b>平台可行</b><span class="arr">→</span><b>對的時機</b><span class="arr">→</span><b>隱私模式</b><span class="arr">→</span><b>技術實施</b><span class="arr">→</span><b>結語</b></div>
+      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>CRM 分群</b><span class="arr">→</span><b>平台可行</b><span class="arr">→</span><b>對的時機</b><span class="arr">→</span><b>隱私模式</b><span class="arr">→</span><b>技術實施</b><span class="arr">→</span><b>時程</b><span class="arr">→</span><b>結語</b></div>
     </div>
   </section>
 
@@ -584,6 +608,41 @@ strong{font-weight:700;color:var(--fg)}
         </div>
       </div>
       <div class="impl-foot">⚠ <b>跨團隊待敲定</b>：pilot 品牌（DB TRACKINGSETTING type=7）· notificationType 整數／字串 · 追蹤機制（GA.gtag vs EventQueue）。&nbsp;&nbsp;✦ <b>P1 後端幾乎免改</b> — token API 已現成、出金旗標低工，主要工作量落在前端與設計。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 時程 / 里程碑 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>時程 · 里程碑</div>
+      <h2>分階段上線，首發後端負擔小</h2>
+      <p class="body-t">技術里程碑 <strong>P1→P3</strong> 對應產品節奏：<span class="hl">P1 ＝ Phase 1 存款／出金推播首發</span>、P2 ＝ Phase 2 Promotion 活動推播、P3 ＝ 玩家自助設定。以下工時為<strong>粗估</strong>，待 writing-plans 展開後確認，可分品牌／平行推進。</p>
+      <div class="gantt">
+        <div class="gantt-weeks"><span class="wlbl">階段 ＼ 週</span><div class="wgrid"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div></div>
+        <div class="gantt-row">
+          <div class="gantt-name">P0 · 準備決策<span class="sub">pilot 品牌 · 型別 · 文案定稿</span></div>
+          <div class="gantt-track"><div class="gantt-bar gb-p0" style="left:0;width:12.5%">~1 週</div></div>
+        </div>
+        <div class="gantt-row">
+          <div class="gantt-name">P1 · soft-ask 首發<span class="sub">權限狀態機 · 軟詢問 · 出金/banner</span></div>
+          <div class="gantt-track"><div class="gantt-bar gb-p1" style="left:12.5%;width:37.5%">~2–3 週</div></div>
+        </div>
+        <div class="gantt-row">
+          <div class="gantt-name">P2 · 到帳事件 + payload<span class="sub">事件渲染 · 契約會簽 FCM</span></div>
+          <div class="gantt-track"><div class="gantt-bar gb-p2" style="left:50%;width:25%">~1–2 週</div></div>
+        </div>
+        <div class="gantt-row">
+          <div class="gantt-name">P3 · 設定頁 + 偏好中心<span class="sub">標準/隱私 · 分類 · 解鎖教學</span></div>
+          <div class="gantt-track"><div class="gantt-bar gb-p3" style="left:75%;width:25%">~2 週</div></div>
+        </div>
+        <div class="gantt-ms">
+          <span class="lbl">上線里程碑 ▸</span>
+          <span class="ms-chip ms-p1">◆ W4 存款／出金推播首發（Phase 1）</span>
+          <span class="ms-chip ms-p2">◆ W6 Promotion 活動推播（Phase 2）</span>
+          <span class="ms-chip ms-p3">◆ W8 玩家自助通知設定</span>
+        </div>
+      </div>
+      <div class="note plain">※ 總期程 ≈ <strong>7–8 週（粗估）</strong>。P1 後端僅「首次出金旗標」低工、token API 已現成 → 首發可快速落地；P2／P3 可依資源平行或順延。</div>
     </div>
   </section>
 
