@@ -191,7 +191,8 @@ strong{font-weight:700;color:var(--fg)}
 .crm-notif{flex:none;align-self:start;display:flex;flex-direction:column;align-items:center;gap:10px}
 .crm-notif .cap{font-size:11px;color:var(--muted);font-family:var(--mono);text-align:center}
 /* Samsung S24 機身（19.5:9）*/
-.s24{height:74vh;max-height:720px;aspect-ratio:1080/2340;background:#0a0a0c;border-radius:34px;padding:6px;
+.s24{height:74vh;width:calc(74vh*1080/2340);max-height:700px;max-width:calc(700px*1080/2340);
+  aspect-ratio:1080/2340;background:#0a0a0c;border-radius:34px;padding:6px;overflow:hidden;
   box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.07) inset;position:relative;flex:none}
 .s24-screen{width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;
   background:linear-gradient(165deg,#13284a 0%,#0b1a30 50%,#070e1c 100%);
