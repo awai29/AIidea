@@ -199,19 +199,20 @@ strong{font-weight:700;color:var(--fg)}
 .s24-cam{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;
   background:#000;box-shadow:0 0 0 1.5px rgba(255,255,255,.10);z-index:5}
 .s24-notif{width:100%;border-radius:13px;display:block;box-shadow:0 8px 24px rgba(0,0,0,.45)}
-/* 額外精簡通知（無 banner）*/
-.lsn{width:100%;background:rgba(34,35,38,.9);backdrop-filter:blur(8px);border-radius:15px;padding:9px 12px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
-.lsn-src{display:flex;align-items:center;gap:6px;margin-bottom:5px}
-.lsn-src .chrome-icon{width:13px;height:13px}
-.lsn-src .chrome-icon::after{background:#222326}
-.lsn-app{font-size:10px;color:#cac4d0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lsn-time{font-size:10px;color:#cac4d0;flex:none}
-.lsn-row{display:flex;align-items:center;gap:9px}
-.lsn-ico{width:28px;height:28px;border-radius:8px;flex-shrink:0;background:#1f9d57;display:flex;align-items:center;justify-content:center;padding:3px}
+/* 額外通知：統一為收合樣式（來源列含頭像+chevron、大圖示、無 banner/按鈕）*/
+.lsn{width:100%;background:rgba(28,29,33,.94);backdrop-filter:blur(8px);border-radius:16px;padding:10px 13px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.lsn-src{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.lsn-src .chrome-icon{width:14px;height:14px;flex:none}
+.lsn-src .chrome-icon::after{background:#1c1d21}
+.lsn-app{font-size:11px;color:#cac4d0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lsn-avatar{width:18px;height:18px;border-radius:50%;background:#6b7280;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.lsn-chev{color:#9aa0a6;font-size:11px;flex:none;line-height:1}
+.lsn-row{display:flex;align-items:center;gap:11px}
+.lsn-ico{width:40px;height:40px;border-radius:11px;flex:none;background:#1f9d57;display:flex;align-items:center;justify-content:center;padding:4px}
 .lsn-ico img{width:100%;height:100%;object-fit:contain}
 .lsn-txt{flex:1;min-width:0}
-.lsn-title{font-size:12px;font-weight:700;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lsn-body{font-size:10.5px;color:#cac4d0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsn-title{font-size:13px;font-weight:700;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lsn-body{font-size:12px;color:#9aa0a6;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 @media(max-width:760px){.crm-inner{grid-template-columns:1fr;height:auto}.s24{height:auto;width:240px;margin:0 auto}}
 
 /* ════════ phone mockups (device-accurate, kept from design proposal) ════════ */
@@ -363,12 +364,12 @@ strong{font-weight:700;color:var(--fg)}
           <div class="s24-screen">
             <img class="s24-notif" src="images/crm-push-notif.png" alt="差異化推播實例：首存引導推播通知">
             <div class="lsn">
-              <div class="lsn-src"><span class="chrome-icon"></span><span class="lsn-app">Chrome · feuatcb.bkw168</span><span class="lsn-time">5 分前</span></div>
-              <div class="lsn-row"><span class="lsn-ico"><img src="images/bj-logo.png" alt=""></span><div class="lsn-txt"><div class="lsn-title">⚽ 你關注的賽事即將開賽</div><div class="lsn-body">BAN vs QAT · 主 1.85｜立即下注</div></div></div>
+              <div class="lsn-src"><span class="chrome-icon"></span><span class="lsn-app">Chrome · feuatcb.bkw168 · 5 分前</span><span class="lsn-avatar">F</span><span class="lsn-chev">⌃</span></div>
+              <div class="lsn-row"><span class="lsn-ico"><img src="images/bj-logo.png" alt=""></span><div class="lsn-txt"><div class="lsn-title">你關注的賽事即將開賽</div><div class="lsn-body">BAN vs QAT · 主 1.85｜立即下注</div></div></div>
             </div>
             <div class="lsn">
-              <div class="lsn-src"><span class="chrome-icon"></span><span class="lsn-app">Chrome · feuatcb.bkw168</span><span class="lsn-time">12 分前</span></div>
-              <div class="lsn-row"><span class="lsn-ico"><img src="images/bj-logo.png" alt=""></span><div class="lsn-txt"><div class="lsn-title">🎁 迎新獎金即將到期</div><div class="lsn-body">再存 ৳200 解鎖 100% 獎金</div></div></div>
+              <div class="lsn-src"><span class="chrome-icon"></span><span class="lsn-app">Chrome · feuatcb.bkw168 · 12 分前</span><span class="lsn-avatar">F</span><span class="lsn-chev">⌃</span></div>
+              <div class="lsn-row"><span class="lsn-ico"><img src="images/bj-logo.png" alt=""></span><div class="lsn-txt"><div class="lsn-title">迎新獎金即將到期</div><div class="lsn-body">再存 ৳500 解鎖 100% 獎金</div></div></div>
             </div>
           </div>
         </div>
