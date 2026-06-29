@@ -1,7 +1,9 @@
+import { ImageIcon } from 'lucide-react';
 import Canvas from './Canvas';
 import Toolbar from './Toolbar';
 import ResultPanel from './ResultPanel';
 import { useAppState } from './hooks/useAppState';
+import './index.css';
 
 export default function App() {
   const {
@@ -18,7 +20,8 @@ export default function App() {
   const hasImage = !!baseImageBlob;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 1280, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', minWidth: 1280, background: '#0a0a0a' }}>
+
       {/* 頂部工具列 */}
       <Toolbar
         brushRadius={brushRadius}
@@ -27,39 +30,68 @@ export default function App() {
         onToggleMask={() => setShowMask((v) => !v)}
         showMask={showMask}
         onUpload={uploadImage}
-        onGenerate={generateImage}
         disabled={isLoading}
       />
 
-      {/* 錯誤訊息橫幅 */}
+      {/* 錯誤訊息 */}
       {appState === 'error' && (
         <div style={{
-          background: '#fee2e2', color: '#dc2626',
-          padding: '8px 16px', fontSize: 13, borderBottom: '1px solid #fca5a5',
+          padding: '7px 16px', fontSize: 12, flexShrink: 0,
+          background: 'rgba(239,68,68,0.08)', color: '#f87171',
+          borderBottom: '1px solid rgba(239,68,68,0.2)',
+          display: 'flex', alignItems: 'center', gap: 8,
         }}>
+          <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
           {errorMessage}
         </div>
       )}
 
-      {/* 主要雙面板區 */}
+      {/* 主要區塊 */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* 左側：畫布 */}
-        <div style={{ flex: 1, position: 'relative', background: '#d1d5db', overflow: 'hidden' }}>
-          {!hasImage ? (
+
+        {/* 中央畫布 */}
+        <div className="canvas-bg" style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+
+          {/* 無圖片狀態 */}
+          {!hasImage && (
             <div style={{
-              position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', color: '#9ca3af', gap: 8,
+              position: 'absolute', inset: 0,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              gap: 12,
             }}>
-              {appState === 'uploading' && <span style={{ fontSize: 14 }}>圖片處理中…</span>}
-              {appState === 'generating' && <span style={{ fontSize: 14 }}>AI 生圖中…</span>}
+              {appState === 'uploading' && (
+                <>
+                  <div style={{ width: 28, height: 28, border: '2px solid #2a2a2a', borderTopColor: '#8b5cf6', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  <span style={{ fontSize: 13, color: '#52525b' }}>圖片處理中…</span>
+                </>
+              )}
+              {appState === 'generating' && (
+                <>
+                  <div style={{ width: 28, height: 28, border: '2px solid #2a2a2a', borderTopColor: '#8b5cf6', borderRadius: '50%', animation: 'spin 0.7s linear infinite', boxShadow: '0 0 12px rgba(139,92,246,0.4)' }} />
+                  <span style={{ fontSize: 13, color: '#52525b' }}>AI 生圖中…</span>
+                </>
+              )}
               {(appState === 'idle' || appState === 'error') && (
                 <>
-                  <span style={{ fontSize: 32 }}>🖼</span>
-                  <span style={{ fontSize: 14 }}>上傳圖片或使用文字生圖</span>
+                  <div style={{
+                    width: 64, height: 64, borderRadius: 16,
+                    background: '#141414', border: '1px solid #2a2a2a',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <ImageIcon size={28} color="#3f3f46" />
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: '#52525b', marginBottom: 4 }}>尚無圖片</div>
+                    <div style={{ fontSize: 12, color: '#3f3f46' }}>使用右側「文字生圖」，或點上方「上傳圖片」</div>
+                  </div>
                 </>
               )}
             </div>
-          ) : (
+          )}
+
+          {/* 畫布 */}
+          {hasImage && (
             <Canvas
               imageBlob={baseImageBlob}
               maskCanvasRef={maskCanvasRef}
@@ -70,47 +102,21 @@ export default function App() {
           )}
         </div>
 
-        {/* 右側：結果 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderLeft: '1px solid #e5e7eb' }}>
-          <ResultPanel
-            resultBlob={resultImageBlob}
-            onAdopt={adoptResult}
-            onRegenerate={regenerate}
-            isEditing={appState === 'editing'}
-          />
-        </div>
+        {/* 右側面板（整合 prompt + 結果） */}
+        <ResultPanel
+          resultBlob={resultImageBlob}
+          onAdopt={adoptResult}
+          onRegenerate={regenerate}
+          isEditing={appState === 'editing'}
+          prompt={prompt}
+          onPromptChange={setPrompt}
+          onEdit={editImage}
+          onGenerate={generateImage}
+          appState={appState}
+          hasImage={hasImage}
+          isLoading={isLoading}
+        />
       </div>
-
-      {/* 底部 prompt 輸入列（有圖片才顯示） */}
-      {hasImage && (
-        <div style={{
-          padding: '10px 16px', borderTop: '1px solid #e5e7eb',
-          display: 'flex', gap: 8, background: '#fff',
-        }}>
-          <input
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !isLoading) editImage(); }}
-            placeholder="描述要修改的內容，例如「把這裡換成一隻貓」"
-            disabled={isLoading}
-            style={{
-              flex: 1, padding: '8px 12px', border: '1px solid #d1d5db',
-              borderRadius: 6, fontSize: 14, outline: 'none',
-            }}
-          />
-          <button
-            onClick={editImage}
-            disabled={isLoading || !prompt.trim()}
-            style={{
-              padding: '8px 24px', background: isLoading ? '#93c5fd' : '#2563eb',
-              color: '#fff', border: 'none', borderRadius: 6,
-              cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: 14,
-            }}
-          >
-            {appState === 'editing' ? '處理中…' : '生成修改'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
