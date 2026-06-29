@@ -1987,12 +1987,25 @@
 </div>
 
 <script>
+  var pqdTooltipTimer = null;
   function switchProto(id, el) {
     document.querySelectorAll('.proto').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     if (el) el.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 切換到 pqd 時，tooltip 5 秒後自動消失
+    if (pqdTooltipTimer) clearTimeout(pqdTooltipTimer);
+    if (id === 'pqd') {
+      var tt  = document.getElementById('pqd-coachmark-tooltip');
+      var ring = document.getElementById('pqd-coachmark-ring');
+      if (tt)  tt.style.display  = '';
+      if (ring) ring.style.display = '';
+      pqdTooltipTimer = setTimeout(function() {
+        if (tt)  tt.style.display  = 'none';
+        if (ring) ring.style.display = 'none';
+      }, 5000);
+    }
   }
 
   // Hash-based auto-switch：支援 iframe 直接帶入指定 tab
