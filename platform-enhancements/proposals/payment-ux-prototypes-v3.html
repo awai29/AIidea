@@ -320,6 +320,18 @@
   .p3-banner-close { width: 16px; height: 16px; color: #657381; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; opacity: 0.7; margin-left: 2px; }
   .p3-banner-gold .p3-banner-bar { background: #f59e0b; }
   .p3-banner-gold .p3-banner-btn { background: #92400e; color: #fde68a; }
+
+  /* ── pqd coachmark animations ── */
+  @keyframes pqd-icon-shake {
+    0%                        { transform: rotate(-5deg); }
+    10%,30%,50%,70%,90%       { transform: rotate(-5deg); }
+    20%,40%,60%,80%           { transform: rotate(5deg); }
+    100%                      { transform: rotate(0); }
+  }
+  @keyframes pqd-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(39,180,136,0.55); opacity:1; }
+    50%     { box-shadow: 0 0 0 7px rgba(39,180,136,0); opacity:0.7; }
+  }
 </style>
 </head>
 <body>
@@ -1485,7 +1497,7 @@
           <!-- P6 S2: one-tap repeat deposit -->
           <div class="pstate active" id="p6-s2">
             <div class="app-bar">
-              <div class="app-bar-back">←</div>
+              <div class="app-bar-back" onclick="switchProto('pqd', document.querySelector('.ptab[onclick*=\'pqd\']'));">←</div>
               <div class="app-bar-title">存款</div>
             </div>
             <div class="scroll">
@@ -1831,7 +1843,31 @@
 
               <!-- ── Step 1: Full-screen image ── -->
               <div id="pqd-step1" style="position:absolute;inset:0;cursor:pointer;overflow:hidden;" onclick="pqdNextStep()">
-                <img src="assets/Quick.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+                <img src="assets/home-without.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+
+                <!-- Quick Deposit icon with shake animation -->
+                <img id="pqd-qd-icon" src="assets/icon-quick-deposit.png"
+                     onclick="event.stopPropagation(); switchProto('p6', document.querySelector('.ptab[onclick*=\'p6\']'));"
+                     style="position:absolute;top:57px;right:46px;width:30px;height:30px;cursor:pointer;z-index:3;animation:pqd-icon-shake 3s infinite;">
+
+                <!-- Coachmark pulse ring -->
+                <div id="pqd-coachmark-ring" style="position:absolute;top:50px;right:39px;width:44px;height:44px;border-radius:50%;border:2px solid rgba(39,180,136,0.9);pointer-events:none;z-index:2;animation:pqd-pulse 1.8s ease-in-out infinite;"></div>
+
+                <!-- Tooltip -->
+                <div id="pqd-coachmark-tooltip" style="position:absolute;top:97px;right:32px;width:210px;z-index:4;">
+                  <!-- arrow pointing up-right -->
+                  <div style="position:absolute;top:-7px;right:18px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:7px solid #454647;"></div>
+                  <!-- body -->
+                  <div style="background:#454647;border-radius:3px;padding:10px 12px;position:relative;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:12px;font-weight:700;color:#fff;">Quick Deposit</span>
+                      <span onclick="event.stopPropagation();document.getElementById('pqd-coachmark-tooltip').style.display='none';document.getElementById('pqd-coachmark-ring').style.display='none';"
+                            style="font-size:14px;color:#aaa;cursor:pointer;line-height:1;padding:0 2px;">×</span>
+                    </div>
+                    <p style="margin:0;font-size:11px;color:#ccc;line-height:1.5;">Tap to repeat your last deposit in one tap — no re-entry needed.</p>
+                  </div>
+                </div>
+
                 <div style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;font-size:10px;color:#bbb;white-space:nowrap;">Tap anywhere to continue</div>
               </div>
 
@@ -2683,8 +2719,7 @@
     var wrapper = document.getElementById('p2-kb-wrapper');
     var pstate  = document.getElementById('p2-s2');
     var arrow   = document.getElementById('p2-kb-arrow');
-    if (wrapper) wrapper.style.transform = p2KbVisible ? 'translateY(0)' : 'translateY(100%)';
-    if (pstate)  pstate.style.paddingBottom = p2KbVisible ? '280px' : '8px';
+    if (wrapper) wrapper.style.transform = p2KbVisible ? 'translateY(0)' : 'translateY(184px)';
     if (arrow)   arrow.textContent = p2KbVisible ? '▾' : '▴';
   }
 
@@ -3750,6 +3785,22 @@
       }
     }
   }
+
+  // ── 隱藏 header/footer/proto-tabs/phone-label（iframe 嵌入或直接開啟都生效）──
+  (function() {
+    ['.page-header', '.footer', '.proto-tabs', '.phone-label'].forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) { el.style.display = 'none'; });
+    });
+  })();
+
+  // ── postMessage 監聽（讓 deposit-dropoff-analysis.html 的 iframe 可以切換原型）──
+  window.addEventListener('message', function(e) {
+    var id = e.data && e.data.switchProto;
+    if (id && document.getElementById(id)) {
+      var btn = document.querySelector('.ptab[onclick*=\'' + id + '\']');
+      switchProto(id, btn);
+    }
+  });
 </script>
 </body>
 </html>
