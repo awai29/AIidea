@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款流程優化 — BJ V3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#efefef;--fg:#09090b;--card:#fff;--muted:#71717a;--border:#e4e4e7;
+  --radius:16px;--rsm:10px;
+  --sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono','Courier New',monospace;
+  --green:#16a34a;--gbg:#f0fdf4;--gbdr:#bbf7d0;
+  --blue:#2563eb;--bbg:#eff6ff;--bbdr:#bfdbfe;
+  --amber:#d97706;--abg:#fffbeb;--abdr:#fde68a;
+  --red:#dc2626;--rbg:#fef2f2;--rbdr:#fecaca;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh-lg:0 10px 40px rgba(0,0,0,.10);
+}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.6;overflow:hidden}
+code{font-family:var(--mono);font-size:.88em;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
+
+/* ── deck ── */
+.deck{position:fixed;inset:0;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,5vw,80px) clamp(24px,7vw,120px) clamp(70px,8vh,90px);
+  opacity:0;transform:translateX(50px);transition:opacity .42s ease,transform .42s ease;
+  pointer-events:none;overflow-y:auto;cursor:pointer}
+.slide.active{opacity:1;transform:none;pointer-events:auto}
+.slide.prev{transform:translateX(-50px)}
+.inner{width:100%;max-width:1020px;margin:0 auto}
+
+/* ── stagger entrance ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.slide.active .inner>*{animation:fadeUp .48s cubic-bezier(.16,1,.3,1) both}
+.slide.active .inner>*:nth-child(1){animation-delay:60ms}
+.slide.active .inner>*:nth-child(2){animation-delay:120ms}
+.slide.active .inner>*:nth-child(3){animation-delay:180ms}
+.slide.active .inner>*:nth-child(4){animation-delay:240ms}
+.slide.active .inner>*:nth-child(5){animation-delay:300ms}
+.slide.active .inner>*:nth-child(6){animation-delay:360ms}
+
+/* ── typography ── */
+.eyebrow{font-family:var(--mono);font-size:clamp(13px,1.5vw,16px);font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
+h1{font-size:clamp(36px,6.6vw,78px);font-weight:800;line-height:1.03;letter-spacing:-.025em}
+h2{font-size:clamp(23px,4vw,44px);font-weight:800;line-height:1.14;letter-spacing:-.015em;margin-bottom:clamp(16px,2.6vh,26px)}
+.sub{font-size:clamp(15px,1.9vw,21px);color:var(--muted);line-height:1.6}
+.body-t{font-size:clamp(14px,1.6vw,18px);line-height:1.8;color:#3f3f46}
+.body-t+.body-t{margin-top:12px}
+.hl{background:linear-gradient(transparent 58%,#fde68a 58%);font-weight:600;padding:0 2px}
+strong{font-weight:700;color:var(--fg)}
+
+/* ── COVER ── */
+.slide.cover{justify-content:center}
+.cover-h1-wrap{margin:18px 0 30px}
+.cover-h1-wrap::before{content:'';display:block;width:54px;height:5px;border-radius:9px;background:var(--fg);margin-bottom:24px}
+.cover-tag{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:30px}
+.cover-tag span{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--border);
+  background:var(--card);padding:7px 14px;border-radius:9999px;box-shadow:var(--sh)}
+.agenda{display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.agenda b{color:var(--fg)}.agenda .arr{color:#c4c4c8}
+
+/* ── hero number ── */
+.hero-block{margin:4px 0 18px;line-height:1}
+.hero-num{font-weight:800;letter-spacing:-.03em;line-height:.88;display:inline}
+.hero-num.xl{font-size:clamp(72px,12vw,130px)}
+.hero-num.lg{font-size:clamp(52px,8vw,90px)}
+.hero-num.red{color:var(--red)}
+.hero-num.blue{color:var(--blue)}
+.hero-num.amber{color:var(--amber)}
+.hero-num.muted{color:#d4d4d8}
+.hero-unit{font-size:clamp(16px,2.5vw,28px);font-weight:400;color:var(--muted);margin-left:10px}
+.slide.active .hero-block .hero-num{animation:fadeUp .65s cubic-bezier(.16,1,.3,1) both;animation-delay:180ms}
+
+/* ── stat call ── */
+.stat-call{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:10px 0 22px}
+.stat-val{font-size:clamp(40px,7vw,72px);font-weight:800;line-height:1;letter-spacing:-.025em}
+.stat-t{font-size:13px;color:var(--muted);line-height:1.5;max-width:200px}
+.stat-div{width:1px;height:54px;background:var(--border);flex:none;align-self:center}
+
+/* ── evidence ── */
+.evidence{margin-top:18px}
+.evidence .ev-hd{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;padding-bottom:8px;border-bottom:2px solid var(--fg);margin-bottom:0}
+.ev-row{display:flex;align-items:flex-start;gap:12px;font-size:13px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ev-row:last-child{border-bottom:none}
+.ev-num{font-family:var(--mono);font-weight:700;font-size:12.5px;flex:none;min-width:48px;padding-top:1px}
+.ev-desc{color:#3f3f46;line-height:1.55;flex:1}
+.tpill{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:700;
+  padding:2px 9px;border-radius:9999px;border:1px solid;flex:none;letter-spacing:.03em}
+.tp-r{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.tp-g{color:var(--green);background:var(--gbg);border-color:var(--gbdr)}
+.tp-b{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.tp-a{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+.tp-m{color:var(--muted);background:var(--card);border-color:var(--border)}
+
+/* ── track table ── */
+.track-tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:20px;
+  background:var(--card);border-radius:var(--rsm);overflow:hidden;box-shadow:var(--sh)}
+.track-tbl th{background:var(--fg);color:#fff;font-family:var(--mono);font-size:11px;
+  text-transform:uppercase;letter-spacing:.06em;font-weight:600;text-align:left;padding:11px 16px}
+.track-tbl td{padding:12px 16px;border-top:1px solid var(--border);vertical-align:middle;line-height:1.45}
+.tbadge{display:inline-flex;align-items:center;font-family:var(--mono);
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:9999px;border:1px solid}
+.tb-a{color:var(--red);background:var(--rbg);border-color:var(--rbdr)}
+.tb-b{color:var(--blue);background:var(--bbg);border-color:var(--bbdr)}
+.tb-c{color:var(--muted);background:var(--card);border-color:var(--border)}
+.tb-d{color:var(--amber);background:var(--abg);border-color:var(--abdr)}
+
+/* ── two col ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.sol{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--sh);padding:22px 26px;display:flex;flex-direction:column;gap:12px}
+.sol.g{border-top:3px solid var(--green)}.sol.b{border-top:3px solid var(--blue)}
+.sol .stag{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.sol .stag.g{color:var(--green)}.sol .stag.b{color:var(--blue)}
+.sol .st{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.sol .sd{font-size:13px;color:var(--muted);line-height:1.7}
+.sol .snums{display:flex;gap:24px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border)}
+.sol .snum .sl{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.sol .snum .sv{font-size:22px;font-weight:800;letter-spacing:-.02em}
+
+/* ── compare boxes ── */
+.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+.cbox{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--sh)}
+.cbox .chead{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.cbox .cv{font-size:clamp(32px,5vw,54px);font-weight:800;line-height:1;letter-spacing:-.025em;margin-bottom:8px}
+.cbox .cd{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* ── funnel ── */
+.funnel{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.frow{display:grid;grid-template-columns:148px 1fr 68px;align-items:center;gap:10px}
+.frow .lbl{font-size:11px;color:var(--muted);line-height:1.35}
+.frow .lbl .ev{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--fg);display:block}
+.frow .lbl .hint{font-size:10px;color:var(--green);font-weight:600;margin-top:1px;display:block}
+.frow .bar-wrap{height:30px;background:rgba(0,0,0,.06);border-radius:8px;overflow:hidden}
+.frow .bar-fill{height:100%;border-radius:8px;width:0;transition:width 1.1s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;padding-left:10px}
+.frow .bar-fill .bv{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;opacity:0;transition:opacity .3s .75s;white-space:nowrap}
+.frow .bar-fill.show .bv{opacity:1}
+.frow .pct{font-family:var(--mono);font-size:14px;font-weight:700;text-align:right}
+.loop-lbl{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:8px;margin:8px 0 3px}
+.loop-lbl::before,.loop-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── conclusion 3-col ── */
+.concl3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px}
+.pcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 22px;border-left:4px solid}
+.pcard.r{border-left-color:var(--red)}.pcard.b{border-left-color:var(--blue)}.pcard.a{border-left-color:var(--amber)}
+.pcard .ph{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.pcard.r .ph{color:var(--red)}.pcard.b .ph{color:var(--blue)}.pcard.a .ph{color:var(--amber)}
+.pcard .pt{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px;line-height:1.3}
+.pcard .pd{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* ── solution 2×2 ── */
+.sol4{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.scard{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:20px 24px;border-top:3px solid}
+.scard.b{border-top-color:var(--blue)}.scard.g{border-top-color:var(--green)}
+.scard.a{border-top-color:var(--amber)}.scard.r{border-top-color:var(--red)}
+.scard .snum{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.scard.b .snum{color:var(--blue)}.scard.g .snum{color:var(--green)}
+.scard.a .snum{color:var(--amber)}.scard.r .snum{color:var(--red)}
+.scard .st{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:7px;line-height:1.3}
+.scard .sd{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* ── proto slide ── */
+.slide.proto-slide{padding:0 !important;cursor:default}
+.proto-wrap{display:grid;grid-template-columns:360px 1fr;height:100%;width:100%}
+.proto-left{padding:clamp(28px,4vw,64px) 32px clamp(60px,7vh,80px) clamp(28px,6vw,80px);
+  display:flex;flex-direction:column;justify-content:center;overflow-y:auto;background:var(--bg);border-right:1px solid var(--border)}
+.proto-left h2{font-size:clamp(20px,2.8vw,30px);margin-bottom:12px}
+.proto-left .body-t{font-size:13px;color:var(--muted);margin-bottom:22px}
+.sol-list{display:flex;flex-direction:column;gap:11px}
+.sol-item{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.proto-right{background:#09090b;overflow:hidden}
+.proto-right iframe{
+  width: calc(100% / 0.85);
+  height: calc(100% / 0.85);
+  border: none;
+  display: block;
+  transform: scale(0.85);
+  transform-origin: top left;
+}
+
+/* ── nav ── */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;transition:width .4s ease;z-index:50}
+.nav{position:fixed;bottom:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(16px,4vw,40px);z-index:40;background:linear-gradient(transparent,rgba(239,239,239,.92) 45%)}
+.dots{display:flex;gap:6px;align-items:center}
+.dot-btn{width:8px;height:8px;border-radius:50%;border:none;background:#c4c4c8;cursor:pointer;padding:0;transition:all .2s}
+.dot-btn:hover{background:var(--muted)}.dot-btn.on{background:var(--fg);transform:scale(1.35)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.counter{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:54px;text-align:right}
+.arrow{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);
+  cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;
+  color:var(--fg);transition:all .15s;box-shadow:var(--sh)}
+.arrow:hover{background:var(--fg);color:#fff;border-color:var(--fg)}
+.arrow:disabled{opacity:.35;cursor:default;background:var(--card);color:var(--fg)}
+.kbd-hint{position:fixed;bottom:68px;right:clamp(16px,4vw,40px);font-family:var(--mono);font-size:11px;color:var(--muted);z-index:40;opacity:.8}
+
+@media(max-width:760px){
+  .two-col,.compare-row,.concl3,.sol4{grid-template-columns:1fr}
+  .proto-wrap{grid-template-columns:1fr}
+  .proto-right{display:none}
+  .kbd-hint{display:none}
+}
+
+/* ── proto sol-item interaction ── */
+.sol-item{cursor:pointer;border-radius:8px;padding:7px 10px;margin:0 -10px;transition:background .15s}
+.sol-item:hover{background:rgba(0,0,0,.05)}
+.sol-item.proto-active{background:rgba(0,0,0,.06)}
+.sol-item.proto-active .tpill{outline:2px solid currentColor;outline-offset:1px}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ══════════ 封面 ══════════ -->
+  <section class="slide cover active">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>行為數據分析 · BJ V3</div>
+      <div class="cover-h1-wrap">
+        <h1>存款流程優化</h1>
+      </div>
+      <p class="sub">分析 47,719 個放棄存款的 session，找出真正的卡關原因——以及四個針對性解法。</p>
+      <div class="cover-tag" style="margin-top:28px">
+        <span>GA4 行為數據分析</span>
+        <span>樣本：未完成存款 session</span>
+        <span style="display:none">2026.05.28 — 05.29</span>
+        <span>BJ V3 · 全幣種</span>
+      </div>
+      <div class="agenda">
+        <b>分析設計</b><span class="arr">→</span>
+        <b>數據總覽</b><span class="arr">→</span>
+        <b>關鍵發現</b><span class="arr">→</span>
+        <b>結論</b><span class="arr">→</span>
+        <b>四個設計提案</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 數字速覽（from v2 01）══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>數據總覽</div>
+      <h2>三個數字，說明問題的規模</h2>
+      <p class="body-t" style="display:none">兩天的行為數據，追蹤進入存款流程但最終未完成的使用者。</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--sh);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)"></div>
+          <div style="font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.05em;line-height:1;margin-bottom:10px;color:var(--red)">47,719</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">次存款到一半放棄</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;display:none">分析期間：2026-05-28 ~ 05-29</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--sh);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber)"></div>
+          <div style="font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.05em;line-height:1;margin-bottom:10px;color:var(--amber)">12.3%</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">確認已離開平台</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">5,879 人觸發返回首頁信號，其餘仍在流程內持續嘗試</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--sh);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--green)"></div>
+          <div style="font-size:clamp(28px,4vw,48px);font-weight:800;letter-spacing:-0.05em;line-height:1;margin-bottom:10px;color:var(--green)">99%+</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">換了方式還是繼續試</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">使用者換完不走，存款意願始終都在</div>
+        </div>
+      </div>
+      <div class="evidence" style="margin-top:24px">
+        <div class="ev-hd">核心洞察</div>
+        <div class="ev-row">
+          <span class="tpill tp-b">數據結論</span>
+          <span class="ev-desc">他們不是「不想存款」，而是<strong>找不到一條能用的路</strong>。換方式的高留存率，正是最有力的證明。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 02 數據總覽 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>數據總覽</div>
+      <h2>四種放棄模式，背後原因各不相同</h2>
+      <table class="track-tbl">
+        <thead>
+          <tr>
+            <th>行為類型</th>
+            <th>使用者</th>
+            <th>人數（抽樣）</th>
+            <th>佔比</th>
+            <th>特徵</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:rgba(220,38,38,.04)">
+            <td><span class="tbadge tb-a">A</span> <span style="font-size:12px;font-weight:600">被帶離</span></td>
+            <td>看完表單被帶到其他頁面</td>
+            <td>21,735</td>
+            <td><strong style="color:var(--red)">45.5%</strong></td>
+            <td>仍在嘗試中；其中 12.3% 確認已返回首頁放棄</td>
+          </tr>
+          <tr style="background:rgba(37,99,235,.07)">
+            <td><span class="tbadge tb-b">B</span> <span style="font-size:12px;font-weight:600">換方式</span></td>
+            <td>主動從方式列表選入</td>
+            <td>12,488</td>
+            <td><strong style="color:var(--blue)">26.2%</strong></td>
+            <td>反覆換存款方式，幾乎沒有人中途離開 ← 本次分析重點</td>
+          </tr>
+          <tr style="opacity:.55">
+            <td><span class="tbadge tb-c">C</span> <span style="font-size:12px;font-weight:600">路徑分散</span></td>
+            <td>從其他頁面跳入</td>
+            <td>4,227</td>
+            <td><strong>8.9%</strong></td>
+            <td>路徑高度分散，存款意圖相對模糊</td>
+          </tr>
+          <tr style="background:rgba(217,119,6,.04)">
+            <td><span class="tbadge tb-d">D</span> <span style="font-size:12px;font-weight:600">查餘額</span></td>
+            <td>用快速錢包入口進入</td>
+            <td>4,034</td>
+            <td><strong style="color:var(--amber)">8.5%</strong></td>
+            <td>反覆確認錢包餘額，幾乎沒有人中途放棄</td>
+          </tr>
+          <tr style="opacity:.4">
+            <td><span class="tbadge tb-c">其他</span></td>
+            <td>行為過於分散，無法歸類</td>
+            <td>~5,235</td>
+            <td><strong>~11.0%</strong></td>
+            <td>不納入主線分析</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════ B+D 合併 Persona ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 · B+D Persona</div>
+      <h2>三分之一的放棄者是同一群人——卡在方式與餘額</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--radius);padding:22px 24px">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">B · 換方式的人</div>
+          <div style="font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--blue);margin-bottom:8px">26.2%</div>
+          <div style="font-size:13px;color:#3f3f46;line-height:1.65;margin-bottom:12px">12,488 人在存款方式之間反覆切換，每輪幾乎沒有人離開（留存率 98.4%）</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:600">換了 3 輪，53% 的人還在繼續找</div>
+        </div>
+        <div style="background:var(--abg);border:1px solid var(--abdr);border-radius:var(--radius);padding:22px 24px">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">D · 查餘額的人</div>
+          <div style="font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--amber);margin-bottom:8px">8.5%</div>
+          <div style="font-size:13px;color:#3f3f46;line-height:1.65;margin-bottom:12px">4,034 人進入存款頁後才去查錢包餘額，查完幾乎全部回來（留存率 91%）</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:600">想存款，只是還沒準備好</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:20px;box-shadow:var(--sh)">
+        <div style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.03em;color:var(--fg);line-height:1;flex:none">34.7%</div>
+        <div style="font-size:13px;color:#3f3f46;line-height:1.7">B + D 合計佔所有放棄存款 session 的 34.7%。<strong>他們都有存款意願</strong>，只是在「方式」和「資訊」上卡住了。這兩個問題，可以用設計解決。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 本次提案範圍 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>本次提案範圍</div>
+      <h2>針對 B+D Persona，四個設計改善方向</h2>
+      <div class="sol4" style="margin-top:20px">
+        <div class="scard b">
+          <div class="snum">01 · 存款優化</div>
+          <div class="st">Tab 切換、顯示餘額、Promotion 衝突提示</div>
+          <div class="sd">解決 B+D 在存款表單頁的三個卡關點——換方式要回上一頁、不知道餘額、Promotion 不符合沒有提示。</div>
+        </div>
+        <div class="scard g">
+          <div class="snum">02 · 一鍵重複存款</div>
+          <div class="st">回訪玩家不需要重填所有資料</div>
+          <div class="sd">有過成功存款記錄的玩家，直接以上次設定（方式 + 金額）一鍵完成再次存款。</div>
+        </div>
+        <div class="scard a">
+          <div class="snum">03 · Quick Deposit 曝光</div>
+          <div class="st">按鈕在那，但玩家不知道能做什麼</div>
+          <div class="sd">快速存款按鈕點擊率只有 6.3%，卻有 76.1% 的玩家從首頁進入存款。提升曝光時機與說明。</div>
+        </div>
+        <div class="scard r">
+          <div class="snum">04 · 流失後問卷</div>
+          <div class="st">GA 只能推論，問卷直接問</div>
+          <div class="sd">54.4% 的放棄原因 GA 無法確認。在玩家離開前詢問原因，補充數據看不到的真實聲音。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 1 Intro ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 01 · 存款優化</div>
+      <h2>三個改進點，讓 B+D Persona 不再卡住</h2>
+      <p class="body-t">B（換方式循環）和 D（查餘額循環）都發生在存款表單頁。以下三個設計改進，直接針對他們在表單頁遇到的問題。</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:24px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
+          <span class="tpill tp-b" style="flex:none;margin-top:2px">1-1</span>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em">Tab 切換支付方式</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65">換方式不用再回上一頁重新選——直接在表單頁 Tab 切換。對應 B 換方式循環（26.2%，12,488 人）。</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
+          <span class="tpill tp-a" style="flex:none;margin-top:2px">1-2</span>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em">在存款頁顯示餘額</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65">進存款頁就能看到餘額，不用離開去查——直接做決定。對應 D 查餘額循環（8.5%，4,034 人）。</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
+          <span class="tpill tp-r" style="flex:none;margin-top:2px">1-3</span>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em">Promotion 相容性提示</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65">選了不符合的 Promotion，目前系統會悄悄改掉而不告知玩家。加入明確提示，讓玩家知道為什麼。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 1-1 Tab 切換 ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 01-1 · Tab 切換支付方式</div>
+      <h2>換方式不再需要回到上一頁</h2>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：B 換方式循環 — 26.2%（12,488 人），換方式三輪留存率 79–82%</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計</div>
+          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">換方式需回到上一頁重新選擇，再進入新的表單頁</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
+          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">在同一頁面以 Tab 直接切換支付方式，無需回上一頁</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 1-2 Show Balance ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 01-2 · 在存款頁顯示餘額</div>
+      <h2>不用離開存款頁就能確認餘額</h2>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：D 查餘額循環 — 8.5%（4,034 人），查完幾乎全部回來（留存率 91%）</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計</div>
+          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">存款頁不顯示餘額，玩家需離開去查，查完再回來</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
+          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">存款頁直接顯示 Balance ৳2,450，玩家無需離頁確認</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 1-3 Promotion Conflict ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 01-3 · Promotion 相容性提示</div>
+      <h2>選錯 Promotion，玩家不會被悄悄改掉而不知情</h2>
+      <p class="body-t">目前若玩家選擇的 Promotion 不符合所選支付方式，系統會自動改為「No Promotion」，<span class="hl">玩家不會收到任何提示</span>。玩家可能存款後才發現 Promotion 未套用。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計 — 沒有提示</div>
+          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">Promotion 被靜默改掉，玩家毫不知情</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
+          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">跳出提示告知玩家「此 Promotion 不支援所選支付方式」，讓玩家主動選擇</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 2 Finding ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 02 · 一鍵重複存款</div>
+      <h2>回訪玩家每次存款，都在重複一樣的操作</h2>
+      <p class="body-t">現有存款流程需要玩家每次重新選支付方式、輸入金額、選 Promotion。對<span class="hl">已有存款記錄的回訪玩家</span>來說，這些步驟完全重複——上次怎麼做，這次還是要做一遍。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">數據背景</div>
+          <div style="font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--blue);margin-bottom:8px">76.1%</div>
+          <div style="font-size:13px;color:#3f3f46;line-height:1.65">的存款從<strong>首頁</strong>發起。首頁使用者多半是已登入的回訪玩家，他們反覆進行相同的存款流程。</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">現有流程步驟</div>
+          <div style="min-height:120px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">流程步驟圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 2 Before/After ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 02 · 現有 vs 新設計</div>
+      <h2>從多個步驟，縮短到 1 個確認</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有流程</div>
+          <div style="min-height:240px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有完整存款流程截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">每次都需要重新選方式、填金額、選 Promotion</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p6 原型</div>
+          <div style="min-height:240px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">自動帶入上次設定，玩家只需確認一次即可完成存款</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 3 Finding ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 03 · Quick Deposit 曝光</div>
+      <h2>按鈕一直在那裡，但 93.7% 的人沒點它</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">存款入口比較</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:3px">deposit_normal（一般存款按鈕）</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;height:24px;background:var(--bbg);border-radius:6px;overflow:hidden"><div style="width:43.8%;height:100%;background:var(--blue);border-radius:6px"></div></div>
+                <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--blue);flex:none">43.8%</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:3px">deposit_quick（快速存款按鈕）</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;height:24px;background:var(--rbg);border-radius:6px;overflow:hidden"><div style="width:6.3%;height:100%;background:var(--red);border-radius:6px"></div></div>
+                <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red);flex:none">6.3%</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">資料來源：GA4 存款入口事件計數（734,468 次）</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">問題核心</div>
+          <div style="font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--fg);margin-bottom:10px">76.1%</div>
+          <div style="font-size:13px;color:#3f3f46;line-height:1.65;margin-bottom:14px">的存款從首頁發起。這些玩家每次都能<strong>看到</strong>快速存款按鈕，但點擊率卻只有 6.3%。</div>
+          <div style="background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);padding:10px 14px;font-size:12px;color:#92400e;line-height:1.65">曝光不是問題——<strong>玩家不清楚這顆按鈕能做什麼</strong>，才是根本原因。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 3 Strategies ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 03 · 三個曝光策略方案</div>
+      <h2>從「看到」到「知道可以存款」</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 04</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">首存教學 Coachmark</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65">首次登入時以 Coachmark 引導玩家認識 Quick Deposit 按鈕的功能，建立認知。</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 05</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">Login 觸發條</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65">登入後在首頁頂部顯示「上次存款 ৳1,000，一鍵重複？」提示條，主動喚起使用意圖。</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 06</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">Popup 快捷列</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.65">點擊 Quick Deposit 按鈕後彈出快捷存款列，直接顯示上次記錄，一步完成重複存款。</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;margin-top:16px;box-shadow:var(--sh);font-size:12px;color:var(--muted);line-height:1.65">
+        三個方案可對應 <strong>pqd 互動原型</strong>（見最後一頁）直接操作體驗
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 4 Finding ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 04 · 流失後問卷</div>
+      <h2>超過一半的放棄原因，GA 只能推測</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">GA 能確認 vs 只能推測</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:var(--rbg);border:1px solid var(--rbdr);border-radius:var(--rsm);padding:12px 14px">
+              <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);margin-bottom:4px">只能推測 — 54.4%</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:3px">Track A（45.5%）+ Track C（8.9%）</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">GA 只知道他們離開了。A 中只有 12.3% 確認返回首頁，其他 33.2% 去哪了不知道。</div>
+            </div>
+            <div style="background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);padding:12px 14px">
+              <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);margin-bottom:4px">有數據支撐 — 34.7%</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:3px">Track B（26.2%）+ Track D（8.5%）</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">行為路徑清楚，可推導出「換方式」和「查餘額」的問題。</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">問卷能回答的問題</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:13px;color:#3f3f46;padding:9px 12px;background:var(--bg);border-radius:var(--rsm);line-height:1.5">「您選擇的支付方式是否可以正常使用？」</div>
+            <div style="font-size:13px;color:#3f3f46;padding:9px 12px;background:var(--bg);border-radius:var(--rsm);line-height:1.5">「是否因為餘額不足而取消存款？」</div>
+            <div style="font-size:13px;color:#3f3f46;padding:9px 12px;background:var(--bg);border-radius:var(--rsm);line-height:1.5">「您是否找到想要的 Promotion？」</div>
+            <div style="font-size:13px;color:#3f3f46;padding:9px 12px;background:var(--bg);border-radius:var(--rsm);line-height:1.5">「您打算之後再完成存款嗎？」</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ Section 4 Design ══════════ -->
+  <section class="slide" style="cursor:default">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解法 04 · 問卷設計方向</div>
+      <h2>在對的時機問玩家：為什麼沒完成？</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有狀況</div>
+          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">沒有問卷<br>GA 埋點 + 推論</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">玩家離開後 GA 只記錄行為，不知道原因</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p4 原型</div>
+          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="font-size:28px;color:#d4d4d8">📷</div>
+            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">問卷設計截圖<br><span style="font-size:11px">（請提供）</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">玩家離開存款頁時，彈出 2–3 個選項的快速問卷</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 07 結論 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>結論</div>
+      <h2>使用者想存款，但找不到能用的方式</h2>
+      <p class="body-t">B 換方式的人 98.4%、D 查餘額的人 ~100%、換方式三輪 79%→82%——三組數據都指向同一結論：<span class="hl">不是使用者放棄了存款，是存款方式讓他們卡住了</span>。C 不明原因的 8.9%，是 GA 無法解釋、只能直接問使用者的部分。</p>
+      <div class="concl3">
+        <div class="pcard b">
+          <div class="ph">B 換方式的人 · 26.2%</div>
+          <div class="pt">一直換方式，問題在方式本身</div>
+          <div class="pd">三步後 98.4% 還在循環，換了還換——使用者<strong>沒有放棄</strong>，只是找不到能順利完成存款的方式。</div>
+        </div>
+        <div class="pcard a">
+          <div class="ph">D 查餘額的人 · 8.5%</div>
+          <div class="pt">有意願，但資訊不完整</div>
+          <div class="pd">進了存款頁才想起要查餘額，幾乎沒有人中途離開——<strong>不是不想存，是還沒準備好</strong>做決策。</div>
+        </div>
+        <div class="pcard" style="border-color:#a3a3a3">
+          <div class="ph" style="color:#525252">C 不明原因 · 8.9%</div>
+          <div class="pt" style="color:#737373">GA 看不見的流失，只能直接問</div>
+          <div class="pd" style="color:#737373">開始填表後默默離開，沒有明確行為軌跡可追蹤——問卷是唯一能找出原因的方式。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 09 互動原型 ══════════ -->
+  <section class="slide proto-slide" id="slide-proto">
+    <div class="proto-wrap">
+      <div class="proto-left">
+        <div class="eyebrow"><span class="dot"></span>互動原型</div>
+        <h2>四個解法的<br>實際操作原型</h2>
+        <p class="body-t">右側可直接點擊操作，切換上方 Tab 看不同情境的設計。</p>
+        <div class="sol-list">
+          <div class="sol-item proto-active" data-proto="p6">
+            <span class="tpill tp-g" style="min-width:26px;justify-content:center">01</span>
+            <span>一鍵重複存款</span>
+          </div>
+          <div class="sol-item" data-proto="p2">
+            <span class="tpill tp-b" style="min-width:26px;justify-content:center">02</span>
+            <span>快速存款 — 自動帶入上次設定</span>
+          </div>
+          <div class="sol-item" data-proto="pqd">
+            <span class="tpill tp-a" style="min-width:26px;justify-content:center">03</span>
+            <span>Quick Deposit</span>
+          </div>
+          <div class="sol-item" data-proto="p4">
+            <span class="tpill tp-r" style="min-width:26px;justify-content:center">04</span>
+            <span>流失後問卷</span>
+          </div>
+        </div>
+      </div>
+      <div class="proto-right">
+        <iframe id="proto-iframe" src="payment-ux-prototypes-v3.html?embed=1#p6" title="互動原型"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 10 附錄：A 被帶離的人 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>附錄 · Track A</div>
+      <h2>A 被帶離的人 · 45.5%</h2>
+      <p class="body-t">這是樣本最大的族群，但放棄原因不在存款流程本身——使用者在填表過程中被其他頁面帶走。這次提案暫不處理，保留在附錄供後續參考。</p>
+      <div class="two-col" style="margin-top:24px">
+        <div class="sol r">
+          <div class="stag r">行為特徵</div>
+          <div class="st">開始填表後，切換到其他頁面未返回</div>
+          <div class="sd">使用者進入存款表單後，被平台內其他頁面（如促銷、遊戲）吸引而離開，或主動瀏覽其他功能後未回到存款流程。</div>
+          <div class="snums" style="margin-top:16px">
+            <div class="snum">
+              <div class="sl">佔比</div>
+              <div class="sv" style="color:var(--red)">45.5%</div>
+            </div>
+            <div class="snum">
+              <div class="sl">可確認流失</div>
+              <div class="sv" style="color:var(--red)">5,879 人</div>
+            </div>
+          </div>
+        </div>
+        <div class="sol" style="border-color:#e5e7eb">
+          <div class="stag" style="background:#f3f4f6;color:#6b7280">為何暫緩？</div>
+          <div class="st">問題根源不在存款流程</div>
+          <div class="sd" style="margin-top:8px">被帶離的觸發點可能是促銷 banner 設計、頁面跳轉邏輯、或使用者本身的瀏覽習慣，需要跨頁面的分析才能釐清根源，超出本次範圍。</div>
+          <div class="sd" style="margin-top:12px;color:#6b7280">後續可追蹤：使用者是被哪個頁面帶走？被帶走後的行為路徑是什麼？最終是否在當天完成存款？</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 12 附錄：分析設計 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>附錄 · 分析設計</div>
+      <h2>為什麼要兩份分析？不同入口，不同使用者</h2>
+      <p class="body-t">使用者進入存款有兩種路徑，行為截然不同。用<strong>同一份分析</strong>會互相稀釋，看不出真正問題所在。</p>
+      <div class="two-col">
+        <div class="sol g">
+          <div class="stag g">分析一 · 廣角全覆蓋</div>
+          <div class="st">所有看過存款表單就放棄的使用者</div>
+          <div class="sd">包含透過首頁快捷按鈕、促銷 banner 直接進入的使用者，<strong>涵蓋所有入口</strong>，樣本最大、覆蓋最廣。</div>
+          <div class="snums">
+            <div class="snum">
+              <div class="sl">追蹤人數</div>
+              <div class="sv" style="color:var(--red)">47,719</div>
+            </div>
+            <div class="snum">
+              <div class="sl">追蹤步驟</div>
+              <div class="sv">6 步</div>
+            </div>
+          </div>
+        </div>
+        <div class="sol b">
+          <div class="stag b">分析二 · 深度路徑</div>
+          <div class="st">主動選擇存款方式後放棄的使用者</div>
+          <div class="sd">透過存款方式列表頁<strong>自己選方式</strong>才進入的使用者。用快捷按鈕的人不走這條路，<strong>不在本分析範圍</strong>，路徑更單純、行為更明確。</div>
+          <div class="snums">
+            <div class="snum">
+              <div class="sl">追蹤人數</div>
+              <div class="sv" style="color:var(--blue)">19,075</div>
+            </div>
+            <div class="snum">
+              <div class="sl">追蹤步驟</div>
+              <div class="sv">9 步</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="evidence" style="margin-top:20px">
+        <div class="ev-hd">分析樣本定義（兩份分析相同）</div>
+        <div class="ev-row">
+          <span class="tpill tp-b">未完成存款的使用者</span>
+          <span class="ev-desc">同一次登入內曾開始存款流程，但<strong>最終未點擊送出</strong>。確保排除所有最終完成存款的使用者，只保留真正放棄的人。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<nav class="nav">
+  <div class="dots" id="dots"></div>
+  <div class="nav-right">
+    <span class="counter" id="counter">01 / 10</span>
+    <button class="arrow" id="prev" aria-label="上一頁" disabled>←</button>
+    <button class="arrow" id="next" aria-label="下一頁">→</button>
+  </div>
+</nav>
+<div class="kbd-hint">← / → 切換</div>
+
+<script>
+const slides  = Array.from(document.querySelectorAll('.slide'));
+const N       = slides.length;
+let cur       = 0;
+
+const dotsWrap = document.getElementById('dots');
+slides.forEach((_, i) => {
+  const b = document.createElement('button');
+  b.className = 'dot-btn' + (i === 0 ? ' on' : '');
+  b.addEventListener('click', e => { e.stopPropagation(); go(i); });
+  dotsWrap.appendChild(b);
+});
+const dotBtns  = Array.from(dotsWrap.children);
+const counter  = document.getElementById('counter');
+const prevBtn  = document.getElementById('prev');
+const nextBtn  = document.getElementById('next');
+const progress = document.getElementById('progress');
+
+function go(i) {
+  i = Math.max(0, Math.min(N - 1, i));
+  cur = i;
+  slides.forEach((s, idx) => {
+    s.classList.toggle('active', idx === i);
+    s.classList.toggle('prev',   idx < i);
+  });
+  dotBtns.forEach((d, idx) => d.classList.toggle('on', idx === i));
+  counter.textContent  = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+  progress.style.width = (N > 1 ? i / (N - 1) * 100 : 100) + '%';
+  prevBtn.disabled     = i === 0;
+  nextBtn.disabled     = i === N - 1;
+  if (slides[i].id === 'slide-funnel') initFunnel();
+}
+
+prevBtn.addEventListener('click', () => go(cur - 1));
+nextBtn.addEventListener('click', () => go(cur + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End')  go(N - 1);
+});
+document.getElementById('deck').addEventListener('click', e => {
+  if (e.target.closest('a, button')) return;
+  if (slides[cur].classList.contains('proto-slide')) return;
+  go(e.clientX > window.innerWidth * 0.42 ? cur + 1 : cur - 1);
+});
+
+// ── proto tab switching（使用 postMessage，最可靠的 iframe 溝通方式）──
+const protoIframe = document.getElementById('proto-iframe');
+
+document.querySelectorAll('.sol-item[data-proto]').forEach(item => {
+  item.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.sol-item').forEach(i => i.classList.remove('proto-active'));
+    item.classList.add('proto-active');
+    protoIframe.contentWindow.postMessage({ switchProto: item.dataset.proto }, '*');
+  });
+});
+
+// ── 影片預設 1.5x 播放速度 ──
+document.querySelectorAll('#slide-video video').forEach(function(v) {
+  v.addEventListener('loadedmetadata', function() { v.playbackRate = 1.5; });
+  v.playbackRate = 1.5;
+});
+
+// ── 影片切換 ──
+function switchVideo(which) {
+  var isIdeal = (which === 'ideal');
+  document.getElementById('video-ideal').style.display = isIdeal ? 'block' : 'none';
+  document.getElementById('video-real').style.display  = isIdeal ? 'none'  : 'block';
+  // 暫停另一個影片
+  document.getElementById(isIdeal ? 'video-real' : 'video-ideal').pause();
+  // 更新 tab 樣式
+  var tIdeal = document.getElementById('vtab-ideal');
+  var tReal  = document.getElementById('vtab-real');
+  tIdeal.style.color       = isIdeal ? 'var(--green)' : 'var(--muted)';
+  tIdeal.style.borderBottom= isIdeal ? '2px solid var(--green)' : '2px solid transparent';
+  tIdeal.querySelector('span').style.background = isIdeal ? 'var(--green)' : 'var(--muted)';
+  tReal.style.color        = isIdeal ? 'var(--muted)' : 'var(--red)';
+  tReal.style.borderBottom = isIdeal ? '2px solid transparent' : '2px solid var(--red)';
+  tReal.querySelector('span').style.background  = isIdeal ? 'var(--muted)' : 'var(--red)';
+}
+
+let funnelDone = false;
+function initFunnel() {
+  if (funnelDone) return;
+  funnelDone = true;
+  document.querySelectorAll('#funnel-bars .bar-fill').forEach((f, idx) => {
+    const pct = parseFloat(f.dataset.pct);
+    setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        f.style.width = pct + '%';
+        f.classList.add('show');
+      }));
+    }, idx * 90);
+  });
+}
+</script>
+</body>
+</html>
