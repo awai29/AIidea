@@ -288,7 +288,7 @@ strong{font-weight:700;color:var(--fg)}
   <section class="slide">
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>數據總覽</div>
-      <h2>四種放棄模式，背後原因各不相同</h2>
+      <h2>三種放棄模式，34.7% 是卡住想存款的人</h2>
       <table class="track-tbl">
         <thead>
           <tr>
@@ -300,33 +300,29 @@ strong{font-weight:700;color:var(--fg)}
           </tr>
         </thead>
         <tbody>
-          <tr style="background:rgba(220,38,38,.04)">
+          <tr style="background:rgba(220,38,38,.04);opacity:.5">
             <td><span class="tbadge tb-a">A</span> <span style="font-size:12px;font-weight:600">被帶離</span></td>
             <td>看完表單被帶到其他頁面</td>
             <td>21,735</td>
             <td><strong style="color:var(--red)">45.5%</strong></td>
-            <td>仍在嘗試中；其中 12.3% 確認已返回首頁放棄</td>
+            <td>見附錄</td>
           </tr>
           <tr style="background:rgba(37,99,235,.07)">
-            <td><span class="tbadge tb-b">B</span> <span style="font-size:12px;font-weight:600">換方式</span></td>
-            <td>主動從方式列表選入</td>
-            <td>12,488</td>
-            <td><strong style="color:var(--blue)">26.2%</strong></td>
-            <td>反覆換存款方式，幾乎沒有人中途離開 ← 本次分析重點</td>
+            <td>
+              <span class="tbadge tb-b" style="margin-bottom:4px;display:inline-block">B</span>
+              <span style="font-size:12px;font-weight:600;display:block;margin-top:2px">卡住想存款</span>
+            </td>
+            <td>反覆換方式 / 中途查餘額</td>
+            <td>16,522</td>
+            <td><strong style="color:var(--blue)">34.7%</strong></td>
+            <td>高留存率——沒有放棄，只是找不到能用的路 ← 本次分析重點</td>
           </tr>
           <tr style="opacity:.55">
-            <td><span class="tbadge tb-c">C</span> <span style="font-size:12px;font-weight:600">路徑分散</span></td>
+            <td><span class="tbadge tb-c">C</span> <span style="font-size:12px;font-weight:600">不明原因</span></td>
             <td>從其他頁面跳入</td>
             <td>4,227</td>
             <td><strong>8.9%</strong></td>
-            <td>路徑高度分散，存款意圖相對模糊</td>
-          </tr>
-          <tr style="background:rgba(217,119,6,.04)">
-            <td><span class="tbadge tb-d">D</span> <span style="font-size:12px;font-weight:600">查餘額</span></td>
-            <td>用快速錢包入口進入</td>
-            <td>4,034</td>
-            <td><strong style="color:var(--amber)">8.5%</strong></td>
-            <td>反覆確認錢包餘額，幾乎沒有人中途放棄</td>
+            <td>路徑分散，GA 無從解釋 → 需問卷補充</td>
           </tr>
           <tr style="opacity:.4">
             <td><span class="tbadge tb-c">其他</span></td>
@@ -343,55 +339,21 @@ strong{font-weight:700;color:var(--fg)}
   <!-- ══════════ B+D 合併 Persona ══════════ -->
   <section class="slide">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>關鍵發現 · B+D Persona</div>
-      <h2>三分之一的放棄者是同一群人——卡在方式與餘額</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
-        <div style="background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--radius);padding:22px 24px">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">B · 換方式的人</div>
-          <div style="font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--blue);margin-bottom:8px">26.2%</div>
-          <div style="font-size:13px;color:#3f3f46;line-height:1.65;margin-bottom:12px">12,488 人在存款方式之間反覆切換，每輪幾乎沒有人離開（留存率 98.4%）</div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:600">換了 3 輪，53% 的人還在繼續找</div>
+      <div class="eyebrow"><span class="dot"></span>關鍵發現 · Persona</div>
+      <h2>三分之一的放棄者：有存款意願，只是卡住了</h2>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 28px;box-shadow:var(--sh)">
+        <div style="text-align:center">
+          <div style="font-size:clamp(48px,6vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--blue)">34.7%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;font-family:var(--mono)">16,522 sessions</div>
         </div>
-        <div style="background:var(--abg);border:1px solid var(--abdr);border-radius:var(--radius);padding:22px 24px">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">D · 查餘額的人</div>
-          <div style="font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--amber);margin-bottom:8px">8.5%</div>
-          <div style="font-size:13px;color:#3f3f46;line-height:1.65;margin-bottom:12px">4,034 人進入存款頁後才去查錢包餘額，查完幾乎全部回來（留存率 91%）</div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:600">想存款，只是還沒準備好</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--fg);line-height:1.6;margin-bottom:10px">他們沒有放棄存款——在找到能用的方式之前就被迫停下來了。</div>
+          <div style="font-size:12px;color:#3f3f46;line-height:1.65">反覆切換存款方式，或中途離開查餘額——幾乎沒有人真正放棄，只是卡在流程裡出不來。</div>
         </div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:20px;box-shadow:var(--sh)">
-        <div style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.03em;color:var(--fg);line-height:1;flex:none">34.7%</div>
-        <div style="font-size:13px;color:#3f3f46;line-height:1.7">B + D 合計佔所有放棄存款 session 的 34.7%。<strong>他們都有存款意願</strong>，只是在「方式」和「資訊」上卡住了。這兩個問題，可以用設計解決。</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════ 本次提案範圍 ══════════ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>本次提案範圍</div>
-      <h2>針對 B+D Persona，四個設計改善方向</h2>
-      <div class="sol4" style="margin-top:20px">
-        <div class="scard b">
-          <div class="snum">01 · 存款優化</div>
-          <div class="st">Tab 切換、顯示餘額、Promotion 衝突提示</div>
-          <div class="sd">解決 B+D 在存款表單頁的三個卡關點——換方式要回上一頁、不知道餘額、Promotion 不符合沒有提示。</div>
-        </div>
-        <div class="scard g">
-          <div class="snum">02 · 一鍵重複存款</div>
-          <div class="st">回訪玩家不需要重填所有資料</div>
-          <div class="sd">有過成功存款記錄的玩家，直接以上次設定（方式 + 金額）一鍵完成再次存款。</div>
-        </div>
-        <div class="scard a">
-          <div class="snum">03 · Quick Deposit 曝光</div>
-          <div class="st">按鈕在那，但玩家不知道能做什麼</div>
-          <div class="sd">快速存款按鈕點擊率只有 6.3%，卻有 76.1% 的玩家從首頁進入存款。提升曝光時機與說明。</div>
-        </div>
-        <div class="scard r">
-          <div class="snum">04 · 流失後問卷</div>
-          <div class="st">GA 只能推論，問卷直接問</div>
-          <div class="sd">54.4% 的放棄原因 GA 無法確認。在玩家離開前詢問原因，補充數據看不到的真實聲音。</div>
-        </div>
+      <div style="margin-top:14px">
+        <div style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">存款流程示意</div>
+        <img src="../mockup-img/Deposit flow.png" alt="存款流程示意" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block">
       </div>
     </div>
   </section>
@@ -400,21 +362,21 @@ strong{font-weight:700;color:var(--fg)}
   <section class="slide">
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>解法 01 · 存款優化</div>
-      <h2>三個改進點，讓 B+D Persona 不再卡住</h2>
-      <p class="body-t">B（換方式循環）和 D（查餘額循環）都發生在存款表單頁。以下三個設計改進，直接針對他們在表單頁遇到的問題。</p>
+      <h2>三個改進點，讓玩家不再卡在存款表單頁</h2>
+      <p class="body-t">玩家在存款表單頁常見的行為：反覆切換存款方式、中途離開查餘額、遇到 Promotion 衝突不知如何處理。以下三個設計直接對應這三個卡點。</p>
       <div style="display:flex;flex-direction:column;gap:14px;margin-top:24px">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
           <span class="tpill tp-b" style="flex:none;margin-top:2px">1-1</span>
           <div>
             <div style="font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em">Tab 切換支付方式</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.65">換方式不用再回上一頁重新選——直接在表單頁 Tab 切換。對應 B 換方式循環（26.2%，12,488 人）。</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65">換方式不用再回上一頁重新選——直接在表單頁 Tab 切換，消除反覆切換的摩擦。</div>
           </div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
           <span class="tpill tp-a" style="flex:none;margin-top:2px">1-2</span>
           <div>
             <div style="font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.01em">在存款頁顯示餘額</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.65">進存款頁就能看到餘額，不用離開去查——直接做決定。對應 D 查餘額循環（8.5%，4,034 人）。</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.65">進存款頁就能看到餘額，不用離開去查——直接做決定，省去中途中斷的一趟。</div>
           </div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 22px;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:16px">
@@ -433,22 +395,16 @@ strong{font-weight:700;color:var(--fg)}
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>解法 01-1 · Tab 切換支付方式</div>
       <h2>換方式不再需要回到上一頁</h2>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：B 換方式循環 — 26.2%（12,488 人），換方式三輪留存率 79–82%</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：34.7% 玩家卡在存款流程，換方式三輪留存率 79–82%，問題在流程而非意願</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計</div>
-          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/current-back.png" alt="現有設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">換方式需回到上一頁重新選擇，再進入新的表單頁</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
-          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/update tab.png" alt="新設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">在同一頁面以 Tab 直接切換支付方式，無需回上一頁</div>
         </div>
       </div>
@@ -460,22 +416,16 @@ strong{font-weight:700;color:var(--fg)}
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>解法 01-2 · 在存款頁顯示餘額</div>
       <h2>不用離開存款頁就能確認餘額</h2>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：D 查餘額循環 — 8.5%（4,034 人），查完幾乎全部回來（留存率 91%）</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:16px">數據支撐：34.7% 玩家卡在存款流程，查完餘額幾乎全部回來（留存率 91%），有意願但資訊不完整</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計</div>
-          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/current-balance.png" alt="現有設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">存款頁不顯示餘額，玩家需離開去查，查完再回來</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
-          <div style="min-height:220px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/update balance.png" alt="新設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">存款頁直接顯示 Balance ৳2,450，玩家無需離頁確認</div>
         </div>
       </div>
@@ -491,18 +441,12 @@ strong{font-weight:700;color:var(--fg)}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有設計 — 沒有提示</div>
-          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/current-promotion.png" alt="現有設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">Promotion 被靜默改掉，玩家毫不知情</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p2 原型</div>
-          <div style="min-height:200px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/update promotion.png" alt="新設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">跳出提示告知玩家「此 Promotion 不支援所選支付方式」，讓玩家主動選擇</div>
         </div>
       </div>
@@ -515,19 +459,12 @@ strong{font-weight:700;color:var(--fg)}
       <div class="eyebrow"><span class="dot"></span>解法 02 · 一鍵重複存款</div>
       <h2>回訪玩家每次存款，都在重複一樣的操作</h2>
       <p class="body-t">現有存款流程需要玩家每次重新選支付方式、輸入金額、選 Promotion。對<span class="hl">已有存款記錄的回訪玩家</span>來說，這些步驟完全重複——上次怎麼做，這次還是要做一遍。</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">數據背景</div>
-          <div style="font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--blue);margin-bottom:8px">76.1%</div>
-          <div style="font-size:13px;color:#3f3f46;line-height:1.65">的存款從<strong>首頁</strong>發起。首頁使用者多半是已登入的回訪玩家，他們反覆進行相同的存款流程。</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--sh);margin-top:20px;display:flex;align-items:center;gap:32px">
+        <div style="flex:none">
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">數據背景</div>
+          <div style="font-size:clamp(48px,6vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--blue)">76.1%</div>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">現有流程步驟</div>
-          <div style="min-height:120px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">流程步驟圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
-        </div>
+        <div style="font-size:14px;color:#3f3f46;line-height:1.7">的存款從<strong>首頁</strong>發起。首頁使用者多半是已登入的回訪玩家，他們反覆進行相同的存款流程——每次都要重新選方式、填金額、選 Promotion。</div>
       </div>
     </div>
   </section>
@@ -540,18 +477,12 @@ strong{font-weight:700;color:var(--fg)}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">現有流程</div>
-          <div style="min-height:240px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">現有完整存款流程截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/Qucik deposit flow.png" alt="現有存款流程" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">每次都需要重新選方式、填金額、選 Promotion</div>
         </div>
         <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px">新設計 · 對應 p6 原型</div>
-          <div style="min-height:240px;background:var(--bg);border-radius:10px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-            <div style="font-size:28px;color:#d4d4d8">📷</div>
-            <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">新設計截圖<br><span style="font-size:11px">（請提供）</span></div>
-          </div>
+          <img src="../mockup-img/update quick deposit.png" alt="新設計" style="width:100%;border-radius:10px;display:block">
           <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">自動帶入上次設定，玩家只需確認一次即可完成存款</div>
         </div>
       </div>
@@ -591,33 +522,38 @@ strong{font-weight:700;color:var(--fg)}
           <div style="background:var(--abg);border:1px solid var(--abdr);border-radius:var(--rsm);padding:10px 14px;font-size:12px;color:#92400e;line-height:1.65">曝光不是問題——<strong>玩家不清楚這顆按鈕能做什麼</strong>，才是根本原因。</div>
         </div>
       </div>
+      <div style="margin-top:14px">
+        <img src="../mockup-img/Deposit entrance.png" alt="存款入口示意" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block">
+      </div>
     </div>
   </section>
 
   <!-- ══════════ Section 3 Strategies ══════════ -->
   <section class="slide" style="cursor:default">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解法 03 · 三個曝光策略方案</div>
-      <h2>從「看到」到「知道可以存款」</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:20px">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 04</div>
-          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">首存教學 Coachmark</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.65">首次登入時以 Coachmark 引導玩家認識 Quick Deposit 按鈕的功能，建立認知。</div>
+      <div class="eyebrow"><span class="dot"></span>解法 03 · Quick Deposit 曝光時機</div>
+      <h2>首次存款成功後教學</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">觸發條件</div>
+            <div style="font-size:13px;color:var(--fg);font-weight:600;margin-bottom:6px">deposit_success 事件 · 僅首次 · 觸發一次</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.65">首次存款完成的瞬間，是玩家情緒最好、記憶最深的時機——此刻的教學留存率遠高於登入提示。</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--sh)">
+            <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">為什麼這樣做</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12px;color:#3f3f46;line-height:1.6;display:flex;gap:8px"><span style="color:var(--green);flex:none">✓</span>Quick deposit CTR 低的根本原因是<strong>玩家不知道那個 icon 是什麼</strong>，而非入口位置問題</div>
+              <div style="font-size:12px;color:#3f3f46;line-height:1.6;display:flex;gap:8px"><span style="color:var(--green);flex:none">✓</span>只對剛完成首存的真實意圖用戶觸發，不打擾其他玩家</div>
+              <div style="font-size:12px;color:#3f3f46;line-height:1.6;display:flex;gap:8px"><span style="color:var(--green);flex:none">✓</span>為 Quick deposit 建立「肌肉記憶」——下次看到 icon 知道點</div>
+              <div style="font-size:12px;color:#3f3f46;line-height:1.6;display:flex;gap:8px"><span style="color:var(--green);flex:none">✓</span>零改動現有 header、popup、存款流程，風險極低</div>
+            </div>
+          </div>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 05</div>
-          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">Login 觸發條</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.65">登入後在首頁頂部顯示「上次存款 ৳1,000，一鍵重複？」提示條，主動喚起使用意圖。</div>
+        <div style="background:#09090b;border-radius:var(--radius);overflow:hidden;height:340px;position:relative">
+          <iframe src="payment-ux-prototypes-v3.html?embed=1#pqd" title="Quick Deposit 原型"
+            style="width:calc(100%/0.85);height:calc(100%/0.85);border:none;display:block;transform:scale(0.85);transform-origin:top left;pointer-events:auto"></iframe>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--amber)">
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">想法 06</div>
-          <div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.3">Popup 快捷列</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.65">點擊 Quick Deposit 按鈕後彈出快捷存款列，直接顯示上次記錄，一步完成重複存款。</div>
-        </div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;margin-top:16px;box-shadow:var(--sh);font-size:12px;color:var(--muted);line-height:1.65">
-        三個方案可對應 <strong>pqd 互動原型</strong>（見最後一頁）直接操作體驗
       </div>
     </div>
   </section>
@@ -687,17 +623,12 @@ strong{font-weight:700;color:var(--fg)}
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>結論</div>
       <h2>使用者想存款，但找不到能用的方式</h2>
-      <p class="body-t">B 換方式的人 98.4%、D 查餘額的人 ~100%、換方式三輪 79%→82%——三組數據都指向同一結論：<span class="hl">不是使用者放棄了存款，是存款方式讓他們卡住了</span>。C 不明原因的 8.9%，是 GA 無法解釋、只能直接問使用者的部分。</p>
+      <p class="body-t">34.7% 的玩家會反覆切換存款方式或中途離開查餘額，但幾乎沒有人真正放棄——留存率 91–98%。數據顯示<span class="hl">不是玩家不想存款，是流程讓他們卡住了</span>。另有 8.9% 的放棄原因 GA 無法解釋，只能直接問。</p>
       <div class="concl3">
         <div class="pcard b">
-          <div class="ph">B 換方式的人 · 26.2%</div>
-          <div class="pt">一直換方式，問題在方式本身</div>
-          <div class="pd">三步後 98.4% 還在循環，換了還換——使用者<strong>沒有放棄</strong>，只是找不到能順利完成存款的方式。</div>
-        </div>
-        <div class="pcard a">
-          <div class="ph">D 查餘額的人 · 8.5%</div>
-          <div class="pt">有意願，但資訊不完整</div>
-          <div class="pd">進了存款頁才想起要查餘額，幾乎沒有人中途離開——<strong>不是不想存，是還沒準備好</strong>做決策。</div>
+          <div class="ph">卡住想存款的人 · 34.7%</div>
+          <div class="pt">有意願、高留存，問題在流程本身</div>
+          <div class="pd">反覆換方式（留存率 98.4%）或中途去查餘額（留存率 91%）——他們<strong>沒有放棄</strong>，只是找不到能順利完成存款的路。</div>
         </div>
         <div class="pcard" style="border-color:#a3a3a3">
           <div class="ph" style="color:#525252">C 不明原因 · 8.9%</div>
@@ -815,6 +746,36 @@ strong{font-weight:700;color:var(--fg)}
         <div class="ev-row">
           <span class="tpill tp-b">未完成存款的使用者</span>
           <span class="ev-desc">同一次登入內曾開始存款流程，但<strong>最終未點擊送出</strong>。確保排除所有最終完成存款的使用者，只保留真正放棄的人。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 本次提案範圍 ══════════ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>本次提案範圍</div>
+      <h2>針對卡關族群，四個設計改善方向</h2>
+      <div class="sol4" style="margin-top:20px">
+        <div class="scard b">
+          <div class="snum">01 · 存款優化</div>
+          <div class="st">Tab 切換、顯示餘額、Promotion 衝突提示</div>
+          <div class="sd">針對玩家在存款表單頁的三個卡關點——換方式要回上一頁、不知道餘額、Promotion 不符合沒有提示。</div>
+        </div>
+        <div class="scard g">
+          <div class="snum">02 · 一鍵重複存款</div>
+          <div class="st">回訪玩家不需要重填所有資料</div>
+          <div class="sd">有過成功存款記錄的玩家，直接以上次設定（方式 + 金額）一鍵完成再次存款。</div>
+        </div>
+        <div class="scard a">
+          <div class="snum">03 · Quick Deposit 曝光</div>
+          <div class="st">按鈕在那，但玩家不知道能做什麼</div>
+          <div class="sd">快速存款按鈕點擊率只有 6.3%，卻有 76.1% 的玩家從首頁進入存款。提升曝光時機與說明。</div>
+        </div>
+        <div class="scard r">
+          <div class="snum">04 · 流失後問卷</div>
+          <div class="st">GA 只能推論，問卷直接問</div>
+          <div class="sd">54.4% 的放棄原因 GA 無法確認。在玩家離開前詢問原因，補充數據看不到的真實聲音。</div>
         </div>
       </div>
     </div>
