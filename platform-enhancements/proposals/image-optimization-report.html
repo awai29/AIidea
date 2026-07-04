@@ -88,7 +88,23 @@ strong{font-weight:700;color:var(--fg)}
 .fmtcmp-row{display:grid;grid-template-columns:70px 1fr;gap:14px;align-items:center}
 .fmtcmp-lbl{display:flex;flex-direction:column;gap:5px;align-items:flex-start;font-size:12px;color:var(--muted)}
 .fmtcmp .thumb-grid{margin-top:0;gap:8px}
+.fmtcmp .thumb{max-width:132px;width:100%;justify-self:center}
 .fmtcmp .thumb-kb{font-size:10px;padding:1px 6px;bottom:4px;right:4px}
+/* 盲測 → 揭曉 */
+.fmtcmp-row{transition:grid-template-columns .55s cubic-bezier(.16,1,.3,1), column-gap .55s cubic-bezier(.16,1,.3,1)}
+.fmtcmp.blind .fmtcmp-row{grid-template-columns:0 1fr;column-gap:0}
+.fmtcmp-lbl{transition:opacity .5s ease, transform .5s cubic-bezier(.16,1,.3,1)}
+.fmtcmp.blind .fmtcmp-lbl{opacity:0;transform:translateX(-12px);pointer-events:none}
+.fmtcmp .thumb-kb{transition:opacity .45s ease}
+.fmtcmp.blind .thumb-kb{opacity:0}
+.fmtcmp:not(.blind) .fmtcmp-row:nth-child(1) .fmtcmp-lbl{transition-delay:.05s}
+.fmtcmp:not(.blind) .fmtcmp-row:nth-child(2) .fmtcmp-lbl{transition-delay:.20s}
+.fmtcmp:not(.blind) .fmtcmp-row:nth-child(3) .fmtcmp-lbl{transition-delay:.35s}
+.fmt-controls{display:flex;align-items:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+.fmt-hint{font-size:13px;color:var(--muted)}
+.reveal-btn{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--fg);border:none;border-radius:9999px;padding:9px 20px;cursor:pointer;box-shadow:var(--sh);transition:transform .15s ease,box-shadow .15s ease}
+.reveal-btn:hover{transform:translateY(-1px);box-shadow:var(--sh-lg,0 8px 24px rgba(0,0,0,.12))}
+.fmt-answer{transition:opacity .5s ease}
 
 /* ── homepage mockup slide ── */
 .home-wrap{display:grid;grid-template-columns:auto 1fr;gap:44px;align-items:center;margin-top:6px}
@@ -270,6 +286,13 @@ strong{font-weight:700;color:var(--fg)}
 .arrow:disabled{opacity:.35;cursor:default;background:var(--card);color:var(--fg)}
 .kbd-hint{position:fixed;bottom:68px;right:clamp(16px,4vw,40px);font-family:var(--mono);font-size:11px;color:var(--muted);z-index:40;opacity:.8}
 @media(max-width:760px){.sol2,.concl{grid-template-columns:1fr}.feas-tbl{font-size:12px}.feas-tbl th,.feas-tbl td{padding:10px 12px}.kbd-hint{display:none}.fstep:not(:first-child)::before{left:50%;top:-20px;transform:translateX(-50%) rotate(90deg)}}
+/* 大綱 / Outline */
+.outline-list{display:flex;flex-direction:column;margin-top:24px;max-width:900px}
+.ol-row{display:flex;gap:20px;align-items:baseline;padding:16px 6px;border-bottom:1px solid var(--border)}
+.ol-row:last-child{border-bottom:none}
+.ol-n{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--blue);flex:none;width:46px;line-height:1}
+.ol-t{font-size:17px;font-weight:700;color:var(--fg)}
+.ol-d{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -281,18 +304,272 @@ strong{font-weight:700;color:var(--fg)}
   <!-- ═══ 封面 ═══ -->
   <section class="slide cover active">
     <div class="inner">
-      <!-- <div class="cover-rule"></div> -->
-      <div class="eyebrow"><span class="dot"></span>技術提案 · Image Loading</div>
+      <div class="eyebrow"><span class="dot"></span>技術提案 · Page Loading</div>
       <h1>圖片載入優化</h1>
-      <p class="sub">用 WebP / JPG 格式轉換與網路自適應載入，為主流 3x 用戶與孟加拉／巴基斯坦／越南市場，降低圖片下載量、加快載入。</p>
+      <p class="sub">從「網路」與「網頁大小」兩條線下手——網路自適應載入＋格式轉換。</p>
       <div class="cover-tag">
-        <span>🟢 Lazy 現況</span><span>⚪ Responsive 不採用</span><span>✅ 格式轉換</span><span>✅ 網路自適應</span>
+        <span>✅ 網路自適應</span><span>✅ 格式轉換</span><span>⚪ Responsive 不採用</span>
       </div>
-      <div class="agenda"><b>前期提要</b><span class="arr">→</span><b>發現問題</b><span class="arr">→</span><b>提出改善</b><span class="arr">→</span><b>可行評估</b><span class="arr">→</span><b>落地比較</b></div>
+      <div class="agenda"><b>發現問題</b><span class="arr">→</span><b>網路自適應</b><span class="arr">→</span><b>網頁大小</b><span class="arr">→</span><b>結語</b></div>
     </div>
   </section>
 
-  <!-- ═══ 01 前期提要 ═══ -->
+  <!-- ═══ 大綱 / Outline ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>大綱 · Outline</div>
+      <div class="outline-list">
+        <div class="ol-row"><span class="ol-n">01</span><div><div class="ol-t">發現問題</div><div class="ol-d">網頁慢＝網路慢＋網頁太大——本站圖片 13.4 MB，佔總傳輸約 60%，是最大元凶。</div></div></div>
+        <div class="ol-row"><span class="ol-n">02</span><div><div class="ol-t">① 網路自適應</div><div class="ol-d">主要市場網速落差懸殊 → 看網路給圖（4G / 3G / 2G），弱網最高省 ~92%。</div></div></div>
+        <div class="ol-row"><span class="ol-n">03</span><div><div class="ol-t">② 格式轉換</div><div class="ol-d">PNG → JPG / WebP，同尺寸、視覺無損省 ~79%（Responsive 評估後不採用）。</div></div></div>
+        <div class="ol-row"><span class="ol-n">04</span><div><div class="ol-t">結語 · 成效</div><div class="ol-d">圖片傳輸 13.4 MB → ~2.8 MB，維持客戶要求的呈現品質。</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 發現問題 · 網路 vs 網頁大小 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>發現問題</div>
+      <h2>網頁載入很久——問題出在哪？</h2>
+      <p class="body-t">用戶反映「網頁開很慢」。拆開來看，載入慢不外乎兩個原因：<span class="hl">不是網路太慢，就是網頁本身太大</span>。這份提案就從這兩條線各自找解法。</p>
+      <div class="cards">
+        <div class="mcard a"><div class="ic">📶</div><div class="t">① 網路</div><div class="d">用戶當下的連線品質。主要市場網速落差大，弱網吃大檔特別痛。<br><strong>→ 網路自適應載入</strong></div></div>
+        <div class="mcard g"><div class="ic">📦</div><div class="t">② 網頁大小</div><div class="d">真正被下載的內容體積。首頁以大圖為主，圖片過大是主因。<br><strong>→ 格式轉換</strong></div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">先談<strong>網路</strong>這條線，再回頭處理<strong>網頁大小</strong>。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 發現問題 · 三網站視覺對比 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>發現問題 · 先比一比</div>
+      <h2>先把我們的網站，跟其他人比比看</h2>
+      <div style="display:flex;gap:18px;justify-content:center;align-items:flex-start">
+        <figure style="margin:0;flex:1;max-width:240px;text-align:center">
+          <img src="images/site-stake.png" alt="Stake 首頁" style="object-fit: cover;object-position: top;width:100%;max-height:33vh;border-radius:16px;border:1px solid var(--border);box-shadow:var(--sh-lg)">
+          <figcaption style="margin-top:8px"><div style="font-weight:800;font-size:15px">Stake</div><div style="font-size:11px;color:var(--muted)">博弈同業</div></figcaption>
+        </figure>
+        <figure style="margin:0;flex:1;max-width:240px;text-align:center;position:relative">
+          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 13px;border-radius:9999px;z-index:2;white-space:nowrap">本站</span>
+          <img src="images/site-baji.png" alt="Baji 首頁（本站）" style="object-fit: cover;object-position: top;width:100%;max-height:33vh;border-radius:16px;border:2px solid var(--red);box-shadow:var(--sh-lg)">
+          <figcaption style="margin-top:8px"><div style="font-weight:800;font-size:15px;color:var(--red)">Baji（我們）</div><div style="font-size:11px;color:var(--muted)">本站</div></figcaption>
+        </figure>
+        <figure style="margin:0;flex:1;max-width:240px;text-align:center">
+          <img src="images/site-youtube.png" alt="YouTube 首頁" style="object-fit: cover;object-position: top;width:100%;max-height:33vh;border-radius:16px;border:1px solid var(--border);box-shadow:var(--sh-lg)">
+          <figcaption style="margin-top:8px"><div style="font-weight:800;font-size:15px">YouTube</div><div style="font-size:11px;color:var(--muted)">影音平台</div></figcaption>
+        </figure>
+      </div>
+      <table class="feas-tbl" style="margin-top:16px">
+        <thead><tr>
+          <th>網站</th><th>總傳輸</th>
+          <th>Load</th>
+          <th>Finish</th>
+          <th>差距</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>YouTube</td><td>8.6 MB</td><td>3.08s</td><td>15.49s</td><td>+12.4s</td></tr>
+          <tr><td>Stake</td><td>4.7 MB</td><td>4.65s</td><td>17.59s</td><td>+12.9s</td></tr>
+          <tr style="background:var(--rbg)"><td style="color:var(--red);font-weight:800">Baji · 本站</td><td style="color:var(--red);font-weight:800">22 MB</td><td>2.37s</td><td style="font-weight:800">25.46s</td><td style="color:var(--red);font-weight:800">+23.5s</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ 發現問題 · 三網站數據對比 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>發現問題 · 拆解</div>
+      <h2>三網站完整對比 — 肥在「圖片」</h2>
+      <table class="feas-tbl">
+        <thead><tr><th>分類</th><th>Stake</th><th style="background:var(--rbg);color:var(--red)">Baji · 本站</th><th>YouTube</th></tr></thead>
+        <tbody>
+          <tr><td>JS</td><td>3,765 kB</td><td style="background:var(--rbg)">5,443 kB</td><td>2,959 kB</td></tr>
+          <tr><td>Img <span style="color:var(--muted);font-size:12px">圖片</span></td><td>422 kB</td><td style="background:var(--rbg);color:var(--red);font-weight:800">13,393 kB</td><td>421 kB</td></tr>
+          <tr><td>Fetch / XHR</td><td>20.5 kB</td><td style="background:var(--rbg)">2,369 kB</td><td style="font-weight:800">5,270 kB</td></tr>
+          <tr><td><strong>總傳輸</strong></td><td>4.7 MB</td><td style="background:var(--rbg);color:var(--red);font-weight:800">22 MB</td><td>8.6 MB</td></tr>
+        </tbody>
+      </table>
+      <div class="note">我們首頁 22 MB，<strong>光圖片就佔 13.4 MB（約 60%）</strong>——同樣是博弈站，Stake 的圖只用 422 kB。圖片正是「網頁太大」的元凶，也是<strong>格式轉換</strong>要解決的對象。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 兩個方向 · Overview（原08 重排） ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善</div>
+      <h2>對應這兩個問題，我們提兩個方向</h2>
+      <div class="sol2">
+        <div class="sol">
+          <div class="num">① 對應網路</div>
+          <div class="t">✅ 網路自適應載入</div>
+          <div class="d">依網路品質給圖。快的網路（如越南）拿好圖，慢的（孟加拉、巴基斯坦、城鄉、尖峰）拿輕量圖。</div>
+        </div>
+        <div class="sol">
+          <div class="num">② 對應網頁大小</div>
+          <div class="t">✅ 格式轉換　PNG → JPG / WebP</div>
+          <div class="d">同尺寸換更省的格式，壓縮 3x 圖體積。主流 90% 用戶直接受益，且兼顧客戶要求的呈現品質。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 網速落差（原14） ═══ -->
+  <section class="slide" id="slide-netspeed">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 網路自適應 · 為什麼</div>
+      <h2>主要市場行動網速落差懸殊</h2>
+      <div class="netbars" id="netbars">
+
+        <div class="netgroup"></div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇹🇼 台灣 <span class="rk">全球第 39</span> <span class="rk" style="color:var(--blue);background:var(--bbg);border-color:var(--bbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--blue)">~114 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="71" style="background:var(--blue)"></div></div>
+        </div>
+
+        <div class="netgroup mkt" style="margin-top:12px">主要市場</div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇧🇩 孟加拉 <span class="rk">全球第 86</span> <span class="rk" style="color:var(--amber);background:var(--abg);border-color:var(--abdr)">≈ 3G～ 一般 4G</span></div><div class="mb" style="color:var(--amber)">~42 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="26" style="background:var(--amber)"></div></div>
+        </div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇻🇳 越南 <span class="rk">全球第 17</span> <span class="rk" style="color:var(--green);background:var(--gbg);border-color:var(--gbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--green)">~160 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="100" style="background:var(--green)"></div></div>
+        </div>
+        <div class="netrow">
+          <div class="top"><div class="nm">🇵🇰 巴基斯坦 <span class="rk">全球後段（~100）</span> <span class="rk" style="color:var(--red);background:var(--rbg);border-color:var(--rbdr)">≈ 3G～入門 4G</span></div><div class="mb" style="color:var(--red)">~20 Mbps</div></div>
+          <div class="net-track"><div class="net-fill" data-pct="13" style="background:var(--red)"></div></div>
+        </div>
+
+      </div>
+      <div class="net-src">行動下載「中位數」（非平均）· Ookla Speedtest Global Index 2025 · 🇹🇼 對照 · 換算 3G≈1–10 / 4G≈10–50+ / 5G≈100+ Mbps</div>
+      <p class="body-t" style="margin-top:18px">落差懸殊——對照台灣（~114 Mbps），<span class="hl">巴基斯坦、孟加拉只到 3G～入門 4G 等級</span>，正是自適應要服務的對象。</p>
+      <div class="note" style="margin-top:16px">⚠️ <strong>這是全國中位數，且取樣偏都會與新裝置</strong>（資料來自自願測速者）——鄉村、尖峰、舊機、廉價方案用戶<strong>實際遠低於此</strong>。中位數看來還行，但這群弱端用戶吃大圖最痛，正是網路自適應要保護的對象。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 網路自適應開場（原12） ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="prop-num">01</div>
+      <div class="eyebrow"><span class="dot"></span>第一提案</div>
+      <h1>網路自適應載入</h1>
+      <p class="sub">看網路給圖——好網給高品質、弱網給輕量圖，服務孟加拉／巴基斯坦的網速落差。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 什麼是網路自適應（原13） ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 網路自適應</div>
+      <h2>什麼是網路自適應載入？</h2>
+      <p class="body-t">偵測使用者<strong>當下的網路品質</strong>，動態給對應的圖：<span class="hl">好網路給高解析、高品質；弱網路給輕量小圖</span>——讓每個人都先看得到、不卡在大檔上。</p>
+      <div class="cards">
+        <div class="mcard b"><div class="ic">📡</div><div class="t">① 偵測網路</div><div class="d">用 <code>navigator.connection</code> 的 effectiveType（2G/3G/4G）或 HTTP Client Hints，判斷當下連線品質。</div></div>
+        <div class="mcard a"><div class="ic">🎚️</div><div class="t">② 選圖策略</div><div class="d">依網速對應一組參數——<strong>尺寸 × 品質 × 格式</strong>；弱網就降尺寸、降品質。</div></div>
+        <div class="mcard g"><div class="ic">⚡</div><div class="t">③ 漸進體驗</div><div class="d">弱網先給「看得到」的輕量圖，網路好再給高品質。先快、再清楚。</div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">對前面提到的<strong>孟加拉、巴基斯坦弱端用戶</strong>尤其有感——同一張圖，不必所有人都扛 3x 大檔。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · Demo 看網路給圖（原15） ═══ -->
+  <section class="slide" id="slide-netdemo">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 網路自適應</div>
+      <h2>看網路給圖 — 現場切換比較</h2>
+      <div class="net-top">
+        <span class="lab">模擬網路：</span>
+        <button class="simbtn" data-net="slow-2g">slow-2g</button>
+        <button class="simbtn" data-net="2g">2G</button>
+        <button class="simbtn" data-net="3g">3G</button>
+        <button class="simbtn on" data-net="4g">4G</button>
+      </div>
+      <div class="netgrid" id="netgrid"></div>
+      <div class="net-read">
+        <div><div class="l">6 張實際下載</div><div class="v" id="nd-total">—</div></div>
+        <div><div class="l">平均 / 張</div><div class="v" id="nd-avg">—</div></div>
+        <div><div class="l">當前品質</div><div class="v" id="nd-q" style="font-size:14px">—</div></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:14px;line-height:1.7">
+        策略：弱網只降尺寸、格式維持 PNG（pngquant 優化）—
+        <span style="color:var(--red)">slow-2g 25%</span> ·
+        <span style="color:#ef4444">2G 50%</span> ·
+        <span style="color:var(--amber)">3G 75%</span> ·
+        <span style="color:var(--green)">4G 原圖（現況 893 KB）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 技術實施 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 網路自適應 · 技術實施</div>
+      <h2>網路自適應載入 — 各組怎麼做</h2>
+      <table class="feas-tbl">
+        <thead><tr><th>角色／組</th><th>負責項目</th></tr></thead>
+        <tbody>
+          <tr><td>🎨 設計</td><td>訂各網路階尺寸／可接受畫質、弱網可視性把關</td></tr>
+          <tr><td>💻 前端</td><td><code>navigator.connection</code> 偵測選圖、監聽 change、Safari fallback</td></tr>
+          <tr><td>⚙️ 後端</td><td>預生成各尺寸圖／CDN on-the-fly resize，回對應 URL</td></tr>
+          <tr><td>🌐 網路組</td><td>CDN Image Resizing、邊緣快取、Client Hints（<code>Accept-CH</code>）</td></tr>
+          <tr><td>📊 工作預期</td><td><span class="eff eff-m">M 中</span> · 風險中 · <span class="phase">Phase 2</span><div class="sub">前端＋網路組主責，Safari／CDN 需留意</div></td></tr>
+        </tbody>
+      </table>
+      <div class="note">弱網先給「看得到」的輕量圖，網路好再給高品質；尺寸／品質分階由設計與前端共同把關。</div>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 小結 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>第一線 · 小結</div>
+      <h2>網路自適應能幫我們什麼？</h2>
+      <div class="cards">
+        <div class="mcard g"><div class="ic">⚡</div><div class="t">弱網也看得到</div><div class="d">slow-2g／2G／3G 依網速降尺寸，先給輕量圖——不再卡在大檔上。</div></div>
+        <div class="mcard a"><div class="ic">📉</div><div class="t">下載量大降</div><div class="d">弱網自適應實測最高省 <strong>~92%</strong>，直接服務孟加拉／巴基斯坦弱端用戶。</div></div>
+        <div class="mcard b"><div class="ic">🌏</div><div class="t">兼顧好網路</div><div class="d">越南等快網仍拿高品質原圖，體驗不打折。</div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">弱網吃原圖最痛——<span class="hl">看網路給圖，先給輕量圖，每個人先看得到、再看得清</span>。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 第一線 · 各網路下載量長條圖 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 網路自適應</div>
+      <h2>同一張圖，各網路下載量比較</h2>
+      <div class="barchart">
+        <div class="bc-group">同一張首頁圖 · 依網路自適應後的實際下載量（單張）</div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--red)">2G 網路</div><div class="tg">自適應 · 尺寸降至 50%</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--red);width:16%"><span class="kb">147 KB</span></div></div><span class="bc-save">▼ 省 ~84%</span></div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--amber)">3G 網路</div><div class="tg">自適應 · 尺寸降至 75%</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--amber);width:33%"><span class="kb">291 KB</span></div></div><span class="bc-save">▼ 省 ~67%</span></div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--green)">4G / WiFi</div><div class="tg">原圖 100%（現況）</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--green);width:100%"><span class="kb">893 KB</span></div></div><span class="bc-save" style="color:var(--muted)">baseline</span></div>
+        </div>
+      </div>
+      <p class="body-t" style="margin-top:18px">同一張圖，<span class="hl">2G 只下載 147 KB、3G 291 KB，4G 才給 893 KB 原圖</span>——弱網先給輕量圖，最高省約 84%。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 第二線 · 網頁大小 開場 ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="prop-num">02</div>
+      <div class="eyebrow"><span class="dot"></span>第二線</div>
+      <h1>網頁的大小</h1>
+      <p class="sub">處理完網路，回頭看網頁本身——真正被下載的內容有多大？主角是圖片。</p>
+    </div>
+  </section>
+
+  <!-- ═══ 第二線 · 目前圖片太大（原03） ═══ -->
   <section class="slide" id="slide-preamble">
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>前期提要</div>
@@ -307,23 +584,97 @@ strong{font-weight:700;color:var(--fg)}
     </div>
   </section>
 
-  <!-- ═══ 02 現況 Lazy ═══ -->
+  <!-- ═══ 第二線 · 可以怎麼努力 ═══ -->
   <section class="slide">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>現況</div>
-      <div class="home-wrap">
-        <img class="phone" src="images/homepage-mockup.png" alt="目前首頁">
-        <div>
-          <h2>已經做了 Lazy Load<br>但圖還是大</h2>
-          <p class="body-t"><span class="chip c-exist">🟢 首頁已用 Lazy Load</span></p>
-          <p class="body-t" style="margin-top:14px">圖片進入視窗才載入，解決了「一開頁就把整頁圖全抓下來」。</p>
-          <p class="body-t">但<span class="hl">真正被下載的每一張圖，體積仍然過大</span>。Lazy 只改變「何時下載」，沒改變「下載什麼」——治標不治本。</p>
+      <div class="eyebrow"><span class="dot"></span>第二線 · 網頁大小</div>
+      <h2>針對網頁容量，可以怎麼努力？</h2>
+      <p class="body-t">圖片佔了首頁下載量的大宗。要讓「下載的內容」變小，主要有兩個方向——先看第一個直覺想法，再看真正採用的解法。</p>
+      <div class="cards">
+        <div class="mcard b"><div class="ic">📐</div><div class="t">① 給不同解析度</div><div class="d">Responsive Images：依裝置 DPR 給 1x／2x／3x。<br><span class="hl">評估後不採用</span>（下一頁說明原因）。</div></div>
+        <div class="mcard g"><div class="ic">🗜️</div><div class="t">② 換更省的格式</div><div class="d">格式轉換 PNG → JPG / WebP：同尺寸、同畫質，檔案大幅縮小。<br><strong>本次採用。</strong></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 第二線 · 討論過 Responsive（原06） ═══ -->
+  <section class="slide">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善 · 討論方向</div>
+      <h2>我們討論過 Responsive Images（1x / 2x / 3x）</h2>
+      <p class="body-t">為了解決圖片太大，第一個想到的是 <strong>Responsive Images</strong>——依裝置 DPR 給不同解析度版本。同樣 6 張圖，切換 1x / 2x / 3x，觀察 6 張合計流量差距；理論上弱裝置拿小圖、省流量。</p>
+      <div class="cards">
+        <div class="mcard b"><div class="ic">1x</div><div class="t">100 × 133</div><div class="d">低密度 / 桌機——檔最小，但在高密度螢幕會糊。</div></div>
+        <div class="mcard a"><div class="ic">2x</div><div class="t">200 × 266</div><div class="d">中密度裝置——折衷尺寸。</div></div>
+        <div class="mcard g"><div class="ic">3x</div><div class="t">348 × 462</div><div class="d">高密度螢幕（Samsung / iPhone）——最清楚、檔最大。</div></div>
+      </div>
+      <p class="body-t" style="margin-top:22px">瀏覽器會依螢幕 DPR 自動選版本。<span class="hl">但要先確認——我們的用戶實際上是什麼裝置？</span></p>
+    </div>
+  </section>
+
+  <!-- ═══ 第二線 · DPR 分布（原07） ═══ -->
+  <section class="slide" id="slide-dpr">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>提出改善 · 用戶實際裝置</div>
+      <h2>用戶實際 DPR 分布</h2>
+
+      <button class="play-btn" id="dpr-play" aria-label="看用戶裝置分析">▶</button>
+
+      <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px 20px">
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px">
+          <div>
+            <div style="font-size:13px;font-weight:700">用戶實際 DPR 分布</div>
+            <div style="font-size:11px;color:var(--muted)">來源：GA4 · N = 3,560,322（排除 other）· 依解析度推算裝置 DPR</div>
+          </div>
+          <div style="display:flex;gap:7px">
+            <span class="bdg bg">3x ~90%</span><span class="bdg ba">2x ~8%</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:1px 7px;border-radius:9999px;border:1px solid var(--border)">1x ~2%</span>
+          </div>
+        </div>
+
+        <table class="dpr-tbl" style="box-shadow:none">
+          <thead><tr><th>解析度</th><th>佔比</th><th>裝置</th><th style="text-align:center">DPR</th><th style="text-align:center">倍速圖</th></tr></thead>
+          <tbody>
+            <tr><td><code>360×800</code></td><td><strong>38.22%</strong></td><td>Samsung Galaxy A 系列、Redmi Note、OPPO A 系列</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>385×854</code></td><td>12.93%</td><td>Galaxy A54/A55、部分 vivo、Redmi</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>393×873</code></td><td>10.82%</td><td>iPhone 14 Pro、15 Pro</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>360×806</code></td><td>10.30%</td><td>多數 Android（Chrome Dynamic Toolbar）</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>412×915</code></td><td>9.19%</td><td>Google Pixel 6、7、8</td><td style="text-align:center;color:var(--muted)">2.625</td><td style="text-align:center"><span class="bdg bg">3x</span><sup style="color:var(--muted);font-size:8px">※</sup></td></tr>
+            <tr><td><code>375×812</code></td><td style="color:var(--muted)">8.03% <sup>†</sup></td><td>iPhone X、XS、11 Pro</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
+            <tr><td><code>414×896</code></td><td style="color:var(--muted)">1.70% <sup>†</sup></td><td>iPhone XR、11</td><td style="text-align:center">2</td><td style="text-align:center"><span class="bdg ba">2x</span></td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:8px">※ Pixel 2.625x → srcset 選 3x　·　† StatCounter 來源</div>
+
+        <div style="margin-top:14px;background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);padding:12px 15px;font-size:12.5px;color:var(--blue);line-height:1.7">
+          💡 <strong>主流（~90%）用戶吃的就是 3x 圖。</strong>BO 現在全部上傳 3x 對這些用戶是正確的。優化重點不是降到 2x（= Responsive），而是用 <strong>WebP 壓縮</strong> 縮小 3x 圖的實際體積（本專案實測省 ~79%）。<strong>→ Responsive ⚪ 不採用。</strong>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ 03 原因① PNG ═══ -->
+  <!-- ═══ 第二線 · PNG vs JPG vs WebP（原09） ═══ -->
+  <section class="slide" id="slide-fmt">
+    <div class="inner">
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 格式轉換</div>
+      <h2>PNG vs JPG vs WebP — 6 張實測</h2>
+      <div class="thumb-grid" id="fmt-thumbs" style="margin-bottom:20px">
+        <div class="thumb"><img src="images/exclusive-aviator.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-aztec-gems.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-baji-of-olympus-1000.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-bj-fortune-gems.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-bj-super-ace-plus.png" alt=""><span class="thumb-kb">…</span></div>
+        <div class="thumb"><img src="images/exclusive-boxing-king.png" alt=""><span class="thumb-kb">…</span></div>
+      </div>
+      <div class="barchart">
+        <div id="fmt-rows"></div>
+        <div class="bc-status" id="fmt-status">點進此頁開始即時量測…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 第二線 · 客戶在乎畫面→PNG（原05） ═══ -->
   <section class="slide">
     <div class="inner">
       <div class="eyebrow"><span class="dot"></span>發現問題</div>
@@ -349,110 +700,12 @@ strong{font-weight:700;color:var(--fg)}
     </div>
   </section>
 
-  <!-- ═══ 提出改善 · Responsive Images（討論方向）═══ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>提出改善 · 討論方向</div>
-      <h2>我們討論過 Responsive Images（1x / 2x / 3x）</h2>
-      <p class="body-t">為了解決圖片太大，第一個想到的是 <strong>Responsive Images</strong>——依裝置 DPR 給不同解析度版本。同樣 6 張圖，切換 1x / 2x / 3x，觀察 6 張合計流量差距；理論上弱裝置拿小圖、省流量。</p>
-      <div class="cards">
-        <div class="mcard b"><div class="ic">1x</div><div class="t">100 × 133</div><div class="d">低密度 / 桌機——檔最小，但在高密度螢幕會糊。</div></div>
-        <div class="mcard a"><div class="ic">2x</div><div class="t">200 × 266</div><div class="d">中密度裝置——折衷尺寸。</div></div>
-        <div class="mcard g"><div class="ic">3x</div><div class="t">348 × 462</div><div class="d">高密度螢幕（Samsung / iPhone）——最清楚、檔最大。</div></div>
-      </div>
-      <p class="body-t" style="margin-top:22px">瀏覽器會依螢幕 DPR 自動選版本。<span class="hl">但要先確認——我們的用戶實際上是什麼裝置？</span></p>
-    </div>
-  </section>
-
-  <!-- ═══ 05 提出改善：Responsive + 裝置比 ═══ -->
-  <section class="slide" id="slide-dpr">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>提出改善 · 用戶實際裝置</div>
-      <h2>用戶實際 DPR 分布</h2>
-
-      <button class="play-btn" id="dpr-play" aria-label="看用戶裝置分析">▶</button>
-
-      <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);padding:18px 20px">
-
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px">
-          <div>
-            <div style="font-size:13px;font-weight:700">用戶實際 DPR 分布</div>
-            <div style="font-size:11px;color:var(--muted)">來源：GA4 · N = 3,560,322（排除 other）· 依解析度推算裝置 DPR</div>
-          </div>
-          <div style="display:flex;gap:7px">
-            <span class="bdg bg">3x ~90%</span><span class="bdg ba">2x ~8%</span>
-            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);padding:1px 7px;border-radius:9999px;border:1px solid var(--border)">1x ~2%</span>
-          </div>
-        </div>
-
-        <table class="dpr-tbl" style="box-shadow:none">
-          <thead><tr><th>解析度</th><th>佔比</th><th>裝置</th><th style="text-align:center">DPR</th><th style="text-align:center">倍速圖</th></tr></thead>
-          <tbody>
-            <tr><td><code>360×800</code></td><td><strong>38.22%</strong></td><td>Samsung Galaxy A / S 系列</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
-            <tr><td><code>385×854</code></td><td>12.93%</td><td>Samsung Galaxy A54 / A55</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
-            <tr><td><code>393×873</code></td><td>10.82%</td><td>iPhone 14 / 15</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
-            <tr><td><code>360×806</code></td><td>10.30%</td><td>Samsung Galaxy</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
-            <tr><td><code>412×915</code></td><td>9.19%</td><td>Google Pixel 6 / 7</td><td style="text-align:center;color:var(--muted)">2.625</td><td style="text-align:center"><span class="bdg bg">3x</span><sup style="color:var(--muted);font-size:8px">※</sup></td></tr>
-            <tr><td><code>375×812</code></td><td style="color:var(--muted)">8.03% <sup>†</sup></td><td>iPhone X / 11 / 12</td><td style="text-align:center">3</td><td style="text-align:center"><span class="bdg bg">3x</span></td></tr>
-            <tr><td><code>414×896</code></td><td style="color:var(--muted)">1.70% <sup>†</sup></td><td>iPhone XR / 11</td><td style="text-align:center">2</td><td style="text-align:center"><span class="bdg ba">2x</span></td></tr>
-          </tbody>
-        </table>
-        <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:8px">※ Pixel 2.625x → srcset 選 3x　·　† StatCounter 來源</div>
-
-        <div style="margin-top:14px;background:var(--bbg);border:1px solid var(--bbdr);border-radius:var(--rsm);padding:12px 15px;font-size:12.5px;color:var(--blue);line-height:1.7">
-          💡 <strong>主流（~90%）用戶吃的就是 3x 圖。</strong>BO 現在全部上傳 3x 對這些用戶是正確的。優化重點不是降到 2x（= Responsive），而是用 <strong>WebP 壓縮</strong> 縮小 3x 圖的實際體積（本專案實測省 ~79%）。<strong>→ Responsive ⚪ 不採用。</strong>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ 06 採用兩案 ═══ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>提出改善</div>
-      <h2>改提兩項真正有效的方案</h2>
-      <div class="sol2">
-        <div class="sol">
-          <div class="num">① 採用 · 本次落地</div>
-          <div class="t">✅ 格式轉換　PNG → JPG / WebP</div>
-          <div class="d">同尺寸換更省的格式，壓縮 3x 圖體積。主流 90% 用戶直接受益，且兼顧客戶要求的呈現品質。</div>
-        </div>
-        <div class="sol">
-          <div class="num">② 採用 · 本次落地</div>
-          <div class="t">✅ 網路自適應載入</div>
-          <div class="d">依網路品質給圖。快的網路（如越南）拿好圖，慢的（孟加拉、巴基斯坦、城鄉、尖峰）拿輕量圖。</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ 07 格式比較 PNG/JPG/WebP（live）═══ -->
-  <section class="slide" id="slide-fmt">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
-      <h2>PNG vs JPG vs WebP — 6 張實測</h2>
-      <div class="thumb-grid" id="fmt-thumbs" style="margin-bottom:20px">
-        <div class="thumb"><img src="images/exclusive-aviator.png" alt=""><span class="thumb-kb">…</span></div>
-        <div class="thumb"><img src="images/exclusive-aztec-gems.png" alt=""><span class="thumb-kb">…</span></div>
-        <div class="thumb"><img src="images/exclusive-baji-of-olympus-1000.png" alt=""><span class="thumb-kb">…</span></div>
-        <div class="thumb"><img src="images/exclusive-bj-fortune-gems.png" alt=""><span class="thumb-kb">…</span></div>
-        <div class="thumb"><img src="images/exclusive-bj-super-ace-plus.png" alt=""><span class="thumb-kb">…</span></div>
-        <div class="thumb"><img src="images/exclusive-boxing-king.png" alt=""><span class="thumb-kb">…</span></div>
-      </div>
-      <div class="barchart">
-        <div id="fmt-rows"></div>
-        <div class="bc-status" id="fmt-status">點進此頁開始即時量測…</div>
-      </div>
-      <a class="demo-link" href="image-optimization-demo.html#s3" target="_blank" rel="noopener">開啟完整互動 Demo <span class="arr">→</span></a>
-    </div>
-  </section>
-
-  <!-- ═══ 格式 · 肉眼比較（18 張）═══ -->
+  <!-- ═══ 第二線 · 肉眼比較（原10） ═══ -->
   <section class="slide" id="slide-fmtcompare">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 格式轉換</div>
       <h2>同一批圖 × 三種格式 — 肉眼分得出來嗎？</h2>
-      <div class="fmtcmp">
+      <div class="fmtcmp blind" id="fmtcmp">
         <div class="fmtcmp-row">
           <div class="fmtcmp-lbl"><span class="bdg bb">PNG</span><span>原始</span></div>
           <div class="thumb-grid" id="fc-png"></div>
@@ -466,14 +719,17 @@ strong{font-weight:700;color:var(--fg)}
           <div class="thumb-grid" id="fc-webp"></div>
         </div>
       </div>
-      <p class="body-t" style="margin-top:16px">檔案大小差很多，但肉眼幾乎一樣——下一頁用<strong>色差熱力圖</strong>看「差在哪、差多少」。</p>
+      <div class="fmt-controls">
+        <span class="fmt-hint" id="fmt-hint">🙈 盲測中：三排都是同一批圖，只是格式不同——你分得出哪排是哪個嗎？</span>
+        <button class="reveal-btn" id="fmt-reveal" onclick="revealFmt()">🔍</button>
+      </div>
     </div>
   </section>
 
-  <!-- ═══ 08 色差熱力圖（live）═══ -->
+  <!-- ═══ 第二線 · 色差熱力圖（原11） ═══ -->
   <section class="slide" id="slide-diff">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ① 格式轉換</div>
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 格式轉換</div>
       <h2>色差熱力圖 — 轉檔後差異有多小？</h2>
       <p class="body-t" style="margin-bottom:18px">逐像素比對轉檔版與原始 PNG 的顏色差（×5 放大）。<span style="color:#1d4ed8;font-weight:600">藍</span>=幾乎無差異、<span style="color:#dc2626;font-weight:600">紅</span>=差距大。ΔE 越小代表越接近原圖。</p>
       <div id="diff-wrap"></div>
@@ -481,140 +737,55 @@ strong{font-weight:700;color:var(--fg)}
     </div>
   </section>
 
-  <!-- ═══ 第二提案 · 開場 ═══ -->
+  <!-- ═══ 第二線 · 格式轉換 技術評估 ═══ -->
   <section class="slide">
     <div class="inner">
-      <div class="prop-num">02</div>
-      <div class="eyebrow"><span class="dot"></span>第二提案</div>
-      <h1>網路自適應載入</h1>
-      <p class="sub">看網路給圖——好網給高品質、弱網給輕量圖，服務孟加拉／巴基斯坦的網速落差。</p>
-    </div>
-  </section>
-
-  <!-- ═══ 網路自適應 — 概念介紹 ═══ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應</div>
-      <h2>什麼是網路自適應載入？</h2>
-      <p class="body-t">偵測使用者<strong>當下的網路品質</strong>，動態給對應的圖：<span class="hl">好網路給高解析、高品質；弱網路給輕量小圖</span>——讓每個人都先看得到、不卡在大檔上。</p>
-      <div class="cards">
-        <div class="mcard b"><div class="ic">📡</div><div class="t">① 偵測網路</div><div class="d">用 <code>navigator.connection</code> 的 effectiveType（2G/3G/4G）或 HTTP Client Hints，判斷當下連線品質。</div></div>
-        <div class="mcard a"><div class="ic">🎚️</div><div class="t">② 選圖策略</div><div class="d">依網速對應一組參數——<strong>尺寸 × 品質 × 格式</strong>；弱網就降尺寸、降品質。</div></div>
-        <div class="mcard g"><div class="ic">⚡</div><div class="t">③ 漸進體驗</div><div class="d">弱網先給「看得到」的輕量圖，網路好再給高品質。先快、再清楚。</div></div>
-      </div>
-      <p class="body-t" style="margin-top:22px">對前面提到的<strong>孟加拉、巴基斯坦弱端用戶</strong>尤其有感——同一張圖，不必所有人都扛 3x 大檔。</p>
-    </div>
-  </section>
-
-  <!-- ═══ 網路自適應 · 為什麼（主要市場網速）═══ -->
-  <section class="slide" id="slide-netspeed">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應 · 為什麼</div>
-      <h2>主要市場行動網速落差懸殊</h2>
-      <div class="netbars" id="netbars">
-
-        <div class="netgroup"></div>
-        <div class="netrow">
-          <div class="top"><div class="nm">🇹🇼 台灣 <span class="rk">全球第 39</span> <span class="rk" style="color:var(--blue);background:var(--bbg);border-color:var(--bbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--blue)">~114 Mbps</div></div>
-          <div class="net-track"><div class="net-fill" data-pct="71" style="background:var(--blue)"></div></div>
-        </div>
-
-        <div class="netgroup mkt" style="margin-top:12px">主要市場</div>
-        <div class="netrow">
-          <div class="top"><div class="nm">🇧🇩 孟加拉 <span class="rk">全球第 86</span> <span class="rk" style="color:var(--amber);background:var(--abg);border-color:var(--abdr)">≈ 一般 4G</span></div><div class="mb" style="color:var(--amber)">~42 Mbps</div></div>
-          <div class="net-track"><div class="net-fill" data-pct="26" style="background:var(--amber)"></div></div>
-        </div>
-        <div class="netrow">
-          <div class="top"><div class="nm">🇻🇳 越南 <span class="rk">全球第 17</span> <span class="rk" style="color:var(--green);background:var(--gbg);border-color:var(--gbdr)">≈ 4G+ / 5G</span></div><div class="mb" style="color:var(--green)">~160 Mbps</div></div>
-          <div class="net-track"><div class="net-fill" data-pct="100" style="background:var(--green)"></div></div>
-        </div>
-        <div class="netrow">
-          <div class="top"><div class="nm">🇵🇰 巴基斯坦 <span class="rk">全球後段（~100）</span> <span class="rk" style="color:var(--red);background:var(--rbg);border-color:var(--rbdr)">≈ 3G～入門 4G</span></div><div class="mb" style="color:var(--red)">~20 Mbps</div></div>
-          <div class="net-track"><div class="net-fill" data-pct="13" style="background:var(--red)"></div></div>
-        </div>
-
-      </div>
-      <div class="net-src">行動下載「中位數」（非平均）· Ookla Speedtest Global Index 2025 · 🇹🇼 對照 · 換算 3G≈1–10 / 4G≈10–50+ / 5G≈100+ Mbps</div>
-      <p class="body-t" style="margin-top:18px">落差懸殊——對照台灣（~114 Mbps），<span class="hl">巴基斯坦、孟加拉只到 3G～入門 4G 等級</span>，正是自適應要服務的對象。</p>
-      <div class="note" style="margin-top:16px">⚠️ <strong>這是全國中位數，且取樣偏都會與新裝置</strong>（資料來自自願測速者）——鄉村、尖峰、舊機、廉價方案用戶<strong>實際遠低於此</strong>。中位數看來還行，但這群弱端用戶吃大圖最痛，正是網路自適應要保護的對象。</div>
-    </div>
-  </section>
-
-  <!-- ═══ 網路自適應 Demo（live, switchable）═══ -->
-  <section class="slide" id="slide-netdemo">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 網路自適應</div>
-      <h2>看網路給圖 — 現場切換比較</h2>
-      <div class="net-top">
-        <span class="lab">模擬網路：</span>
-        <button class="simbtn" data-net="slow-2g">slow-2g</button>
-        <button class="simbtn" data-net="2g">2G</button>
-        <button class="simbtn" data-net="3g">3G</button>
-        <button class="simbtn on" data-net="4g">4G</button>
-      </div>
-      <div class="netgrid" id="netgrid"></div>
-      <div class="net-read">
-        <div><div class="l">6 張實際下載</div><div class="v" id="nd-total">—</div></div>
-        <div><div class="l">平均 / 張</div><div class="v" id="nd-avg">—</div></div>
-        <div><div class="l">當前品質</div><div class="v" id="nd-q" style="font-size:14px">—</div></div>
-      </div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:14px;line-height:1.7">
-        策略：弱網只降尺寸、格式維持 PNG（pngquant 優化）—
-        <span style="color:var(--red)">slow-2g 25%</span> ·
-        <span style="color:#ef4444">2G 50%</span> ·
-        <span style="color:var(--amber)">3G 75%</span> ·
-        <span style="color:var(--green)">4G 原圖（現況 893 KB）</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ 10 可行評估 ═══ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>實作方面可行評估</div>
-      <h2>落地評估 — 各組工作分工</h2>
+      <div class="eyebrow"><span class="dot"></span>解決方式 · ② 格式轉換 · 技術評估</div>
+      <h2>格式轉換 — 各組怎麼做</h2>
       <table class="feas-tbl">
-        <thead><tr><th>角色／組</th><th>① 格式轉換 PNG→WebP</th><th>② 網路自適應載入</th></tr></thead>
+        <thead><tr><th>角色／組</th><th>負責項目</th></tr></thead>
         <tbody>
-          <tr><td>🎨 設計</td><td>訂視覺無損標準（<code>q≥95</code>/lossless）、色差驗收、透明背景規則</td><td>訂各網路階尺寸／可接受畫質、弱網可視性把關</td></tr>
-          <tr><td>💻 前端</td><td><code>&lt;picture&gt;</code> ＋ WebP/JPG fallback，封裝共用元件</td><td><code>navigator.connection</code> 偵測選圖、監聽 change、Safari fallback</td></tr>
-          <tr><td>⚙️ 後端</td><td>批量轉檔 <code>Sharp</code>/<code>pngquant</code>，上稿自動產 WebP+JPG</td><td>預生成各尺寸圖／CDN on-the-fly resize，回對應 URL</td></tr>
-          <tr><td>🌐 網路組</td><td>CDN <code>format=auto</code>／Polish、快取與儲存</td><td>CDN Image Resizing、邊緣快取、Client Hints（<code>Accept-CH</code>）</td></tr>
-          <tr><td>📊 工作預期</td><td><span class="eff eff-m">M 中</span> · 風險低 · <span class="phase">Phase 1</span><div class="sub">後端＋前端主責，主流即受益</div></td><td><span class="eff eff-m">M 中</span> · 風險中 · <span class="phase">Phase 2</span><div class="sub">前端＋網路組主責，Safari／CDN 需留意</div></td></tr>
+          <tr><td>🎨 設計</td><td>訂視覺無損標準（<code>q≥95</code>/lossless）、色差驗收、透明背景規則</td></tr>
+          <tr><td>💻 前端</td><td><code>&lt;picture&gt;</code> ＋ WebP/JPG fallback，封裝共用元件</td></tr>
+          <tr><td>⚙️ 後端</td><td>批量轉檔 <code>Sharp</code>/<code>pngquant</code>，上稿自動產 WebP+JPG</td></tr>
+          <tr><td>🌐 網路組</td><td>CDN <code>format=auto</code>／Polish、快取與儲存</td></tr>
+          <tr><td>📊 工作預期</td><td><span class="eff eff-m">M 中</span> · 風險低 · <span class="phase">Phase 1</span><div class="sub">後端＋前端主責，主流即受益</div></td></tr>
         </tbody>
       </table>
-      <div class="note"><strong>決策紀錄：</strong>Responsive 因 9 成用戶為 3x 裝置、投報率低而不採用；資源集中於格式轉換與網路自適應。</div>
+      <div class="note"><strong>決策紀錄：</strong>Responsive 因 9 成用戶為 3x 裝置、投報率低而不採用；資源集中於格式轉換。</div>
     </div>
   </section>
 
-  <!-- ═══ 12 總結 ═══ -->
-  <section class="slide">
-    <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>結語 · 建議</div>
-      <h2>分兩階段落地</h2>
-      <div class="concl">
-        <div class="phase-card">
-          <div class="ph">PHASE 1 · 先做</div>
-          <div class="t">格式轉換 PNG → JPG / WebP</div>
-          <div class="d">批量轉檔 + <code>&lt;picture&gt;</code> fallback。風險低、效益明確，<strong>主流 90% 用戶立即受益</strong>。</div>
-        </div>
-        <div class="phase-card p2">
-          <div class="ph">PHASE 2 · 接續</div>
-          <div class="t">網路自適應載入</div>
-          <div class="d">前端偵測（生產上 CDN），<strong>服務孟加拉／巴基斯坦／越南的網速落差</strong>，提升弱連線體驗。</div>
-        </div>
-      </div>
-      <p class="body-t" style="margin-top:26px">預期成果（實測）：<span class="hl-g">主流 3x 用戶下載量降 ~79%</span>、<span class="hl-g">弱網自適應 ~92%</span>，同時維持客戶要求的呈現品質。</p>
-    </div>
-  </section>
-
-  <!-- ═══ 11 落地比較（live）═══ -->
+  <!-- ═══ 結語 · 成效（原18 live） ═══ -->
   <section class="slide" id="slide-cmp">
     <div class="inner">
-      <div class="eyebrow"><span class="dot"></span>落地後 vs 目前</div>
-      <h2>6 張圖實際下載量比較</h2>
+      <div class="eyebrow"><span class="dot"></span>結語 · 成效</div>
+      <h2>格式轉換後，圖片傳輸能少多少？</h2>
       <div class="barchart">
-        <div id="cmp-rows"></div>
+        <div class="bc-group">本站圖片傳輸 13,393 kB（參考 P5）· 同尺寸、畫質不變，只換格式</div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--red)">現況 · 全上 PNG</div><div class="tg">目前全站上圖以 PNG 為主</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--red);width:100%"><span class="kb">13,393 KB</span></div></div><span class="bc-save" style="color:var(--muted)">baseline</span></div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--amber)">換 JPG</div><div class="tg">同尺寸換 JPG（quality 95）</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--amber);width:43%"><span class="kb">~5,704 KB</span></div></div><span class="bc-save">▼ 省 ~57%</span></div>
+        </div>
+        <div class="bc-row">
+          <div class="bc-lbl"><div class="nm" style="color:var(--green)">換 WebP</div><div class="tg">視覺無損 · 主流 90% 用戶落地</div></div>
+          <div class="bc-wrap"><div class="bc-track"><div class="bc-fill show" style="background:var(--green);width:21%"><span class="kb">~2,813 KB</span></div></div><span class="bc-save">▼ 省 ~79%</span></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;background:var(--gbg);border:1px solid var(--gbdr);border-radius:var(--rsm);padding:12px 18px">
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--green);text-transform:uppercase;margin-bottom:8px">實站試算 · 參考 P5 本站圖片 13,393 kB</div>
+        <div style="display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-size:13px">
+          <span><strong>17 張首頁 banner</strong> 6,724 kB</span><span style="color:var(--muted)">＋</span>
+          <span><strong>13 張遊戲圖</strong> 1,883.7 kB</span><span style="color:var(--muted)">＝</span>
+          <span><strong>8,607.7 kB</strong>（占全站圖片 <strong>64%</strong>）</span>
+          <span style="color:var(--muted)">→ WebP ~79% →</span>
+          <span style="font-family:var(--mono);font-weight:800;color:var(--green);font-size:16px">省 ~6,800 kB</span>
+        </div>
+        <div style="margin-top:7px;font-size:12.5px;color:#3f3f46;line-height:1.65">這 30 張實測轉 WebP 降約 <strong>8 成（~79%）</strong>、縮到 ~1.8 MB，<strong>印證上圖節省率</strong>；全站圖片 <strong>13,393 kB</strong> 全面轉檔後，預期少下載約 <span class="hl-g">10,580 kB（≈10 MB）</span>——同時維持客戶要求的呈現品質。</div>
       </div>
     </div>
   </section>
@@ -622,10 +793,9 @@ strong{font-weight:700;color:var(--fg)}
   <!-- ═══ END ═══ -->
   <section class="slide cover">
     <div class="inner">
-      <!-- <div class="cover-rule"></div> -->
       <div class="eyebrow"><span class="dot"></span>END · Thank you</div>
       <h1>Q &amp; A</h1>
-      <div class="cover-tag"><span>✅ 格式轉換</span><span>✅ 網路自適應</span><span>Q &amp; A</span></div>
+      <div class="cover-tag"><span>✅ 網路自適應</span><span>✅ 格式轉換</span><span>Q &amp; A</span></div>
     </div>
   </section>
 
@@ -646,7 +816,7 @@ strong{font-weight:700;color:var(--fg)}
 <nav class="nav">
   <div class="dots" id="dots"></div>
   <div class="nav-right">
-    <span class="counter" id="counter">01 / 18</span>
+    <span class="counter" id="counter">01 / 24</span>
     <button class="arrow" id="prev" aria-label="上一頁">←</button>
     <button class="arrow" id="next" aria-label="下一頁">→</button>
   </div>
@@ -657,8 +827,8 @@ strong{font-weight:700;color:var(--fg)}
 // 共用：圖片清單 + fetch 量測
 // ─────────────────────────────────────────────
 const IMG_IDS = ['exclusive-aviator','exclusive-aztec-gems','exclusive-baji-of-olympus-1000','exclusive-bj-fortune-gems','exclusive-bj-super-ace-plus','exclusive-boxing-king'];
-async function fetchSize(url){ try{ const r=await fetch(url); if(r.ok) return (await r.blob()).size; }catch(e){} return 0; }
-async function fetchObj(url){ try{ const r=await fetch(url); if(r.ok){ const b=await r.blob(); return {size:b.size,url:URL.createObjectURL(b)}; } }catch(e){} return null; }
+async function fetchSize(url){ try{ const r=await fetch(url,{cache:'no-store'}); if(r.ok) return (await r.blob()).size; }catch(e){} return 0; }
+async function fetchObj(url){ try{ const r=await fetch(url,{cache:'no-store'}); if(r.ok){ const b=await r.blob(); return {size:b.size,url:URL.createObjectURL(b)}; } }catch(e){} return null; }
 
 // ─────────────────────────────────────────────
 // 投影片導覽
@@ -692,10 +862,9 @@ function go(i) {
   if (id === 'slide-preamble') initPreamble();
   if (id === 'slide-netspeed') animateNetSpeed();
   if (id === 'slide-fmt') initFmt();
-  if (id === 'slide-fmtcompare') initFmtCompare();
+  if (id === 'slide-fmtcompare') { initFmtCompare(); resetFmt(); }
   if (id === 'slide-diff') initDiff();
   if (id === 'slide-netdemo') initNetDemo();
-  if (id === 'slide-cmp') runComparison();
 }
 prevBtn.addEventListener('click', () => go(cur - 1));
 nextBtn.addEventListener('click', () => go(cur + 1));
@@ -809,6 +978,18 @@ async function initFmt(){
 
 // 09 頁：6 張 × PNG/JPG/WebP = 18 張肉眼比較（每張標 KB）
 let fcDone = false;
+function revealFmt(){
+  const c=document.getElementById('fmtcmp'); if(c) c.classList.remove('blind');
+  const b=document.getElementById('fmt-reveal'); if(b) b.style.display='none';
+  const h=document.getElementById('fmt-hint'); if(h) h.style.display='none';
+  const a=document.getElementById('fmt-answer'); if(a) a.style.opacity='1';
+}
+function resetFmt(){
+  const c=document.getElementById('fmtcmp'); if(c) c.classList.add('blind');
+  const b=document.getElementById('fmt-reveal'); if(b) b.style.display='';
+  const h=document.getElementById('fmt-hint'); if(h) h.style.display='';
+  const a=document.getElementById('fmt-answer'); if(a) a.style.opacity='0';
+}
 async function initFmtCompare(){
   if(fcDone) return; fcDone = true;
   const rows = [
