@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存款 UX 優化 · 可行性評估 Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #efefef; --fg: #09090b; --card: #ffffff; --border: #e4e4e7; --muted: #71717a;
+    --green: #16a34a; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+    --red: #dc2626;   --red-bg: #fef2f2;   --red-border: #fecaca;
+    --amber: #d97706; --amber-bg: #fffbeb; --amber-border: #fde68a;
+    --blue: #2563eb;  --blue-bg: #eff6ff;  --blue-border: #bfdbfe;
+    --purple: #7c3aed;--purple-bg: #f5f3ff;--purple-border:#ddd6fe;
+    --font: 'Inter', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+  .page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 2.5rem; }
+  .header-inner { max-width: 1080px; margin: 0 auto; }
+  .header-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: clamp(21px, 3vw, 29px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.2; margin-bottom: 10px; }
+  .header-desc { font-size: 13.5px; color: var(--muted); max-width: 720px; line-height: 1.7; }
+  .header-meta { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+  .badge-green { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+  .badge-blue  { background: var(--blue-bg);  border-color: var(--blue-border);  color: var(--blue); }
+  .badge-amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+  .badge-red   { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red); }
+  .badge-purple{ background: var(--purple-bg);border-color: var(--purple-border);color: var(--purple); }
+  .badge-gray  { background: #f4f4f5; border-color: var(--border); color: #52525b; }
+
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(239,239,239,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 10px 2.5rem; }
+  .nav-inner { max-width: 1080px; margin: 0 auto; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .nav a { padding: 6px 14px; border-radius: 9999px; border: 1px solid transparent; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--muted); text-decoration: none; transition: all 0.15s; }
+  .nav a:hover { background: var(--card); border-color: var(--border); color: var(--fg); }
+
+  .main { max-width: 1080px; margin: 0 auto; padding: 2.5rem; }
+  section { margin-bottom: 44px; scroll-margin-top: 70px; }
+  .sec-head { margin-bottom: 18px; border-bottom: 2px solid var(--fg); padding-bottom: 10px; }
+  .sec-num { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .sec-title { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; }
+  .sec-desc { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.65; }
+
+  h3 { font-size: 15.5px; font-weight: 700; letter-spacing: -0.02em; margin: 26px 0 10px; display: flex; align-items: center; gap: 9px; }
+  h4 { font-size: 13.5px; font-weight: 700; margin: 16px 0 8px; color: #3f3f46; }
+  p { margin-bottom: 10px; color: #3f3f46; }
+  .lead { font-size: 13.5px; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .card.tight { padding: 14px 16px; }
+
+  .callout { display: flex; gap: 10px; padding: 12px 15px; border-radius: 9px; font-size: 12.5px; line-height: 1.65; margin: 12px 0; }
+  .callout .ic { flex-shrink: 0; font-weight: 700; }
+  .callout.blue  { background: var(--blue-bg);  border: 1px solid var(--blue-border);  color: #1e3a8a; }
+  .callout.amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: #92400e; }
+  .callout.green { background: var(--green-bg); border: 1px solid var(--green-border); color: #14532d; }
+  .callout.red   { background: var(--red-bg);   border: 1px solid var(--red-border);   color: #991b1b; }
+  .callout.purple{ background: var(--purple-bg);border: 1px solid var(--purple-border);color: #5b21b6; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 10px 0 4px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; margin: 12px 0; background: var(--card); }
+  .table-wrap table { margin: 0; }
+  th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  th { background: #fafafa; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  td code, p code, li code { font-family: var(--mono); font-size: 11.5px; background: #f4f4f5; padding: 1.5px 5px; border-radius: 4px; color: #be123c; white-space: nowrap; }
+  .path { font-family: var(--mono); font-size: 11px; color: #3f3f46; word-break: break-all; }
+
+  ul, ol { margin: 6px 0 12px 4px; padding-left: 18px; }
+  li { margin-bottom: 6px; color: #3f3f46; line-height: 1.6; }
+
+  .pill { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em; }
+  .pill-easy { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .pill-med  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .pill-hard { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .pill-none { background: #f4f4f5; color: #52525b; border: 1px solid var(--border); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .kv { display: grid; grid-template-columns: 130px 1fr; gap: 4px 14px; font-size: 12.5px; margin: 8px 0; }
+  .kv dt { font-weight: 600; color: var(--muted); }
+  .kv dd { color: #3f3f46; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+
+  .footer { max-width: 1080px; margin: 0 auto; padding: 24px 2.5rem 48px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); }
+
+  .anchor-note { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+  .verified { color: var(--green); font-weight: 700; }
+  .gap { color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-tag">Feasibility Spec · 2026-07-01</div>
+    <h1>存款 UX 優化 · 可行性評估</h1>
+    <p class="header-desc">
+      對象範圍聚焦三塊：<strong>① User Profile 記住上次/常用存款偏好（後端地基）</strong>、<strong>② Step2 方式選擇</strong>、<strong>③ Step3 表單精簡</strong>。
+      本文以實際 codebase 落地驗證（bkw 前端 Angular 17 · bkw-pg 後端 Java21/Servlet/MyBatis/Oracle）為依據，分「設計 / 前端 / 後端」評估可行性、改動點與風險。需求來源：<code>payment-ux-prototypes-v2.html</code> P1 + P2。
+    </p>
+    <div class="header-meta">
+      <span class="badge badge-blue">bkw · Angular 17 + Signals + NgRx</span>
+      <span class="badge badge-purple">bkw-pg · Java 21 · Servlet + MyBatis · Oracle</span>
+      <span class="badge badge-green">結論：整體可行，多數已有雛形</span>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#summary">結論總表</a>
+    <a href="#status">現況盤點</a>
+    <a href="#profile">① User Profile 偏好</a>
+    <a href="#step2">② Step2 方式選擇</a>
+    <a href="#step3">③ Step3 表單精簡</a>
+    <a href="#risk">風險與依賴</a>
+    <a href="#phasing">實施順序</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- ============ 摘要 ============ -->
+  <section id="summary">
+    <div class="sec-head">
+      <div class="sec-num">Executive Summary</div>
+      <div class="sec-title">結論總表</div>
+      <div class="sec-desc">難度以「在現有架構上落地」評估。多數功能的資料模型/元件雛形已存在，主要工作是「補完 + 串接偏好」，而非從零重寫。</div>
+    </div>
+
+    <div class="callout green">
+      <span class="ic">✓</span>
+      <span><strong>三個最重要的發現：</strong>
+      (1) 前端已有一條建好的單頁精簡流程 <code>deposit-quick</code>（預設方式 + 自動套用優惠 + 快選金額 + 選擇暫存），P2「表單精簡」多半是啟用/補完而非重做。
+      (2) 維護狀態與 ETA 的<strong>資料模型前後端都已存在</strong>（<code>isMaintain</code> / <code>maintainStart/EndTimestamp</code> / <code>isRecommend</code> / <code>PaymentMethodStatusType.MAINTENANCE</code>）。
+      (3) 唯一真正的缺口是<strong>跨裝置的偏好記憶</strong>——前端 <code>depositDataCache</code> 只在記憶體、後端無偏好欄位，這是所有「上次/最常用」功能的共同地基。</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能</th><th>設計</th><th>前端</th><th>後端</th><th>現況雛形</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>① 偏好記憶</strong><br><span class="anchor-note">last/most-used 方式+金額</span></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td>銀行帳號偏好已有（<code>isShowSavedAsPreferred</code>）；方式/金額偏好 <span class="gap">缺</span></td>
+          </tr>
+          <tr>
+            <td><strong>② 預選上次方式</strong></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-none">依賴①</span></td>
+            <td>分組/排序已有，缺「上次使用」高亮（依賴①）</td>
+          </tr>
+          <tr>
+            <td><strong>② 維護中明示 + ETA</strong></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td>資料模型 <span class="verified">已就緒</span>，缺前端渲染 + 後端「顯示而非隱藏」</td>
+          </tr>
+          <tr>
+            <td><strong>② FTD 首存引導</strong></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><code>isRecommend</code> 已有；缺 FTD 旗標 + 提示條</td>
+          </tr>
+          <tr>
+            <td><strong>③ 自動帶入上次設定</strong></td>
+            <td><span class="pill pill-easy">易</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-none">依賴①</span></td>
+            <td><code>deposit-quick</code> 已有預設+暫存，缺「跨 session 帶入」（依賴①）</td>
+          </tr>
+          <tr>
+            <td><strong>③ 統一 Sheet + 優惠自動套用</strong></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-none">無</span></td>
+            <td><code>setDefaultPromotion</code> + PromotionSelect Sheet 已有，統一 Sheet 需重構</td>
+          </tr>
+          <tr>
+            <td><strong>③ 不相容衝突引導</strong></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-med">中</span></td>
+            <td><span class="pill pill-none">無</span></td>
+            <td>相容性資料已有（<code>awardingBankTypes</code>），缺衝突引導 Sheet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="anchor-note">難度定義：<span class="pill pill-easy">易</span> ≈ 0.5–1.5 天 · <span class="pill pill-med">中</span> ≈ 2–5 天 · <span class="pill pill-hard">難</span> ≈ 1 週以上（單一端、不含測試/聯調）。「依賴①」代表本身簡單，但要等偏好地基完成。</p>
+  </section>
+
+  <!-- ============ 現況盤點 ============ -->
+  <section id="status">
+    <div class="sec-head">
+      <div class="sec-num">Current State</div>
+      <div class="sec-title">現況盤點（經 codebase 驗證）</div>
+      <div class="sec-desc">以下皆為實際讀檔確認，非推測。標 <span class="verified">✓</span> 為已存在能力，標 <span class="gap">✗</span> 為缺口。</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>前端 bkw（Angular 17）</h4>
+        <ul>
+          <li>Standalone components + <strong>Signals</strong>（computed/effect）+ NgRx facade + Transloco i18n。</li>
+          <li>存款 UI 在 <span class="path">libs/ui/v3/h5/page/wallet/deposit/</span>，v3 為現行版本。</li>
+          <li><strong>Step2</strong>＝<code>deposit-entry</code>：讀 <code>paymentInfo</code>，按 <code>bankGroupType</code>（本地銀行/第三方/加密）分組、濾掉 INACTIVE。<span class="gap">✗ 無「上次使用」高亮</span>。</li>
+          <li><strong>Step3（既有精簡流程）</strong>＝<code>deposit-quick</code>（1761 行）：已有 <code>defaultPaymentType</code> 預選、<code>setDefaultPromotion</code> 自動套用相容優惠、<code>amountOptionList</code> 快選金額、<code>depositDataCache</code> 暫存選擇。</li>
+          <li>API 由 <code>DepositService</code> 統一：<code>getDepositPaymentInfo</code>、<code>getDepositSetting</code>、<code>deposit3rdParty</code>、<code>deposit</code>、<code>getPendingDeposit</code>。</li>
+          <li><span class="verified">✓</span> <code>PaymentMethodStatusType.MAINTENANCE=0</code>、method 的 <code>isMaintain</code>、channel 的 <code>maintainStart/EndTimestamp</code>、<code>isRecommend</code> 皆已在 model。</li>
+          <li><span class="gap">✗</span> <code>depositDataCache</code> 是 <code>signal(null)</code> 記憶體暫存，<strong>不持久化</strong>（跨登入/裝置即失）。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>後端 bkw-pg（Java 21）</h4>
+        <ul>
+          <li>非 Spring Boot：傳統 Servlet + MyBatis + <strong>Oracle</strong>；Redis(Redisson) + Caffeine + Kafka + Togglz。單體 WAR。</li>
+          <li>存款頁資料：<code>GET /api/wv/v1/payment/getDepositPaymentInfo</code> → <code>BackendAPIWV3</code> / <code>BTPaymentBO.getDepositPaymentInfo</code> → <code>PaymentDisplaySettingCache.getDepositSetting(account)</code>。</li>
+          <li><span class="verified">✓</span> 此 API <strong>已按玩家過濾</strong>（幣別/站台/status/白黑名單/VIP/<code>is_fe_display_condition</code> 會查玩家歷史存款次數與累計金額）→ 代表「在這支 API 讀玩家存款歷史」的路徑現成。</li>
+          <li><span class="verified">✓</span> <code>MoneyTransaction</code> 有 <code>user_id / to_payment_type / to_bank_id / amount / status / create_time</code> → 可推導最近/最常用方式與金額。</li>
+          <li><span class="gap">✗</span> 無專用 Player Preference 表/欄位；快選金額 <code>integer_amount_json</code> 為 per-channel 全局配置（<code>SpeedDeposit</code> / <code>PaymentDisplaySetting</code>），非個人化。</li>
+          <li>維護：現況為 BankType 層級（<code>checkPaymentMethodIsMaintain()</code>）→ 目前「隱藏」；顯示層 <code>status</code> 為 INVISIBLE(-1)/INACTIVE(0)/ACTIVE(1)。</li>
+          <li>存款成功寫入點：<code>PaymentGatewayServlet</code> callback（<code>/pg/CallBackRelay*</code>）驗簽後更新 <code>MoneyTransaction.status=SUCCESS</code> → 這是偏好「寫入」的掛點。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <span class="ic">⚠</span>
+      <span><strong>狀態語意需對齊：</strong>後端 <code>status</code>（-1 INVISIBLE / 0 INACTIVE / 1 ACTIVE）與前端 <code>PaymentMethodStatusType</code>（-1 INACTIVE / 0 MAINTENANCE / 1 ACTIVE）數值語意不一致。前端另有 <code>isMaintain</code> boolean。實作維護顯示前，務必先確認 <code>getDepositPaymentInfo</code> API 層對 <code>paymentMethodStatus</code> / <code>isMaintain</code> 的實際對應與填值邏輯。</span>
+    </div>
+  </section>
+
+  <!-- ============ ① User Profile ============ -->
+  <section id="profile">
+    <div class="sec-head">
+      <div class="sec-num">Foundation</div>
+      <div class="sec-title">① User Profile — 記住上次/常用存款偏好</div>
+      <div class="sec-desc">這是 ②③ 多數功能的共同地基。目標：後端能回傳玩家「上次方式 / 上次金額 / 最常用金額 / 是否首存」，前端據此預選預填。</div>
+    </div>
+
+    <h3>🎨 設計 <span class="pill pill-easy">易</span></h3>
+    <div class="card tight">
+      <ul>
+        <li>定義「<strong>上次使用</strong>」與「<strong>最常存</strong>」兩種標籤的視覺（原型：綠框 + 標籤）；兩者可能衝突，需定優先序（建議：預設帶「上次」，金額 chip 標「最常用」）。</li>
+        <li><strong>啟用門檻</strong>：原型定「最常用金額」需 ≥3 筆存款紀錄，未達則顯示平台熱門金額——設計需涵蓋「無歷史」的 fallback。</li>
+        <li><strong>隱私</strong>：共用裝置上是否顯示上次金額，需產品拍板（可只預選不顯示數字）。</li>
+      </ul>
+    </div>
+
+    <h3>💻 前端 <span class="pill pill-med">中</span></h3>
+    <div class="card tight">
+      <dl class="kv">
+        <dt>改動點</dt><dd>在 <code>DepositPaymentInfoModel</code> 增 <code>lastPaymentMethod / lastBankTypeId / lastAmount / mostUsedAmount / isFirstDeposit</code> 欄位；facade <code>genPaymentInfo()</code> 已能直接帶出。</dd>
+        <dt>預選邏輯</dt><dd><code>deposit-quick</code> 的 <code>defaultPaymentType</code> 與 <code>setDefaultPromotion</code> 改為優先採用後端 last 值；金額 <code>amount</code> control 預填 <code>lastAmount</code>。</dd>
+        <dt>持久化</dt><dd>優先靠<strong>後端欄位</strong>（跨裝置、單一真相）；可加 <code>localStorage</code> 作為離線 fallback（僅本機）。不建議只用 localStorage。</dd>
+        <dt>關鍵檔</dt><dd class="path">libs/model/deposit-v3/src/deposit.model.ts · libs/facade/deposit-v3/src/facade.ts · deposit-quick/deposit-quick.component.ts · deposit-entry/deposit-entry.component.ts</dd>
+      </dl>
+      <div class="callout blue"><span class="ic">i</span><span>可借鏡現有 <code>isShowSavedAsPreferred</code> + <code>accountBanks.isVerified</code>——「儲存偏好銀行帳號」的模式已存在，偏好方式/金額可沿用同一套 UX 與資料流思路。</span></div>
+    </div>
+
+    <h3>🗄️ 後端 <span class="pill pill-med">中</span> — 兩個方案</h3>
+    <div class="grid2">
+      <div class="card tight">
+        <h4>方案 A · 讀時計算（建議先做）</h4>
+        <ul>
+          <li>在 <code>getDepositPaymentInfo</code>（<code>BTPaymentBO</code>）查 <code>MoneyTransaction</code>：該玩家最近一筆 SUCCESS 存款的方式/金額，+ <code>GROUP BY amount</code> 取最常用。</li>
+          <li><strong>零 schema 變更</strong>，重用既有 per-player 查詢模式（<code>is_fe_display_condition</code> 已在查歷史）。</li>
+          <li>結果以 Redis 快取（key=accountId，存款成功時失效），避免每次進頁多打 DB。</li>
+          <li>風險低、可回滾。</li>
+        </ul>
+      </div>
+      <div class="card tight">
+        <h4>方案 B · 反正規化欄位（量大再做）</h4>
+        <ul>
+          <li>新增欄位（<code>Account</code> 表或新 <code>PLAYER_DEPOSIT_PREFERENCE</code> 表）：<code>last_payment_type / last_bank_id / last_amount / updated_at</code>。</li>
+          <li>寫入掛在 <code>PaymentGatewayServlet</code> 存款成功 callback。</li>
+          <li>讀取最快，但 <strong>Oracle 需手寫 DDL</strong>（無 JPA 自動 migration）+ DAO/XML + DBA review。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout green"><span class="ic">✓</span><span><strong>建議：</strong>Phase 0 先做方案 A（讀時計算 + Redis），最快解鎖 ②③ 的所有預選/預填；若監測到查詢負載才升級到方案 B。</span></div>
+  </section>
+
+  <!-- ============ ② Step2 ============ -->
+  <section id="step2">
+    <div class="sec-head">
+      <div class="sec-num">Prototype P1</div>
+      <div class="sec-title">② Step2 — 方式選擇（最大流失點）</div>
+      <div class="sec-desc">改動落在 <code>deposit-entry.component.ts</code>（+ <code>payment-method-item</code>）。三個子項：預選上次方式、維護中明示、FTD 引導。</div>
+    </div>
+
+    <h3>2-1 預選上次使用方式 <span class="pill pill-easy">前端易</span> · <span class="pill pill-none">後端依賴①</span></h3>
+    <div class="card tight">
+      <ul>
+        <li><strong>設計</strong>：上次方式加綠框 + 「上次使用」標籤；底部 CTA 改「繼續用 E-wallet」；每方式加一行速度/用途說明。</li>
+        <li><strong>前端</strong>：<code>deposit-entry</code> 依後端 <code>lastBankTypeId</code> 對 <code>orderedPaymentTypes</code> 做高亮與置頂。純展示層，無流程風險。</li>
+        <li><strong>後端</strong>：由 ① 提供 last 方式即可，無額外工作。</li>
+      </ul>
+    </div>
+
+    <h3>2-2 維護中明示 + 預計恢復 <span class="pill pill-med">前端中</span> · <span class="pill pill-med">後端中</span></h3>
+    <div class="card tight">
+      <div class="callout green"><span class="ic">✓</span><span><strong>資料模型已就緒：</strong>method 有 <code>isMaintain</code> + <code>paymentStart/EndTimestamp</code>；channel（<code>DepositSettingModel</code>）有 <code>isMaintain</code> + <code>maintainStart/EndTimestamp</code>；<code>PaymentMethodStatusType.MAINTENANCE</code> 存在。ETA 不需新欄位。</span></div>
+      <ul>
+        <li><strong>設計</strong>：維護方式保留顯示、半透明 + 「維護中」標籤 + 不可點；用 <code>maintainEndTimestamp</code> 顯示「Back at 15:00」；自動高亮下一可用方式（「推薦替代」）。</li>
+        <li><strong>前端</strong>：目前 <code>deposit-entry</code> 只特判 <code>INACTIVE</code>，需新增 MAINTENANCE 分支：渲染標籤、disable 點擊、讀 timestamp 顯示 ETA。</li>
+        <li><strong>後端</strong>：關鍵是<strong>「顯示而非隱藏」</strong>——現況維護中的 BankType 被 <code>checkPaymentMethodIsMaintain()</code> 濾除。需讓 <code>getDepositPaymentInfo</code> 回傳維護項並帶 <code>isMaintain=true</code> + 時間戳，而非過濾掉。需確認狀態語意對齊（見現況盤點警示）。</li>
+      </ul>
+    </div>
+
+    <h3>2-3 首次存款（FTD）引導 <span class="pill pill-med">前端中</span> · <span class="pill pill-easy">後端易</span></h3>
+    <div class="card tight">
+      <ul>
+        <li><strong>設計</strong>：頂部提示「建議新玩家從 E-wallet 開始」；「新手推薦」醒目標籤；此邏輯只顯示一次，之後切為「預選上次」。</li>
+        <li><strong>前端</strong>：依後端 <code>isFirstDeposit</code> 顯示提示條 + 用既有 <code>isRecommend</code> 呈現推薦標籤。</li>
+        <li><strong>後端</strong>：由 ① 一併回傳 <code>isFirstDeposit</code>（無成功存款紀錄）；<code>isRecommend</code> 已存在。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ③ Step3 ============ -->
+  <section id="step3">
+    <div class="sec-head">
+      <div class="sec-num">Prototype P2</div>
+      <div class="sec-title">③ Step3 — 表單精簡（第二大流失點）</div>
+      <div class="sec-desc">關鍵前提：既有 <code>deposit-quick</code> 已實作單頁精簡的一大半。工作重心是「補完 + 串接①偏好」，而非重寫。</div>
+    </div>
+
+    <div class="callout purple"><span class="ic">★</span><span><strong>待團隊確認（最高優先）：</strong><code>deposit-quick</code> 目前被品牌設定 gate 住（<code>isShowQuickDepositEntry</code> / <code>paymentDisplayFlags</code>），而 <code>deposit-entry</code> 點擊後是導向<strong>分型別頁</strong>（<code>deposit-thirdparty</code> / <code>deposit-localbank</code> / <code>deposit-crypto</code>）。需先確認本品牌現行 Step3 走哪條，才能決定是「啟用 quick」還是「改造分型別頁」。</span></div>
+
+    <h3>3-1 自動帶入上次設定 <span class="pill pill-med">前端中</span> · <span class="pill pill-none">後端依賴①</span></h3>
+    <div class="card tight">
+      <ul>
+        <li><strong>設計</strong>：進表單即帶入上次方式/type/channel/金額，用緊湊摘要列呈現，右側「更換」。</li>
+        <li><strong>前端</strong>：<code>deposit-quick</code> 已有 <code>defaultPaymentType</code> + <code>depositDataCache</code> 還原 + 自動優惠；只需把「來源」從記憶體暫存改為①的後端 last 值，並預填 <code>amount</code>。上次通道停用時，既有邏輯已會 fallback 到 <code>list[0]</code>。</li>
+        <li><strong>後端</strong>：由 ① 提供 last type/channel/amount。</li>
+      </ul>
+    </div>
+
+    <h3>3-2 統一「支付 + 優惠」Sheet · 優惠自動套用 <span class="pill pill-med">前端中</span> · <span class="pill pill-none">後端無</span></h3>
+    <div class="card tight">
+      <ul>
+        <li><strong>設計</strong>：移除表單頂部強制選優惠；填完金額後自動套用最優惠並顯示「已自動套用」；切換支付方式時同一 Sheet 內即時更新相容優惠。</li>
+        <li><strong>前端</strong>：<code>setDefaultPromotion</code> 已做「自動套用預設/相容優惠」；<code>PromotionSelectComponent</code> 底部 Sheet 已存在。整併成「支付+優惠」單一 Sheet 屬中度重構（合併兩個既有元件的互動）。</li>
+        <li><strong>後端</strong>：相容性資料 <code>bonusTemplateList[].awardingBankTypes</code> 已隨 API 回傳，<strong>無需後端改動</strong>。</li>
+      </ul>
+    </div>
+
+    <h3>3-3 不相容衝突引導 <span class="pill pill-med">前端中</span> · <span class="pill pill-none">後端無</span></h3>
+    <div class="card tight">
+      <ul>
+        <li><strong>設計</strong>：選到不相容組合時彈出引導 Sheet，說明「[支付] 不支援 [優惠]」，給兩條出路（換相容優惠 / 換支付方式），不強迫。</li>
+        <li><strong>前端</strong>：相容性判斷已有（<code>bonusTemplateForPaymentMethodExist()</code> / <code>awardingBankTypes</code>），需新增衝突引導 Dialog 元件與觸發時機。</li>
+        <li><strong>後端</strong>：無（資料已足夠）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 風險 ============ -->
+  <section id="risk">
+    <div class="sec-head">
+      <div class="sec-num">Risks &amp; Dependencies</div>
+      <div class="sec-title">風險與依賴</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>項目</th><th>說明 / 緩解</th></tr></thead>
+        <tbody>
+          <tr><td><strong>①是共同地基</strong></td><td>2-1、3-1 皆等①。建議①（方案A）排 Phase 0 最先做，避免阻塞。</td></tr>
+          <tr><td><strong>狀態語意不一致</strong></td><td>後端 <code>status</code> vs 前端 <code>paymentMethodStatus</code> 數值語意不同。實作維護顯示前先對齊 API 填值。</td></tr>
+          <tr><td><strong>Oracle 無自動 migration</strong></td><td>①若走方案 B 需手寫 DDL + DAO/XML + DBA review；方案 A 可規避。</td></tr>
+          <tr><td><strong>Cache 一致性</strong></td><td>偏好屬 per-player，勿混入 <code>PaymentDisplaySettingCache</code>（全站設定 singleton）；用獨立 Redis key，存款成功時失效。</td></tr>
+          <tr><td><strong>quick vs 分型別頁</strong></td><td>3-x 落點取決於本品牌現行 Step3 流程，需先確認（見 ③ 紫色提示）。</td></tr>
+          <tr><td><strong>隱私（共用裝置）</strong></td><td>顯示上次金額需產品拍板，或只預選不顯示。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 實施順序 ============ -->
+  <section id="phasing">
+    <div class="sec-head">
+      <div class="sec-num">Rollout</div>
+      <div class="sec-title">建議實施順序</div>
+    </div>
+    <div class="card">
+      <h4>Phase 0 · 地基（後端主導）</h4>
+      <p>① 方案 A：<code>getDepositPaymentInfo</code> 回傳 <code>lastPaymentMethod / lastAmount / mostUsedAmount / isFirstDeposit</code>（讀時計算 + Redis）。前端同步擴 model 欄位。<span class="badge badge-gray">解鎖 2-1 / 2-3 / 3-1</span></p>
+      <h4>Phase 1 · 前端快速勝利（模型已就緒，可與 Phase 0 並行部分）</h4>
+      <p>2-2 維護中明示（資料模型已備）、2-3 FTD 提示 + recommend badge、2-1 預選上次方式、3-1 預填上次金額。</p>
+      <h4>Phase 2 · 精簡流程強化</h4>
+      <p>先確認 quick vs 分型別頁落點 → 3-2 統一支付+優惠 Sheet、3-3 不相容衝突引導。</p>
+      <div class="callout blue"><span class="ic">i</span><span>Phase 0 完成後，2-1 / 2-3 / 3-1 幾乎都是前端展示層小改；風險集中在 Phase 2 的 Sheet 重構與 2-2 的後端「顯示而非隱藏」對齊。</span></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  存款 UX 優化 · 可行性評估 Spec · 2026-07-01 · 依據 bkw / bkw-pg 實際 codebase 落地驗證 · 需求來源 payment-ux-prototypes-v2.html（P1 + P2）
+</div>
+
+</body>
+</html>
